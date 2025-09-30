@@ -1,15 +1,15 @@
-package org.example;
+package dao;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DbPing {
+public class DbContext {
     public static void main(String[] args) {
         // Có thể truyền qua args hoặc sửa trực tiếp 3 biến này cho nhanh
         String url  = args.length > 0 ? args[0]
                 : "jdbc:mysql://localhost:3306/garage_mgmt?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Bangkok&useUnicode=true&characterEncoding=UTF-8";
         String user = args.length > 1 ? args[1] : "root";
-        String pass = args.length > 2 ? args[2] : "thuy2005";
+        String pass = args.length > 2 ? args[2] : "admin";
 
         // MySQL 8 driver (không bắt buộc gọi, nhưng an toàn)
         try { Class.forName("com.mysql.cj.jdbc.Driver"); }
