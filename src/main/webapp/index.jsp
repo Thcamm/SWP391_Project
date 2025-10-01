@@ -1,6 +1,10 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
-<!doctype html>
-<html><body>
-  <h3>GarageSystem</h3>
-  <a href="${pageContext.request.contextPath}/db-test">Test DB</a>
-</body></html>
+<!<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Document</title>
+</head>
+<body>
+<h1>HomePage</h1>
+</body>
+</html>
