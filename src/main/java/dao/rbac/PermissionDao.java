@@ -1,6 +1,6 @@
 package dao.rbac;
 
-import common.Db;
+import common.DbContext;
 import model.rbac.Permission;
 
 import java.sql.Connection;
@@ -28,7 +28,7 @@ public class PermissionDao {
         }
 
         sb.append("ORDER BY Category, Code");
-        try (Connection c = Db.get();
+        try (Connection c = DbContext.getConnection();
              PreparedStatement ps = c.prepareStatement(sb.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
@@ -53,7 +53,7 @@ public class PermissionDao {
 
     public Set<Integer> getPermissionIdsOfRole(int roleId) throws SQLException{
         String sql = "SELECT PermID FROM RolePermission WHERE RoleID = ?";
-        try(Connection c = Db.get();
+        try(Connection c = DbContext.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)){
             ps.setInt(1, roleId);
             Set<Integer> set = new HashSet<>();
@@ -70,7 +70,7 @@ public class PermissionDao {
         String del = "DELETE FROM RolePermission WHERE RoleID = ?";
         String ins = "INSERT INTO RolePermission(RoleID, PermID, AssignedByUserID, AssignedAt) VALUES(?, ?, ?, NOW())";
 
-        try(Connection c = Db.get()){
+        try(Connection c = DbContext.getConnection()){
             c.setAutoCommit(false);
             try (PreparedStatement psd = c.prepareStatement(del)){
                 psd.setInt(1, roleId);
@@ -95,8 +95,8 @@ public class PermissionDao {
 
         }catch (SQLException e){
             try{
-                if(Db.get() != null){
-                    Db.get().rollback();
+                if(DbContext.getConnection() != null){
+                    DbContext.getConnection().rollback();
                 }
             }catch (Exception rollbackEx){
                 throw new RuntimeException("Rollback failed", rollbackEx);
@@ -109,7 +109,7 @@ public class PermissionDao {
         final String sql =
                 "SELECT PermID FROM Permission WHERE Code = ? AND Active = 1 LIMIT 1";
 
-        try (Connection c = Db.get();
+        try (Connection c = DbContext.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setString(1, requiredPermission);

@@ -1,6 +1,6 @@
 package dao.rbac;
 
-import common.Db;
+import common.DbContext;
 import model.rbac.MenuItem;
 
 import java.sql.Connection;
@@ -23,7 +23,7 @@ public class MenuDao {
             sql = base + "WHERE PermID IS NULL OR PermID IN ("+in+") ORDER BY ParentID, OrderNo";
         }
 
-        try(Connection c = Db.get();
+        try(Connection c = DbContext.getConnection();
             PreparedStatement ps = c.prepareStatement(sql)
         ){
             if(permIds != null){

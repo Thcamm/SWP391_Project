@@ -53,7 +53,7 @@ public class RolePageServlet extends HttpServlet {
             req.setAttribute("roleId", roleId);
             req.setAttribute("perms", perms);
             req.setAttribute("checkedPermsIds", checkedPermIds);
-            req.getRequestDispatcher("/role-page.jsp").forward(req, resp);
+            req.getRequestDispatcher("/view/role-page.jsp").forward(req, resp);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -1,6 +1,6 @@
 package dao.rbac;
 
-import common.Db;
+import common.DbContext;
 import model.rbac.Role;
 
 import java.sql.*;
@@ -14,7 +14,7 @@ public class RoleDao {
         String sql = "SELECT RoleID, RoleName FROM RoleInfo ORDER BY RoleName";
         List<Role> list = new ArrayList<>();
 
-        try (Connection c = Db.get();
+        try (Connection c = DbContext.getConnection();
              PreparedStatement ps = c.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -30,7 +30,7 @@ public class RoleDao {
 
     public Role findById(int roleId) throws SQLException {
         String sql = "SELECT RoleID, RoleName FROM RoleInfo WHERE RoleID = ?";
-        try (Connection c = Db.get();
+        try (Connection c = DbContext.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, roleId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -41,12 +41,26 @@ public class RoleDao {
 
     }
 
+    public Role findByName(String roleName) throws SQLException {
+        String sql ="SELECT RoleID, RoleName FROM RoleInfo WHERE LOWER(RoleName) = LOWER(?)";
+        try (Connection c = DbContext.getConnection();
+        PreparedStatement ps  =  c.prepareStatement(sql)) {
+            ps.setString(1, roleName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if(rs.next()){
+                    return new Role(rs.getInt("RoleID"), rs.getString("RoleName"));
+                }
+                return null;
+            }
+        }
+    }
+
     public Set<String> getPermissionCodesOfUser(int userId) throws SQLException {
         Set<String> permissionCodes = new HashSet<>();
 
         final String sql = "SELECT p.Code AS perm_code FROM `User` u JOIN RolePermission rp ON u.RoleID = rp.RoleID JOIN Permission p ON rp.PermID = p.PermID WHERE u.UserID = ? AND p.Active = 1";
 
-        try (Connection c = Db.get();
+        try (Connection c = DbContext.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -59,5 +73,45 @@ public class RoleDao {
         }
         return permissionCodes;
     }
+
+    //Create role
+    public boolean insert(Role role) throws SQLException {
+        String sql = "INSERT INTO RoleInfo (RoleName) VALUES(?)";
+        try(Connection c = DbContext.getConnection();
+        PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, role.getRoleName());
+            ps.executeUpdate();
+            return ps.getUpdateCount() > 0;
+        }
+
+    }
+
+    //Update role
+    public void update(Role role) throws SQLException {
+        String sql = "UPDATE RoleInfo SET RoleName = ? WHERE RoleID=?";
+        try(Connection c = DbContext.getConnection();
+        PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, role.getRoleName());
+            ps.setInt(2, role.getRoleId());
+            ps.executeUpdate();
+        }
+    }
+
+    //Delete role
+    public boolean delete(int roleId) throws SQLException {
+        String sql = "DELETE FROM RoleInfo WHERE RoleID = ?";
+        try(Connection c = DbContext.getConnection();
+        PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, roleId);
+            return ps.getUpdateCount() > 0;
+        }catch (SQLException e) {
+            if(e.getSQLState().startsWith("23")) {
+                throw new SQLException("Cannot delete role as it is referenced by other records.", e);
+            } else {
+                throw e;
+            }
+        }
+    }
+
 
 }

@@ -1,6 +1,6 @@
 package dao.user;
 
-import common.Db;
+import common.DbContext;
 import model.user.User;
 
 import java.sql.*;
@@ -13,7 +13,7 @@ public class UserDao {
 
     public int findRoleIdByUserId(int userId) {
         final String sql = "SELECT RoleID FROM `User` WHERE UserID = ?";
-        try (Connection c = Db.get();
+        try (Connection c = DbContext.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {

@@ -7,7 +7,7 @@ import java.sql.Statement;
 public class DbPing {
     public static void main(String[] args) {
         String expectedDb = "garage_mgmt";
-        try (Connection c = Db.get();
+        try (Connection c = DbContext.getConnection();
              Statement st = c.createStatement();
              ResultSet rs = st.executeQuery("SELECT DATABASE() AS db")) {
 

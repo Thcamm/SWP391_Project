@@ -45,5 +45,33 @@ public class RbacService {
         return menuDao.byPerms(pids);
     }
 
+    public void createRole(Role role) throws SQLException{
+        Role existing = roleDao.findByName(role.getRoleName());
+        if(existing != null){
+            throw new IllegalArgumentException("Role name already exists");
+        }
+
+        roleDao.insert(role);
+    }
+
+    public void renameRole(int roleId, String newName) throws SQLException{
+        if(newName == null || newName.isBlank()){
+            throw new IllegalArgumentException("New name cannot be null or blank");
+        }
+
+        Role existing = roleDao.findByName(newName);
+        if(existing != null){
+            throw new IllegalArgumentException("Role name already exists");
+
+        }
+
+        Role roleChange = roleDao.findById(roleId);
+        if(roleChange == null){
+            throw new IllegalArgumentException("Role ID not found");
+        }
+
+        roleDao.update(roleChange);
+
+    }
 
 }
