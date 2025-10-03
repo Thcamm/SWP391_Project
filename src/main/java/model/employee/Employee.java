@@ -11,7 +11,7 @@ public class Employee extends User{
     }
 
     public Employee(int userId, int roleId, String fullName, String userName, String email, String phoneNumber, String passwordHash, boolean activeStatus, int employeeId, String position, String department) {
-        super(userId, roleId, fullName, userName, email, phoneNumber, passwordHash, activeStatus);
+        super();
         this.employeeId = employeeId;
         this.position = position;
         this.department = department;

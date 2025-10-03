@@ -9,9 +9,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e244fc79-3f5d-41bf-9eda-0765904ab445" name="Changes" comment="demo user filter">
+    <list default="true" id="e244fc79-3f5d-41bf-9eda-0765904ab445" name="Changes" comment="Test merge">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/admin/users.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/admin/users.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePermSaveServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePermSaveServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dao/DbContext.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dao/user/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/user/UserDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/model/employee/Employee.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/employee/Employee.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem.war" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem.war" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/META-INF/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/META-INF/MANIFEST.MF" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/LoginServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/LoginServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/user/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/user/UserDAO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/model/user/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/model/user/User.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/service/user/UserLoginService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/service/user/UserLoginService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/web.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/controller/auth/LoginServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/controller/auth/LoginServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/dao/DbContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/dao/user/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/dao/user/UserDAO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/model/user/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/model/user/User.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/service/user/UserLoginService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/service/user/UserLoginService.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,18 +50,18 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "JuroMark"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;JuroMark&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Thcamm/SWP391_Project.git",
-    "accountId": "70aa94dc-2800-446c-bf7c-640a66840b19"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Thcamm/SWP391_Project.git&quot;,
+    &quot;accountId&quot;: &quot;70aa94dc-2800-446c-bf7c-640a66840b19&quot;
   }
-}]]></component>
+}</component>
   <component name="LogFilters">
     <option name="FILTER_ERRORS" value="false" />
     <option name="FILTER_WARNINGS" value="false" />
@@ -54,9 +69,9 @@
     <option name="FILTER_DEBUG" value="true" />
     <option name="CUSTOM_FILTER" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="33Vy0sXxkWVK6Y7Gq5La90JA9Eo" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
@@ -67,11 +82,12 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "Tomcat Server.Tomcat.executor": "Run",
-    "git-widget-placeholder": "An",
+    "git-widget-placeholder": "thuyvu",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -101,7 +117,7 @@
     </option>
   </component>
   <component name="RunManager">
-    <configuration name="Tomcat" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.1.17" ALTERNATIVE_JRE_ENABLED="false">
+    <configuration name="Tomcat" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.1.40" ALTERNATIVE_JRE_ENABLED="false">
       <option name="UPDATING_POLICY" value="restart-server" />
       <deployment>
         <artifact name="SWP391_Project:war">
@@ -205,6 +221,7 @@
       <option name="presentableId" value="Default" />
       <updated>1759416318822</updated>
       <workItem from="1759416320921" duration="14515000" />
+      <workItem from="1759471843192" duration="1271000" />
     </task>
     <task id="LOCAL-00001" summary="demo user filter">
       <option name="closed" value="true" />
@@ -214,7 +231,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759427692864</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Test merge">
+      <option name="closed" value="true" />
+      <created>1759472310503</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1759472310503</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -222,6 +247,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="demo user filter" />
-    <option name="LAST_COMMIT_MESSAGE" value="demo user filter" />
+    <MESSAGE value="Test merge" />
+    <option name="LAST_COMMIT_MESSAGE" value="Test merge" />
   </component>
 </project>
