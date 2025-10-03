@@ -9,61 +9,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e244fc79-3f5d-41bf-9eda-0765904ab445" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask2agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/webContexts.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/controller/auth/LoginServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/dao/user/UserDAO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/model/user/User.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/service/user/UserLoginService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/home.jsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/login.jsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/register.jsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/GarageSystem.war" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/GarageSystem/META-INF/MANIFEST.MF" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/LoginServlet.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/DbContext.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/user/UserDAO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/model/user/User.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/service/user/UserLoginService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/lib/jakarta.servlet.jsp.jstl-3.0.1.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/lib/jakarta.servlet.jsp.jstl-api-3.0.0.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/lib/mysql-connector-j-8.4.0.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/lib/protobuf-java-3.25.1.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/web.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/GarageSystem/home.jsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/GarageSystem/index.jsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/GarageSystem/login.jsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/GarageSystem/register.jsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/controller/auth/LoginServlet.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/dao/DbContext.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/dao/user/UserDAO.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/model/user/User.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/service/user/UserLoginService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sqlDataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqlDataSources.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controller/LoginServlet.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/dao/AccountDAO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/DbPing.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/DbContext.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/Main.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/META-INF/context.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/META-INF/context.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/index.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model/Customer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/util/EmailSender.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/webapp/WEB-INF/lib/mysql-connector-java-8.x.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/webapp/WEB-INF/web.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/webapp/assets/css/style.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/webapp/assets/js/script.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/webapp/index.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/webapp/view/dashboard.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/webapp/view/error.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/webapp/view/login.jsp" beforeDir="false" />
+    <list default="true" id="e244fc79-3f5d-41bf-9eda-0765904ab445" name="Changes" comment="demo user filter">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/admin/users.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/admin/users.jsp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -256,11 +204,24 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1759416318822</updated>
-      <workItem from="1759416320921" duration="11240000" />
+      <workItem from="1759416320921" duration="14515000" />
     </task>
+    <task id="LOCAL-00001" summary="demo user filter">
+      <option name="closed" value="true" />
+      <created>1759427692864</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1759427692864</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="demo user filter" />
+    <option name="LAST_COMMIT_MESSAGE" value="demo user filter" />
   </component>
 </project>
