@@ -145,6 +145,16 @@ public class UserDAO extends DbContext {
             throw new RuntimeException("findRoleIdByUserId failed", e);
         }
     }
+
+    public int reassignUserRole(int fromRoleId, int toRoleId) throws SQLException{
+        String sql = "UPDATE `User`  SET RoleID = ? WHERE ROLEID =?";
+        try(Connection c = DbContext.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)){
+            ps.setInt(1, toRoleId);
+            ps.setInt(2, fromRoleId);
+            return ps.executeUpdate();
+        }
+    }
     
 
 }

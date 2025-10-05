@@ -11,22 +11,8 @@
   <component name="ChangeListManager">
     <list default="true" id="e244fc79-3f5d-41bf-9eda-0765904ab445" name="Changes" comment="Test merge">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePermSaveServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePermSaveServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/dao/DbContext.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/dao/user/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/user/UserDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/model/employee/Employee.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/employee/Employee.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dao/rbac/RoleDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/rbac/RoleDao.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/GarageSystem.war" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem.war" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/META-INF/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/META-INF/MANIFEST.MF" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/LoginServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/LoginServlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/user/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/user/UserDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/model/user/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/model/user/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/service/user/UserLoginService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/service/user/UserLoginService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/controller/auth/LoginServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/controller/auth/LoginServlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/dao/DbContext.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/dao/user/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/dao/user/UserDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/model/user/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/model/user/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/service/user/UserLoginService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/service/user/UserLoginService.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,8 +23,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Jsp File" />
-        <option value="Class" />
         <option value="Servlet" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -82,6 +68,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "JavaScript Debug.login.jsp.executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -116,7 +103,10 @@
       </map>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="JavaScript Debug.login.jsp">
+    <configuration name="login.jsp" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:8080/GarageSystem/login.jsp">
+      <method v="2" />
+    </configuration>
     <configuration name="Tomcat" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.1.40" ALTERNATIVE_JRE_ENABLED="false">
       <option name="UPDATING_POLICY" value="restart-server" />
       <deployment>
@@ -204,6 +194,11 @@
         </option>
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="JavaScript Debug.login.jsp" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -221,7 +216,8 @@
       <option name="presentableId" value="Default" />
       <updated>1759416318822</updated>
       <workItem from="1759416320921" duration="14515000" />
-      <workItem from="1759471843192" duration="1271000" />
+      <workItem from="1759471843192" duration="5451000" />
+      <workItem from="1759503114969" duration="11237000" />
     </task>
     <task id="LOCAL-00001" summary="demo user filter">
       <option name="closed" value="true" />
