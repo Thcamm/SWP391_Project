@@ -9,25 +9,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e244fc79-3f5d-41bf-9eda-0765904ab445" name="Changes" comment="Test merge">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePermSaveServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePermSaveServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/dao/DbContext.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/dao/user/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/user/UserDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/model/employee/Employee.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/employee/Employee.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem.war" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem.war" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/META-INF/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/META-INF/MANIFEST.MF" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/LoginServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/LoginServlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/user/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/user/UserDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/model/user/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/model/user/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/service/user/UserLoginService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/service/user/UserLoginService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/controller/auth/LoginServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/controller/auth/LoginServlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/dao/DbContext.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/dao/user/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/dao/user/UserDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/model/user/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/model/user/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/service/user/UserLoginService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/service/user/UserLoginService.class" afterDir="false" />
-    </list>
+    <list default="true" id="e244fc79-3f5d-41bf-9eda-0765904ab445" name="Changes" comment="Test merge" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -36,9 +18,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Jsp File" />
         <option value="Class" />
         <option value="Servlet" />
+        <option value="Jsp File" />
       </list>
     </option>
   </component>
@@ -56,12 +38,12 @@
     &quot;assignee&quot;: &quot;JuroMark&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/Thcamm/SWP391_Project.git&quot;,
-    &quot;accountId&quot;: &quot;70aa94dc-2800-446c-bf7c-640a66840b19&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Thcamm/SWP391_Project.git",
+    "accountId": "a944da77-78d2-420a-bae9-d43189c242b9"
   }
-}</component>
+}]]></component>
   <component name="LogFilters">
     <option name="FILTER_ERRORS" value="false" />
     <option name="FILTER_WARNINGS" value="false" />
@@ -87,7 +69,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "Tomcat Server.Tomcat.executor": "Run",
-    "git-widget-placeholder": "thuyvu",
+    "git-widget-placeholder": "thao",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",

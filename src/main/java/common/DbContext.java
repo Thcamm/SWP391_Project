@@ -9,7 +9,7 @@ public class DbContext {
         String url  = args.length > 0 ? args[0]
                 : "jdbc:mysql://localhost:3306/garage_mgmt?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Bangkok&useUnicode=true&characterEncoding=UTF-8";
         String user = args.length > 1 ? args[1] : "root";
-        String pass = args.length > 2 ? args[2] : "thuy2005";
+        String pass = args.length > 2 ? args[2] : "Phanthitha0";
 
 
         try { Class.forName("com.mysql.cj.jdbc.Driver"); }
