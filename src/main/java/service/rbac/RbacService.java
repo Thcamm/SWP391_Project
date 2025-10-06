@@ -51,7 +51,7 @@ public class RbacService {
             throw new IllegalArgumentException("Role name already exists");
         }
 
-        roleDao.insert(role);
+        roleDao.insert(role.getRoleName());
     }
 
     public void renameRole(int roleId, String newName) throws SQLException{

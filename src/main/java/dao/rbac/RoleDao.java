@@ -57,6 +57,47 @@ public class RoleDao {
         }
     }
 
+    public List<Role> findByName(String keyword, int offset, int limit) throws SQLException {
+        List<Role> list = new ArrayList<>();
+        String sql = """
+        SELECT r.RoleID, r.RoleName, COUNT(u.UserID) AS userCount
+        FROM RoleInfo r
+        LEFT JOIN `User` u ON r.RoleID = u.RoleID
+        WHERE LOWER(r.RoleName) LIKE LOWER(?)
+        GROUP BY r.RoleID, r.RoleName
+        ORDER BY r.RoleName
+        LIMIT ? OFFSET ?
+    """;
+        try (Connection c = DbContext.getConnection();
+        PreparedStatement ps = c.prepareStatement(sql)){
+            ps.setString(1, "%" + keyword + "%");
+            ps.setInt(2, limit);
+            ps.setInt(3, offset);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()){
+                Role r = new Role();
+                r.setRoleId(rs.getInt("RoleID"));
+                r.setRoleName(rs.getString("RoleName"));
+                r.setUserCount(rs.getInt("userCount"));
+                list.add(r);
+            }
+
+        }
+
+        return list;
+    }
+
+    public int countByName(String keyword) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM RoleInfo WHERE LOWER(RoleName) LIKE LOWER(?)";
+        try (Connection con = DbContext.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, "%" + keyword + "%");
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1);
+        }
+        return 0;
+    }
+
     public Set<String> getPermissionCodesOfUser(int userId) throws SQLException {
         Set<String> permissionCodes = new HashSet<>();
 
@@ -159,8 +200,50 @@ public class RoleDao {
 
             }
         }
+
     }
 
+    public List<Role> findPaginated(int offset, int limit) throws Exception {
+        String sql = """
+        SELECT r.RoleID, r.RoleName, COUNT(u.UserID) AS userCount
+        FROM RoleInfo r
+        LEFT JOIN `User` u ON r.RoleID = u.RoleID
+        GROUP BY r.RoleID, r.RoleName
+        ORDER BY r.RoleName
+        LIMIT ? OFFSET ?
+    """;
+        List<Role> list = new ArrayList<>();
+        try(Connection c = DbContext.getConnection();
+        PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            ps.setInt(2, offset);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    Role r = new Role();
+                    r.setRoleId(rs.getInt("RoleID"));
+                    r.setRoleName(rs.getString("RoleName"));
+                    r.setUserCount(rs.getInt("userCount"));
+                    list.add(r);
+                }
+            }
+        }catch (SQLException e) {
+            throw new RuntimeException("Query paginated roles failed",e);
+        }
+
+        return list;
+    }
+
+
+    public int countAll() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM RoleInfo";
+        try(Connection c = DbContext.getConnection();
+        PreparedStatement ps = c.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery()
+        ) {
+           return rs.next() ? rs.getInt(1) : 0;
+        }
+    }
 
 
 
