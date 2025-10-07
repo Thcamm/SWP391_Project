@@ -11,21 +11,18 @@
   <component name="ChangeListManager">
     <list default="true" id="c1526b4c-3098-4394-aeb4-8ad1a4586e8a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/controller/auth/LoginServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/auth/Login.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controller/auth/Login.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/auth/Login.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controller/auth/Register.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/auth/Register.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/dao/user/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/user/UserDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/model/user/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/user/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/home.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/home.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/webapp/login.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/login.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/webapp/register.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/register.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/GarageSystem.war" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem.war" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/LoginServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/LoginServlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/user/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/user/UserDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/model/user/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/model/user/User.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/Login.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/Login.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/GarageSystem/login.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/login.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/GarageSystem/register.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/register.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/controller/auth/LoginServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/controller/auth/LoginServlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/dao/user/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/dao/user/UserDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/model/user/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/model/user/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/service/user/UserLoginService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/controller/auth/Login.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/controller/auth/Login.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -308,7 +305,10 @@
       <workItem from="1759649364252" duration="2996000" />
       <workItem from="1759652463057" duration="4831000" />
       <workItem from="1759671115206" duration="404000" />
-      <workItem from="1759818210323" duration="4154000" />
+      <workItem from="1759818210323" duration="4338000" />
+      <workItem from="1759833316137" duration="2671000" />
+      <workItem from="1759857933840" duration="121000" />
+      <workItem from="1759858079624" duration="3094000" />
     </task>
     <servers />
   </component>

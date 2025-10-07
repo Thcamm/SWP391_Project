@@ -28,10 +28,17 @@ public class Register extends HttpServlet {
         String phoneNumber = request.getParameter("phoneNumber");
         String password = request.getParameter("password");
 
-        // Kiểm tra thông tin bắt buộc
-        if (fullName == null || userName == null || email == null || phoneNumber == null || password == null ||
-            fullName.isEmpty() || userName.isEmpty() || email.isEmpty() || phoneNumber.isEmpty() || password.isEmpty()) {
+        // Kiểm tra thông tin bắt buộc (trừ password)
+        if (fullName == null || userName == null || email == null || phoneNumber == null ||
+                fullName.isEmpty() || userName.isEmpty() || email.isEmpty() || phoneNumber.isEmpty()) {
             request.setAttribute("error", "Vui lòng nhập đầy đủ thông tin.");
+            request.getRequestDispatcher("/register.jsp").forward(request, response);
+            return;
+        }
+
+        // Kiểm tra password riêng cho đăng ký thông thường
+        if (password == null || password.isEmpty()) {
+            request.setAttribute("error", "Vui lòng nhập mật khẩu.");
             request.getRequestDispatcher("/register.jsp").forward(request, response);
             return;
         }
@@ -46,14 +53,13 @@ public class Register extends HttpServlet {
         user.setEmail(email);
         user.setPhoneNumber(phoneNumber);
         user.setPasswordHash(hashedPassword);
-        user.setRoleId(2); // Mặc định role là user
+        user.setRoleId(2);
         user.setActiveStatus(true);
 
         // Lưu user vào database
         boolean success = false;
         try {
             dao.user.UserDAO userDAO = new dao.user.UserDAO();
-            // Kiểm tra trùng username
             if (userDAO.getUserByUserName(userName) != null) {
                 request.setAttribute("error", "Tên đăng nhập đã tồn tại.");
                 request.getRequestDispatcher("/register.jsp").forward(request, response);
@@ -67,7 +73,6 @@ public class Register extends HttpServlet {
         }
 
         if (success) {
-            // Đăng ký thành công, chuyển hướng về trang đăng nhập
             response.sendRedirect("login.jsp");
         } else {
             request.setAttribute("error", "Đăng ký thất bại, vui lòng thử lại.");

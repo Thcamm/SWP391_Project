@@ -13,7 +13,7 @@ import util.PasswordUtil;
 
 import java.io.IOException;
 
-@WebServlet(name = "LoginServlet", urlPatterns = {"/LoginServlet"})
+@WebServlet(name = "Login", urlPatterns = {"/Login"})
 public class Login extends HttpServlet {
 
     @Override

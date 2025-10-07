@@ -40,6 +40,21 @@ public class UserDAO extends DbContext {
         return null;
     }
 
+    // Lấy user bằng email (khi user đã active)
+    public User getUserByEmail(String email) throws SQLException {
+        String sql = "SELECT * FROM User WHERE Email = ? AND ActiveStatus = 1";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return extractUser(rs);
+                }
+            }
+        }
+        return null;
+    }
+
     // Lấy tất cả user đang active
     public ArrayList<User> getAllActiveUsers() throws SQLException {
         String sql = "SELECT * FROM User WHERE ActiveStatus = 1";
@@ -66,6 +81,20 @@ public class UserDAO extends DbContext {
             ps.setString(5, user.getPhoneNumber());
             ps.setString(6, user.getPasswordHash());
             ps.setBoolean(7, user.isActiveStatus());
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    // Thêm user mới từ Google (chỉ có email, fullname, có thể không có password)
+    public boolean insertGoogleUser(User user) throws SQLException {
+        String sql = "INSERT INTO User (RoleID, FullName, UserName, Email, ActiveStatus) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, user.getRoleId());
+            ps.setString(2, user.getFullName());
+            ps.setString(3, user.getUserName());
+            ps.setString(4, user.getEmail());
+            ps.setBoolean(5, user.isActiveStatus());
             return ps.executeUpdate() > 0;
         }
     }
