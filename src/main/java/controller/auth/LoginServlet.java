@@ -6,13 +6,15 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.user.User;
+import service.UserLoginService;
+import util.PasswordUtil;
+
 
 import java.io.IOException;
-import model.user.User;
-import service.user.UserLoginService;
+
 @WebServlet(name = "LoginServlet", urlPatterns = {"/LoginServlet"})
 public class LoginServlet extends HttpServlet {
-    //private static final long serialVersionUID = 1L;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -23,28 +25,25 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        UserDAO userDAO = new UserDAO();
-        UserLoginService userService = new UserLoginService(userDAO);
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        String errorMessage;
+        String errorMessage = null;
 
+        UserDAO userDAO = new UserDAO();
+        UserLoginService userService = new UserLoginService(userDAO);
         User user = userService.findByUserName(username);
 
-        if (user == null) {
-            errorMessage = "Username does not exist.";
-            request.setAttribute("errorMessage", errorMessage);
-            request.getRequestDispatcher("/login.jsp").forward(request, response);
-            return;
-        }
+        if (user != null && PasswordUtil.checkPassword(password, user.getPasswordHash())) {
 
-        if (password.equals(user.getPasswordHash())) {
-            request.getRequestDispatcher("/home").forward(request, response);
+            // Mật khẩu đúng!
+            request.getSession().setAttribute("user", user);
+            request.getSession().setMaxInactiveInterval(30 * 60);
+            response.sendRedirect(request.getContextPath() + "/home.jsp");
+
         } else {
-            errorMessage = "Incorrect password.";
+            errorMessage = "Invalid username or password.";
             request.setAttribute("errorMessage", errorMessage);
             request.getRequestDispatcher("/login.jsp").forward(request, response);
         }
     }
 }
-
