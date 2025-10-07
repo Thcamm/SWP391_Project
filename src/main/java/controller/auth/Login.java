@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.user.User;
-import service.user.UserLoginService;
+import service.UserLoginService;
 import util.PasswordUtil;
 
 

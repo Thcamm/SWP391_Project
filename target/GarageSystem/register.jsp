@@ -1,0 +1,104 @@
+<%--
+  Created by IntelliJ IDEA.
+  User: ADMIN
+  Date: 10/1/2025
+  Time: 4:58 AM
+  To change this template use File | Settings | File Templates.
+--%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Register - Garage System</title>
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/bs-brain@2.0.4/components/registrations/registration-3/assets/css/registration-3.css">
+</head>
+<body>
+<!-- Registration 3 - Bootstrap Brain Component -->
+<section class="p-3 p-md-4 p-xl-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-6 bsb-tpl-bg-platinum">
+                <div class="d-flex flex-column justify-content-between h-100 p-3 p-md-4 p-xl-5">
+                    <h3 class="m-0">Welcome!</h3>
+                    <img class="img-fluid rounded mx-auto my-4" loading="lazy" src="./assets/img/bsb-logo.svg" width="245" height="80" alt="BootstrapBrain Logo">
+                    <p class="mb-0">Join us today! <a href="register.jsp" class="link-secondary text-decoration-none">Register now</a></p>
+                </div>
+            </div>
+            <div class="col-12 col-md-6 bsb-tpl-bg-lotion">
+                <div class="p-3 p-md-4 p-xl-5">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-5">
+                                <h2 class="h3">Registration</h2>
+                                <h3 class="fs-6 fw-normal text-secondary m-0">Enter your details to register</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hiển thị thông báo lỗi nếu có -->
+                    <% if (request.getAttribute("error") != null) { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <%= request.getAttribute("error") %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } %>
+
+                    <!-- Hiển thị thông báo thành công nếu có -->
+                    <% if (request.getParameter("success") != null) { %>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            Đăng ký thành công! Vui lòng đăng nhập.
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } %>
+
+                    <form action="Register" method="POST">
+                        <div class="row gy-3 gy-md-4 overflow-hidden">
+                            <div class="col-12">
+                                <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="fullName" id="fullName" placeholder="Enter your full name" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="userName" class="form-label">Username <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="userName" id="userName" placeholder="Enter your username" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="phoneNumber" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" name="phoneNumber" id="phoneNumber" placeholder="Enter your phone number" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" name="email" id="email" placeholder="name@example.com" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" name="password" id="password" placeholder="Enter your password" required>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" name="iAgree" id="iAgree" required>
+                                    <label class="form-check-label text-secondary" for="iAgree">
+                                        I agree to the <a href="#!" class="link-primary text-decoration-none">terms and conditions</a>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-grid">
+                                    <button class="btn bsb-btn-xl btn-primary" type="submit">Sign up</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="row">
+                        <div class="col-12">
+                            <hr class="mt-5 mb-4 border-secondary-subtle">
+                            <p class="m-0 text-secondary text-end">Already have an account? <a href="login.jsp" class="link-primary text-decoration-none">Sign in</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
