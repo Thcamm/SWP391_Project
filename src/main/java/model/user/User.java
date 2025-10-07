@@ -1,9 +1,7 @@
 package model.user;
 
-import java.sql.Timestamp;
-
 public class User {
-    private int userId;
+    private int userId;  // Đổi từ int thành Integer để có thể null
     private int roleId;
     private String fullName;
     private String userName;
