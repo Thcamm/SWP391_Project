@@ -8,16 +8,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import model.user.User;
+import util.GoogleConfig;
 import java.io.IOException;
 import java.sql.SQLException;
 
 @WebServlet(name = "GoogleCallback", urlPatterns = {"/auth/google/callback"})
 public class GoogleCallback extends HttpServlet {
-
-    private static final String CLIENT_ID = "188697502625-7r23admsb47s01746uo5iccn9lcao5pi.apps.googleusercontent.com";
-    private static final String CLIENT_SECRET = "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";
-    private static final String REDIRECT_URI = "http://localhost:9999/GarageSystem_war/auth/google/callback";
-
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -29,10 +25,10 @@ public class GoogleCallback extends HttpServlet {
             GoogleTokenResponse tokenResponse = new GoogleAuthorizationCodeTokenRequest(
                     new NetHttpTransport(),
                     new GsonFactory(),
-                    CLIENT_ID,
-                    CLIENT_SECRET,
+                    GoogleConfig.getClientId(),
+                    GoogleConfig.getClientSecret(),
                     code,
-                    REDIRECT_URI)
+                    GoogleConfig.getRedirectUri())
                     .execute();
 
             GoogleIdToken idToken = tokenResponse.parseIdToken();

@@ -10,19 +10,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c1526b4c-3098-4394-aeb4-8ad1a4586e8a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/controller/auth/Login.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/auth/Login.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/controller/auth/Register.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/auth/Register.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/dao/user/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/user/UserDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/home.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/home.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/login.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/login.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/register.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/register.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controller/auth/GoogleCallback.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/auth/GoogleCallback.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controller/auth/GoogleLogin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/auth/GoogleLogin.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/GarageSystem.war" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem.war" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/Login.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/Login.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/login.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/login.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/register.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/register.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/controller/auth/Login.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/controller/auth/Login.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,8 +25,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Jsp File" />
-        <option value="Class" />
         <option value="Servlet" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -98,7 +90,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Facets&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
@@ -308,7 +300,8 @@
       <workItem from="1759818210323" duration="4338000" />
       <workItem from="1759833316137" duration="2671000" />
       <workItem from="1759857933840" duration="121000" />
-      <workItem from="1759858079624" duration="3094000" />
+      <workItem from="1759858079624" duration="4288000" />
+      <workItem from="1759863873974" duration="418000" />
     </task>
     <servers />
   </component>
