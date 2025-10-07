@@ -14,7 +14,7 @@ import util.PasswordUtil;
 import java.io.IOException;
 
 @WebServlet(name = "LoginServlet", urlPatterns = {"/LoginServlet"})
-public class LoginServlet extends HttpServlet {
+public class Login extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -38,7 +38,7 @@ public class LoginServlet extends HttpServlet {
             // Mật khẩu đúng!
             request.getSession().setAttribute("user", user);
             request.getSession().setMaxInactiveInterval(30 * 60);
-            response.sendRedirect(request.getContextPath() + "/home.jsp");
+            response.sendRedirect(request.getContextPath() + "/Home");
 
         } else {
             errorMessage = "Invalid username or password.";
