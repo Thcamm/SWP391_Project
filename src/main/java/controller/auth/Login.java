@@ -10,10 +10,9 @@ import model.user.User;
 import service.UserLoginService;
 import util.PasswordUtil;
 
-
 import java.io.IOException;
 
-@WebServlet(name = "LoginServlet", urlPatterns = {"/LoginServlet"})
+@WebServlet("/login")
 public class Login extends HttpServlet {
 
     @Override
@@ -37,6 +36,7 @@ public class Login extends HttpServlet {
 
             // Mật khẩu đúng!
             request.getSession().setAttribute("user", user);
+            request.getSession().setAttribute("userName", user.getUserName());
             request.getSession().setMaxInactiveInterval(30 * 60);
             response.sendRedirect(request.getContextPath() + "/Home");
 
