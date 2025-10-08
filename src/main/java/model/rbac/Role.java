@@ -4,6 +4,8 @@ public class Role {
     public int roleId;
     public String roleName;
 
+    private int userCount;
+
     public Role() {
     }
     public Role(int roleId, String roleName) {
@@ -25,5 +27,12 @@ public class Role {
 
     public void setRoleName(String roleName) {
         this.roleName = roleName;
+    }
+
+    public int getUserCount() {
+        return userCount;
+    }
+    public void setUserCount(int userCount) {
+        this.userCount = userCount;
     }
 }

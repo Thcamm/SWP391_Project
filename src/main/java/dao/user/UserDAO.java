@@ -131,6 +131,11 @@ public class UserDAO extends DbContext {
         user.setPhoneNumber(rs.getString("PhoneNumber"));
         user.setPasswordHash(rs.getString("PasswordHash"));
         user.setActiveStatus(rs.getBoolean("ActiveStatus"));
+        user.setCreatedAt(rs.getTimestamp("CreatedAt"));
+        user.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
+        user.setGender(rs.getString("gender"));
+        user.setBirthDate(rs.getDate("birthdate"));
+        user.setAddress(rs.getString("address"));
         return user;
     }
     public int findRoleIdByUserId(int userId) {
@@ -145,6 +150,40 @@ public class UserDAO extends DbContext {
             throw new RuntimeException("findRoleIdByUserId failed", e);
         }
     }
-    
+
+    public int reassignUserRole(int fromRoleId, int toRoleId) throws SQLException{
+        String sql = "UPDATE `User`  SET RoleID = ? WHERE ROLEID =?";
+        try(Connection c = DbContext.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)){
+            ps.setInt(1, toRoleId);
+            ps.setInt(2, fromRoleId);
+            return ps.executeUpdate();
+        }
+    }
+    public boolean isEmailExists(String email, int currentUserId) throws SQLException {
+        String sql = "SELECT 1 FROM `User` WHERE Email = ? AND UserID != ?";
+        try (Connection conn = getDBConnect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setInt(2, currentUserId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+    public boolean updateUserProfile(User user) throws SQLException {
+        String sql = "UPDATE `User` SET FullName=?, Email=?, PhoneNumber=?, gender=?, birthdate=?, address=? WHERE UserID=?";
+        try (Connection conn = getDBConnect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, user.getFullName());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPhoneNumber());
+            ps.setString(4, user.getGender());
+            ps.setDate(5, user.getBirthDate());
+            ps.setString(6, user.getAddress());
+            ps.setInt(7, user.getUserId());
+            return ps.executeUpdate() > 0;
+        }
+    }
 
 }

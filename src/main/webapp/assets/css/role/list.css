@@ -1,0 +1,269 @@
+:root {
+    --primary-color: #212529; /* Màu nền nút chính */
+    --accent-color: #495057;  /* Màu tiêu đề, viền, link */
+    --table-header-bg: #343a40; /* Màu Header Bảng */
+    --link-color: #1b1e21;    /* Màu link hành động */
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f4f7fa;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #fff; /* Nền trắng cho nội dung */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.page-title {
+    color: var(--primary-color);
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+/* --- Thông báo --- */
+.alert {
+    padding: 12px 20px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.success-message {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.error-message {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+/* --- Nút Bấm Chung --- */
+.btn {
+    display: inline-block;
+    padding: 10px 18px;
+    margin-right: 10px;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+/* Nút chính (Thêm Vai Trò) */
+.btn-primary {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #000;
+}
+
+/* Nút phụ (Quản Lý RBAC) */
+.btn-secondary {
+    background-color: var(--accent-color);
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background-color: #343a40;
+}
+/* --- Form Tìm kiếm và Cấu hình --- */
+.search-form {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-right: 8px;
+    color: #555;
+}
+
+.form-control {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(33, 37, 41, 0.2);
+}
+
+.btn-search {
+    background-color: var(--primary-color);
+    color: #fff;
+    padding: 8px 15px;
+}
+
+.btn-search:hover {
+    background-color: #000;
+}
+
+.total-items {
+    font-weight: 600;
+    color: var(--accent-color);
+    margin-left: auto;
+}
+
+
+
+/* --- Bảng Dữ liệu --- */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+.data-table th, .data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.data-table thead tr {
+    background-color: var(--table-header-bg); /* Header màu xám đậm */
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.data-table tbody tr:nth-of-type(even) {
+    background-color: #f8f8f8;
+}
+
+.data-table tbody tr:hover {
+    background-color: #eef;
+    cursor: pointer;
+}
+
+.no-data {
+    text-align: center;
+    font-style: italic;
+    color: #777;
+}
+
+/* --- Cột Hành động --- */
+.action-column {
+    white-space: nowrap; /* Giữ các liên kết trên một hàng */
+}
+
+.action-link {
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    margin-right: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.edit-link {
+    color: var(--link-color); /* Màu chữ xám đậm */
+    background-color: #ffc107; /* Màu vàng (giữ lại để phân biệt) */
+}
+
+
+.edit-link:hover {
+    background-color: #e0a800;
+}
+.delete-link {
+    color: #fff;
+    background-color: #dc3545; /* Màu đỏ (giữ lại để cảnh báo) */
+}
+
+.delete-link:hover {
+    background-color: #c82333;
+}
+
+/* --- Phân Trang --- */
+.pagination-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.pagination {
+    display: inline-flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.page-item {
+    margin: 0;
+}
+
+.page-link {
+    /* Màu link xám đậm */
+    color: var(--accent-color);
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+
+.page-item:first-child .page-link {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+}
+
+.page-item:last-child .page-link {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+}
+
+.page-link:hover:not(.active > .page-link):not(.disabled > .page-link) {
+    background-color: #f0f0f0;
+}
+
+.page-item.active .page-link {
+    /* Nền trang hiện tại là màu chủ đạo */
+    background-color: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+    font-weight: bold;
+}
+
+
+.page-item.disabled .page-link {
+    color: #aaa;
+    background-color: #f9f9f9;
+    cursor: not-allowed;
+}
+
+.page-item + .page-item {
+    margin-left: -1px; /* Xóa khoảng cách giữa các mục */
+}
