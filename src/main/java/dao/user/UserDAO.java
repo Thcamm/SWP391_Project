@@ -214,7 +214,6 @@ public class UserDAO extends DbContext {
             throw new RuntimeException("findRoleIdByUserId failed", e);
         }
     }
-<<<<<<< Updated upstream
 
     public int reassignUserRole(int fromRoleId, int toRoleId) throws SQLException{
         String sql = "UPDATE `User`  SET RoleID = ? WHERE ROLEID =?";
@@ -251,6 +250,4 @@ public class UserDAO extends DbContext {
         }
     }
 
-=======
->>>>>>> Stashed changes
 }
