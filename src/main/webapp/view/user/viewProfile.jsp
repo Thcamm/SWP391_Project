@@ -1,0 +1,68 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<html>
+<head>
+    <title>User Profile</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/user/viewProfile.css">
+</head>
+<body>
+<div class="container">
+    <h2>User Profile</h2>
+
+    <c:if test="${not empty sessionScope.success}">
+        <div class="message success">${sessionScope.success}</div>
+        <c:remove var="success" scope="session" />
+    </c:if>
+    <c:if test="${not empty error}">
+        <div class="message error">${error}</div>
+    </c:if>
+
+    <table class="profile-table">
+        <tr><th>Full Name</th><td>${user.fullName}</td></tr>
+        <tr><th>Email</th><td>${user.email}</td></tr>
+        <tr><th>Phone Number</th><td>${user.phoneNumber}</td></tr>
+        <tr><th>Address</th><td>${user.address}</td></tr>
+        <tr><th>Gender</th><td>${user.gender}</td></tr>
+        <tr><th>Birthdate</th><td>${user.birthDate}</td></tr>
+    </table>
+
+    <div class="action-buttons">
+        <form action="profile" method="get" style="display:inline;">
+            <input type="hidden" name="action" value="edit"/>
+            <button type="submit" class="btn btn-primary">Edit Profile</button>
+        </form>
+        <button type="button" class="btn btn-disabled" disabled>Change Password</button>
+    </div>
+
+    <h2>Service History</h2>
+    <table class="service-table">
+        <thead>
+        <tr><th>Service ID</th><th>Service Name</th><th>Date</th><th>Status</th><th>Price</th></tr>
+        </thead>
+        <tbody id="serviceBody"></tbody>
+    </table>
+    <div class="pagination">
+        <div class="pagination-info">
+            Showing <span id="start">0</span> to <span id="end">0</span> of <span id="total">0</span> records
+        </div>
+        <div class="pagination-controls">
+            <button onclick="prevPage()" id="prevBtn" disabled>Previous</button>
+            <div id="pageNumbers"></div>
+            <button onclick="nextPage()" id="nextBtn" disabled>Next</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const services = [
+        {id: 'SV001', name: 'Oil Change', date: '2025-10-01', status: 'completed', price: '500.000đ'},
+        {id: 'SV002', name: 'Tire Rotation', date: '2025-09-15', status: 'completed', price: '300.00đ'},
+        {id: 'SV003', name: 'Oil Change', date: '2025-10-01', status: 'completed', price: '500.000đ'},
+        {id: 'SV004', name: 'Wash Car', date: '2025-09-15', status: 'completed', price: '300.00đ'},
+        {id: 'SV005', name: 'Oil Change', date: '2025-10-01', status: 'completed', price: '500.000đ'},
+        {id: 'SV006', name: 'Tire Rotation', date: '2025-09-15', status: 'completed', price: '300.00đ'}
+    ];
+</script>
+<script src="${pageContext.request.contextPath}/assets/js/user/viewProfile.js"></script>
+</body>
+</html>

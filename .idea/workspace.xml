@@ -9,17 +9,59 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c1526b4c-3098-4394-aeb4-8ad1a4586e8a" name="Changes" comment="">
+    <list default="true" id="e244fc79-3f5d-41bf-9eda-0765904ab445" name="Changes" comment="Test merge">
+      <change afterPath="$PROJECT_DIR$/garage_mgnt.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/common/filter/PermissionFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/common/utils/NameValidator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/common/utils/PaginationUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/controller/BaseServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/controller/role/RoleServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/model/pagination/PaginationResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/service/role/RoleService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/view/error.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/view/role/form.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/view/role/list.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/6e89da29-5372-430e-b8d1-d479a40417f0.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/6e89da29-5372-430e-b8d1-d479a40417f0.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/common/utils/PaginationUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/common/utils/PaginationUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/common/DbContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/common/DbContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controller/auth/GoogleCallback.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controller/auth/Login.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/auth/Login.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controller/mock/MockLoginServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/mock/MockLoginServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePageServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePageServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/dao/rbac/PermissionDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/rbac/PermissionDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePermSaveServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePermSaveServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dao/DbContext.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/dao/rbac/RoleDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/rbac/RoleDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dao/user/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/user/UserDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/model/rbac/Role.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/rbac/Role.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/model/user/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/user/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/service/UserLoginService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/service/auth/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/service/auth/AuthService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/service/rbac/RbacService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/service/rbac/RbacService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/META-INF/context.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/META-INF/context.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/webapp/view/role-page.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/view/role-page.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/view/role/form.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/view/role/form.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/view/role/list.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/view/role/list.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/GarageSystem.war" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem.war" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/META-INF/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/META-INF/MANIFEST.MF" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/META-INF/context.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/META-INF/context.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/GoogleCallback.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/Login.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/Login.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/DbContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/user/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/user/UserDAO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/model/user/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/model/user/User.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/service/UserLoginService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/index.jsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/controller/auth/GoogleCallback.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/controller/auth/GoogleLogin.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/controller/auth/GoogleLogin.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/controller/auth/Login.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/controller/auth/Login.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/controller/auth/LoginServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/controller/auth/LoginServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/controller/auth/Register.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/controller/auth/Register.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/controller/user/Home.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/controller/user/Home.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/dao/DbContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/dao/user/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/dao/user/UserDAO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/model/user/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/model/user/User.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/service/UserLoginService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/service/user/UserLoginService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/service/user/UserLoginService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/util/PasswordUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/util/PasswordUtil.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,18 +78,23 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
     &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;btduong209&quot;
+    &quot;assignee&quot;: &quot;JuroMark&quot;
   }
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/Thcamm/SWP391_Project.git&quot;,
-    &quot;accountId&quot;: &quot;9426e1df-5123-48d7-9d19-ff8fe5c28367&quot;
+    &quot;accountId&quot;: &quot;70aa94dc-2800-446c-bf7c-640a66840b19&quot;
   }
 }</component>
   <component name="LogFilters">
@@ -57,13 +104,10 @@
     <option name="FILTER_DEBUG" value="true" />
     <option name="CUSTOM_FILTER" />
   </component>
-  <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
-  </component>
   <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 3
+  &quot;associatedIndex&quot;: 2
 }</component>
-  <component name="ProjectId" id="33QgHqgCd5i43NVK3lTcQTNaESn" />
+  <component name="ProjectId" id="33Vy0sXxkWVK6Y7Gq5La90JA9Eo" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
   </component>
@@ -71,49 +115,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.DbContext.executor&quot;: &quot;Run&quot;,
-    &quot;Application.DbPing.executor&quot;: &quot;Run&quot;,
-    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
-    &quot;Application.userDAO.executor&quot;: &quot;Run&quot;,
-    &quot;Application.DbPing.executor&quot;: &quot;Run&quot;,
-    &quot;JavaScript Debug.login.jsp.executor&quot;: &quot;Run&quot;,
-    &quot;Maven.GarageSystem [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.GarageSystem [package].executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Smart Tomcat.Tomcat: GarageSystem.executor&quot;: &quot;Run&quot;,
-    &quot;Tomcat Server.Tomcat 10.1.41.executor&quot;: &quot;Run&quot;,
-    &quot;Tomcat Server.Tomcat.executor&quot;: &quot;Run&quot;,
-    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;td2k12&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;G:/Giao_trinh/Ky_5/SWP391_Project&quot;,
-    &quot;Tomcat Server.Tomcat.executor&quot;: &quot;Run&quot;,
-    &quot;Tomcat Server.form.jsp.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;thuyvu&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;fileTemplates&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.DbPing.executor": "Run",
+    "JavaScript Debug.editProfile.jsp.executor": "Run",
+    "JavaScript Debug.login.jsp.executor": "Run",
+    "JavaScript Debug.register.jsp.executor": "Run",
+    "Maven.GarageSystem [clean].executor": "Run",
+    "Maven.GarageSystem [package].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "Tomcat Server.Tomcat.executor": "Run",
+    "Tomcat Server.form.jsp.executor": "Run",
+    "git-widget-placeholder": "tcam",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "fileTemplates",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\IntelliJ Community\Work-space\SWP-GarageManagement\SWP391_Project\src\main\webapp\assets\css\role" />
       <recent name="D:\IntelliJ Community\Work-space\SWP-GarageManagement\SWP391_Project\src\main\webapp\view\role" />
       <recent name="C:\Users\Admin\Documents\Hoc Java\SWP391_Project\src\main\webapp\admin" />
     </key>
@@ -125,14 +153,13 @@
           <value>
             <map>
               <entry key="Tomcat" value="STOPPED" />
-              <entry key="form.jsp" value="STOPPED" />
             </map>
           </value>
         </entry>
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="Tomcat Server.Tomcat">
+  <component name="RunManager" selected="JavaScript Debug.editProfile.jsp">
     <configuration name="DbPing" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="common.DbPing" />
       <module name="SWP391_Project" />
@@ -146,10 +173,22 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="editProfile.jsp" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:8080/GarageSystem_war/view/user/editProfile.jsp">
+      <method v="2" />
+    </configuration>
     <configuration name="login.jsp" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:8080/GarageSystem/login.jsp">
       <method v="2" />
     </configuration>
-    <configuration name="Tomcat" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.1.40" ALTERNATIVE_JRE_ENABLED="false">
+    <configuration name="register.jsp" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:8080/GarageSystem_war/register.jsp">
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="GarageSystem" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Tomcat" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.1.17" ALTERNATIVE_JRE_ENABLED="false">
       <option name="UPDATING_POLICY" value="restart-server" />
       <deployment>
         <artifact name="GarageSystem:war">
@@ -159,7 +198,7 @@
         </artifact>
       </deployment>
       <server-settings>
-        <option name="BASE_DIRECTORY_NAME" value="c494b850-9f21-45e8-b225-7c57ee5cbdd6" />
+        <option name="BASE_DIRECTORY_NAME" value="ea031b10-5eec-4ec0-bc47-ad21123b0e14" />
       </server-settings>
       <predefined_log_file enabled="true" id="Tomcat" />
       <predefined_log_file enabled="true" id="Tomcat Catalina" />
@@ -167,7 +206,7 @@
       <predefined_log_file id="Tomcat Host Manager" />
       <predefined_log_file id="Tomcat Localhost Access" />
       <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="61424" />
+        <option name="DEBUG_PORT" value="59007" />
       </RunnerSettings>
       <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Cover">
         <option name="USE_ENV_VARIABLES" value="true" />
@@ -232,53 +271,23 @@
       <method v="2">
         <option name="Make" enabled="true" />
         <option name="BuildArtifacts" enabled="true">
+          <artifact name="SWP391_Project:war" />
           <artifact name="GarageSystem:war" />
         </option>
       </method>
     </configuration>
-    <configuration name="form.jsp" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" temporary="true" APPLICATION_SERVER_NAME="Tomcat 10.1.40" ALTERNATIVE_JRE_ENABLED="false">
-      <option name="OPEN_IN_BROWSER_URL" value="http://localhost:8080/view/role/form.jsp" />
-      <deployment>
-        <artifact name="SWP391_Project:war">
-          <settings>
-            <option name="CONTEXT_PATH" value="/SWP391_Project_war" />
-          </settings>
-        </artifact>
-      </deployment>
-      <server-settings>
-        <option name="BASE_DIRECTORY_NAME" value="02f45ee0-5df6-46d4-b198-ab910fbd668e" />
-      </server-settings>
-      <predefined_log_file enabled="true" id="Tomcat" />
-      <predefined_log_file enabled="true" id="Tomcat Catalina" />
-      <predefined_log_file id="Tomcat Manager" />
-      <predefined_log_file id="Tomcat Host Manager" />
-      <predefined_log_file id="Tomcat Localhost Access" />
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </SHUTDOWN>
-      </ConfigurationWrapper>
-      <method v="2">
-        <option name="Make" enabled="true" />
-        <option name="BuildArtifacts" enabled="true">
-          <artifact name="SWP391_Project:war" />
-        </option>
-      </method>
-    </configuration>
+    <list>
+      <item itemvalue="Application.DbPing" />
+      <item itemvalue="JavaScript Debug.editProfile.jsp" />
+      <item itemvalue="JavaScript Debug.login.jsp" />
+      <item itemvalue="JavaScript Debug.register.jsp" />
+      <item itemvalue="Tomcat Server.Tomcat" />
+    </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JavaScript Debug.editProfile.jsp" />
+        <item itemvalue="JavaScript Debug.register.jsp" />
         <item itemvalue="JavaScript Debug.login.jsp" />
-        <item itemvalue="Tomcat Server.form.jsp" />
         <item itemvalue="Application.DbPing" />
       </list>
     </recent_temporary>
@@ -293,8 +302,8 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="c1526b4c-3098-4394-aeb4-8ad1a4586e8a" name="Changes" comment="" />
-      <created>1759254625074</created>
+      <changelist id="e244fc79-3f5d-41bf-9eda-0765904ab445" name="Changes" comment="" />
+      <created>1759416318822</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1759416318822</updated>
@@ -303,59 +312,45 @@
       <workItem from="1759503114969" duration="18045000" />
       <workItem from="1759681826867" duration="14301000" />
       <workItem from="1759723323360" duration="11183000" />
-      <workItem from="1759772496715" duration="1313000" />
-      <workItem from="1759827025689" duration="10675000" />
+      <workItem from="1759772496715" duration="716000" />
     </task>
+    <task id="LOCAL-00001" summary="demo user filter">
+      <option name="closed" value="true" />
+      <created>1759427692864</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1759427692864</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Test merge">
+      <option name="closed" value="true" />
+      <created>1759472310503</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1759472310503</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
-  <component name="UnknownFeatures">
-    <option featureType="com.intellij.configurationType" implementationName="com.poratu.idea.plugins.tomcat" />
-    <option featureType="dependencySupport" implementationName="maven-packaging:war" />
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="demo user filter" />
+    <MESSAGE value="Test merge" />
+    <option name="LAST_COMMIT_MESSAGE" value="Test merge" />
   </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="RECENT_FILTERS">
-      <map>
-        <entry key="Branch">
-          <value>
-            <list>
-              <RecentGroup>
-                <option name="FILTER_VALUES">
-                  <option value="origin/main" />
-                </option>
-              </RecentGroup>
-            </list>
-          </value>
-        </entry>
-      </map>
-    </option>
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State>
-              <option name="FILTERS">
-                <map>
-                  <entry key="branch">
-                    <value>
-                      <list>
-                        <option value="origin/main" />
-                      </list>
-                    </value>
-                  </entry>
-                </map>
-              </option>
-            </State>
-          </value>
-        </entry>
-      </map>
-    </option>
-  </component>
-  <component name="XSLT-Support.FileAssociations.UIState">
-    <expand />
-    <select />
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/webapp/view/role/form.jsp</url>
+          <line>25</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
