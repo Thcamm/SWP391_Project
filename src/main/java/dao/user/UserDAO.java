@@ -142,4 +142,28 @@ public class UserDAO extends DbContext {
         // user.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
         return user;
     }
+    public int findRoleIdByUserId(int userId) {
+        final String sql = "SELECT RoleID FROM User WHERE UserID = ?";
+        try (Connection c = getDBConnect();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt("RoleID") : -1;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("findRoleIdByUserId failed", e);
+        }
+    }
+
+    public int reassignUserRole(int fromRoleId, int toRoleId) throws SQLException{
+        String sql = "UPDATE `User`  SET RoleID = ? WHERE ROLEID =?";
+        try(Connection c = DbContext.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)){
+            ps.setInt(1, toRoleId);
+            ps.setInt(2, fromRoleId);
+            return ps.executeUpdate();
+        }
+    }
+    
+
 }

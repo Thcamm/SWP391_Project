@@ -11,6 +11,15 @@
   <component name="ChangeListManager">
     <list default="true" id="c1526b4c-3098-4394-aeb4-8ad1a4586e8a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/common/utils/PaginationUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/common/utils/PaginationUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePageServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePageServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dao/rbac/PermissionDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/rbac/PermissionDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dao/rbac/RoleDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/rbac/RoleDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/service/rbac/RbacService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/service/rbac/RbacService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/view/role-page.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/view/role-page.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/view/role/form.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/view/role/form.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/view/role/list.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/view/role/list.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem.war" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem.war" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,9 +29,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Jsp File" />
         <option value="Servlet" />
         <option value="Class" />
+        <option value="Jsp File" />
       </list>
     </option>
   </component>
@@ -68,6 +77,10 @@
     &quot;Application.DbPing.executor&quot;: &quot;Run&quot;,
     &quot;Application.Main.executor&quot;: &quot;Run&quot;,
     &quot;Application.userDAO.executor&quot;: &quot;Run&quot;,
+    &quot;Application.DbPing.executor&quot;: &quot;Run&quot;,
+    &quot;JavaScript Debug.login.jsp.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.GarageSystem [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.GarageSystem [package].executor&quot;: &quot;Run&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
@@ -81,6 +94,10 @@
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;G:/Giao_trinh/Ky_5/SWP391_Project&quot;,
+    &quot;Tomcat Server.Tomcat.executor&quot;: &quot;Run&quot;,
+    &quot;Tomcat Server.form.jsp.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;thuyvu&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -90,12 +107,15 @@
     &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;fileTemplates&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="G:\Giao_trinh\Ky_5\SWP391_Project\src\main\java" />
+      <recent name="D:\IntelliJ Community\Work-space\SWP-GarageManagement\SWP391_Project\src\main\webapp\assets\css\role" />
+      <recent name="D:\IntelliJ Community\Work-space\SWP-GarageManagement\SWP391_Project\src\main\webapp\view\role" />
+      <recent name="C:\Users\Admin\Documents\Hoc Java\SWP391_Project\src\main\webapp\admin" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -104,47 +124,32 @@
         <entry key="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory">
           <value>
             <map>
-              <entry key="Tomcat 10.1.41" value="STOPPED" />
+              <entry key="Tomcat" value="STOPPED" />
+              <entry key="form.jsp" value="STOPPED" />
             </map>
           </value>
         </entry>
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="Tomcat Server.Tomcat 10.1.41">
-    <configuration name="DbContext" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="dao.DbContext" />
-      <module name="GarageSystem" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="dao.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="UserDAO" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="dao.user.UserDAO" />
-      <module name="GarageSystem" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="dao.user.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="JetRunConfigurationType">
+  <component name="RunManager" selected="Tomcat Server.Tomcat">
+    <configuration name="DbPing" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="common.DbPing" />
       <module name="SWP391_Project" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="common.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Tomcat 10.1.41" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.1.41" ALTERNATIVE_JRE_ENABLED="false" nameIsGenerated="true">
+    <configuration name="login.jsp" type="JavascriptDebugType" temporary="true" nameIsGenerated="true" uri="http://localhost:8080/GarageSystem/login.jsp">
+      <method v="2" />
+    </configuration>
+    <configuration name="Tomcat" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.1.40" ALTERNATIVE_JRE_ENABLED="false">
       <option name="UPDATING_POLICY" value="restart-server" />
       <deployment>
         <artifact name="GarageSystem:war">
@@ -231,15 +236,50 @@
         </option>
       </method>
     </configuration>
-    <list>
-      <item itemvalue="Application.DbContext" />
-      <item itemvalue="Application.UserDAO" />
-      <item itemvalue="Tomcat Server.Tomcat 10.1.41" />
-    </list>
+    <configuration name="form.jsp" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" temporary="true" APPLICATION_SERVER_NAME="Tomcat 10.1.40" ALTERNATIVE_JRE_ENABLED="false">
+      <option name="OPEN_IN_BROWSER_URL" value="http://localhost:8080/view/role/form.jsp" />
+      <deployment>
+        <artifact name="SWP391_Project:war">
+          <settings>
+            <option name="CONTEXT_PATH" value="/SWP391_Project_war" />
+          </settings>
+        </artifact>
+      </deployment>
+      <server-settings>
+        <option name="BASE_DIRECTORY_NAME" value="02f45ee0-5df6-46d4-b198-ab910fbd668e" />
+      </server-settings>
+      <predefined_log_file enabled="true" id="Tomcat" />
+      <predefined_log_file enabled="true" id="Tomcat Catalina" />
+      <predefined_log_file id="Tomcat Manager" />
+      <predefined_log_file id="Tomcat Host Manager" />
+      <predefined_log_file id="Tomcat Localhost Access" />
+      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
+        <option name="USE_ENV_VARIABLES" value="true" />
+        <STARTUP>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </STARTUP>
+        <SHUTDOWN>
+          <option name="USE_DEFAULT" value="true" />
+          <option name="SCRIPT" value="" />
+          <option name="VM_PARAMETERS" value="" />
+          <option name="PROGRAM_PARAMETERS" value="" />
+        </SHUTDOWN>
+      </ConfigurationWrapper>
+      <method v="2">
+        <option name="Make" enabled="true" />
+        <option name="BuildArtifacts" enabled="true">
+          <artifact name="SWP391_Project:war" />
+        </option>
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.DbContext" />
-        <item itemvalue="Application.UserDAO" />
+        <item itemvalue="JavaScript Debug.login.jsp" />
+        <item itemvalue="Tomcat Server.form.jsp" />
+        <item itemvalue="Application.DbPing" />
       </list>
     </recent_temporary>
   </component>
@@ -257,47 +297,14 @@
       <created>1759254625074</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1759254625074</updated>
-      <workItem from="1759254645082" duration="137000" />
-      <workItem from="1759254807501" duration="2568000" />
-      <workItem from="1759259671341" duration="965000" />
-      <workItem from="1759262105072" duration="86000" />
-      <workItem from="1759262299075" duration="82000" />
-      <workItem from="1759262434557" duration="580000" />
-      <workItem from="1759263050460" duration="7661000" />
-      <workItem from="1759298437310" duration="10384000" />
-      <workItem from="1759313128075" duration="1497000" />
-      <workItem from="1759342829719" duration="10147000" />
-      <workItem from="1759353107093" duration="334000" />
-      <workItem from="1759353510706" duration="44000" />
-      <workItem from="1759353560568" duration="2000" />
-      <workItem from="1759353566875" duration="5000" />
-      <workItem from="1759354043313" duration="308000" />
-      <workItem from="1759389190538" duration="1843000" />
-      <workItem from="1759391430306" duration="72000" />
-      <workItem from="1759391545468" duration="397000" />
-      <workItem from="1759391970671" duration="224000" />
-      <workItem from="1759392216409" duration="1118000" />
-      <workItem from="1759393355732" duration="1156000" />
-      <workItem from="1759395513474" duration="1241000" />
-      <workItem from="1759396773972" duration="566000" />
-      <workItem from="1759397618437" duration="212000" />
-      <workItem from="1759398962886" duration="199000" />
-      <workItem from="1759423080796" duration="914000" />
-      <workItem from="1759432748239" duration="1014000" />
-      <workItem from="1759433782871" duration="63000" />
-      <workItem from="1759433891750" duration="286000" />
-      <workItem from="1759434197229" duration="92000" />
-      <workItem from="1759434430126" duration="129000" />
-      <workItem from="1759471609445" duration="1983000" />
-      <workItem from="1759649364252" duration="2996000" />
-      <workItem from="1759652463057" duration="4831000" />
-      <workItem from="1759671115206" duration="404000" />
-      <workItem from="1759818210323" duration="4338000" />
-      <workItem from="1759833316137" duration="2671000" />
-      <workItem from="1759857933840" duration="121000" />
-      <workItem from="1759858079624" duration="4288000" />
-      <workItem from="1759863873974" duration="920000" />
+      <updated>1759416318822</updated>
+      <workItem from="1759416320921" duration="14515000" />
+      <workItem from="1759471843192" duration="5451000" />
+      <workItem from="1759503114969" duration="18045000" />
+      <workItem from="1759681826867" duration="14301000" />
+      <workItem from="1759723323360" duration="11183000" />
+      <workItem from="1759772496715" duration="1313000" />
+      <workItem from="1759827025689" duration="10675000" />
     </task>
     <servers />
   </component>
@@ -349,5 +356,16 @@
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
     <select />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/webapp/view/role/form.jsp</url>
+          <line>25</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
