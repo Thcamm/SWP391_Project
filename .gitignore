@@ -53,4 +53,3 @@ build/
         src/main/java/common/DbContext.java
         src/main/java/common/DbPing.java
         src/main/webapp/META-INF/context.xml
-        src/main/webapp/WEB-INF/web.xml
