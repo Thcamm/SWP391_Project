@@ -34,7 +34,7 @@ public class RolePermSaveServlet extends HttpServlet {
             final String REQUIRED_PERMISSION = "role_permission_manage";
             Integer userIdObj = (Integer) req.getSession().getAttribute("userId");
             if (userIdObj == null || userIdObj <= 0) {
-                resp.sendRedirect(resp.encodeRedirectURL(req.getContextPath() + "/login"));
+                resp.sendRedirect(resp.encodeRedirectURL(req.getContextPath() + "/LoginServlet"));
                 return;
             }
             int actorUserId = userIdObj;
@@ -55,7 +55,7 @@ public class RolePermSaveServlet extends HttpServlet {
                 for (String pid : permIds) selected.add(Integer.parseInt(pid));
             }
 
-            int currentUserRoleId = new dao.user.UserDAO().findRoleIdByUserId(actorUserId); // viết hàm đơn giản
+            int currentUserRoleId = new dao.user.UserDAO().findRoleIdByUserId(actorUserId);
             int managePermId = new dao.rbac.PermissionDao().findPermIdByCode(REQUIRED_PERMISSION);
             if (roleId == currentUserRoleId && !selected.contains(managePermId)) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,

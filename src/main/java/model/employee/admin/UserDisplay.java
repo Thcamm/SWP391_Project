@@ -18,6 +18,7 @@ public class UserDisplay {
 
     public UserDisplay() {
     }
+
     public UserDisplay(User user, Role role) {
         this.userId = user.getUserId();
         this.userName = user.getUserName();
@@ -36,14 +37,21 @@ public class UserDisplay {
             this.roleBadgeClass = "bg-dark";
         }
     }
+
     private String getRoleBadgeClass(int roleId) {
         switch (roleId) {
-            case 1: return "bg-danger";           // Admin
-            case 2: return "bg-warning text-dark"; // Manager
-            case 3: return "bg-info";             // Employee
-            case 4: return "bg-primary";          // User
-            case 5: return "bg-secondary";        // Guest
-            default: return "bg-dark";            // Unknown
+            case 1:
+                return "bg-danger"; // Admin
+            case 2:
+                return "bg-warning text-dark"; // Manager
+            case 3:
+                return "bg-info"; // Employee
+            case 4:
+                return "bg-primary"; // User
+            case 5:
+                return "bg-secondary"; // Guest
+            default:
+                return "bg-dark"; // Unknown
         }
     }
 

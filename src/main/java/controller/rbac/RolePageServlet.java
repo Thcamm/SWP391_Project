@@ -32,7 +32,7 @@ public class RolePageServlet extends HttpServlet {
             final String REQUIRED_PERMISSION = "role_permission_manage";
 
             if(userIdObj == null || userIdObj <= 0){
-                resp.sendRedirect(req.getContextPath() + "/login");
+                resp.sendRedirect(req.getContextPath() + "/LoginServlet");
                 return;
             }
             int userId = userIdObj;
@@ -42,20 +42,40 @@ public class RolePageServlet extends HttpServlet {
                 resp.sendError(HttpServletResponse.SC_FORBIDDEN, "You have not permission to access role manage");
                 return;
             }
+
+            String keyword = req.getParameter("keyword");
+            String category = req.getParameter("category");
+            int page = parseIntOrDefault(req.getParameter("page"), 1);
+            int size = parseIntOrDefault(req.getParameter("size"), 10);
+
+
             var roles = rbacService.getAllRoles();
             Integer roleId = req.getParameter("roleId") == null
                     ? (roles.isEmpty() ? -1 : roles.get(0).roleId)
                     : Integer.parseInt(req.getParameter("roleId"));
 
-            var perms = rbacService.getAllPermissions(req.getParameter("keyword"), req.getParameter("category"));
-            var checkedPermIds = (roleId == null) ? java.util.Set.of() : rbacService.getPermissionIdsOfRole(roleId);
+            var pager = rbacService.getPermissionsPaged(page, size, keyword, category);
+
+            var checkedPermIds = (roleId == null) ? java.util.Collections.<Integer>emptySet()
+                    : rbacService.getPermissionIdsOfRole(roleId);
             req.setAttribute("roles", roles);
             req.setAttribute("roleId", roleId);
-            req.setAttribute("perms", perms);
+            req.setAttribute("pager", pager);
+            req.setAttribute("perms", pager.getData());
+            req.setAttribute("keyword", keyword);
+            req.setAttribute("category", category);
             req.setAttribute("checkedPermsIds", checkedPermIds);
             req.getRequestDispatcher("/view/role-page.jsp").forward(req, resp);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private int parseIntOrDefault(String page, int i) {
+        try {
+            return Integer.parseInt(page);
+        } catch (Exception ex) {
+            return i;
         }
     }
 

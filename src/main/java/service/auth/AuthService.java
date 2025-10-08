@@ -11,7 +11,7 @@ public class AuthService {
         this.roleDao = roleDao;
     }
 
-    private Set<String> getPermissionCodesOfUser(int userId) throws Exception{
+    public Set<String> getPermissionCodesOfUser(int userId) throws Exception{
         return roleDao.getPermissionCodesOfUser(userId);
 
     }

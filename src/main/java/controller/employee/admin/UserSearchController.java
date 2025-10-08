@@ -71,7 +71,7 @@ public class UserSearchController extends HttpServlet {
             Boolean activeStatus = parseStatusParameter(statusParam);
 
             // Use the new search method with sort parameter
-            System.out.println("🔧 DEBUG: Using search with sort parameter: " + sortBy);
+            System.out.println(" DEBUG: Using search with sort parameter: " + sortBy);
             ArrayList<UserDisplay> searchResults = adminService.searchUsers(keyword, roleId, activeStatus, sortBy);
             int totalResults = searchResults.size();
 
@@ -153,8 +153,6 @@ public class UserSearchController extends HttpServlet {
                     "Có lỗi xảy ra: " + e.getMessage(), "error");
         }
     }
-
-    // ===== HELPER METHODS =====
 
     private String getCurrentUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);

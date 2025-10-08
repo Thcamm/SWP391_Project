@@ -10,23 +10,113 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e244fc79-3f5d-41bf-9eda-0765904ab445" name="Changes" comment="Test merge">
+      <change afterPath="$PROJECT_DIR$/garage_mgnt.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/common/filter/PermissionFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/common/utils/NameValidator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/common/utils/PaginationUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/controller/BaseServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/controller/auth/GoogleLogin.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/controller/customer/CreateCustomerServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/controller/customer/SearchCustomerServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/controller/role/RoleServlet.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/controller/user/ProfileController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/dao/customer/CustomerDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/dao/vehicle/VehicleDAO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/model/customer/Customer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/model/pagination/PaginationResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/model/vehicle/Vehicle.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/service/role/RoleService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/service/user/UserProfileService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/util/GoogleConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/google.properties.example" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/assets/css/role/form.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/assets/css/role/list.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/assets/css/role/role-page.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/assets/css/user/editProfile.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/assets/css/user/viewProfile.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/assets/js/user/viewProfile.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/create-customer.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/search-customer.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/view/error.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/view/role/form.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/view/role/list.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/view/user/editProfile.jsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/webapp/view/user/viewProfile.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/copilot.data.migration.agent.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/copilot.data.migration.ask.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/copilot.data.migration.ask2agent.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/copilot.data.migration.edit.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/6e89da29-5372-430e-b8d1-d479a40417f0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/ffffcf08-433e-44cf-9810-3bde3a2f619b.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/ffffcf08-433e-44cf-9810-3bde3a2f619b/storage_v2/_src_/schema/information_schema.FNRwLQ.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/ffffcf08-433e-44cf-9810-3bde3a2f619b/storage_v2/_src_/schema/mysql.osA4Bg.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/ffffcf08-433e-44cf-9810-3bde3a2f619b/storage_v2/_src_/schema/performance_schema.kIw0nw.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/ffffcf08-433e-44cf-9810-3bde3a2f619b/storage_v2/_src_/schema/sys.zb4BAA.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/sqlDataSources.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/sqlDataSources.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/webContexts.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/webContexts.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GarageSystem.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/common/DbContext.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/common/DbContext.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controller/auth/Login.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/auth/Login.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controller/auth/Register.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/auth/Register.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controller/employee/admin/UserSearchController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/employee/admin/UserSearchController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controller/mock/MockLoginServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/mock/MockLoginServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePageServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePageServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePermSaveServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePermSaveServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/dao/DbContext.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dao/employee/AdminDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/employee/AdminDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dao/rbac/PermissionDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/rbac/PermissionDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dao/rbac/RoleDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/rbac/RoleDao.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/dao/user/UserDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/user/UserDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/model/employee/Employee.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/employee/Employee.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/model/employee/admin/UserDisplay.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/employee/admin/UserDisplay.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/model/rbac/Role.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/rbac/Role.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/model/user/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/user/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/service/UserLoginService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/service/auth/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/service/auth/AuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/service/employee/AdminService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/service/employee/AdminService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/service/rbac/RbacService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/service/rbac/RbacService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/META-INF/context.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/META-INF/context.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/admin/users.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/admin/users.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/home.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/home.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/login.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/login.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/register.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/register.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/view/role-page.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/view/role-page.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/GarageSystem.war" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem.war" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/META-INF/MANIFEST.MF" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/META-INF/MANIFEST.MF" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/LoginServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/LoginServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/META-INF/MANIFEST.MF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/META-INF/context.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/META-INF/context.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/Login.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/Login.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/Register.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/auth/Register.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/user/Home.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/controller/user/Home.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/user/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/user/UserDAO.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/model/user/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/model/user/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/service/user/UserLoginService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/service/user/UserLoginService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/service/UserLoginService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/service/user/UserLoginService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/util/PasswordUtil.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/lib/jakarta.servlet.jsp.jstl-3.0.1.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/lib/jakarta.servlet.jsp.jstl-api-3.0.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/lib/jbcrypt-0.4.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/lib/mysql-connector-j-8.4.0.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/lib/protobuf-java-3.25.1.jar" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/web.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/controller/auth/LoginServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/controller/auth/LoginServlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/dao/DbContext.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/home.jsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/index.jsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/login.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/login.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/GarageSystem/register.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/register.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/controller/auth/Login.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/controller/auth/Login.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/controller/auth/Register.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/controller/user/Home.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/controller/user/Home.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/dao/user/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/dao/user/UserDAO.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/model/user/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/model/user/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/service/user/UserLoginService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/service/user/UserLoginService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/service/UserLoginService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/util/PasswordUtil.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/util/PasswordUtil.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,7 +177,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "Tomcat Server.Tomcat.executor": "Run",
-    "git-widget-placeholder": "thuyvu",
+    "git-widget-placeholder": "Merging An",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",

@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.user.User;
-import service.UserLoginService;
+import service.user.UserLoginService;
 import util.PasswordUtil;
 
 import java.io.IOException;

@@ -1,6 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib
 prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt"
 uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib
+prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt"
+uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -17,7 +20,34 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
     />
   </head>
   <body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý Users - Admin</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <!-- Header -->
+    <nav class="navbar navbar-dark bg-dark">
+      <div class="container-fluid">
+        <span class="navbar-brand"
+          ><i class="bi bi-people"></i> User Management</span
+        >
+        <span class="navbar-text">
+          <i class="bi bi-person-circle"></i> ${currentUser} |
+          <fmt:formatDate
+            value="<%= new java.util.Date() %>"
+            pattern="dd/MM/yyyy HH:mm"
+          />
+        </span>
+      </div>
     <nav class="navbar navbar-dark bg-dark">
       <div class="container-fluid">
         <span class="navbar-brand"
@@ -62,6 +92,8 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
         </c:choose>
       </c:if>
 
+      <!-- Action Menu -->
+      <div class="row mb-3">
       <!-- Action Menu -->
       <div class="row mb-3">
         <div class="col-md-8">
@@ -208,6 +240,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
             </div>
           </form>
         </div>
+      </div>
       </div>
 
       <!-- Quick Filters -->
@@ -497,7 +530,12 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
         </div>
       </div>
     </div>
+      </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>
+
