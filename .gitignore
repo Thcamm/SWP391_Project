@@ -7,6 +7,8 @@ target/
 !.idea/modules.xml
 !.idea/compiler.xml
 !.idea/artifacts/
+ .idea/dataSources.local.xml
+ .idea/workspace.xml
 
 ### Eclipse ###
 .apt_generated
