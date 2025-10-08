@@ -102,7 +102,7 @@ public class PaginationUtils {
     }
 
     public static PaginationCalculation calculateParams(int totalItems, int currentPage, int intemsPerPage){
-        int size = Math.min(1, intemsPerPage);
+        int size = Math.max(1, intemsPerPage);
         int page = Math.max(1, currentPage);
 
         int totalPages = (int)Math.ceil((double)totalItems / size);

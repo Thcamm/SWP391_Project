@@ -1,8 +1,10 @@
 package service.rbac;
 
+import common.utils.PaginationUtils;
 import dao.rbac.MenuDao;
 import dao.rbac.PermissionDao;
 import dao.rbac.RoleDao;
+import model.pagination.PaginationResponse;
 import model.rbac.MenuItem;
 import model.rbac.Permission;
 import model.rbac.Role;
@@ -72,6 +74,23 @@ public class RbacService {
 
         roleDao.update(roleChange);
 
+    }
+
+    public PaginationResponse<Permission> getPermissionsPaged(int page, int size, String kw, String cate) throws Exception {
+        int totalItems = permissionDao.countAll(kw,cate);
+        PaginationUtils.PaginationCalculation params = PaginationUtils.calculateParams(totalItems, page, size);
+
+        List<Permission> perms = permissionDao.findPaginated(kw, cate, params.getOffset(), size);
+
+        PaginationResponse<Permission> response = new PaginationResponse<>();
+        response.setData(perms);
+        response.setCurrentPage(params.getSafePage());
+        response.setItemsPerPage(size);
+        response.setTotalPages(params.getTotalPages());
+
+        response.setTotalItems(totalItems);
+
+        return response;
     }
 
 }

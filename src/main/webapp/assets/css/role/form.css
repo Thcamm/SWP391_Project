@@ -1,0 +1,96 @@
+/* --- Bổ sung style cho trang Form (Thêm/Sửa) --- */
+
+:root {
+    --primary-color: #212529; /* Màu nền nút chính (Đen đậm) */
+    --accent-color: #495057;  /* Màu tiêu đề, viền, link (Xám đậm) */
+    --table-header-bg: #343a40; /* Màu Header Bảng */
+    --link-color: #1b1e21;    /* Màu link hành động */
+
+    /* Thêm các định nghĩa khác nếu cần */
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f4f7fa; /* Màu nền xám nhạt */
+    color: #333; /* Màu chữ cơ bản */
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.form-container {
+    max-width: 600px; /* Giảm chiều rộng cho form */
+    margin-top: 50px;
+    padding: 40px;
+}
+
+.main-form {
+    padding: 15px 0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--accent-color);
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box; /* Quan trọng để padding không làm tăng width */
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(33, 37, 41, 0.1);
+}
+
+.role-id {
+    font-size: 16px;
+    color: var(--accent-color);
+}
+
+.role-id strong {
+    font-size: 18px;
+    color: var(--primary-color);
+}
+
+.form-actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: flex-start;
+}
+
+.form-submit-btn {
+    /* Đảm bảo nút Submit chính là màu đen chủ đạo */
+    background-color: var(--primary-color);
+    color: #fff;
+    font-weight: 700;
+    padding: 10px 25px;
+}
+
+.form-submit-btn:hover {
+    background-color: #000;
+}
+
+/* Nút Hủy */
+.form-actions .btn-secondary {
+    background-color: #f8f9fa; /* Nền trắng/xám nhạt */
+    color: var(--primary-color); /* Chữ màu đen */
+    border: 1px solid #ced4da;
+}
+
+.form-actions .btn-secondary:hover {
+    background-color: #e9ecef;
+}

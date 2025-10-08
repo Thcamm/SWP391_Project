@@ -10,24 +10,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e244fc79-3f5d-41bf-9eda-0765904ab445" name="Changes" comment="Test merge">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/6e89da29-5372-430e-b8d1-d479a40417f0.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/6e89da29-5372-430e-b8d1-d479a40417f0.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/common/utils/PaginationUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/common/utils/PaginationUtils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePageServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePageServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePermSaveServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/controller/rbac/RolePermSaveServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/dao/rbac/PermissionDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/rbac/PermissionDao.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/dao/rbac/RoleDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/dao/rbac/RoleDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/model/rbac/Role.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/model/rbac/Role.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/service/auth/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/service/auth/AuthService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/service/rbac/RbacService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/service/rbac/RbacService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/service/role/RoleService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/service/role/RoleService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/META-INF/context.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/META-INF/context.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/webapp/view/role-page.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/view/role-page.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/view/role/form.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/view/role/form.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/view/role/list.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/view/role/list.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/GarageSystem.war" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem.war" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/META-INF/context.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/META-INF/context.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/DbContext.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/user/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/GarageSystem/WEB-INF/classes/dao/user/UserDAO.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/GarageSystem/index.jsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/dao/user/UserDAO.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/dao/user/UserDAO.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,6 +98,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\IntelliJ Community\Work-space\SWP-GarageManagement\SWP391_Project\src\main\webapp\assets\css\role" />
       <recent name="D:\IntelliJ Community\Work-space\SWP-GarageManagement\SWP391_Project\src\main\webapp\view\role" />
       <recent name="C:\Users\Admin\Documents\Hoc Java\SWP391_Project\src\main\webapp\admin" />
     </key>
@@ -295,7 +288,8 @@
       <workItem from="1759503114969" duration="18045000" />
       <workItem from="1759681826867" duration="14301000" />
       <workItem from="1759723323360" duration="11183000" />
-      <workItem from="1759772496715" duration="716000" />
+      <workItem from="1759772496715" duration="1313000" />
+      <workItem from="1759827025689" duration="10675000" />
     </task>
     <task id="LOCAL-00001" summary="demo user filter">
       <option name="closed" value="true" />

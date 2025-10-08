@@ -55,7 +55,7 @@ public class RolePermSaveServlet extends HttpServlet {
                 for (String pid : permIds) selected.add(Integer.parseInt(pid));
             }
 
-            int currentUserRoleId = new dao.user.UserDAO().findRoleIdByUserId(actorUserId); // viết hàm đơn giản
+            int currentUserRoleId = new dao.user.UserDAO().findRoleIdByUserId(actorUserId);
             int managePermId = new dao.rbac.PermissionDao().findPermIdByCode(REQUIRED_PERMISSION);
             if (roleId == currentUserRoleId && !selected.contains(managePermId)) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,

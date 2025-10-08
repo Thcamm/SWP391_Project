@@ -120,4 +120,85 @@ public class PermissionDao {
             throw new RuntimeException("findPermIdByCode failed", e);
         }
     }
+
+    public int countAll(String keyword, String category) throws SQLException {
+        StringBuilder sb = new StringBuilder("SELECT COUNT(PermID) FROM Permission WHERE Active = 1 ");
+        List<Object> params = new ArrayList<>();
+
+        if(keyword != null && !keyword.isBlank()) {
+            sb.append("AND (Code LIKE ? OR Name LIKE ?)");
+            params.add("%" + keyword + "%");
+            params.add("%" + keyword + "%");
+
+        }
+
+        if(category != null && !category.isBlank()){
+            sb.append("AND LOWER(Category) LIKE LOWER(?) ");
+            params.add("%" + category + "%");
+
+        }
+
+        try (Connection c = DbContext.getConnection();
+        PreparedStatement ps = c.prepareStatement(sb.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+               if(rs.next()){
+                     return rs.getInt(1);
+                } else {
+                     return 0;
+               }
+            }
+
+        }
+    }
+
+    public List<Permission> findPaginated (String keyword, String category, int offset, int limit) throws SQLException {
+        StringBuilder sb = new StringBuilder("SELECT PermID, Code, Name, Category, Active FROM Permission WHERE Active = 1 ");
+        List<Object> params = new ArrayList<>();
+        if (keyword != null && !keyword.isBlank()) {
+            sb.append("AND (Code LIKE ? OR Name LIKE ?) ");
+            params.add("%" + keyword + "%");
+            params.add("%" + keyword + "%");
+
+        }
+
+        if (category != null && !category.isBlank()) {
+            sb.append("AND Category = ? ");
+            params.add(category);
+
+        }
+
+        sb.append("ORDER BY Category, Code LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sb.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            List<Permission> list = new ArrayList<>();
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Permission p = new Permission();
+                    p.permId = rs.getInt("PermID");
+                    p.code = rs.getString("Code");
+                    p.name = rs.getString("Name");
+                    p.category = rs.getString("Category");
+                    p.active = rs.getBoolean("Active");
+                    list.add(p);
+                }
+            }
+            return list;
+        }
+    }
+
+
+
+
 }

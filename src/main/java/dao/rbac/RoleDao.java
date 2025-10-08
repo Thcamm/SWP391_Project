@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class RoleDao {
     public List<Role> findAll() throws Exception {
-        String sql = "SELECT RoleID, RoleName FROM RoleInfo ORDER BY RoleName";
+        String sql = "SELECT RoleID, RoleName FROM RoleInfo ORDER BY RoleID";
         List<Role> list = new ArrayList<>();
 
         try (Connection c = DbContext.getConnection();
@@ -65,7 +65,7 @@ public class RoleDao {
         LEFT JOIN `User` u ON r.RoleID = u.RoleID
         WHERE LOWER(r.RoleName) LIKE LOWER(?)
         GROUP BY r.RoleID, r.RoleName
-        ORDER BY r.RoleName
+        ORDER BY r.RoleID ASC
         LIMIT ? OFFSET ?
     """;
         try (Connection c = DbContext.getConnection();
@@ -209,7 +209,7 @@ public class RoleDao {
         FROM RoleInfo r
         LEFT JOIN `User` u ON r.RoleID = u.RoleID
         GROUP BY r.RoleID, r.RoleName
-        ORDER BY r.RoleName
+        ORDER BY r.RoleID
         LIMIT ? OFFSET ?
     """;
         List<Role> list = new ArrayList<>();
