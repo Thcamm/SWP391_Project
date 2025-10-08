@@ -16,8 +16,6 @@ public class AdminService {
         this.userDAO = new UserDAO();
     }
 
-<<<<<<< Updated upstream
-=======
     /**
      * IMPROVED METHOD: Check if user is admin based on role characteristics
      */
@@ -130,7 +128,6 @@ public class AdminService {
 
     // ===== ALL OTHER EXISTING METHODS (unchanged) =====
 
->>>>>>> Stashed changes
     public List<User> getAllUsers() {
         try {
             return userDAO.getAllActiveUsers();
@@ -376,7 +373,6 @@ public class AdminService {
                 return user.getRoleId() == 1 || user.getRoleId() == 2;
             }
             return false;
-=======
             System.out.println("   keyword: " + keyword);
             System.out.println("   roleId: " + roleId);
             System.out.println("   activeStatus: " + activeStatus);
@@ -389,7 +385,6 @@ public class AdminService {
 
             ArrayList<UserDisplay> result = adminDAO.searchAllUsersWithRole(keyword, roleId, activeStatus, "userid");
             return result;
->>>>>>> Stashed changes
         } catch (SQLException e) {
             System.out.println("Lỗi khi kiểm tra quyền admin: " + e.getMessage());
             return false;
@@ -398,13 +393,10 @@ public class AdminService {
 
     public int countUsers() {
         try {
-<<<<<<< Updated upstream
             return userDAO.getAllActiveUsers().size();
-=======
 
             ArrayList<UserDisplay> result = adminDAO.searchAllUsersWithRole(keyword, roleId, activeStatus, sortBy);
             return result;
->>>>>>> Stashed changes
         } catch (SQLException e) {
             System.out.println("Lỗi khi đếm users: " + e.getMessage());
             return 0;
@@ -419,9 +411,6 @@ public class AdminService {
             return null;
         }
     }
-<<<<<<< Updated upstream
-=======
-
     public int getInactiveUsersCount() {
         try {
             return adminDAO.countSearchResults(null, null, false);
@@ -451,5 +440,4 @@ public class AdminService {
         role.setRoleName(roleName);
         return role;
     }
->>>>>>> Stashed changes
 }
