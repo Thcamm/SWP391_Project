@@ -16,7 +16,10 @@ public class MockLoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
 
-        // 1. Tạo một đối tượng User giả lập
+//        req.getSession().setAttribute("userId",999);
+//        resp.sendRedirect(resp.encodeRedirectURL(req.getContextPath() + "/rbac/roles"));
+
+
         User mockUser = new User();
         mockUser.setUserId(1001);
         session.setAttribute("user", mockUser);

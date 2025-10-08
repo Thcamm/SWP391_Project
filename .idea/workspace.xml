@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ArtifactsWorkspaceSettings">
     <artifacts-to-build>
-      <artifact name="GarageSystem:war" />
+      <artifact name="SWP391_Project:war" />
     </artifacts-to-build>
   </component>
   <component name="AutoImportSettings">
@@ -129,13 +129,15 @@
     "RunOnceActivity.git.unshallow": "true",
     "Tomcat Server.Tomcat.executor": "Run",
     "Tomcat Server.form.jsp.executor": "Run",
-    "git-widget-placeholder": "tcam",
     "kotlin-language-version-configured": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Artifacts",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
     "settings.editor.selected.configurable": "fileTemplates",
     "vue.rearranger.settings.migration": "true"
   }
@@ -159,7 +161,7 @@
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="JavaScript Debug.editProfile.jsp">
+  <component name="RunManager" selected="Tomcat Server.Tomcat">
     <configuration name="DbPing" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="common.DbPing" />
       <module name="SWP391_Project" />
@@ -188,12 +190,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Tomcat" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.1.17" ALTERNATIVE_JRE_ENABLED="false">
+    <configuration name="Tomcat" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10.1.40" ALTERNATIVE_JRE_ENABLED="false">
       <option name="UPDATING_POLICY" value="restart-server" />
       <deployment>
-        <artifact name="GarageSystem:war">
+        <artifact name="SWP391_Project:war">
           <settings>
-            <option name="CONTEXT_PATH" value="/GarageSystem_war" />
+            <option name="CONTEXT_PATH" value="/GarageSystem" />
           </settings>
         </artifact>
       </deployment>
@@ -346,18 +348,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/webapp/view/role/form.jsp</url>
-          <line>25</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/webapp/view/role/form.jsp</url>
-          <line>25</line>
+          <line>19</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
       </breakpoints>
