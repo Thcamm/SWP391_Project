@@ -32,7 +32,7 @@ public class RolePageServlet extends HttpServlet {
             final String REQUIRED_PERMISSION = "role_permission_manage";
 
             if(userIdObj == null || userIdObj <= 0){
-                resp.sendRedirect(req.getContextPath() + "/login");
+                resp.sendRedirect(req.getContextPath() + "/LoginServlet");
                 return;
             }
             int userId = userIdObj;
