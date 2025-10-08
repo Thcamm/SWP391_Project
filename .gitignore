@@ -8,6 +8,15 @@ target/
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+src/main/java/common/DbContext.java
+src/main/webapp/META-INF/context.xml
+.idea/dataSources.local.xml
+.idea/dataSources/3622e84d-45b2-42f8-bca9-08a574d4c369.corrupted.20251005-104108.reason.txt
+.idea/workspace.xml
+/target/
+.idea/
+
+
 *.iws
 *.iml
 *.ipr

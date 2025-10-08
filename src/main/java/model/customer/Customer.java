@@ -1,7 +1,10 @@
 package model.customer;
 
+import model.vehicle.Vehicle;
+
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 public class Customer {
@@ -15,6 +18,8 @@ public class Customer {
     private LocalDate birthDate;
     private int pointLoyalty;
     private Date createdAt;
+
+    private List<Vehicle> vehicles;
 
     public Customer() {
     }
@@ -119,6 +124,14 @@ public class Customer {
 
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public List<Vehicle> getVehicles() {
+        return vehicles;
+    }
+
+    public void setVehicles(List<Vehicle> vehicles) {
+        this.vehicles = vehicles;
     }
 
     @Override

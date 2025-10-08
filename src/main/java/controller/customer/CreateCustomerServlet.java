@@ -34,16 +34,26 @@ public class CreateCustomerServlet extends HttpServlet {
         if (birthDateRaw != null && !birthDateRaw.isEmpty()) {
             birthDate = LocalDate.parse(birthDateRaw);
         }
+
         Customer customer = new Customer(fullName, email, phoneNumber, gender, address, birthDate);
         CustomerDAO dao = new CustomerDAO();
+
+        boolean isDuplicate = dao.isCustomerDuplicate(email, phoneNumber);
+        if (isDuplicate) {
+            request.setAttribute("message", "⚠️ Email hoặc số điện thoại đã tồn tại!");
+            request.setAttribute("messageType", "warning");
+            request.getRequestDispatcher("/create-customer.jsp").forward(request, response);
+            return;
+        }
         boolean success = dao.insertCustomer(customer);
         if (success) {
             request.setAttribute("message", "✅ Thêm khách hàng thành công!");
             request.setAttribute("messageType", "success");
         } else {
             request.setAttribute("message", "❌ Không thể thêm khách hàng. Vui lòng thử lại.");
-            request.setAttribute("messageType", "error");
+            request.setAttribute("messageType", "warning");
         }
+        request.getRequestDispatcher("/create-customer-result.jsp").forward(request, response);
 
 
     }
