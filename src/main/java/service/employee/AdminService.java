@@ -16,6 +16,121 @@ public class AdminService {
         this.userDAO = new UserDAO();
     }
 
+<<<<<<< Updated upstream
+=======
+    /**
+     * IMPROVED METHOD: Check if user is admin based on role characteristics
+     */
+
+    public boolean isAdmin(String userName) {
+        try {
+
+            if (userName == null || userName.trim().isEmpty()) {
+                return false;
+            }
+
+            User user = userDAO.getUserByUsername(userName);
+            System.out.println("User found: " + (user != null));
+
+            if (user == null) {
+                return false;
+            }
+
+            System.out.println("User ID: " + user.getUserId());
+            System.out.println("User Name: " + user.getUserName());
+            System.out.println("User Role ID: " + user.getRoleId());
+            System.out.println("User Active Status: " + user.isActiveStatus());
+
+            if (!user.isActiveStatus()) {
+                return false;
+            }
+
+
+            boolean hasAdminPermission = checkAdminPermissionByRole(user.getRoleId());
+
+            if (hasAdminPermission) {
+                System.out.println("User " + userName + " has admin permissions.");
+            } else {
+                System.out.println("User " + userName + " does NOT have admin permissions.");
+            }
+
+            return hasAdminPermission;
+
+        } catch (SQLException e) {
+            System.err.println("Error checking admin status for user " + userName + ": " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    private boolean checkAdminPermissionByRole(int roleId) {
+        try {
+            System.out.println("Checking role permissions for roleId: " + roleId);
+
+
+            Role role = roleDao.findById(roleId);
+
+            if (role != null) {
+                String roleName = role.getRoleName().toLowerCase();
+                System.out.println("Found role: " + roleName);
+
+                boolean isAdminRole = roleName.contains("admin") ||
+                        roleName.contains("manager") ||
+                        roleName.contains("supervisor") ||
+                        roleName.equals("tech manager") ||
+                        roleName.contains("quản lý") || // Vietnamese
+                        roleName.contains("admin"); // Any admin variant
+
+                System.out.println("Role '" + roleName + "' is admin role: " + isAdminRole);
+                return isAdminRole;
+
+            } else {
+                System.out.println("No role found for roleId: " + roleId);
+                return false;
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error retrieving role for roleId " + roleId + ": " + e.getMessage());
+            e.printStackTrace();
+
+            boolean fallbackResult = roleId == 1 || roleId == 2; // Admin or Manager
+            System.out.println("Fallback result: " + fallbackResult);
+            return fallbackResult;
+        }
+    }
+
+    private boolean checkSpecificPermission(int roleId, String permissionCode) {
+        try {
+            // TODO: Implement this if you want permission-based access
+            // Example:
+            // return rolePermissionDAO.hasPermission(roleId, permissionCode);
+
+            System.out.println("Permission check not implemented yet - using fallback");
+            return false; // For now, return false to use role name check
+
+        } catch (Exception e) {
+            System.err.println("Error checking specific permission: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean isAdminForDevelopment(String userName) {
+        try {
+            User user = userDAO.getUserByUsername(userName);
+            if (user != null && user.isActiveStatus()) {
+                return true;
+            }
+            return false;
+        } catch (SQLException e) {
+            System.err.println("Error in development admin check: " + e.getMessage());
+            return false;
+        }
+    }
+
+    // ===== ALL OTHER EXISTING METHODS (unchanged) =====
+
+>>>>>>> Stashed changes
     public List<User> getAllUsers() {
         try {
             return userDAO.getAllActiveUsers();
@@ -254,12 +369,27 @@ public class AdminService {
 
     public boolean isAdmin(String userName) {
         try {
+<<<<<<< Updated upstream
             User user = userDAO.getUserByUsername(userName);
             if (user != null && user.isActiveStatus()) {
                 // roleId 1 = ADMIN, roleId 2 = MANAGER
                 return user.getRoleId() == 1 || user.getRoleId() == 2;
             }
             return false;
+=======
+            System.out.println("   keyword: " + keyword);
+            System.out.println("   roleId: " + roleId);
+            System.out.println("   activeStatus: " + activeStatus);
+
+
+            try {
+                ArrayList<User> simpleUsers = adminDAO.getAllUsersForAdmin();
+            } catch (Exception e) {
+            }
+
+            ArrayList<UserDisplay> result = adminDAO.searchAllUsersWithRole(keyword, roleId, activeStatus, "userid");
+            return result;
+>>>>>>> Stashed changes
         } catch (SQLException e) {
             System.out.println("Lỗi khi kiểm tra quyền admin: " + e.getMessage());
             return false;
@@ -268,7 +398,13 @@ public class AdminService {
 
     public int countUsers() {
         try {
+<<<<<<< Updated upstream
             return userDAO.getAllActiveUsers().size();
+=======
+
+            ArrayList<UserDisplay> result = adminDAO.searchAllUsersWithRole(keyword, roleId, activeStatus, sortBy);
+            return result;
+>>>>>>> Stashed changes
         } catch (SQLException e) {
             System.out.println("Lỗi khi đếm users: " + e.getMessage());
             return 0;
@@ -283,4 +419,37 @@ public class AdminService {
             return null;
         }
     }
+<<<<<<< Updated upstream
+=======
+
+    public int getInactiveUsersCount() {
+        try {
+            return adminDAO.countSearchResults(null, null, false);
+        } catch (SQLException e) {
+            System.err.println("Error counting inactive users: " + e.getMessage());
+            return 0;
+        }
+    }
+
+    public int getAdminUsersCount() {
+        try {
+            return adminDAO.countSearchResults(null, 1, null);
+        } catch (SQLException e) {
+            System.err.println("Error counting admin users: " + e.getMessage());
+            try {
+                List<User> users = userDAO.getAllActiveUsers();
+                return (int) users.stream().filter(user -> checkAdminPermissionByRole(user.getRoleId())).count();
+            } catch (SQLException fallbackError) {
+                return 0;
+            }
+        }
+    }
+
+    private Role createDefaultRole(int roleId, String roleName) {
+        Role role = new Role();
+        role.setRoleId(roleId);
+        role.setRoleName(roleName);
+        return role;
+    }
+>>>>>>> Stashed changes
 }
