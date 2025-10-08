@@ -33,18 +33,18 @@ public class UserSearchController extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         this.adminService = new AdminService();
-        System.out.println("🚀 UserSearchController initialized at " + java.time.LocalDateTime.now());
-        System.out.println("🚀 UserSearchController servlet mapping: /admin/users");
+        System.out.println(" UserSearchController initialized at " + java.time.LocalDateTime.now());
+        System.out.println(" UserSearchController servlet mapping: /admin/users");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        System.out.println("🚀 UserSearchController.doGet() CALLED! URL: " + request.getRequestURL());
-        System.out.println("🚀 Context Path: " + request.getContextPath());
-        System.out.println("🚀 Servlet Path: " + request.getServletPath());
-        System.out.println("🚀 Request URI: " + request.getRequestURI());
+        System.out.println("UserSearchController.doGet() CALLED! URL: " + request.getRequestURL());
+        System.out.println("Context Path: " + request.getContextPath());
+        System.out.println("Servlet Path: " + request.getServletPath());
+        System.out.println("Request URI: " + request.getRequestURI());
 
         String currentUser = getCurrentUser(request);
 

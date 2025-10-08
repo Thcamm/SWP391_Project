@@ -1,331 +1,503 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib
+prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt"
+uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Users - Admin Panel</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-</head>
-<body>
-<div class="container-fluid">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý Users - Admin</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-        <div class="container-fluid">
-                <span class="navbar-brand">
-                    <i class="bi bi-gear-fill"></i> Admin Panel
-                </span>
-            <div class="navbar-nav ms-auto">
-                    <span class="navbar-text">
-                        <i class="bi bi-person-circle"></i> Xin chào, <strong>${currentUser}</strong>
-                    </span>
-            </div>
-        </div>
+    <nav class="navbar navbar-dark bg-dark">
+      <div class="container-fluid">
+        <span class="navbar-brand"
+          ><i class="bi bi-people"></i> User Management</span
+        >
+        <span class="navbar-text">
+          <i class="bi bi-person-circle"></i> ${currentUser} |
+          <fmt:formatDate
+            value="<%= new java.util.Date() %>"
+            pattern="dd/MM/yyyy HH:mm"
+          />
+        </span>
+      </div>
     </nav>
 
-    <!-- HIỂN THỊ MESSAGE THAY VÌ JSON -->
-    <c:if test="${not empty message}">
-        <div class="row mb-3">
-            <div class="col-12">
-                <div class="alert ${messageType == 'success' ? 'alert-success' : 'alert-danger'} alert-dismissible fade show" role="alert">
-                    <c:choose>
-                        <c:when test="${messageType == 'success'}">
-                            <i class="bi bi-check-circle-fill"></i>
-                        </c:when>
-                        <c:otherwise>
-                            <i class="bi bi-exclamation-triangle-fill"></i>
-                        </c:otherwise>
-                    </c:choose>
-                        ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+    <div class="container-fluid mt-3">
+      <!-- Alert Messages -->
+      <c:if test="${not empty message}">
+        <c:choose>
+          <c:when test="${messageType == 'success'}">
+            <div class="alert alert-success alert-dismissible fade show">
+              <i class="bi bi-check-circle"></i>
+              ${message}
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+              ></button>
             </div>
-        </div>
-    </c:if>
+          </c:when>
+          <c:otherwise>
+            <div class="alert alert-danger alert-dismissible fade show">
+              <i class="bi bi-exclamation-triangle"></i>
+              ${message}
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+              ></button>
+            </div>
+          </c:otherwise>
+        </c:choose>
+      </c:if>
 
-    <!-- Page Title & Stats -->
-    <div class="row mb-4">
+      <!-- Action Menu -->
+      <div class="row mb-3">
         <div class="col-md-8">
-            <h2><i class="bi bi-people-fill"></i> Quản lý Users</h2>
-            <p class="text-muted">Ngày: <%= new java.util.Date() %></p>
+          <h3><i class="bi bi-search"></i> Tìm kiếm Users</h3>
         </div>
-        <div class="col-md-4">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <h5 class="card-title">Tổng Users</h5>
-                    <h3><i class="bi bi-people"></i> ${totalUsers}</h3>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Search Form -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="bi bi-search"></i> Tìm kiếm & Lọc</h5>
-                </div>
-                <div class="card-body">
-                    <form method="GET" action="${pageContext.request.contextPath}/admin/users/" class="row g-3">
-                        <div class="col-md-4">
-                            <label for="keyword" class="form-label">Từ khóa</label>
-                            <input type="text" class="form-control" id="keyword" name="keyword"
-                                   value="${searchKeyword}" placeholder="Tìm username, email, tên...">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="role" class="form-label">Vai trò</label>
-                            <select class="form-select" id="role" name="role">
-                                <option value="">Tất cả</option>
-                                <option value="1" ${selectedRole == 1 ? 'selected' : ''}>Admin</option>
-                                <option value="2" ${selectedRole == 2 ? 'selected' : ''}>Manager</option>
-                                <option value="3" ${selectedRole == 3 ? 'selected' : ''}>Employee</option>
-                                <option value="4" ${selectedRole == 4 ? 'selected' : ''}>User</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">&nbsp;</label>
-                            <div>
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="bi bi-search"></i> Tìm kiếm
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Create User Button -->
-    <div class="row mb-3">
-        <div class="col-12">
-            <button class="btn btn-success" data-bs-toggle="collapse" data-bs-target="#createUserForm">
-                <i class="bi bi-person-plus"></i> Tạo User Mới
+        <div class="col-md-4 text-end">
+          <div class="btn-group">
+            <a
+              href="${pageContext.request.contextPath}/admin/users/create"
+              class="btn btn-success"
+            >
+              <i class="bi bi-plus-circle"></i> Create User
+            </a>
+            <button
+              class="btn btn-outline-secondary dropdown-toggle"
+              data-bs-toggle="dropdown"
+            >
+              <i class="bi bi-gear"></i> Actions
             </button>
+            <ul class="dropdown-menu">
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="${pageContext.request.contextPath}/admin/users/bulk-disable"
+                >
+                  <i class="bi bi-lock"></i> Bulk Disable
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="${pageContext.request.contextPath}/admin/roles/assign"
+                >
+                  <i class="bi bi-shield"></i> Assign Roles
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <!-- Create User Form (Collapse) -->
-    <div class="collapse mb-4" id="createUserForm">
-        <div class="card">
-            <div class="card-header">
-                <h5>Tạo User Mới</h5>
+      <!-- Quick Stats -->
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+              <h4>${totalResults}</h4>
+              <small>Total Users</small>
             </div>
-            <div class="card-body">
-                <form method="POST" action="${pageContext.request.contextPath}/admin/users">
-                    <input type="hidden" name="action" value="createUser">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="fullName" class="form-label">Họ tên *</label>
-                                <input type="text" class="form-control" id="fullName" name="fullName" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="userName" class="form-label">Username *</label>
-                                <input type="text" class="form-control" id="userName" name="userName" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email *</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="phoneNumber" class="form-label">Số điện thoại</label>
-                                <input type="text" class="form-control" id="phoneNumber" name="phoneNumber">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="role" class="form-label">Vai trò *</label>
-                                <select class="form-select" id="role" name="role" required>
-                                    <option value="">Chọn vai trò</option>
-                                    <option value="1">Admin</option>
-                                    <option value="2">Manager</option>
-                                    <option value="3">Employee</option>
-                                    <option value="4">User</option>
-                                    <option value="5">Guest</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">&nbsp;</label>
-                                <div>
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="bi bi-person-plus"></i> Tạo User
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
+          </div>
         </div>
-    </div>
+        <div class="col-md-3">
+          <div class="card bg-success text-white">
+            <div class="card-body text-center">
+              <h4>${activeUsersCount}</h4>
+              <small>Active</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-warning text-white">
+            <div class="card-body text-center">
+              <h4>${inactiveUsersCount}</h4>
+              <small>Inactive</small>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card bg-danger text-white">
+            <div class="card-body text-center">
+              <h4>${adminUsersCount}</h4>
+              <small>Admins</small>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    <!-- Users Table -->
-    <div class="row">
+      <!-- Search Form -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5><i class="bi bi-funnel"></i> Search & Filter</h5>
+        </div>
+        <div class="card-body">
+          <form method="GET" class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Keyword</label>
+              <input
+                type="text"
+                class="form-control"
+                name="keyword"
+                value="${searchKeyword}"
+                placeholder="Username, email, name..."
+              />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Role</label>
+              <select class="form-select" name="role">
+                <option value="">All roles</option>
+                <c:forEach var="roleOption" items="${availableRoles}">
+                  <c:choose>
+                    <c:when test="${selectedRole == roleOption.roleId}">
+                      <option value="${roleOption.roleId}" selected>
+                        ${roleOption.roleName}
+                      </option>
+                    </c:when>
+                    <c:otherwise>
+                      <option value="${roleOption.roleId}">
+                        ${roleOption.roleName}
+                      </option>
+                    </c:otherwise>
+                  </c:choose>
+                </c:forEach>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Status</label>
+              <select class="form-select" name="status">
+                <option value="">All status</option>
+                <c:choose>
+                  <c:when test="${selectedStatus == 'active'}">
+                    <option value="active" selected>Active</option>
+                  </c:when>
+                  <c:otherwise>
+                    <option value="active">Active</option>
+                  </c:otherwise>
+                </c:choose>
+                <c:choose>
+                  <c:when test="${selectedStatus == 'inactive'}">
+                    <option value="inactive" selected>Inactive</option>
+                  </c:when>
+                  <c:otherwise>
+                    <option value="inactive">Inactive</option>
+                  </c:otherwise>
+                </c:choose>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">&nbsp;</label>
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-search"></i> Search
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Quick Filters -->
+      <div class="mb-3">
+        <div class="btn-group">
+          <c:choose>
+            <c:when test="${selectedStatus == 'active'}">
+              <a href="?status=active" class="btn btn-success btn-sm">
+                <i class="bi bi-check-circle"></i> Active
+              </a>
+            </c:when>
+            <c:otherwise>
+              <a href="?status=active" class="btn btn-outline-success btn-sm">
+                <i class="bi bi-check-circle"></i> Active
+              </a>
+            </c:otherwise>
+          </c:choose>
+          <c:choose>
+            <c:when test="${selectedStatus == 'inactive'}">
+              <a href="?status=inactive" class="btn btn-warning btn-sm">
+                <i class="bi bi-x-circle"></i> Inactive
+              </a>
+            </c:when>
+            <c:otherwise>
+              <a href="?status=inactive" class="btn btn-outline-warning btn-sm">
+                <i class="bi bi-x-circle"></i> Inactive
+              </a>
+            </c:otherwise>
+          </c:choose>
+          <c:choose>
+            <c:when test="${selectedRole == 1}">
+              <a href="?role=1" class="btn btn-danger btn-sm">
+                <i class="bi bi-shield"></i> Admins
+              </a>
+            </c:when>
+            <c:otherwise>
+              <a href="?role=1" class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-shield"></i> Admins
+              </a>
+            </c:otherwise>
+          </c:choose>
+          <a href="?" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-clockwise"></i> Reset
+          </a>
+        </div>
+      </div>
+
+      <!-- Results Table -->
+      <div class="card">
+        <div class="card-header d-flex justify-content-between">
+          <span>Search Results (${totalResults} users)</span>
+          <small class="text-muted">
+            <c:if test="${hasSearchCriteria}">
+              Filtered results |
+              <a href="?" class="text-decoration-none">Show all</a>
+            </c:if>
+          </small>
+        </div>
+        <div class="card-body p-0">
+          <c:choose>
+            <c:when test="${empty users}">
+              <div class="text-center p-5">
+                <i class="bi bi-search display-4 text-muted"></i>
+                <h5 class="text-muted mt-3">No users found</h5>
+                <p class="text-muted">Try adjusting your search criteria</p>
+                <a
+                  href="${pageContext.request.contextPath}/admin/users/create"
+                  class="btn btn-success"
+                >
+                  <i class="bi bi-plus-circle"></i> Create First User
+                </a>
+              </div>
+            </c:when>
+            <c:otherwise>
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>
+                        <a
+                          href="?sort=userid&keyword=${searchKeyword}&role=${selectedRole}&status=${selectedStatus}"
+                          class="text-white text-decoration-none"
+                        >
+                          ID
+                          <c:if test="${currentSort == 'userid'}">
+                            <i class="bi bi-arrow-up"></i>
+                          </c:if>
+                        </a>
+                      </th>
+                      <th>
+                        <a
+                          href="?sort=username&keyword=${searchKeyword}&role=${selectedRole}&status=${selectedStatus}"
+                          class="text-white text-decoration-none"
+                        >
+                          Username
+                          <c:if test="${currentSort == 'username'}">
+                            <i class="bi bi-arrow-up"></i>
+                          </c:if>
+                        </a>
+                      </th>
+                      <th>
+                        <a
+                          href="?sort=fullname&keyword=${searchKeyword}&role=${selectedRole}&status=${selectedStatus}"
+                          class="text-white text-decoration-none"
+                        >
+                          Full Name
+                          <c:if test="${currentSort == 'fullname'}">
+                            <i class="bi bi-arrow-up"></i>
+                          </c:if>
+                        </a>
+                      </th>
+                      <th>
+                        <a
+                          href="?sort=email&keyword=${searchKeyword}&role=${selectedRole}&status=${selectedStatus}"
+                          class="text-white text-decoration-none"
+                        >
+                          Email
+                          <c:if test="${currentSort == 'email'}">
+                            <i class="bi bi-arrow-up"></i>
+                          </c:if>
+                        </a>
+                      </th>
+                      <th>
+                        <a
+                          href="?sort=rolename&keyword=${searchKeyword}&role=${selectedRole}&status=${selectedStatus}"
+                          class="text-white text-decoration-none"
+                        >
+                          Role
+                          <c:if test="${currentSort == 'rolename'}">
+                            <i class="bi bi-arrow-up"></i>
+                          </c:if>
+                        </a>
+                      </th>
+                      <th>
+                        <a
+                          href="?sort=status&keyword=${searchKeyword}&role=${selectedRole}&status=${selectedStatus}"
+                          class="text-white text-decoration-none"
+                        >
+                          Status
+                          <c:if test="${currentSort == 'status'}">
+                            <i class="bi bi-arrow-up"></i>
+                          </c:if>
+                        </a>
+                      </th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <c:forEach var="user" items="${users}">
+                      <tr>
+                        <td>
+                          <span class="badge bg-light text-dark"
+                            >${user.userId}</span
+                          >
+                        </td>
+                        <td>
+                          <strong>${user.userName}</strong>
+                          <c:if test="${user.userName == currentUser}">
+                            <span class="badge bg-warning text-dark ms-1"
+                              >You</span
+                            >
+                          </c:if>
+                        </td>
+                        <td>${user.fullName}</td>
+                        <td>
+                          <c:choose>
+                            <c:when test="${not empty user.email}">
+                              <a
+                                href="mailto:${user.email}"
+                                class="text-decoration-none"
+                                >${user.email}</a
+                              >
+                            </c:when>
+                            <c:otherwise
+                              ><span class="text-muted"
+                                >No email</span
+                              ></c:otherwise
+                            >
+                          </c:choose>
+                        </td>
+                        <td>
+                          <span class="badge ${user.roleBadgeClass}"
+                            >${user.roleName}</span
+                          >
+                        </td>
+                        <td>
+                          <c:choose>
+                            <c:when test="${user.activeStatus}">
+                              <span class="badge bg-success">Active</span>
+                            </c:when>
+                            <c:otherwise>
+                              <span class="badge bg-danger">Inactive</span>
+                            </c:otherwise>
+                          </c:choose>
+                        </td>
+                        <td>
+                          <div class="btn-group btn-group-sm">
+                            <a
+                              href="${pageContext.request.contextPath}/admin/users/view/${user.userId}"
+                              class="btn btn-outline-info"
+                              title="View"
+                            >
+                              <i class="bi bi-eye"></i>
+                            </a>
+                            <a
+                              href="${pageContext.request.contextPath}/admin/users/edit/${user.userId}"
+                              class="btn btn-outline-primary"
+                              title="Edit"
+                            >
+                              <i class="bi bi-pencil"></i>
+                            </a>
+                            <a
+                              href="${pageContext.request.contextPath}/admin/users/roles/${user.userId}"
+                              class="btn btn-outline-warning"
+                              title="Manage Roles"
+                            >
+                              <i class="bi bi-shield"></i>
+                            </a>
+                            <c:if test="${user.userName != currentUser}">
+                              <c:choose>
+                                <c:when test="${user.activeStatus}">
+                                  <a
+                                    href="${pageContext.request.contextPath}/admin/users/disable/${user.userId}"
+                                    class="btn btn-outline-danger"
+                                    title="Disable"
+                                    onclick="return confirm('Are you sure?')"
+                                  >
+                                    <i class="bi bi-lock"></i>
+                                  </a>
+                                </c:when>
+                                <c:otherwise>
+                                  <a
+                                    href="${pageContext.request.contextPath}/admin/users/disable/${user.userId}"
+                                    class="btn btn-outline-success"
+                                    title="Enable"
+                                    onclick="return confirm('Are you sure?')"
+                                  >
+                                    <i class="bi bi-unlock"></i>
+                                  </a>
+                                </c:otherwise>
+                              </c:choose>
+                            </c:if>
+                          </div>
+                        </td>
+                      </tr>
+                    </c:forEach>
+                  </tbody>
+                </table>
+              </div>
+            </c:otherwise>
+          </c:choose>
+        </div>
+      </div>
+
+      <!-- Footer Info -->
+      <div class="row mt-4">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5><i class="bi bi-table"></i> Danh sách Users</h5>
-                </div>
-                <div class="card-body">
-                    <c:choose>
-                        <c:when test="${empty users}">
-                            <div class="text-center p-4">
-                                <i class="bi bi-inbox display-1 text-muted"></i>
-                                    <p class="text-muted">Không tìm thấy user nào</p>
-                            </div>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="table-responsive">
-                                <table class="table table-striped table-hover">
-                                    <thead class="table-dark">
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Username</th>
-                                        <th>Họ tên</th>
-                                        <th>Email</th>
-                                        <th>Vai trò</th>
-                                        <th>Trạng thái</th>
-                                        <th>Thao tác</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <c:forEach var="user" items="${users}">
-                                        <tr>
-                                            <td>${user.userId}</td>
-                                            <td>
-                                                <strong>${user.userName}</strong>
-                                                <c:if test="${user.userName == currentUser}">
-                                                    <span class="badge bg-warning text-dark">Bạn</span>
-                                                </c:if>
-                                            </td>
-                                            <td>${user.fullName}</td>
-                                            <td>${user.email}</td>
-                                            <td>
-                                                <c:choose>
-                                                    <c:when test="${user.roleId == 1}">
-                                                        <span class="badge bg-danger">Admin</span>
-                                                    </c:when>
-                                                    <c:when test="${user.roleId == 2}">
-                                                        <span class="badge bg-warning text-dark">Manager</span>
-                                                    </c:when>
-                                                    <c:when test="${user.roleId == 3}">
-                                                        <span class="badge bg-info">Employee</span>
-                                                    </c:when>
-                                                    <c:when test="${user.roleId == 4}">
-                                                        <span class="badge bg-primary">User</span>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="badge bg-secondary">Guest</span>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </td>
-                                            <td>
-                                                <c:choose>
-                                                    <c:when test="${user.activeStatus}">
-                                                        <span class="badge bg-success">Hoạt động</span>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="badge bg-danger">Không hoạt động</span>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </td>
-                                            <td>
-                                                <!-- FORM BUTTONS THAY VÌ JAVASCRIPT -->
-                                                <div class="btn-group" role="group">
-                                                    <!-- Change Role -->
-                                                    <button class="btn btn-sm btn-outline-primary"
-                                                            data-bs-toggle="collapse"
-                                                            data-bs-target="#roleForm${user.userId}"
-                                                        ${user.userName == currentUser ? 'disabled' : ''}>
-                                                        <i class="bi bi-shield-check"></i>
-                                                    </button>
-
-                                                    <!-- Toggle Status -->
-                                                    <form method="POST" action="/admin/users" style="display:inline;">
-                                                        <input type="hidden" name="action" value="toggleStatus">
-                                                        <input type="hidden" name="userId" value="${user.userId}">
-                                                        <button class="btn btn-sm ${user.activeStatus ? 'btn-outline-warning' : 'btn-outline-success'}"
-                                                                type="submit"
-                                                            ${user.userName == currentUser ? 'disabled' : ''}
-                                                                onclick="return confirm('Bạn có chắc muốn thay đổi trạng thái?')">
-                                                            <i class="bi ${user.activeStatus ? 'bi-lock' : 'bi-unlock'}"></i>
-                                                        </button>
-                                                    </form>
-
-                                                    <!-- Reset Password -->
-                                                    <form method="POST" action="/admin/users" style="display:inline;">
-                                                        <input type="hidden" name="action" value="resetPassword">
-                                                        <input type="hidden" name="userId" value="${user.userId}">
-                                                        <button class="btn btn-sm btn-outline-secondary"
-                                                                type="submit"
-                                                                onclick="return confirm('Bạn có chắc muốn reset password?')">
-                                                            <i class="bi bi-key"></i>
-                                                        </button>
-                                                    </form>
-
-                                                    <!-- Activate (chỉ hiện khi inactive) -->
-                                                    <c:if test="${!user.activeStatus}">
-                                                        <form method="POST" action="/admin/users" style="display:inline;">
-                                                            <input type="hidden" name="action" value="activate">
-                                                            <input type="hidden" name="userId" value="${user.userId}">
-                                                            <button class="btn btn-sm btn-outline-success"
-                                                                    type="submit"
-                                                                    onclick="return confirm('Bạn có chắc muốn kích hoạt user này?')">
-                                                                <i class="bi bi-check-circle"></i>
-                                                            </button>
-                                                        </form>
-                                                    </c:if>
-                                                </div>
-
-                                                <!-- Role Change Form (Collapse) -->
-                                                <div class="collapse mt-2" id="roleForm${user.userId}">
-                                                    <form method="POST" action="/admin/users" class="border p-2 rounded bg-light">
-                                                        <input type="hidden" name="action" value="changeRole">
-                                                        <input type="hidden" name="userId" value="${user.userId}">
-                                                        <div class="row">
-                                                            <div class="col-8">
-                                                                <select name="newRole" class="form-select form-select-sm">
-                                                                    <option value="1" ${user.roleId == 1 ? 'selected' : ''}>Admin</option>
-                                                                    <option value="2" ${user.roleId == 2 ? 'selected' : ''}>Manager</option>
-                                                                    <option value="3" ${user.roleId == 3 ? 'selected' : ''}>Employee</option>
-                                                                    <option value="4" ${user.roleId == 4 ? 'selected' : ''}>User</option>
-                                                                    <option value="5" ${user.roleId == 5 ? 'selected' : ''}>Guest</option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="col-4">
-                                                                <button type="submit" class="btn btn-sm btn-primary w-100">
-                                                                    Đổi
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-            </div>
+          <div class="alert alert-light">
+            <small class="text-muted">
+              <i class="bi bi-info-circle"></i>
+              <strong>Quick Actions:</strong>
+              <a
+                href="${pageContext.request.contextPath}/admin/users/create"
+                class="text-decoration-none"
+                >Create User</a
+              >
+              |
+              <a
+                href="${pageContext.request.contextPath}/admin/users/bulk-disable"
+                class="text-decoration-none"
+                >Bulk Disable</a
+              >
+              |
+              <a
+                href="${pageContext.request.contextPath}/admin/roles/"
+                class="text-decoration-none"
+                >Manage Roles</a
+              >
+              |
+              <a
+                href="${pageContext.request.contextPath}/admin/reports"
+                class="text-decoration-none"
+                >View Reports</a
+              >
+            </small>
+          </div>
         </div>
+      </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>

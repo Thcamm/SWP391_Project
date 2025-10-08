@@ -53,35 +53,35 @@ public class AdminService {
             boolean hasAdminPermission = checkAdminPermissionByRole(user.getRoleId());
 
             if (hasAdminPermission) {
-                System.out.println("✅ User HAS ADMIN permission - Access GRANTED");
+
             } else {
-                System.out.println("❌ User DOES NOT HAVE ADMIN permission - Access DENIED");
+                System.out.println(" User DOES NOT HAVE ADMIN permission - Access DENIED");
             }
 
             return hasAdminPermission;
 
         } catch (SQLException e) {
-            System.err.println("💥 ERROR checking admin privileges: " + e.getMessage());
+            System.err.println(" ERROR checking admin privileges: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
 
     /**
-     * ✅ NEW METHOD: Check admin permission by role name/characteristics
+     * NEW METHOD: Check admin permission by role name/characteristics
      */
     private boolean checkAdminPermissionByRole(int roleId) {
         try {
             System.out.println("Checking role permissions for roleId: " + roleId);
 
-            // ✅ Use your existing findById() method
+            // Use your existing findById() method
             Role role = roleDao.findById(roleId);
 
             if (role != null) {
                 String roleName = role.getRoleName().toLowerCase();
                 System.out.println("Found role: " + roleName);
 
-                // ✅ FLEXIBLE: Check by role name patterns
+                // FLEXIBLE: Check by role name patterns
                 boolean isAdminRole = roleName.contains("admin") ||
                         roleName.contains("manager") ||
                         roleName.contains("supervisor") ||
@@ -93,16 +93,16 @@ public class AdminService {
                 return isAdminRole;
 
             } else {
-                System.out.println("❌ Role not found for roleId: " + roleId);
+                System.out.println(" Role not found for roleId: " + roleId);
                 return false;
             }
 
         } catch (SQLException e) {
-            System.err.println("💥 Error checking role permission: " + e.getMessage());
+            System.err.println(" Error checking role permission: " + e.getMessage());
             e.printStackTrace();
 
             // ✅ FALLBACK: Use original hardcoded logic if database fails
-            System.out.println("🔄 Using fallback logic - checking roleId: " + roleId);
+            System.out.println(" Using fallback logic - checking roleId: " + roleId);
             boolean fallbackResult = roleId == 1 || roleId == 2; // Admin or Manager
             System.out.println("Fallback result: " + fallbackResult);
             return fallbackResult;
@@ -110,11 +110,10 @@ public class AdminService {
     }
 
     /**
-     * ✅ ALTERNATIVE: Check specific permission (if you implement Permission system)
+     * ALTERNATIVE: Check specific permission (if you implement Permission system)
      */
     private boolean checkSpecificPermission(int roleId, String permissionCode) {
         try {
-            // TODO: Implement this if you want permission-based access
             // Example:
             // return rolePermissionDAO.hasPermission(roleId, permissionCode);
 
@@ -128,14 +127,14 @@ public class AdminService {
     }
 
     /**
-     * ✅ ALTERNATIVE: Completely bypass permission check for development
+     * ALTERNATIVE: Completely bypass permission check for development
      */
     public boolean isAdminForDevelopment(String userName) {
         try {
             User user = userDAO.getUserByUsername(userName);
             if (user != null && user.isActiveStatus()) {
-                System.out.println("🚧 DEVELOPMENT MODE: Granting admin access to: " + userName);
-                return true; // ✅ Allow any active user for development
+                System.out.println(" DEVELOPMENT MODE: Granting admin access to: " + userName);
+                return true; // Allow any active user for development
             }
             return false;
         } catch (SQLException e) {
