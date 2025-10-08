@@ -1,10 +1,11 @@
 package model.user;
 
-import java.time.LocalDateTime;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 public class User {
-    private int userId;
+    private Integer userId;
     private int roleId;
     private String fullName;
     private String userName;
@@ -12,43 +13,20 @@ public class User {
     private String phoneNumber;
     private String passwordHash;
     private boolean activeStatus;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
+    private String gender;
+    private Date birthDate;
+    private String address;
 
-    public User() {
-    }
+    public User() {}
 
-    public User(int userId, int roleId, String fullName, String userName,
-            String email, String phoneNumber, String passwordHash,
-            boolean activeStatus, LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.userId = userId;
-        this.roleId = roleId;
-        this.fullName = fullName;
-        this.userName = userName;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.passwordHash = passwordHash;
-        this.activeStatus = activeStatus;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
-    public class User {
-        private int userId; // Đổi từ int thành Integer để có thể null
-        private int roleId;
-        private String fullName;
-        private String userName;
-        private String email;
-        private String phoneNumber;
-        private String passwordHash;
-        private boolean activeStatus;
-    }
-
-    public int getUserId() {
+    //<editor-fold defaultstate="collapsed" desc="Getters and Setters">
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
@@ -108,40 +86,56 @@ public class User {
         this.activeStatus = activeStatus;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Timestamp getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (!(o instanceof User))
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return userId == user.userId;
+        return Objects.equals(userId, user.userId);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(userId);
-    }
-
-    @Override
-    public String toString() {
-        return "User{userId=" + userId + ", roleId=" + roleId +
-                ", userName='" + userName + "', email='" + email + "', active=" + activeStatus + "}";
     }
 }
