@@ -12,7 +12,17 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/role/role-page.css">
 
 </head>
-<body class="rbac-page">
+<body>
+<h2>Role -> Permission (RBAC)</h2>
+
+
+<a href="${pageContext.request.contextPath}/roles?action=list"
+   style="display: inline-block; margin-bottom: 10px; text-decoration: none; background-color: #777; color: white; padding: 6px 12px; border-radius: 4px;">
+    ⬅ Back to Role List
+</a>
+<c:if test = "${param.saved == '1'}">
+    <div class="msg"> Save permission successfully!</div>
+</c:if>
 
 <div class="container rbac-container">
     <h1 class="page-title">Role -> Permission (RBAC)</h1>
