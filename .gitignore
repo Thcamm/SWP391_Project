@@ -8,6 +8,15 @@ target/
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/.gitignore
+.idea/copilot.data.migration.agent.xml
+.idea/copilot.data.migration.ask.xml
+.idea/copilot.data.migration.ask2agent.xml
+.idea/copilot.data.migration.edit.xml
+.idea/encodings.xml
+.idea/misc.xml
+.idea/sqlDataSources.xml
+.idea/vcs.xml
 *.iws
 *.iml
 *.ipr
@@ -36,3 +45,11 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+
+
+
+
+        src/main/java/common/DbContext.java
+        src/main/java/common/DbPing.java
+        src/main/webapp/META-INF/context.xml
