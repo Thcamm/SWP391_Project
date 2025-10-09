@@ -53,3 +53,5 @@ build/
         src/main/java/common/DbContext.java
         src/main/java/common/DbPing.java
         src/main/webapp/META-INF/context.xml
+.idea/workspace.xml
+target/GarageSystem.war
