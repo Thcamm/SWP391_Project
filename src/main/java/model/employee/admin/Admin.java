@@ -1,6 +1,8 @@
-package model.employee;
+package model.employee.admin;
 
-public class Admin extends Employee{
+import model.employee.Employee;
+
+public class Admin extends Employee {
     public Admin() {
         super();
     }

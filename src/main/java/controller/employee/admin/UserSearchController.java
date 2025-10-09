@@ -33,11 +33,18 @@ public class UserSearchController extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         this.adminService = new AdminService();
+        System.out.println(" UserSearchController initialized at " + java.time.LocalDateTime.now());
+        System.out.println(" UserSearchController servlet mapping: /admin/users");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        System.out.println("UserSearchController.doGet() CALLED! URL: " + request.getRequestURL());
+        System.out.println("Context Path: " + request.getContextPath());
+        System.out.println("Servlet Path: " + request.getServletPath());
+        System.out.println("Request URI: " + request.getRequestURI());
 
         String currentUser = getCurrentUser(request);
 
@@ -64,15 +71,9 @@ public class UserSearchController extends HttpServlet {
             Boolean activeStatus = parseStatusParameter(statusParam);
 
             // Use the new search method with sort parameter
-            System.out.println(" DEBUG: Using search with sort parameter: " + sortBy);
+            System.out.println("🔧 DEBUG: Using search with sort parameter: " + sortBy);
             ArrayList<UserDisplay> searchResults = adminService.searchUsers(keyword, roleId, activeStatus, sortBy);
             int totalResults = searchResults.size();
-
-            // Original complex search (temporarily disabled for debugging)
-            // ArrayList<UserDisplay> searchResults = adminService.searchUsers(keyword,
-            // roleId, activeStatus);
-            // int totalResults = adminService.getSearchResultCount(keyword, roleId,
-            // activeStatus);
 
             ArrayList<Role> availableRoles = adminService.getAvailableRoles();
 
@@ -147,6 +148,7 @@ public class UserSearchController extends HttpServlet {
         }
     }
 
+    // ===== HELPER METHODS =====
 
     private String getCurrentUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
