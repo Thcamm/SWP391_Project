@@ -329,13 +329,5 @@ public class AdminService {
         role.setRoleName(roleName);
         return role;
     }
-
-    public List<User> getUsersByRole(int roleId) {
-        return null;
-    }
-
-    public int countUsers() {
-        return 0;
-    }
 }
 

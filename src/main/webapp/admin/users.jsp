@@ -36,19 +36,30 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
     <div class="container-fluid mt-3">
       <!-- Alert Messages -->
       <c:if test="${not empty message}">
-        <div
-          class="alert alert-${messageType == 'success' ? 'success' : 'danger'} alert-dismissible fade show"
-        >
-          <i
-            class="bi bi-${messageType == 'success' ? 'check-circle' : 'exclamation-triangle'}"
-          ></i>
-          ${message}
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="alert"
-          ></button>
-        </div>
+        <c:choose>
+          <c:when test="${messageType == 'success'}">
+            <div class="alert alert-success alert-dismissible fade show">
+              <i class="bi bi-check-circle"></i>
+              ${message}
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+              ></button>
+            </div>
+          </c:when>
+          <c:otherwise>
+            <div class="alert alert-danger alert-dismissible fade show">
+              <i class="bi bi-exclamation-triangle"></i>
+              ${message}
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+              ></button>
+            </div>
+          </c:otherwise>
+        </c:choose>
       </c:if>
 
       <!-- Action Menu -->
@@ -92,65 +103,6 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
         </div>
       </div>
 
-<<<<<<< Updated upstream
-    <!-- Create User Form (Collapse) -->
-    <div class="collapse mb-4" id="createUserForm">
-        <div class="card">
-            <div class="card-header">
-                <h5>Tạo User Mới</h5>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="${pageContext.request.contextPath}/admin/users">
-                    <input type="hidden" name="action" value="createUser">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="fullName" class="form-label">Họ tên *</label>
-                                <input type="text" class="form-control" id="fullName" name="fullName" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="userName" class="form-label">Username *</label>
-                                <input type="text" class="form-control" id="userName" name="userName" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email *</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="phoneNumber" class="form-label">Số điện thoại</label>
-                                <input type="text" class="form-control" id="phoneNumber" name="phoneNumber">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="role" class="form-label">Vai trò *</label>
-                                <select class="form-select" id="role" name="role" required>
-                                    <option value="">Chọn vai trò</option>
-                                    <option value="2">Manager</option>
-                                    <option value="3">Employee</option>
-                                    <option value="4">User</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">&nbsp;</label>
-                                <div>
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="bi bi-person-plus"></i> Tạo User
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-=======
       <!-- Quick Stats -->
       <div class="row mb-4">
         <div class="col-md-3">
@@ -158,7 +110,6 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
             <div class="card-body text-center">
               <h4>${totalResults}</h4>
               <small>Total Users</small>
->>>>>>> Stashed changes
             </div>
           </div>
         </div>
@@ -443,11 +394,14 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                           >
                         </td>
                         <td>
-                          <span
-                            class="badge ${user.activeStatus ? 'bg-success' : 'bg-danger'}"
-                          >
-                            ${user.activeStatus ? 'Active' : 'Inactive'}
-                          </span>
+                          <c:choose>
+                            <c:when test="${user.activeStatus}">
+                              <span class="badge bg-success">Active</span>
+                            </c:when>
+                            <c:otherwise>
+                              <span class="badge bg-danger">Inactive</span>
+                            </c:otherwise>
+                          </c:choose>
                         </td>
                         <td>
                           <div class="btn-group btn-group-sm">
@@ -473,16 +427,28 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                               <i class="bi bi-shield"></i>
                             </a>
                             <c:if test="${user.userName != currentUser}">
-                              <a
-                                href="${pageContext.request.contextPath}/admin/users/disable/${user.userId}"
-                                class="btn ${user.activeStatus ? 'btn-outline-danger' : 'btn-outline-success'}"
-                                title="${user.activeStatus ? 'Disable' : 'Enable'}"
-                                onclick="return confirm('Are you sure?')"
-                              >
-                                <i
-                                  class="bi ${user.activeStatus ? 'bi-lock' : 'bi-unlock'}"
-                                ></i>
-                              </a>
+                              <c:choose>
+                                <c:when test="${user.activeStatus}">
+                                  <a
+                                    href="${pageContext.request.contextPath}/admin/users/disable/${user.userId}"
+                                    class="btn btn-outline-danger"
+                                    title="Disable"
+                                    onclick="return confirm('Are you sure?')"
+                                  >
+                                    <i class="bi bi-lock"></i>
+                                  </a>
+                                </c:when>
+                                <c:otherwise>
+                                  <a
+                                    href="${pageContext.request.contextPath}/admin/users/disable/${user.userId}"
+                                    class="btn btn-outline-success"
+                                    title="Enable"
+                                    onclick="return confirm('Are you sure?')"
+                                  >
+                                    <i class="bi bi-unlock"></i>
+                                  </a>
+                                </c:otherwise>
+                              </c:choose>
                             </c:if>
                           </div>
                         </td>

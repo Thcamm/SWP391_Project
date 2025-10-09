@@ -20,7 +20,7 @@ public class RoleService {
 
     private static final Set<String> SYSTEM_ROLES = Set.of("ADMINISTRATOR", "SUPER_ADMIN");
 
-    public Role createRole(String rawName) throws SQLException {
+    public Role createRole(String rawName, String description) throws SQLException {
         String name = NameValidator.normalizeDisplayName(rawName);
 
         var vr = NameValidator.validateDisplayName(
@@ -37,15 +37,16 @@ public class RoleService {
 
         if (!vr.valid) throw new IllegalArgumentException(String.join("; ", vr.errors));
 
-        int id = roleDao.insert(vr.normalizedValue);
+        int id = roleDao.insert(vr.normalizedValue, description);
         Role r = new Role();
         r.setRoleId(id);
         r.setRoleName(vr.normalizedValue);
+        r.setDesrciption(description);
         return r;
 
     }
 
-    public Role renameRole(int roleId, String newName) throws SQLException {
+    public Role renameRole(int roleId, String newName, String newDescription) throws SQLException {
         if(roleId <= 0){
             throw new IllegalArgumentException("Invalid role ID");
         }
@@ -77,6 +78,7 @@ public class RoleService {
         }
 
         current.setRoleName(vr.normalizedValue);
+        current.setDesrciption(newDescription);
         roleDao.update(current);
         return current;
     }

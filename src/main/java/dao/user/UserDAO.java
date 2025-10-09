@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package dao.user;
 
 import common.DbContext;
@@ -14,117 +9,71 @@ import java.util.ArrayList;
 import model.user.User;
 
 public class UserDAO extends DbContext {
-    public Connection getDBConnect() throws SQLException {
-        return DbContext.getConnection();
-    }
 
+    // Lấy user bằng ID (khi user đã active)
     public User getUserById(int userId) throws SQLException {
         String sql = "SELECT * FROM User WHERE UserID = ? AND ActiveStatus = 1";
-
-        try (
-                Connection conn = this.getDBConnect();
-                PreparedStatement ps = conn.prepareStatement(sql);
-        ) {
+        try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
-
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    User var6 = this.extractUser(rs);
-                    return var6;
+                    return extractUser(rs);
                 }
             }
         }
-
         return null;
     }
 
-    public User getPasswordHashByUsername(String userName) throws SQLException {
-        String sql = "SELECT PasswordHash FROM User WHERE UserName = ? AND ActiveStatus = 1";
-
-        try (
-                Connection conn = this.getDBConnect();
-                PreparedStatement ps = conn.prepareStatement(sql);
-        ) {
-            ps.setString(1, userName);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    User user = new User();
-                    user.setPasswordHash(rs.getString("PasswordHash"));
-                    User var7 = user;
-                    return var7;
-                }
-            }
-        }
-
-        return null;
-    }
-
+    // Lấy user bằng username (khi user đã active), đã bỏ phương thức bị trùng
     public User getUserByUserName(String userName) throws SQLException {
         String sql = "SELECT * FROM User WHERE UserName = ? AND ActiveStatus = 1";
-
-        try (
-                Connection conn = this.getDBConnect();
-                PreparedStatement ps = conn.prepareStatement(sql);
-        ) {
+        try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, userName);
-
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    User var6 = this.extractUser(rs);
-                    return var6;
+                    return extractUser(rs);
                 }
             }
         }
-
         return null;
     }
 
-    public ArrayList<User> getAllActiveUsers() throws SQLException {
-        String sql = "SELECT * FROM User WHERE ActiveStatus = 1";
-        ArrayList<User> users = new ArrayList();
-
-        try (
-                Connection conn = this.getDBConnect();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery();
-        ) {
-            while(rs.next()) {
-                users.add(this.extractUser(rs));
+    // Lấy user bằng email (khi user đã active)
+    public User getUserByEmail(String email) throws SQLException {
+        String sql = "SELECT * FROM User WHERE Email = ? AND ActiveStatus = 1";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return extractUser(rs);
+                }
             }
         }
+        return null;
+    }
 
+    // Lấy tất cả user đang active
+    public ArrayList<User> getAllActiveUsers() throws SQLException {
+        String sql = "SELECT * FROM User WHERE ActiveStatus = 1";
+        ArrayList<User> users = new ArrayList<>();
+        try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                users.add(extractUser(rs));
+            }
+        }
         return users;
     }
 
-    public User getUserByUsername(String userName) throws SQLException {
-        String sql = "SELECT * FROM User WHERE UserName = ? AND ActiveStatus = 1";
-
-        try (
-                Connection conn = this.getDBConnect();
-                PreparedStatement ps = conn.prepareStatement(sql);
-        ) {
-            ps.setString(1, userName);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    User var6 = this.extractUser(rs);
-                    return var6;
-                }
-            }
-        }
-
-        return null;
-    }
-
+    // Thêm user mới
     public boolean addUser(User user) throws SQLException {
         String sql = "INSERT INTO User (RoleID, FullName, UserName, Email, PhoneNumber, PasswordHash, ActiveStatus) VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-        boolean var5;
-        try (
-                Connection conn = this.getDBConnect();
-                PreparedStatement ps = conn.prepareStatement(sql);
-        ) {
+        try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, user.getRoleId());
             ps.setString(2, user.getFullName());
             ps.setString(3, user.getUserName());
@@ -132,20 +81,29 @@ public class UserDAO extends DbContext {
             ps.setString(5, user.getPhoneNumber());
             ps.setString(6, user.getPasswordHash());
             ps.setBoolean(7, user.isActiveStatus());
-            var5 = ps.executeUpdate() > 0;
+            return ps.executeUpdate() > 0;
         }
-
-        return var5;
     }
 
+    // Thêm user mới từ Google (chỉ có email, fullname, có thể không có password)
+    public boolean insertGoogleUser(User user) throws SQLException {
+        String sql = "INSERT INTO User (RoleID, FullName, UserName, Email, ActiveStatus) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, user.getRoleId());
+            ps.setString(2, user.getFullName());
+            ps.setString(3, user.getUserName());
+            ps.setString(4, user.getEmail());
+            ps.setBoolean(5, user.isActiveStatus());
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    // Cập nhật thông tin user
     public boolean updateUser(User user) throws SQLException {
         String sql = "UPDATE User SET RoleID=?, FullName=?, UserName=?, Email=?, PhoneNumber=?, PasswordHash=?, ActiveStatus=? WHERE UserID=?";
-
-        boolean var5;
-        try (
-                Connection conn = this.getDBConnect();
-                PreparedStatement ps = conn.prepareStatement(sql);
-        ) {
+        try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, user.getRoleId());
             ps.setString(2, user.getFullName());
             ps.setString(3, user.getUserName());
@@ -154,27 +112,21 @@ public class UserDAO extends DbContext {
             ps.setString(6, user.getPasswordHash());
             ps.setBoolean(7, user.isActiveStatus());
             ps.setInt(8, user.getUserId());
-            var5 = ps.executeUpdate() > 0;
+            return ps.executeUpdate() > 0;
         }
-
-        return var5;
     }
 
+    // "Xóa" user (thực chất là chuyển trạng thái active = 0)
     public boolean deleteUser(int userId) throws SQLException {
         String sql = "UPDATE User SET ActiveStatus = 0 WHERE UserID = ?";
-
-        boolean var5;
-        try (
-                Connection conn = this.getDBConnect();
-                PreparedStatement ps = conn.prepareStatement(sql);
-        ) {
+        try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
-            var5 = ps.executeUpdate() > 0;
+            return ps.executeUpdate() > 0;
         }
-
-        return var5;
     }
 
+    // Helper method để map ResultSet sang đối tượng User
     private User extractUser(ResultSet rs) throws SQLException {
         User user = new User();
         user.setUserId(rs.getInt("UserID"));
@@ -185,48 +137,28 @@ public class UserDAO extends DbContext {
         user.setPhoneNumber(rs.getString("PhoneNumber"));
         user.setPasswordHash(rs.getString("PasswordHash"));
         user.setActiveStatus(rs.getBoolean("ActiveStatus"));
-        user.setCreatedAt(rs.getTimestamp("CreatedAt"));
-        user.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
-        user.setGender(rs.getString("gender"));
-        user.setBirthDate(rs.getDate("birthdate"));
-        user.setAddress(rs.getString("address"));
+        // Bạn thiếu CreatedAt và UpdatedAt, có thể bổ sung nếu cần
+        // user.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
+        // user.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
         return user;
     }
 
     public int findRoleIdByUserId(int userId) {
-        String sql = "SELECT RoleID FROM User WHERE UserID = ?";
-
-        try {
-            int var6;
-            try (
-                    Connection c = this.getDBConnect();
-                    PreparedStatement ps = c.prepareStatement("SELECT RoleID FROM User WHERE UserID = ?");
-            ) {
-                ps.setInt(1, userId);
-
-                try (ResultSet rs = ps.executeQuery()) {
-                    var6 = rs.next() ? rs.getInt("RoleID") : -1;
-                }
+        final String sql = "SELECT RoleID FROM User WHERE UserID = ?";
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt("RoleID") : -1;
             }
-
-            return var6;
         } catch (SQLException e) {
             throw new RuntimeException("findRoleIdByUserId failed", e);
         }
     }
 
-    public int reassignUserRole(int fromRoleId, int toRoleId) throws SQLException{
-        String sql = "UPDATE `User`  SET RoleID = ? WHERE ROLEID =?";
-        try(Connection c = DbContext.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql)){
-            ps.setInt(1, toRoleId);
-            ps.setInt(2, fromRoleId);
-            return ps.executeUpdate();
-        }
-    }
     public boolean isEmailExists(String email, int currentUserId) throws SQLException {
-        String sql = "SELECT 1 FROM `User` WHERE Email = ? AND UserID != ?";
-        try (Connection conn = getDBConnect();
+        String sql = "SELECT 1 FROM User WHERE Email = ? AND UserID != ?";
+        try (Connection conn = DbContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
             ps.setInt(2, currentUserId);
@@ -235,9 +167,10 @@ public class UserDAO extends DbContext {
             }
         }
     }
+
     public boolean updateUserProfile(User user) throws SQLException {
-        String sql = "UPDATE `User` SET FullName=?, Email=?, PhoneNumber=?, gender=?, birthdate=?, address=? WHERE UserID=?";
-        try (Connection conn = getDBConnect();
+        String sql = "UPDATE User SET FullName=?, Email=?, PhoneNumber=?, gender=?, birthdate=?, address=? WHERE UserID=?";
+        try (Connection conn = DbContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getFullName());
             ps.setString(2, user.getEmail());
@@ -251,3 +184,4 @@ public class UserDAO extends DbContext {
     }
 
 }
+

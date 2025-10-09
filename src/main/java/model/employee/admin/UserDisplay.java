@@ -38,12 +38,12 @@ public class UserDisplay {
     }
     private String getRoleBadgeClass(int roleId) {
         switch (roleId) {
-            case 1: return "bg-danger";
-            case 2: return "bg-warning text-dark";
-            case 3: return "bg-info";
-            case 4: return "bg-primary";
-            case 5: return "bg-secondary";
-            default: return "bg-dark";
+            case 1: return "bg-danger";           // Admin
+            case 2: return "bg-warning text-dark"; // Manager
+            case 3: return "bg-info";             // Employee
+            case 4: return "bg-primary";          // User
+            case 5: return "bg-secondary";        // Guest
+            default: return "bg-dark";            // Unknown
         }
     }
 

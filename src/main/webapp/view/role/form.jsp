@@ -47,6 +47,13 @@
                    placeholder="Enter name of role">
         </div>
 
+        <div class="form-group">
+            <label for="description" class="form-label">Description: </label>
+            <textarea id="description" name="description" rows="4" maxlength="255" class="form-control"
+                      placeholder="Enter description (optional)"><c:out value="${isEdit ? role.description : (not empty description ? description : '')}"/></textarea>
+
+        </div>
+
         <div class="form-actions">
             <input type="submit" value="${isEdit ? 'update' : 'create'}" class="btn btn-primary form-submit-btn">
             <a href="${pageContext.request.contextPath}/roles?action=list" class="btn btn-secondary">Cancel</a>
