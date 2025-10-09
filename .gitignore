@@ -1,12 +1,28 @@
-
+# Build output
 target/
 
+# Log files
+*.log
+
+# Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+
+# Google OAuth credentials
+src/main/resources/google.properties
 
 ### IntelliJ IDEA ###
 .idea/
-!.idea/modules.xml
-!.idea/compiler.xml
-!.idea/artifacts/
+*.iml
+*.iws
+# The following files are safe to share
+!modules.xml
+!compiler.xml
+!artifacts/
 
 ### Eclipse ###
 .apt_generated
@@ -16,6 +32,7 @@ target/
 .settings
 .springBeans
 .sts4-cache
+bin/
 
 ### NetBeans ###
 /nbproject/private/
@@ -25,25 +42,10 @@ target/
 /.nb-gradle/
 build/
 !**/src/main/**/build/
-!**/src/test/**/build/
+!**/src-test/**/build/
 
 ### VS Code ###
 .vscode/
 
 ### Mac OS ###
 .DS_Store
-
-# Google OAuth credentials
-src/main/resources/google.properties
-
-# IntelliJ IDEA
-.idea/
-*.iml
-*.iws
-target/
-
-# Maven
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-
