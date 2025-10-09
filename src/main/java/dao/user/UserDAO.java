@@ -125,6 +125,53 @@ public class UserDAO extends DbContext {
             return ps.executeUpdate() > 0;
         }
     }
+    public int reassignUserRole(int fromRoleId, int toRoleId) throws SQLException{
+        String sql = "UPDATE `User`  SET RoleID = ? WHERE ROLEID =?";
+        try(Connection c = DbContext.getConnection();
+            PreparedStatement ps = c.prepareStatement(sql)){
+            ps.setInt(1, toRoleId);
+            ps.setInt(2, fromRoleId);
+            return ps.executeUpdate();
+        }
+    }
+    public boolean isEmailExists(String email, int currentUserId) throws SQLException {
+        String sql = "SELECT 1 FROM `User` WHERE Email = ? AND UserID != ?";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setInt(2, currentUserId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+    public boolean updateUserProfile(User user) throws SQLException {
+        String sql = "UPDATE `User` SET FullName=?, Email=?, PhoneNumber=?, gender=?, birthdate=?, address=? WHERE UserID=?";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, user.getFullName());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getPhoneNumber());
+            ps.setString(4, user.getGender());
+            ps.setDate(5, user.getBirthDate());
+            ps.setString(6, user.getAddress());
+            ps.setInt(7, user.getUserId());
+            return ps.executeUpdate() > 0;
+        }
+    }
+    public int findRoleIdByUserId(int userId) throws SQLException {
+        String sql = "SELECT RoleID FROM User WHERE UserID = ?";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("RoleID");
+                }
+                return -1;
+            }
+        }
+    }
 
     // Helper method để map ResultSet sang đối tượng User
     private User extractUser(ResultSet rs) throws SQLException {

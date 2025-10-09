@@ -26,6 +26,7 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--dark-bg);
             color: var(--primary-color);
+            padding-top: 120px;
         }
 
         /* --- Header Top Bar --- */
@@ -41,7 +42,6 @@
             color: var(--secondary-color);
             text-decoration: none;
         }
-
         .header-top a:hover {
             color: var(--primary-color);
         }
@@ -79,7 +79,6 @@
             color: var(--primary-color) !important;
             letter-spacing: -1px;
         }
-
         .navbar-brand span {
             font-weight: 400;
             font-size: 0.6em;
@@ -94,7 +93,6 @@
             cursor: pointer;
             transition: color 0.3s ease;
         }
-
         .nav-icons .nav-icon:hover {
             color: var(--secondary-color);
         }
@@ -120,13 +118,13 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.3));
+            background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.3));
         }
 
         .hero-content {
             position: relative;
             z-index: 2;
-            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.7);
         }
 
         .hero-content .sub-heading {
@@ -174,7 +172,6 @@
             transform: translateY(-50%);
             z-index: 1000;
         }
-
         .side-nav-dots .dot {
             display: block;
             width: 10px;
@@ -185,7 +182,6 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
-
         .side-nav-dots .dot.active, .side-nav-dots .dot:hover {
             background-color: var(--primary-color);
         }
@@ -208,11 +204,9 @@
             cursor: pointer;
             transition: transform 0.3s ease;
         }
-
         .floating-contact-btn:hover {
             transform: scale(1.1);
         }
-
         /* Sidebar Menu */
         .menu-overlay {
             position: fixed;
@@ -294,7 +288,6 @@
             color: #adb5bd;
             font-size: 0.8rem;
         }
-
         .welcome-user {
             color: var(--primary-color);
             font-weight: 500;
@@ -334,38 +327,15 @@
     <div class="header-top d-none d-lg-block">
         <div class="container d-flex justify-content-between align-items-center">
             <div class="d-flex gap-4">
-                <a href="https://www.google.com/maps/search/?api=1&query=757+Huỳnh+Tấn+Phát,+Phú+Thuận,+Q7"
-                   target="_blank" class="info-item">
+                <a href="https://www.google.com/maps/search/?api=1&query=757+Huỳnh+Tấn+Phát,+Phú+Thuận,+Q7" target="_blank" class="info-item">
                     <i class="fas fa-map-marker-alt"></i> 757 Huỳnh Tấn Phát, Phú Thuận, Q7
                 </a>
 
                 <span class="info-item"><i class="fas fa-clock"></i> Thứ 2 - 7 / 08.00AM - 17.00PM</span>
-                <a href="tel:0909579579" class="info-item"><i class="fas fa-phone-alt"></i> Hotline: 0909 579 579 (Mr.
-                    Hưng)</a>
+                <a href="tel:0909579579" class="info-item"><i class="fas fa-phone-alt"></i> Hotline: 0909 579 579 (Mr. Hưng)</a>
             </div>
-            <div class="d-flex align-items-center gap-3">
-                <c:choose>
-                    <c:when test="${not empty sessionScope.user}">
-            <span class="welcome-user">
-                <i class="fas fa-user-circle"></i>
-                Xin chào, ${sessionScope.user.fullName}
-            </span>
-                        <a href="Home?action=logout" class="btn btn-logout" name="action" value="logout">
-                            <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                        </a>
-                    </c:when>
-                    <c:otherwise>
-                        <a href="Login" class="btn btn-contact-top" name="action" value="login">
-                            <i class="fas fa-sign-in-alt"></i> Đăng nhập
-                        </a>
-                    </c:otherwise>
-                </c:choose>
-            </div>
-
         </div>
     </div>
-
-    <!-- Main navigation bar -->
     <nav class="main-navbar">
         <div class="container d-flex justify-content-between align-items-center">
             <a class="navbar-brand" href="#">
@@ -377,102 +347,5 @@
             </div>
         </div>
     </nav>
-</header>
-<!-- Overlay -->
-<div class="menu-overlay" id="menuOverlay"></div>
-
-<!-- Sidebar Menu -->
-<div class="sidebar-menu" id="sidebarMenu">
-    <div class="sidebar-header">
-        <button class="close-btn" id="closeMenu">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
-    <nav class="sidebar-nav">
-        <a href="#" class="menu-item">
-            <span>DỊCH VỤ</span>
-        </a>
-        <a href="#" class="menu-item">
-            <span>THƯ VIỆN DỰ ÁN</span>
-        </a>
-        <a href="#" class="menu-item">
-            <span>ĐÀO TẠO NGHỀ</span>
-        </a>
-        <a href="#" class="menu-item">
-            <span>TIN TỨC</span>
-        </a>
-        <a href="AppointmentScheduling" class="menu-item">
-            <span>Lien he dat lich</span>
-        </a>
-    </nav>
-</div>
-
-
-<!-- SECTION: Hero -->
-<main class="hero-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="hero-content">
-                    <p class="sub-heading">Carspa. Khắc phục mọi vấn đề cho xe</p>
-                    <h1>Trung tâm sửa chữa ô tô <strong>chuyên nghiệp.</strong></h1>
-                    <a href="#" class="btn btn-view-services">
-                        XEM TẤT CẢ DỊCH VỤ <i class="fas fa-arrow-right ms-2"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</main>
-
-
-<!-- SECTION: Chat Widget (Gemini AI) -->
-<!-- Nút toggle chat -->
-<button id="chat-toggle-btn">
-    <i class="fas fa-comment-dots"></i>
-</button>
-
-<div id="chatbox">
-    <div id="chat-header">
-        Garacuabuituanduong
-    </div>
-    <div id="chat-messages">
-    </div>
-    <div id="chat-input-area">
-        <input type="text" id="user-input" placeholder="Aa"/>
-        <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
-    </div>
-</div>
-
-<%@ include file="/common/footer.jsp" %>
-<!-- Bootstrap JS -->
-<script src="${pageContext.request.contextPath}/js/chatbot.js"></script>
-<!-- Chat widget inline script (Gemini UI behaviour) -->
+    </header>
 </body>
-<script>
-    // Toggle Sidebar Menu
-    const menuIcon = document.querySelector('.fa-bars');
-    const sidebarMenu = document.getElementById('sidebarMenu');
-    const menuOverlay = document.getElementById('menuOverlay');
-    const closeMenuBtn = document.getElementById('closeMenu');
-
-    // Mở menu
-    menuIcon.addEventListener('click', function () {
-        sidebarMenu.classList.add('active');
-        menuOverlay.classList.add('active');
-    });
-
-    // Đóng menu khi click nút X
-    closeMenuBtn.addEventListener('click', function () {
-        sidebarMenu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-    });
-
-    // Đóng menu khi click overlay
-    menuOverlay.addEventListener('click', function () {
-        sidebarMenu.classList.remove('active');
-        menuOverlay.classList.remove('active');
-    });
-</script>
-
-</html>
