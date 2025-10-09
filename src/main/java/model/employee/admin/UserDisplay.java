@@ -31,28 +31,66 @@ public class UserDisplay {
         // Set role information
         if (role != null) {
             this.roleName = role.getRoleName();
-            this.roleBadgeClass = getRoleBadgeClass(role.getRoleId());
+            this.roleBadgeClass = getRoleBadgeClassByName(role.getRoleName());
         } else {
             this.roleName = "Unknown";
             this.roleBadgeClass = "bg-dark";
         }
     }
 
-    private String getRoleBadgeClass(int roleId) {
-        switch (roleId) {
-            case 1:
-                return "bg-danger"; // Admin
-            case 2:
-                return "bg-warning text-dark"; // Manager
-            case 3:
-                return "bg-info"; // Employee
-            case 4:
-                return "bg-primary"; // User
-            case 5:
-                return "bg-secondary"; // Guest
-            default:
-                return "bg-dark"; // Unknown
+    /**
+     * Dynamic role badge class assignment based on role name
+     */
+    private String getRoleBadgeClassByName(String roleName) {
+        if (roleName == null) {
+            return "bg-dark";
         }
+
+        String name = roleName.toLowerCase();
+
+        // Admin roles - red for high authority
+        if (name.contains("admin") || name.contains("administrator") ||
+                name.contains("superuser") || name.contains("root")) {
+            return "bg-danger";
+        }
+
+        // Manager roles - warning orange for management
+        if (name.contains("manager") || name.contains("supervisor") ||
+                name.contains("lead") || name.contains("head") || name.contains("chief") ||
+                name.contains("quản lý") || name.contains("giám sát") || name.contains("trưởng")) {
+            return "bg-warning text-dark";
+        }
+
+        // Technical roles - info blue for technical staff
+        if (name.contains("technician") || name.contains("tech") || name.contains("developer") ||
+                name.contains("engineer") || name.contains("specialist") || name.contains("analyst") ||
+                name.contains("kỹ thuật") || name.contains("phát triển") || name.contains("chuyên viên")) {
+            return "bg-info";
+        }
+
+        // Financial roles - success green for accounting
+        if (name.contains("accountant") || name.contains("finance") || name.contains("cashier") ||
+                name.contains("billing") || name.contains("payment") ||
+                name.contains("kế toán") || name.contains("tài chính") || name.contains("thu ngân")) {
+            return "bg-success";
+        }
+
+        // Storage/warehouse roles - secondary gray
+        if (name.contains("keeper") || name.contains("storage") || name.contains("inventory") ||
+                name.contains("warehouse") || name.contains("stock") ||
+                name.contains("kho") || name.contains("tồn kho")) {
+            return "bg-secondary";
+        }
+
+        // Customer service - primary blue
+        if (name.contains("customer") || name.contains("service") || name.contains("support") ||
+                name.contains("reception") || name.contains("sales") ||
+                name.contains("khách hàng") || name.contains("hỗ trợ") || name.contains("bán hàng")) {
+            return "bg-primary";
+        }
+
+        // Default for unknown roles
+        return "bg-dark";
     }
 
     public int getUserId() {

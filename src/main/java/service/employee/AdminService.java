@@ -311,7 +311,19 @@ public class AdminService {
 
     public int getAdminUsersCount() {
         try {
-            return adminDAO.countSearchResults(null, 1, null);
+            // Get all users and count those with admin roles (dynamic approach)
+            ArrayList<UserDisplay> allUsers = adminDAO.searchAllUsersWithRole(null, null, null, null);
+            int adminCount = 0;
+
+            for (UserDisplay user : allUsers) {
+                if (checkAdminPermissionByRole(user.getRoleId())) {
+                    adminCount++;
+                }
+            }
+
+            System.out.println(" Found " + adminCount + " admin users (dynamic count)");
+            return adminCount;
+
         } catch (SQLException e) {
             System.err.println("Error counting admin users: " + e.getMessage());
             try {
