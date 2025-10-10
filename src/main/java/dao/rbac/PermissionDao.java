@@ -51,6 +51,30 @@ public class PermissionDao {
         }
     }
 
+    public int insert(Permission p)throws SQLException {
+        String sql = "INSERT INTO Permission(Code, Name, Category, Active) VALUES(?, ?, ?, ?)";
+        try (Connection c = DbContext.getConnection();
+        PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, p.code);
+            ps.setString(2, p.name);
+            ps.setString(3, p.category);
+            ps.setBoolean(4, p.active);
+
+            int affected = ps.executeUpdate();
+            if (affected == 1) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
+                }
+            }
+            throw new SQLException("Inserting permission failed, no rows affected.");
+
+        }
+    }
+
+
+
     public Set<Integer> getPermissionIdsOfRole(int roleId) throws SQLException{
         String sql = "SELECT PermID FROM RolePermission WHERE RoleID = ?";
         try(Connection c = DbContext.getConnection();
