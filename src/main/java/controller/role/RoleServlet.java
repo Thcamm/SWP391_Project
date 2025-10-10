@@ -118,9 +118,10 @@ public class RoleServlet extends HttpServlet {
 
     private void createRole(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, SQLException {
         String name = req.getParameter("name");
+        String description = req.getParameter("description");
 
         try{
-            roleService.createRole(name);
+            roleService.createRole(name, description);
             req.getSession().setAttribute("flash", "Role has been created");
             resp.sendRedirect(req.getContextPath()+"/roles?action=list");
 
@@ -128,6 +129,7 @@ public class RoleServlet extends HttpServlet {
             req.setAttribute("mode", "create");
             req.setAttribute("error", ex.getMessage());
             req.setAttribute("name",name);
+            req.setAttribute("description",description);
             req.getRequestDispatcher("/view/role/form.jsp").forward(req, resp);
         }
 
@@ -154,6 +156,7 @@ public class RoleServlet extends HttpServlet {
     public void updateRole(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, SQLException {
         int id = parseIntOrDefault(req.getParameter("id"), 0);
         String name = req.getParameter("name");
+        String description = req.getParameter("description");
 
         if(id <= 0){
             resp.sendRedirect(req.getContextPath()+"/roles?action=list");
@@ -161,7 +164,7 @@ public class RoleServlet extends HttpServlet {
         }
 
         try{
-            roleService.renameRole(id, name);
+            roleService.renameRole(id, name, description);
             req.getSession().setAttribute("flash", "Role has been updated");
             resp.sendRedirect(req.getContextPath()+"/roles?action=list");
 
@@ -171,6 +174,7 @@ public class RoleServlet extends HttpServlet {
             Role r = new Role();
             r.setRoleId(id);
             r.setRoleName(name);
+            r.setDesrciption(description);
             req.setAttribute("role",r);
             req.getRequestDispatcher("/view/role/form.jsp").forward(req, resp);
         }
