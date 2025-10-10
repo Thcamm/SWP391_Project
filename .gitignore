@@ -18,6 +18,10 @@ src/main/resources/google.properties
 
 ### IntelliJ IDEA ###
 .idea/
+!.idea/modules.xml
+!.idea/compiler.xml
+!.idea/artifacts/
+*.iws
 *.iml
 *.iws
 # The following files are safe to share
