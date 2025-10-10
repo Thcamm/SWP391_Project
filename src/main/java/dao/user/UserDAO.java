@@ -1,6 +1,6 @@
 package dao.user;
 
-import common.DbContext;
+import dao.DbContext;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -126,33 +126,13 @@ public class UserDAO extends DbContext {
         }
     }
 
-    // Helper method để map ResultSet sang đối tượng User
-    private User extractUser(ResultSet rs) throws SQLException {
-        User user = new User();
-        user.setUserId(rs.getInt("UserID"));
-        user.setRoleId(rs.getInt("RoleID"));
-        user.setFullName(rs.getString("FullName"));
-        user.setUserName(rs.getString("UserName"));
-        user.setEmail(rs.getString("Email"));
-        user.setPhoneNumber(rs.getString("PhoneNumber"));
-        user.setPasswordHash(rs.getString("PasswordHash"));
-        user.setActiveStatus(rs.getBoolean("ActiveStatus"));
-        // Bạn thiếu CreatedAt và UpdatedAt, có thể bổ sung nếu cần
-        // user.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
-        // user.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
-        return user;
-    }
-
-    public int findRoleIdByUserId(int userId) {
-        final String sql = "SELECT RoleID FROM User WHERE UserID = ?";
+    public int reassignUserRole(int fromRoleId, int toRoleId) throws SQLException {
+        String sql = "UPDATE `User`  SET RoleID = ? WHERE ROLEID =?";
         try (Connection c = DbContext.getConnection();
                 PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? rs.getInt("RoleID") : -1;
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("findRoleIdByUserId failed", e);
+            ps.setInt(1, toRoleId);
+            ps.setInt(2, fromRoleId);
+            return ps.executeUpdate();
         }
     }
 
@@ -183,4 +163,34 @@ public class UserDAO extends DbContext {
         }
     }
 
+    public int findRoleIdByUserId(int userId) throws SQLException {
+        String sql = "SELECT RoleID FROM User WHERE UserID = ?";
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("RoleID");
+                }
+                return -1;
+            }
+        }
+    }
+
+    // Helper method để map ResultSet sang đối tượng User
+    private User extractUser(ResultSet rs) throws SQLException {
+        User user = new User();
+        user.setUserId(rs.getInt("UserID"));
+        user.setRoleId(rs.getInt("RoleID"));
+        user.setFullName(rs.getString("FullName"));
+        user.setUserName(rs.getString("UserName"));
+        user.setEmail(rs.getString("Email"));
+        user.setPhoneNumber(rs.getString("PhoneNumber"));
+        user.setPasswordHash(rs.getString("PasswordHash"));
+        user.setActiveStatus(rs.getBoolean("ActiveStatus"));
+        // Bạn thiếu CreatedAt và UpdatedAt, có thể bổ sung nếu cần
+        // user.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
+        // user.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
+        return user;
+    }
 }

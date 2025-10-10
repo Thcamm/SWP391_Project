@@ -23,9 +23,6 @@ public class AdminService {
         this.roleDao = new RoleDao();
     }
 
-    /**
-     * FIXED: Check admin permission by role name instead of hardcoded IDs
-     */
     public boolean isAdmin(String userName) {
         try {
 
@@ -335,6 +332,7 @@ public class AdminService {
         }
     }
 
+    // ===== HELPER METHODS =====
     private Role createDefaultRole(int roleId, String roleName) {
         Role role = new Role();
         role.setRoleId(roleId);
