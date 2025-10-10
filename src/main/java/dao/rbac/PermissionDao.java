@@ -3,13 +3,55 @@ package dao.rbac;
 import common.DbContext;
 import model.rbac.Permission;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 public class PermissionDao {
+
+    public int insert(Permission p) {
+        String sql = "INSERT INTO Permission(Code, Name, Category, Description, Active) VALUEs(?, ?, ?, ?, ?)";
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, p.code);
+            ps.setString(2, p.name);
+            ps.setString(3, p.category);
+            ps.setString(4, p.description);
+            ps.setBoolean(5, p.active);
+            ps.executeUpdate();
+
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                } else {
+                    throw new SQLException("Insert permission failed, no ID obtained.");
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Insert permission failed", e);
+        }
+    }
+
+    public Permission findById(int permId) throws SQLException {
+        String sql = "SELECT PermID, Code, Name, Category, Description, Active From Permission WHERE PermID = ?";
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, permId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Permission p = new Permission();
+                    p.permId = rs.getInt("PermID");
+                    p.code = rs.getString("Code");
+                    p.name = rs.getString("Name");
+                    p.category = rs.getString("Category");
+                    p.description = rs.getString("Description");
+                    p.active = rs.getBoolean("Active");
+                    return p;
+                }
+            }
+        }
+        return null;
+    }
 
     public List<Permission> findAll(String keyword, String category) throws SQLException {
         StringBuilder sb = new StringBuilder("SELECT PermID, Code, Name, Category, Active FROM Permission WHERE Active = 1 ");
@@ -51,38 +93,14 @@ public class PermissionDao {
         }
     }
 
-    public int insert(Permission p)throws SQLException {
-        String sql = "INSERT INTO Permission(Code, Name, Category, Active) VALUES(?, ?, ?, ?)";
-        try (Connection c = DbContext.getConnection();
-        PreparedStatement ps = c.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, p.code);
-            ps.setString(2, p.name);
-            ps.setString(3, p.category);
-            ps.setBoolean(4, p.active);
-
-            int affected = ps.executeUpdate();
-            if (affected == 1) {
-                try (ResultSet rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        return rs.getInt(1);
-                    }
-                }
-            }
-            throw new SQLException("Inserting permission failed, no rows affected.");
-
-        }
-    }
-
-
-
-    public Set<Integer> getPermissionIdsOfRole(int roleId) throws SQLException{
+    public Set<Integer> getPermissionIdsOfRole(int roleId) throws SQLException {
         String sql = "SELECT PermID FROM RolePermission WHERE RoleID = ?";
-        try(Connection c = DbContext.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql)){
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, roleId);
             Set<Integer> set = new HashSet<>();
-            try(ResultSet rs = ps.executeQuery()){
-                while(rs.next()){
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
                     set.add(rs.getInt(1));
                 }
                 return set;
@@ -94,16 +112,16 @@ public class PermissionDao {
         String del = "DELETE FROM RolePermission WHERE RoleID = ?";
         String ins = "INSERT INTO RolePermission(RoleID, PermID, AssignedByUserID, AssignedAt) VALUES(?, ?, ?, NOW())";
 
-        try(Connection c = DbContext.getConnection()){
+        try (Connection c = DbContext.getConnection()) {
             c.setAutoCommit(false);
-            try (PreparedStatement psd = c.prepareStatement(del)){
+            try (PreparedStatement psd = c.prepareStatement(del)) {
                 psd.setInt(1, roleId);
                 psd.executeUpdate();
             }
 
-            if(permIds != null && !permIds.isEmpty()){
-                try (PreparedStatement psi = c.prepareStatement(ins)){
-                    for(Integer pid : permIds){
+            if (permIds != null && !permIds.isEmpty()) {
+                try (PreparedStatement psi = c.prepareStatement(ins)) {
+                    for (Integer pid : permIds) {
                         psi.setInt(1, roleId);
                         psi.setInt(2, pid);
                         psi.setInt(3, actorUserId);
@@ -117,12 +135,12 @@ public class PermissionDao {
 
             c.commit();
 
-        }catch (SQLException e){
-            try{
-                if(DbContext.getConnection() != null){
+        } catch (SQLException e) {
+            try {
+                if (DbContext.getConnection() != null) {
                     DbContext.getConnection().rollback();
                 }
-            }catch (Exception rollbackEx){
+            } catch (Exception rollbackEx) {
                 throw new RuntimeException("Rollback failed", rollbackEx);
             }
         }
@@ -149,37 +167,37 @@ public class PermissionDao {
         StringBuilder sb = new StringBuilder("SELECT COUNT(PermID) FROM Permission WHERE Active = 1 ");
         List<Object> params = new ArrayList<>();
 
-        if(keyword != null && !keyword.isBlank()) {
+        if (keyword != null && !keyword.isBlank()) {
             sb.append("AND (Code LIKE ? OR Name LIKE ?)");
             params.add("%" + keyword + "%");
             params.add("%" + keyword + "%");
 
         }
 
-        if(category != null && !category.isBlank()){
+        if (category != null && !category.isBlank()) {
             sb.append("AND LOWER(Category) LIKE LOWER(?) ");
             params.add("%" + category + "%");
 
         }
 
         try (Connection c = DbContext.getConnection();
-        PreparedStatement ps = c.prepareStatement(sb.toString())) {
+             PreparedStatement ps = c.prepareStatement(sb.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
 
             try (ResultSet rs = ps.executeQuery()) {
-               if(rs.next()){
-                     return rs.getInt(1);
+                if (rs.next()) {
+                    return rs.getInt(1);
                 } else {
-                     return 0;
-               }
+                    return 0;
+                }
             }
 
         }
     }
 
-    public List<Permission> findPaginated (String keyword, String category, int offset, int limit) throws SQLException {
+    public List<Permission> findPaginated(String keyword, String category, int offset, int limit) throws SQLException {
         StringBuilder sb = new StringBuilder("SELECT PermID, Code, Name, Category, Active FROM Permission WHERE Active = 1 ");
         List<Object> params = new ArrayList<>();
         if (keyword != null && !keyword.isBlank()) {
@@ -221,8 +239,6 @@ public class PermissionDao {
             return list;
         }
     }
-
-
 
 
 }

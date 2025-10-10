@@ -33,7 +33,7 @@ public class AdminService {
                 return false;
             }
 
-            User user = userDAO.getUserByUserName(userName);
+            User user = userDAO.getUserByUsername(userName);
             System.out.println("User found: " + (user != null));
 
             if (user == null) {
@@ -114,11 +114,8 @@ public class AdminService {
      */
     private boolean checkSpecificPermission(int roleId, String permissionCode) {
         try {
-            // Example:
-            // return rolePermissionDAO.hasPermission(roleId, permissionCode);
-
             System.out.println("Permission check not implemented yet - using fallback");
-            return false; // For now, return false to use role name check
+            return false;
 
         } catch (Exception e) {
             System.err.println("Error checking specific permission: " + e.getMessage());
@@ -131,7 +128,7 @@ public class AdminService {
      */
     public boolean isAdminForDevelopment(String userName) {
         try {
-            User user = userDAO.getUserByUserName(userName);
+            User user = userDAO.getUserByUsername(userName);
             if (user != null && user.isActiveStatus()) {
                 System.out.println(" DEVELOPMENT MODE: Granting admin access to: " + userName);
                 return true; // Allow any active user for development
@@ -190,7 +187,7 @@ public class AdminService {
                 return false;
             }
 
-            User existingUser = userDAO.getUserByUserName(userName);
+            User existingUser = userDAO.getUserByUsername(userName);
             if (existingUser != null) {
                 System.out.println("Username đã tồn tại: " + userName);
                 return false;
@@ -222,21 +219,21 @@ public class AdminService {
 
     public ArrayList<UserDisplay> searchUsers(String keyword, Integer roleId, Boolean activeStatus) {
         try {
-            System.out.println(" DEBUG AdminService.searchUsers() called with:");
+            System.out.println("🔍 DEBUG AdminService.searchUsers() called with:");
             System.out.println("   keyword: " + keyword);
             System.out.println("   roleId: " + roleId);
             System.out.println("   activeStatus: " + activeStatus);
 
-            // TEST: Try simple query first
+            // 🧪 TEST: Try simple query first
             try {
                 ArrayList<User> simpleUsers = adminDAO.getAllUsersForAdmin();
-                System.out.println(" DEBUG: Simple query returned " + simpleUsers.size() + " users");
+                System.out.println("🧪 DEBUG: Simple query returned " + simpleUsers.size() + " users");
             } catch (Exception e) {
-                System.err.println(" DEBUG: Simple query failed: " + e.getMessage());
+                System.err.println("🚨 DEBUG: Simple query failed: " + e.getMessage());
             }
 
             ArrayList<UserDisplay> result = adminDAO.searchAllUsersWithRole(keyword, roleId, activeStatus, "userid");
-            System.out.println("DEBUG AdminService.searchUsers() returned " + result.size() + " users");
+            System.out.println("🔍 DEBUG AdminService.searchUsers() returned " + result.size() + " users");
             return result;
         } catch (SQLException e) {
             System.err.println("ADMIN Error searching users: " + e.getMessage());
@@ -248,11 +245,11 @@ public class AdminService {
     // New method with sort parameter
     public ArrayList<UserDisplay> searchUsers(String keyword, Integer roleId, Boolean activeStatus, String sortBy) {
         try {
-            System.out.println(" DEBUG AdminService.searchUsers() with sort called");
+            System.out.println("🔍 DEBUG AdminService.searchUsers() with sort called");
             System.out.println("   sortBy: " + sortBy);
 
             ArrayList<UserDisplay> result = adminDAO.searchAllUsersWithRole(keyword, roleId, activeStatus, sortBy);
-            System.out.println(" DEBUG AdminService.searchUsers() returned " + result.size() + " users");
+            System.out.println("🔍 DEBUG AdminService.searchUsers() returned " + result.size() + " users");
             return result;
         } catch (SQLException e) {
             System.err.println("ADMIN Error searching users: " + e.getMessage());
@@ -323,6 +320,7 @@ public class AdminService {
         }
     }
 
+    // ===== HELPER METHODS =====
     private Role createDefaultRole(int roleId, String roleName) {
         Role role = new Role();
         role.setRoleId(roleId);
@@ -330,4 +328,3 @@ public class AdminService {
         return role;
     }
 }
-

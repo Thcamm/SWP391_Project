@@ -86,31 +86,31 @@ public class AdminDAO extends DbContext {
 
         ArrayList<UserDisplay> users = new ArrayList<>();
 
-        System.out.println("🔍 DEBUG QUERY: " + sql.toString());
-        System.out.println("🔍 DEBUG PARAMS: " + params.toString());
+        System.out.println(" DEBUG QUERY: " + sql.toString());
+        System.out.println(" DEBUG PARAMS: " + params.toString());
 
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-            System.out.println("🔍 DEBUG: Database connection successful!");
+            System.out.println(" DEBUG: Database connection successful!");
 
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
 
             try (ResultSet rs = ps.executeQuery()) {
-                System.out.println("🔍 DEBUG: Query executed successfully!");
+                System.out.println(" DEBUG: Query executed successfully!");
                 while (rs.next()) {
                     UserDisplay user = extractUserDisplay(rs);
                     users.add(user);
                     System.out
-                            .println("🔍 DEBUG: Found user - " + user.getUserName() + " (" + user.getFullName() + ")");
+                            .println(" DEBUG: Found user - " + user.getUserName() + " (" + user.getFullName() + ")");
                 }
             }
         } catch (SQLException e) {
-            System.err.println("🚨 DEBUG SQL ERROR: " + e.getMessage());
-            System.err.println("🚨 DEBUG SQL State: " + e.getSQLState());
-            System.err.println("🚨 DEBUG Error Code: " + e.getErrorCode());
+            System.err.println(" DEBUG SQL ERROR: " + e.getMessage());
+            System.err.println(" DEBUG SQL State: " + e.getSQLState());
+            System.err.println(" DEBUG Error Code: " + e.getErrorCode());
             e.printStackTrace();
             throw e;
         }
