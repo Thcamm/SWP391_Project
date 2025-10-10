@@ -75,7 +75,6 @@ public class UserSearchController extends HttpServlet {
             ArrayList<UserDisplay> searchResults = adminService.searchUsers(keyword, roleId, activeStatus, sortBy);
             int totalResults = searchResults.size();
 
-            // Original complex search (temporarily disabled for debugging)
             // ArrayList<UserDisplay> searchResults = adminService.searchUsers(keyword,
             // roleId, activeStatus);
             // int totalResults = adminService.getSearchResultCount(keyword, roleId,
