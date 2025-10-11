@@ -51,7 +51,7 @@ public class RolePageServlet extends HttpServlet {
 
             var roles = rbacService.getAllRoles();
             Integer roleId = req.getParameter("roleId") == null
-                    ? (roles.isEmpty() ? -1 : roles.get(0).roleId)
+                    ? (roles.isEmpty() ? -1 : roles.get(0).getRoleId())
                     : Integer.parseInt(req.getParameter("roleId"));
 
             var pager = rbacService.getPermissionsPaged(page, size, keyword, category);
@@ -65,7 +65,7 @@ public class RolePageServlet extends HttpServlet {
             req.setAttribute("keyword", keyword);
             req.setAttribute("category", category);
             req.setAttribute("checkedPermsIds", checkedPermIds);
-            req.getRequestDispatcher("/view/role-page.jsp").forward(req, resp);
+            req.getRequestDispatcher("/view/role/rbac.jsp").forward(req, resp);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

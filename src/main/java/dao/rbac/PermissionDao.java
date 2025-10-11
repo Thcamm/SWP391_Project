@@ -53,6 +53,74 @@ public class PermissionDao {
         return null;
     }
 
+    public boolean update(Permission p) throws SQLException {
+        String sql = "UPDATE Permission SET Code = ?, Name = ?, Category = ?, Description = ?, Active = ? WHERE PermID = ?";
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, p.code);
+            ps.setString(2, p.name);
+            ps.setString(3, p.category);
+            ps.setString(4, p.description);
+            ps.setBoolean(5, p.active);
+            ps.setInt(6, p.permId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    public boolean delete(int permId) throws SQLException {
+        String sql = "DELETE FROM Permission WHERE PermID = ?";
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, permId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    public boolean exitsByCode(String code) throws SQLException {
+        String sql = "SELECT 1 FROM Permission WHERE LOWWER(Code) = LOWER(?) LIMIT 1";
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, code);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    public boolean existsByCodeExceptId(String code, int excludeId) throws SQLException {
+        String sql = "SELECT 1 FROM Permission WHERE LOWER(Code) = LOWER(?) AND PermID <> ? LIMIT 1";
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, code);
+            ps.setInt(2, excludeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    public boolean existsByNameIgnorecaseExceptId(String name, int excludeId) throws SQLException {
+        String sql = "SELECT 1 FROM Permission WHERE LOWER(Name) = LOWER(?) AND PermID <> ? LIMIT 1";
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ps.setInt(2, excludeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
+    public boolean existsByNameIgnorecase(String name) throws SQLException {
+        String sql = "SELECT 1 FROM Permission WHERE LOWER(Name) = LOWER(?) LIMIT 1";
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, name);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
     public List<Permission> findAll(String keyword, String category) throws SQLException {
         StringBuilder sb = new StringBuilder("SELECT PermID, Code, Name, Category, Active FROM Permission WHERE Active = 1 ");
         List<Object> params = new ArrayList<>();

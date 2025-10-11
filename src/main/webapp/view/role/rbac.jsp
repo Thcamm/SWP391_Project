@@ -83,7 +83,11 @@
 
     </form>
 
-
+    <div style="margin: 10px 0;">
+        <a href="${pageContext.request.contextPath}/permissions?action=new" class="btn btn-primary">
+             Create New Permission
+        </a>
+    </div>
     <form method="post" action="${pageContext.request.contextPath}/rbac/roles/save" class="permission-form">
         <input type="hidden" name="roleId" value="${roleId}"/>
 
@@ -95,6 +99,8 @@
                     <th>Permission</th>
                     <th>Name</th>
                     <th>Category</th>
+                    <th>Action</th>
+
                 </tr>
                 </thead>
                 <tbody>
@@ -107,6 +113,12 @@
                         <td class="perm-code"><b>${p.code}</b></td>
                         <td class="perm-name">${p.name}</td>
                         <td class="perm-category"><span class="badge badge-category"><c:out value="${p.category}"/></span></td>
+                        <td>
+
+                            <a href="${pageContext.request.contextPath}/permissions?action=edit&id=${p.permId}" class="btn btn-edit">Edit</a>
+                            <a href="${pageContext.request.contextPath}/permissions?action=delete&id=${p.permId}"
+                               class="btn btn-delete" onclick="return confirm('Delete this permission?');">Delete</a>
+                        </td>
                     </tr>
                 </c:forEach>
                 </tbody>
