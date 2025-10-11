@@ -9,17 +9,25 @@
 <head>
     <title>Role Permission Management (RBAC)</title>
 
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/role/role-page.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/role/rbac.css">
 
 </head>
 <body>
-<h2>Role -> Permission (RBAC)</h2>
 
+<c:if test = "${not empty sessionScope.flash}">
+    <div class="alert success-message">
+        ${sessionScope.flash}
+        <c:remove var="flash" scope="session"/>
+    </div>
+</c:if>
 
-<a href="${pageContext.request.contextPath}/roles?action=list"
-   style="display: inline-block; margin-bottom: 10px; text-decoration: none; background-color: #777; color: white; padding: 6px 12px; border-radius: 4px;">
-    ⬅ Back to Role List
-</a>
+<c:if test="${not empty sessionScope.error}">
+    <div class="alert error-message">
+        ${sessionScope.error}
+        <c:remove var="error" scope="session"/>
+    </div>
+</c:if>
+
 <c:if test = "${param.saved == '1'}">
     <div class="msg"> Save permission successfully!</div>
 </c:if>
@@ -78,8 +86,8 @@
         <button class="btn btn-search" type="submit">Filter</button>
 
         <span class="total-count right muted">
-                <c:out value="${fn:length(perms)}"/> permissions found.
-            </span>
+  ${pager.totalItems} permissions found.
+</span>
 
     </form>
 
@@ -121,6 +129,12 @@
                         </td>
                     </tr>
                 </c:forEach>
+
+                <c:if test="${empty pager.data}">
+                    <tr>
+                        <td colspan="5" class="no-data">No permissions founds</td>
+                    </tr>
+                </c:if>
                 </tbody>
             </table>
         </div>

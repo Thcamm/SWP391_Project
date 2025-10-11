@@ -2,20 +2,19 @@ package service.rbac;
 
 import common.utils.NameValidator;
 import dao.rbac.PermissionDao;
-import model.pagination.PaginationResponse;
 import model.rbac.Permission;
 
 import java.sql.SQLException;
 import java.util.Set;
 
-public class PermisisonService {
+public class PermissionService {
     private final PermissionDao dao;
 
-    public PermisisonService(PermissionDao dao) {
+    public PermissionService(PermissionDao dao) {
         this.dao = dao;
     }
 
-    public Permission createPermission(String rawCode,String rawName, String category, String description, boolean active) throws Exception {
+    public Permission createPermission(String rawCode,String rawName, String category, String description) throws Exception {
         var codeResult = NameValidator.validatePermCode(
                 rawCode,
                 cd -> {
@@ -54,7 +53,7 @@ public class PermisisonService {
         p.name = nameResult.normalizedValue;
         p.category = category != null ? category.trim().toUpperCase() : null;
         p.description = description != null ? description.trim() : null;
-        p.active = active;
+//        p.active = active;
 
         int id = dao.insert(p);
         p.permId = id;
@@ -65,8 +64,8 @@ public class PermisisonService {
                                        String rawCode,
                                        String rawName,
                                        String category,
-                                       String description,
-                                       boolean active) throws Exception {
+                                       String description
+                                       ) throws Exception {
         if( id <= 0){
             throw new IllegalArgumentException("Invalid permission ID");
 
@@ -104,9 +103,9 @@ public class PermisisonService {
                 throw new IllegalArgumentException("This permission is protected and its code cannot be changed: " + existing.code);
             }
 
-            if(!active){
-                throw new IllegalArgumentException("This permission is protected and cannot be deactivated: " + existing.code);
-            }
+//            if(!active){
+//                throw new IllegalArgumentException("This permission is protected and cannot be deactivated: " + existing.code);
+//            }
         }
 
         var nameResult = NameValidator.validateDisplayName(
@@ -130,7 +129,7 @@ public class PermisisonService {
         existing.name = nameResult.normalizedValue;
         existing.category = category != null ? category.trim().toUpperCase() : null;
         existing.description = description != null ? description.trim() : null;
-        existing.active = active;
+//        existing.active = active;
 
         dao.update(existing);
         return existing;

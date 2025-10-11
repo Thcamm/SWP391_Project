@@ -19,9 +19,9 @@
 <div class="container form-container">
     <h1 class="page-title">${formTitle}</h1>
 
-    <c:if test="${not empty error}">
+    <c:if test="${not empty requestScope.error}">
         <div class="alert error-message">
-            Error: ${error}
+            Error: ${requestScope.error}
         </div>
     </c:if>
 
@@ -66,12 +66,7 @@
         </div>
 
 
-        <div class="form-group">
-            <label for="active" class="form-label">Active:</label>
-            <input type="checkbox" id="active" name="active"
-                   <c:if test="${isEdit ? perm.active : true}">checked</c:if> />
-            <span class="note">(Check to make permission active)</span>
-        </div>
+
 
 
         <div class="form-actions">

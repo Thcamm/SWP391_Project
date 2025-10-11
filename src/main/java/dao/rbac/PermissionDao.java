@@ -9,14 +9,14 @@ import java.util.*;
 public class PermissionDao {
 
     public int insert(Permission p) {
-        String sql = "INSERT INTO Permission(Code, Name, Category, Description, Active) VALUEs(?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Permission(Code, Name, Category, Description) VALUEs(?, ?, ?, ?)";
         try (Connection c = DbContext.getConnection();
              PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, p.code);
             ps.setString(2, p.name);
             ps.setString(3, p.category);
             ps.setString(4, p.description);
-            ps.setBoolean(5, p.active);
+//            ps.setBoolean(5, p.active);
             ps.executeUpdate();
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -33,7 +33,7 @@ public class PermissionDao {
     }
 
     public Permission findById(int permId) throws SQLException {
-        String sql = "SELECT PermID, Code, Name, Category, Description, Active From Permission WHERE PermID = ?";
+        String sql = "SELECT PermID, Code, Name, Category, Description From Permission WHERE PermID = ?";
         try (Connection c = DbContext.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, permId);
@@ -45,7 +45,7 @@ public class PermissionDao {
                     p.name = rs.getString("Name");
                     p.category = rs.getString("Category");
                     p.description = rs.getString("Description");
-                    p.active = rs.getBoolean("Active");
+//                    p.active = rs.getBoolean("Active");
                     return p;
                 }
             }
@@ -54,15 +54,16 @@ public class PermissionDao {
     }
 
     public boolean update(Permission p) throws SQLException {
-        String sql = "UPDATE Permission SET Code = ?, Name = ?, Category = ?, Description = ?, Active = ? WHERE PermID = ?";
+        String sql = "UPDATE Permission SET Code = ?, Name = ?, Category = ?, Description = ? WHERE PermID = ?";
         try (Connection c = DbContext.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, p.code);
             ps.setString(2, p.name);
             ps.setString(3, p.category);
             ps.setString(4, p.description);
-            ps.setBoolean(5, p.active);
-            ps.setInt(6, p.permId);
+            ps.setInt(5, p.permId);
+//            ps.setBoolean(5, p.active);
+
             return ps.executeUpdate() > 0;
         }
     }
@@ -77,7 +78,7 @@ public class PermissionDao {
     }
 
     public boolean exitsByCode(String code) throws SQLException {
-        String sql = "SELECT 1 FROM Permission WHERE LOWWER(Code) = LOWER(?) LIMIT 1";
+        String sql = "SELECT 1 FROM Permission WHERE LOWER(Code) = LOWER(?) LIMIT 1";
         try (Connection c = DbContext.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, code);
@@ -122,7 +123,7 @@ public class PermissionDao {
         }
     }
     public List<Permission> findAll(String keyword, String category) throws SQLException {
-        StringBuilder sb = new StringBuilder("SELECT PermID, Code, Name, Category, Active FROM Permission WHERE Active = 1 ");
+        StringBuilder sb = new StringBuilder("SELECT PermID, Code, Name, Category FROM Permission WHERE 1 = 1 ");
         List<Object> params = new ArrayList<>();
         if (keyword != null && !keyword.isBlank()) {
             sb.append("AND (Code LIKE ? OR Name LIKE ?) ");
@@ -153,7 +154,7 @@ public class PermissionDao {
                     p.code = rs.getString("Code");
                     p.name = rs.getString("Name");
                     p.category = rs.getString("Category");
-                    p.active = rs.getBoolean("Active");
+//                    p.5 = rs.getBoolean("Active");
                     list.add(p);
                 }
             }
@@ -204,20 +205,14 @@ public class PermissionDao {
             c.commit();
 
         } catch (SQLException e) {
-            try {
-                if (DbContext.getConnection() != null) {
-                    DbContext.getConnection().rollback();
-                }
-            } catch (Exception rollbackEx) {
-                throw new RuntimeException("Rollback failed", rollbackEx);
-            }
+            throw e;
         }
 
     }
 
     public int findPermIdByCode(String requiredPermission) {
         final String sql =
-                "SELECT PermID FROM Permission WHERE Code = ? AND Active = 1 LIMIT 1";
+                "SELECT PermID FROM Permission WHERE Code = ? LIMIT 1";
 
         try (Connection c = DbContext.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
@@ -232,7 +227,7 @@ public class PermissionDao {
     }
 
     public int countAll(String keyword, String category) throws SQLException {
-        StringBuilder sb = new StringBuilder("SELECT COUNT(PermID) FROM Permission WHERE Active = 1 ");
+        StringBuilder sb = new StringBuilder("SELECT COUNT(PermID) FROM Permission WHERE 1 = 1 ");
         List<Object> params = new ArrayList<>();
 
         if (keyword != null && !keyword.isBlank()) {
@@ -266,7 +261,7 @@ public class PermissionDao {
     }
 
     public List<Permission> findPaginated(String keyword, String category, int offset, int limit) throws SQLException {
-        StringBuilder sb = new StringBuilder("SELECT PermID, Code, Name, Category, Active FROM Permission WHERE Active = 1 ");
+        StringBuilder sb = new StringBuilder("SELECT PermID, Code, Name, Category FROM Permission WHERE 1 = 1 ");
         List<Object> params = new ArrayList<>();
         if (keyword != null && !keyword.isBlank()) {
             sb.append("AND (Code LIKE ? OR Name LIKE ?) ");
@@ -300,7 +295,7 @@ public class PermissionDao {
                     p.code = rs.getString("Code");
                     p.name = rs.getString("Name");
                     p.category = rs.getString("Category");
-                    p.active = rs.getBoolean("Active");
+//                    p.active = rs.getBoolean("Active");
                     list.add(p);
                 }
             }
