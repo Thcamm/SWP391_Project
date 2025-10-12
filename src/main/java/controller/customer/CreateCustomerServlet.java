@@ -24,7 +24,7 @@ public class CreateCustomerServlet extends HttpServlet {
 
         // ❌ Chưa đăng nhập
         if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/Login");
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
@@ -32,7 +32,7 @@ public class CreateCustomerServlet extends HttpServlet {
 
         // ⚠️ Kiểm tra role: chỉ Customer Service (ví dụ RoleID = 3)
         if (currentUser.getRoleId() != 3) {
-            response.sendRedirect(request.getContextPath() + "/access-denied.jsp");
+            response.sendRedirect(request.getContextPath() + "/error-permission.jsp");
             return;
         }
 

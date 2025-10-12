@@ -28,20 +28,20 @@ public class RolePageServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws jakarta.servlet.ServletException, java.io.IOException {
         try {
-            Integer userIdObj = (Integer)req.getSession().getAttribute("userId");
-            final String REQUIRED_PERMISSION = "role_permission_manage";
-
-            if(userIdObj == null || userIdObj <= 0){
-                resp.sendRedirect(req.getContextPath() + "/LoginServlet");
-                return;
-            }
-            int userId = userIdObj;
-
-            // kiem tra phan quyen
-            if(!authService.hasPermission(userId, REQUIRED_PERMISSION)){
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN, "You have not permission to access role manage");
-                return;
-            }
+//            Integer userIdObj = (Integer)req.getSession().getAttribute("userId");
+//            final String REQUIRED_PERMISSION = "role_permission_manage";
+//
+//            if(userIdObj == null || userIdObj <= 0){
+//                resp.sendRedirect(req.getContextPath() + "/login");
+//                return;
+//            }
+//            int userId = userIdObj;
+//
+//            // kiem tra phan quyen
+//            if(!authService.hasPermission(userId, REQUIRED_PERMISSION)){
+//                resp.sendError(HttpServletResponse.SC_FORBIDDEN, "You have not permission to access role manage");
+//                return;
+//            }
 
             String keyword = req.getParameter("keyword");
             String category = req.getParameter("category");

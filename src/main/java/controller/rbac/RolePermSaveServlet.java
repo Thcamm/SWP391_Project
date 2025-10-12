@@ -34,7 +34,7 @@ public class RolePermSaveServlet extends HttpServlet {
             final String REQUIRED_PERMISSION = "role_permission_manage";
             Integer userIdObj = (Integer) req.getSession().getAttribute("userId");
             if (userIdObj == null || userIdObj <= 0) {
-                resp.sendRedirect(resp.encodeRedirectURL(req.getContextPath() + "/LoginServlet"));
+                resp.sendRedirect(resp.encodeRedirectURL(req.getContextPath() + "/login"));
                 return;
             }
             int actorUserId = userIdObj;

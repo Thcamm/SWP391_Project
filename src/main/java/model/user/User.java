@@ -19,9 +19,10 @@ public class User {
     private Date birthDate;
     private String address;
 
-    public User() {}
+    public User() {
+    }
 
-    //<editor-fold defaultstate="collapsed" desc="Getters and Setters">
+    // <editor-fold defaultstate="collapsed" desc="Getters and Setters">
     public Integer getUserId() {
         return userId;
     }
@@ -128,8 +129,10 @@ public class User {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         User user = (User) o;
         return Objects.equals(userId, user.userId);
     }
