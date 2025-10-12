@@ -71,7 +71,7 @@ public class UserDAO extends DbContext {
 
     // Thêm user mới
     public boolean addUser(User user) throws SQLException {
-        String sql = "INSERT INTO User (RoleID, FullName, UserName, Email, PhoneNumber, PasswordHash, ActiveStatus) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO User (RoleID, FullName, UserName, Email, PhoneNumber, Gender, BirthDate, Address, PasswordHash, ActiveStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, user.getRoleId());
@@ -79,8 +79,11 @@ public class UserDAO extends DbContext {
             ps.setString(3, user.getUserName());
             ps.setString(4, user.getEmail());
             ps.setString(5, user.getPhoneNumber());
-            ps.setString(6, user.getPasswordHash());
-            ps.setBoolean(7, user.isActiveStatus());
+            ps.setString(6, user.getGender());
+            ps.setDate(7, user.getBirthDate());
+            ps.setString(8, user.getAddress());
+            ps.setString(9, user.getPasswordHash());
+            ps.setBoolean(10, user.isActiveStatus());
             return ps.executeUpdate() > 0;
         }
     }
@@ -101,17 +104,20 @@ public class UserDAO extends DbContext {
 
     // Cập nhật thông tin user
     public boolean updateUser(User user) throws SQLException {
-        String sql = "UPDATE User SET RoleID=?, FullName=?, UserName=?, Email=?, PhoneNumber=?, PasswordHash=?, ActiveStatus=? WHERE UserID=?";
-        try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
+        String sql = "UPDATE User SET RoleID=?, FullName=?, UserName=?, Email=?, PhoneNumber=?, Gender=?, BirthDate=?, Address=?, PasswordHash=?, ActiveStatus=? WHERE UserID=?";
+        try (Connection conn = DbContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, user.getRoleId());
             ps.setString(2, user.getFullName());
             ps.setString(3, user.getUserName());
             ps.setString(4, user.getEmail());
             ps.setString(5, user.getPhoneNumber());
-            ps.setString(6, user.getPasswordHash());
-            ps.setBoolean(7, user.isActiveStatus());
-            ps.setInt(8, user.getUserId());
+            ps.setString(6, user.getGender());
+            ps.setDate(7, user.getBirthDate());
+            ps.setString(8, user.getAddress());
+            ps.setString(9, user.getPasswordHash());
+            ps.setBoolean(10, user.isActiveStatus());
+            ps.setInt(11, user.getUserId());
             return ps.executeUpdate() > 0;
         }
     }
@@ -182,11 +188,12 @@ public class UserDAO extends DbContext {
         user.setUserName(rs.getString("UserName"));
         user.setEmail(rs.getString("Email"));
         user.setPhoneNumber(rs.getString("PhoneNumber"));
+        user.setGender(rs.getString("Gender"));
+        user.setBirthDate(rs.getDate("BirthDate"));
+        user.setAddress(rs.getString("Address"));
         user.setPasswordHash(rs.getString("PasswordHash"));
         user.setActiveStatus(rs.getBoolean("ActiveStatus"));
-        // Bạn thiếu CreatedAt và UpdatedAt, có thể bổ sung nếu cần
-        // user.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
-        // user.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
+        user.setCreatedAt(rs.getTimestamp("CreatedAt"));
         return user;
     }
 }
