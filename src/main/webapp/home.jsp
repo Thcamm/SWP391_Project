@@ -355,7 +355,7 @@
                         </a>
                     </c:when>
                     <c:otherwise>
-                        <a href="Login" class="btn btn-contact-top" name="action" value="login">
+                        <a href="login" class="btn btn-contact-top" name="action" value="login">
                             <i class="fas fa-sign-in-alt"></i> Đăng nhập
                         </a>
                     </c:otherwise>

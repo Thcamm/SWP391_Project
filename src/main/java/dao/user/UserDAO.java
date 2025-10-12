@@ -25,7 +25,6 @@ public class UserDAO extends DbContext {
         return null;
     }
 
-    // Lấy user bằng username (khi user đã active), đã bỏ phương thức bị trùng
     public User getUserByUserName(String userName) throws SQLException {
         String sql = "SELECT * FROM User WHERE UserName = ? AND ActiveStatus = 1";
         try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp

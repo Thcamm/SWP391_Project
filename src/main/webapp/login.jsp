@@ -80,7 +80,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
                           ${errorMessage}
                         </div>
                       </c:if>
-                      <form action="Login" method="post">
+                      <form action="login" method="post">
                         <div class="row gy-3 overflow-hidden">
                           <div class="col-12">
                             <div class="form-floating mb-3">

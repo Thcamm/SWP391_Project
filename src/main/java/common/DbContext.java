@@ -32,7 +32,7 @@ public class DbContext {
         }
 
         public static Connection getConnection() throws SQLException {
-                String url = "jdbc:mysql://localhost:3306/garage_mgmt?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Bangkok&useUnicode=true&characterEncoding=UTF-8";
+                String url = "jdbc:mysql://localhost:3306/garage_mgmt";
                 String user = "root";
                 String pass = "admin";
                 try {
