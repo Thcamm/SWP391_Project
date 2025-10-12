@@ -26,8 +26,8 @@ public class SearchCustomerServlet extends HttpServlet {
         String licensePlate = request.getParameter("licensePlate");
 
         CustomerDAO dao = new CustomerDAO();
-        List<Customer> customers = dao.searchCustomers(fullName, contact, licensePlate);
-
+        //List<Customer> customers = dao.searchCustomers(fullName, contact, licensePlate);
+        List<Customer> customers = null; // Tạm thời đặt là null
         request.setAttribute("customerList", customers);
         request.getRequestDispatcher("search-customer.jsp").forward(request, response);
     }
