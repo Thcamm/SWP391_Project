@@ -8,7 +8,7 @@
     <display-name>GarageSystem</display-name>
 
     <welcome-file-list>
-        <welcome-file>search-customer.jsp</welcome-file>
+        <welcome-file>customer/create-customer.jsp</welcome-file>
     </welcome-file-list>
 
 </web-app>
