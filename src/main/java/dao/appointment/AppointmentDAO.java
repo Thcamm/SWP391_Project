@@ -56,20 +56,27 @@ public class AppointmentDAO extends DbContext {
     }
 
     public void insertAppointment(Appointment appointment) {
-        String sql = "INSERT INTO Appointment (CustomerID, VehicleID, Date, Status, Description) VALUES (?, ?, ?, ?,?)";
+        String sql = "INSERT INTO Appointment (CustomerID, VehicleID, Date, Status, Description) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
             st.setInt(1, appointment.getCustomerID());
             st.setInt(2, appointment.getVehicleID());
-            st.setDate(3, java.sql.Date.valueOf(appointment.getAppointmentDate()));
+            // Kiểm tra null và set date an toàn
+            if (appointment.getAppointmentDate() != null) {
+                st.setDate(3, java.sql.Date.valueOf(appointment.getAppointmentDate()));
+            } else {
+                throw new IllegalArgumentException("Appointment date cannot be null");
+            }
             st.setString(4, appointment.getStatus());
             st.setString(5, appointment.getDescription());
             st.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Lỗi khi thêm cuộc hẹn", e);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace(); // Hiển thị chi tiết lỗi SQL
+            throw new RuntimeException("Lỗi khi thêm cuộc hẹn: " + e.getMessage(), e);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Ngày hẹn không hợp lệ", e);
         }
     }
+
 
     public boolean updateAppointment(Appointment appointment) {
         String sql = "UPDATE Appointment SET CustomerID = ?, VehicleID = ?, Date = ?, Status = ?, Description = ? WHERE AppointmentID = ?";

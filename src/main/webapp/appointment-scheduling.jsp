@@ -72,6 +72,27 @@
                 <h2 class="mb-4" style="font-size: 32px; font-weight: 700; color: #000;">
                     ĐẶT LỊCH SỬA XE VÀ BẢO DƯỠNG
                 </h2>
+                <%-- Hiển thị success message ---%>
+                <% if (session.getAttribute("successMessage") != null) { %>
+                <div class="alert alert-success">
+                    <%= session.getAttribute("successMessage") %>
+                </div>
+                <% session.removeAttribute("successMessage"); %>
+                <% } %>
+
+                <%-- Hiển thị error message ---%>
+                <% if (request.getAttribute("errorMessage") != null) { %>
+                <div class="alert alert-danger">
+                    <%= request.getAttribute("errorMessage") %>
+                </div>
+                <% } %>
+
+                <%-- Debug info ---%>
+                <% if (request.getAttribute("debugInfo") != null) { %>
+                <div class="alert alert-info">
+                    <strong>Debug:</strong> <%= request.getAttribute("debugInfo") %>
+                </div>
+                <% } %>
 
                 <form action="Appointment" method="post">
                     <!-- Row 1: Họ và tên + Số điện thoại -->

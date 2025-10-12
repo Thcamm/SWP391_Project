@@ -3,15 +3,14 @@ package controller.appointment;
 import dao.appointment.AppointmentDAO;
 import dao.customer.CustomerDAO;
 import dao.vehicle.VehicleDAO;
-import model.vehicle.Vehicle;
-import model.user.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
+import model.user.User;
+import model.vehicle.Vehicle;
 
 import java.io.IOException;
 
@@ -43,7 +42,7 @@ public class Appointment extends HttpServlet {
         // 2. Lấy các tham số cần thiết
         String carBrand = request.getParameter("carBrand");
         String licensePlate = request.getParameter("licensePlate");
-        String dateStr = request.getParameter("date");
+        String dateStr = request.getParameter("appointmentDate");
         String description = request.getParameter("description");
 
         // (Tùy chọn) Validation: Kiểm tra các trường bắt buộc không bị trống
@@ -67,7 +66,7 @@ public class Appointment extends HttpServlet {
                 throw new ServletException("Customer profile not found for the logged-in user.");
             }
 
-            // 5. Xử lý Vehicle: Tìm hoặc Tạo mới
+// 5. Xử lý Vehicle: Tìm hoặc Tạo mới
             int vehicleID = vehicleDAO.getVehicleIdByLicensePlate(licensePlate);
             if (vehicleID == -1) {
                 // Nếu xe chưa tồn tại, tạo xe mới
@@ -75,15 +74,21 @@ public class Appointment extends HttpServlet {
                 newVehicle.setCustomerID(customerID);
                 newVehicle.setLicensePlate(licensePlate);
                 newVehicle.setBrand(carBrand);
-                vehicleID = vehicleDAO.getAllVehiclesCount() + 1;
-                vehicleDAO.insertVehicle(newVehicle);
+                // Không cần set vehicleID thủ công
+
+                vehicleID = vehicleDAO.insertVehicle(newVehicle); // ← Lấy ID từ return
+
+                if (vehicleID == -1) {
+                    throw new ServletException("Failed to insert vehicle");
+                }
             }
 
             // 6. Xử lý Appointment
             model.appointment.Appointment appointment = new model.appointment.Appointment();
             appointment.setCustomerID(customerID);
             appointment.setVehicleID(vehicleID); // QUAN TRỌNG: Gán VehicleID
-            appointment.setAppointmentDate(java.sql.Date.valueOf(dateStr).toLocalDate()); // Đặt trong try-catch
+            java.time.LocalDateTime dateTime = java.time.LocalDateTime.parse(dateStr);
+            appointment.setAppointmentDate(dateTime.toLocalDate());// Đặt trong try-catch
             appointment.setDescription(description);
             appointment.setStatus("CONFIRM"); // Gán trạng thái ban đầu
 
@@ -91,7 +96,8 @@ public class Appointment extends HttpServlet {
             appointmentDAO.insertAppointment(appointment);
 
             // 8. Chuyển hướng sau khi thành công (PRG Pattern)
-            response.sendRedirect(request.getContextPath() + "/Appointment");
+            request.setAttribute("successMessage", "Appointment scheduled successfully!");
+            request.getRequestDispatcher("appointment-scheduling.jsp").forward(request, response);
 
         } catch (IllegalArgumentException e) {
             // Bắt lỗi nếu định dạng ngày sai
@@ -100,7 +106,9 @@ public class Appointment extends HttpServlet {
         } catch (Exception e) {
             // Bắt các lỗi khác (lỗi DB, etc.)
             e.printStackTrace(); // Ghi log lỗi ra console
-            request.setAttribute("errorMessage", "An error occurred while booking the appointment.");
+            // Hiển thị lỗi chi tiết trên màn hình
+            String detailError = "An error occurred: " + e.getMessage() + " | Type: " + e.getClass().getSimpleName();
+            request.setAttribute("errorMessage", detailError);
             request.getRequestDispatcher("appointment-scheduling.jsp").forward(request, response);
         }
     }
