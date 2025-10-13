@@ -5,21 +5,30 @@
   Description: Role-Based Access Control (RBAC) Management
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<c:set var="RBAC_BASE" value="/admin/rbac" />
 <html>
 <head>
     <title>Role Permission Management (RBAC)</title>
 
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/role/role-page.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/role/rbac.css">
 
 </head>
 <body>
-<h2>Role -> Permission (RBAC)</h2>
 
+<c:if test = "${not empty sessionScope.flash}">
+    <div class="alert success-message">
+        ${sessionScope.flash}
+        <c:remove var="flash" scope="session"/>
+    </div>
+</c:if>
 
-<a href="${pageContext.request.contextPath}/roles?action=list"
-   style="display: inline-block; margin-bottom: 10px; text-decoration: none; background-color: #777; color: white; padding: 6px 12px; border-radius: 4px;">
-    ⬅ Back to Role List
-</a>
+<c:if test="${not empty sessionScope.error}">
+    <div class="alert error-message">
+        ${sessionScope.error}
+        <c:remove var="error" scope="session"/>
+    </div>
+</c:if>
+
 <c:if test = "${param.saved == '1'}">
     <div class="msg"> Save permission successfully!</div>
 </c:if>
@@ -28,7 +37,7 @@
     <h1 class="page-title">Role -> Permission (RBAC)</h1>
 
     <div class="back-link-container">
-        <a href="${pageContext.request.contextPath}/roles?action=list" class="btn btn-back">
+        <a href="${pageContext.request.contextPath}/admin/rbac/rolesList?action=list" class="btn btn-back">
             &laquo; Back to Role List
         </a>
     </div>
@@ -45,7 +54,7 @@
     </c:if>
 
 
-    <form class="filter-form" method="get" action="${pageContext.request.contextPath}/rbac/roles">
+    <form class="filter-form" method="get" action="${pageContext.request.contextPath}/admin/rbac/roles">
 
         <div class="form-group role-select-group">
             <label class="form-label">
@@ -78,15 +87,22 @@
         <button class="btn btn-search" type="submit">Filter</button>
 
         <span class="total-count right muted">
-                <c:out value="${fn:length(perms)}"/> permissions found.
-            </span>
+  ${pager.totalItems} permissions found.
+</span>
 
     </form>
 
-
-    <form method="post" action="${pageContext.request.contextPath}/rbac/roles/save" class="permission-form">
+    <div style="margin: 10px 0;">
+        <a href="${pageContext.request.contextPath}/admin/rbac/permissions?action=new" class="btn btn-primary">
+             Create New Permission
+        </a>
+    </div>
+    <form method="post" action="${pageContext.request.contextPath}/admin/rbac/roles/save" class="permission-form">
         <input type="hidden" name="roleId" value="${roleId}"/>
 
+        <c:if test="${not empty managePermId}">
+            <input type="hidden" name="permIds" value="${managePermId}"/>
+        </c:if>
         <div class="table-responsive">
             <table class="data-table permission-table">
                 <thead>
@@ -95,27 +111,42 @@
                     <th>Permission</th>
                     <th>Name</th>
                     <th>Category</th>
+                    <th>Action</th>
+
                 </tr>
                 </thead>
                 <tbody>
                 <c:forEach var="p" items="${pager.data}" varStatus="st">
                     <tr class="<c:if test="${checkedPermsIds.contains(p.permId)}">checked-row</c:if>">
                         <td class="col-checkbox">
+                            <input type="hidden" name="pagePermIds" value="${p.permId}"/>
                             <input type="checkbox" name="permIds" value="${p.permId}" class="perm-checkbox"
                                    <c:if test="${checkedPermsIds.contains(p.permId)}">checked</c:if> />
                         </td>
                         <td class="perm-code"><b>${p.code}</b></td>
                         <td class="perm-name">${p.name}</td>
                         <td class="perm-category"><span class="badge badge-category"><c:out value="${p.category}"/></span></td>
+                        <td>
+
+                            <a href="${pageContext.request.contextPath}/admin/rbac/permissions?action=edit&id=${p.permId}" class="btn btn-edit">Edit</a>
+                            <a href="${pageContext.request.contextPath}/admin/rbac/permissions?action=delete&id=${p.permId}"
+                               class="btn btn-delete" onclick="return confirm('Delete this permission?');">Delete</a>
+                        </td>
                     </tr>
                 </c:forEach>
+
+                <c:if test="${empty pager.data}">
+                    <tr>
+                        <td colspan="5" class="no-data">No permissions founds</td>
+                    </tr>
+                </c:if>
                 </tbody>
             </table>
         </div>
 
         <div class="form-toolbar">
             <button class="btn btn-primary" type="submit">Save</button>
-            <a class="btn btn-reset" href="${pageContext.request.contextPath}/rbac/roles?roleId=${roleId}">Reset</a>
+            <a class="btn btn-reset" href="${pageContext.request.contextPath}/admin/rbac/roles?roleId=${roleId}">Reset</a>
         </div>
     </form>
 
@@ -147,7 +178,7 @@
         </div>
 
 
-        <form method="get" action="${pageContext.request.contextPath}/rbac/roles" class="size-config-form">
+        <form method="get" action="${pageContext.request.contextPath}/admin/rbac/roles" class="size-config-form">
             <input type="hidden" name="roleId" value="${roleId}"/>
             <input type="hidden" name="keyword" value="${param.keyword}">
             <input type="hidden" name="category" value="${param.category}">

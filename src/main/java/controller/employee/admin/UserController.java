@@ -1,7 +1,7 @@
 package controller.employee.admin;
 
 import service.employee.AdminService;
-import model.rbac.Role;
+import model.employee.admin.rbac.Role;
 import java.util.ArrayList;
 import model.employee.admin.UserDisplay;
 

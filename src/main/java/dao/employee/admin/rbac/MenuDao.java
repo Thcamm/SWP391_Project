@@ -1,7 +1,7 @@
-package dao.rbac;
+package dao.employee.admin.rbac;
 
 import common.DbContext;
-import model.rbac.MenuItem;
+import model.employee.admin.rbac.MenuItem;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

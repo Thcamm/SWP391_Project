@@ -8,7 +8,7 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <c:set var="isEdit" value="${mode == 'edit'}"/>
-<c:set var = "actionUrl" value="${pageContext.request.contextPath}/roles"/>
+<c:set var = "actionUrl" value="${pageContext.request.contextPath}/admin/rbac/rolesList"/>
 <c:set var="formAction" value="${isEdit ? 'update':'create'}"/>
 <c:set var="formTitle" value="${isEdit ? 'Update role': 'Create new role'}"/>
 <html>
@@ -47,9 +47,16 @@
                    placeholder="Enter name of role">
         </div>
 
+        <div class="form-group">
+            <label for="description" class="form-label">Description: </label>
+            <textarea id="description" name="description" rows="4" maxlength="255" class="form-control"
+                      placeholder="Enter description (optional)"><c:out value="${isEdit ? role.description : (not empty description ? description : '')}"/></textarea>
+
+        </div>
+
         <div class="form-actions">
             <input type="submit" value="${isEdit ? 'update' : 'create'}" class="btn btn-primary form-submit-btn">
-            <a href="${pageContext.request.contextPath}/roles?action=list" class="btn btn-secondary">Cancel</a>
+            <a href="${pageContext.request.contextPath}/admin/rbac/rolesList?action=list" class="btn btn-secondary">Cancel</a>
         </div>
 
     </form>

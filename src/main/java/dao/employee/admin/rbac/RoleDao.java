@@ -1,7 +1,7 @@
-package dao.rbac;
+package dao.employee.admin.rbac;
 
 import common.DbContext;
-import model.rbac.Role;
+import model.employee.admin.rbac.Role;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class RoleDao {
     public List<Role> findAll() throws Exception {
-        String sql = "SELECT RoleID, RoleName FROM RoleInfo ORDER BY RoleID";
+        String sql = "SELECT RoleID, RoleName, Description FROM RoleInfo ORDER BY RoleID";
         List<Role> list = new ArrayList<>();
 
         try (Connection c = DbContext.getConnection();
@@ -19,7 +19,7 @@ public class RoleDao {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                list.add(new Role(rs.getInt("RoleID"), rs.getString("RoleName")));
+                list.add(new Role(rs.getInt("RoleID"), rs.getString("RoleName"), rs.getString("Description")));
             }
         } catch (SQLException e) {
 
@@ -28,13 +28,39 @@ public class RoleDao {
         return list;
     }
 
-    public Role findById(int roleId) throws SQLException {
-        String sql = "SELECT RoleID, RoleName FROM RoleInfo WHERE RoleID = ?";
+    public String findRoleCodeById(int roleId) {
+        final String sql = "SELECT RoleCode FROM RoleInfo WHERE RoleID = ? LIMIT 1";
         try (Connection c = DbContext.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, roleId);
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? new Role(rs.getInt("RoleID"), rs.getString("RoleName")) : null;
+                if (rs.next()) return rs.getString("RoleCode");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
+
+    public String findRoleNameById(int roleId) throws SQLException {
+        String sql = "SELECT RoleName FROM RoleInfo WHERE RoleID = ? LIMIT 1";
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, roleId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getString("RoleName") : null;
+            }
+        }catch (SQLException e){
+            throw new SQLException(e.getMessage());
+        }
+    }
+    public Role findById(int roleId) throws SQLException {
+        String sql = "SELECT RoleID, RoleName , Description FROM RoleInfo WHERE RoleID = ?";
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, roleId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? new Role(rs.getInt("RoleID"), rs.getString("RoleName"), rs.getString("Description")) : null;
             }
 
         }
@@ -44,13 +70,13 @@ public class RoleDao {
 
 
     public Role findByName(String roleName) throws SQLException {
-        String sql ="SELECT RoleID, RoleName FROM RoleInfo WHERE LOWER(RoleName) = LOWER(?)";
+        String sql ="SELECT RoleID, RoleName, Description  FROM RoleInfo WHERE LOWER(RoleName) = LOWER(?)";
         try (Connection c = DbContext.getConnection();
         PreparedStatement ps  =  c.prepareStatement(sql)) {
             ps.setString(1, roleName);
             try (ResultSet rs = ps.executeQuery()) {
                 if(rs.next()){
-                    return new Role(rs.getInt("RoleID"), rs.getString("RoleName"));
+                    return new Role(rs.getInt("RoleID"), rs.getString("RoleName"), rs.getString("Description"));
                 }
                 return null;
             }
@@ -60,24 +86,26 @@ public class RoleDao {
     public List<Role> findByName(String keyword, int offset, int limit) throws SQLException {
         List<Role> list = new ArrayList<>();
         String sql = """
-        SELECT r.RoleID, r.RoleName, COUNT(u.UserID) AS userCount
+        SELECT r.RoleID, r.RoleName,r.Description, COUNT(u.UserID) AS userCount
         FROM RoleInfo r
         LEFT JOIN `User` u ON r.RoleID = u.RoleID
-        WHERE LOWER(r.RoleName) LIKE LOWER(?)
-        GROUP BY r.RoleID, r.RoleName
+        WHERE LOWER(r.RoleName) LIKE LOWER(?) OR LOWER(r.Description) LIKE LOWER(?)
+        GROUP BY r.RoleID, r.RoleName, r.Description
         ORDER BY r.RoleID ASC
         LIMIT ? OFFSET ?
     """;
         try (Connection c = DbContext.getConnection();
         PreparedStatement ps = c.prepareStatement(sql)){
             ps.setString(1, "%" + keyword + "%");
-            ps.setInt(2, limit);
-            ps.setInt(3, offset);
+            ps.setString(2, "%" + keyword + "%");
+            ps.setInt(3, limit);
+            ps.setInt(4, offset);
             ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 Role r = new Role();
                 r.setRoleId(rs.getInt("RoleID"));
                 r.setRoleName(rs.getString("RoleName"));
+                r.setDescription(rs.getString("Description"));
                 r.setUserCount(rs.getInt("userCount"));
                 list.add(r);
             }
@@ -88,10 +116,11 @@ public class RoleDao {
     }
 
     public int countByName(String keyword) throws SQLException {
-        String sql = "SELECT COUNT(*) FROM RoleInfo WHERE LOWER(RoleName) LIKE LOWER(?)";
+        String sql = "SELECT COUNT(*) FROM RoleInfo WHERE LOWER(RoleName) LIKE LOWER(?) OR LOWER(Description) LIKE LOWER(?)";
         try (Connection con = DbContext.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
+            ps.setString(2, "%" + keyword + "%");
             ResultSet rs = ps.executeQuery();
             if (rs.next()) return rs.getInt(1);
         }
@@ -118,11 +147,12 @@ public class RoleDao {
     }
 
     //Create role
-    public int insert(String roleName) throws SQLException {
-        String sql = "INSERT INTO RoleInfo (RoleName) VALUES(?)";
+    public int insert(String roleName, String description) throws SQLException {
+        String sql = "INSERT INTO RoleInfo (RoleName, Description) VALUES(?, ?)";
         try(Connection c = DbContext.getConnection();
         PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, roleName);
+            ps.setString(2, description); // Assuming Description can be empty
             ps.executeUpdate();
 
             try(ResultSet rs = ps.getGeneratedKeys()){
@@ -163,11 +193,12 @@ public class RoleDao {
 
     //Update role
     public void update(Role role) throws SQLException {
-        String sql = "UPDATE RoleInfo SET RoleName = ? WHERE RoleID=?";
+        String sql = "UPDATE RoleInfo SET RoleName = ?, Description = ? WHERE RoleID=?";
         try(Connection c = DbContext.getConnection();
         PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setString(1, role.getRoleName());
-            ps.setInt(2, role.getRoleId());
+            ps.setString(2, role.getDescription());
+            ps.setInt(3, role.getRoleId());
             ps.executeUpdate();
         }
     }
@@ -203,36 +234,39 @@ public class RoleDao {
 
     }
 
-    public List<Role> findPaginated(int offset, int limit) throws Exception {
+    public List<Role> findPaginated(int offset, int limit) {
         String sql = """
-        SELECT r.RoleID, r.RoleName, COUNT(u.UserID) AS userCount
+        SELECT r.RoleID, r.RoleName, r.Description, COUNT(u.UserID) AS userCount
         FROM RoleInfo r
         LEFT JOIN `User` u ON r.RoleID = u.RoleID
-        GROUP BY r.RoleID, r.RoleName
+        GROUP BY r.RoleID, r.RoleName, r.Description
         ORDER BY r.RoleID
         LIMIT ? OFFSET ?
     """;
+
         List<Role> list = new ArrayList<>();
-        try(Connection c = DbContext.getConnection();
-        PreparedStatement ps = c.prepareStatement(sql)) {
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
             ps.setInt(1, limit);
             ps.setInt(2, offset);
 
             try (ResultSet rs = ps.executeQuery()) {
-                while(rs.next()) {
+                while (rs.next()) {
                     Role r = new Role();
                     r.setRoleId(rs.getInt("RoleID"));
                     r.setRoleName(rs.getString("RoleName"));
+                    r.setDescription(rs.getString("Description"));   // <— ĐÚNG tên getter/setter
                     r.setUserCount(rs.getInt("userCount"));
                     list.add(r);
                 }
             }
-        }catch (SQLException e) {
-            throw new RuntimeException("Query paginated roles failed",e);
+        } catch (SQLException e) {
+            throw new RuntimeException("Query paginated roles failed", e);
         }
-
         return list;
     }
+
 
 
     public int countAll() throws SQLException {

@@ -1,6 +1,6 @@
 package model.employee.admin;
 
-import model.rbac.Role;
+import model.employee.admin.rbac.Role;
 import model.user.User;
 
 public class UserDisplay {

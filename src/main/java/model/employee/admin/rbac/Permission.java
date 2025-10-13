@@ -1,4 +1,4 @@
-package model.rbac;
+package model.employee.admin.rbac;
 
 public class Permission {
     public int permId;
@@ -6,7 +6,7 @@ public class Permission {
     public String name;
     public String category;
     public String description;
-    public boolean active;
+//    public boolean active;
 
     public int getPermId() {
         return permId;
@@ -48,11 +48,11 @@ public class Permission {
         this.description = description;
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
+//    public boolean isActive() {
+//        return active;
+//    }
+//
+//    public void setActive(boolean active) {
+//        this.active = active;
+//    }
 }

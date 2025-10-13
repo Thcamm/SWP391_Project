@@ -1,4 +1,4 @@
-package model.rbac;
+package model.employee.admin.rbac;
 
 public class Role {
     public int roleId;
@@ -6,12 +6,18 @@ public class Role {
 
     private int userCount;
 
+    private String description;
+
+
+
     public Role() {
     }
-    public Role(int roleId, String roleName) {
+    public Role(int roleId, String roleName, String description) {
         this.roleId = roleId;
         this.roleName = roleName;
+        this.description = description;
     }
+
 
     public int getRoleId() {
         return roleId;
@@ -34,5 +40,13 @@ public class Role {
     }
     public void setUserCount(int userCount) {
         this.userCount = userCount;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
