@@ -23,6 +23,8 @@ public class Customer extends User {
         this.pointLoyalty = pointLoyalty;
     }
 
+    private List<Vehicle> vehicles = new ArrayList<>();
+
     public Integer getUserId() {
         return userId;
     }
@@ -44,6 +46,14 @@ public class Customer extends User {
 
     public void setPointLoyalty(int pointLoyalty) {
         this.pointLoyalty = pointLoyalty;
+    }
+
+    public List<Vehicle> getVehicles() {
+        return vehicles;
+    }
+
+    public void setVehicles(List<Vehicle> vehicles) {
+        this.vehicles = vehicles;
     }
 
     @Override

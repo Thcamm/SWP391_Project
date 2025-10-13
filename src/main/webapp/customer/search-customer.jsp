@@ -1,123 +1,140 @@
-<%@ page contentType="text/html; charset=UTF-8" language="java" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Tìm kiếm khách hàng</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f5f7fa; }
-        h2 { color: #2c3e50; }
-        form { background: white; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        label { display: inline-block; width: 160px; font-weight: bold; }
-        input[type="text"] { width: 250px; padding: 6px; margin: 5px 0; }
-        button { padding: 8px 16px; border: none; background-color: #3498db; color: white; border-radius: 5px; cursor: pointer; }
-        button:hover { background-color: #2980b9; }
-        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
-        th { background-color: #3498db; color: white; }
-        .toggle-btn { border: none; background: none; color: #2980b9; cursor: pointer; font-weight: bold; }
-        .vehicle-row { display: none; background-color: #f9f9f9; }
-        .vehicle-table { width: 95%; margin: 8px auto; border-collapse: collapse; }
-        .vehicle-table th, .vehicle-table td { border: 1px solid #ccc; padding: 6px; text-align: left; }
-        .no-result { color: red; font-weight: bold; padding: 8px; }
-    </style>
-    <script>
-        function toggleVehicles(id) {
-            const row = document.getElementById('vehicles-' + id);
-            row.style.display = (row.style.display === 'none' || row.style.display === '') ? 'table-row' : 'none';
-        }
-    </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
-<body>
 
-<h2>🔍 Tìm kiếm khách hàng</h2>
+<body class="bg-light">
+<div class="container py-4">
 
-<form action="search-customer" method="get">
-    <div>
-        <label for="fullName">Tên khách hàng:</label>
-        <input type="text" id="fullName" name="fullName" value="${param.fullName}">
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Tìm kiếm khách hàng</h3>
+        <a href="${pageContext.request.contextPath}/customer/create-customer.jsp" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Tạo khách hàng
+        </a>
     </div>
-    <div>
-        <label for="contact">Email hoặc SĐT:</label>
-        <input type="text" id="contact" name="contact" value="${param.contact}">
-    </div>
-    <div>
-        <label for="licensePlate">Biển số xe:</label>
-        <input type="text" id="licensePlate" name="licensePlate" value="${param.licensePlate}">
-    </div>
-    <button type="submit">Tìm kiếm</button>
-</form>
 
-<c:if test="${not empty customerList}">
-    <table>
-        <thead>
-        <tr>
-            <th>Tên khách hàng</th>
-            <th>Email</th>
-            <th>Số điện thoại</th>
-            <th>Giới tính</th>
-            <th>Ngày sinh</th>
-            <th>Địa chỉ</th>
-            <th>Xe</th>
-        </tr>
-        </thead>
-        <tbody>
-        <c:forEach var="c" items="${customerList}">
-            <tr>
-                <td>${c.fullName}</td>
-                <td>${c.email}</td>
-                <td>${c.phoneNumber}</td>
-                <td>${c.gender}</td>
-                <td>${c.birthDate}</td>
-                <td>${c.address}</td>
-                <td>
-                    <c:set var="count" value="${fn:length(c.vehicles)}"/>
-                    <c:choose>
-                        <c:when test="${count > 0}">
-                            <button type="button" class="toggle-btn" onclick="toggleVehicles(${c.customerID})">
-                                🚗 ${count} xe
-                            </button>
-                        </c:when>
-                        <c:otherwise>Không có xe</c:otherwise>
-                    </c:choose>
-                </td>
-            </tr>
+    <!-- SEARCH FORM -->
+    <form action="${pageContext.request.contextPath}/search-customer" method="get" class="card p-4 mb-4">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label for="searchName" class="form-label">Tên khách hàng</label>
+                <input type="text" id="searchName" name="searchName" value="${param.searchName}" class="form-control" placeholder="Nhập tên khách hàng" />
+            </div>
 
-            <!-- Dòng ẩn danh sách xe -->
-            <tr id="vehicles-${c.customerId}" class="vehicle-row">
-                <td colspan="7">
-                    <table class="vehicle-table">
-                        <thead>
-                        <tr>
-                            <th>Biển số</th>
-                            <th>Hãng xe</th>
-                            <th>Mẫu xe</th>
-                            <th>Năm SX</th>
+            <div class="col-md-4">
+                <label for="searchLicensePlate" class="form-label">Biển số xe</label>
+                <input type="text" id="searchLicensePlate" name="searchLicensePlate" value="${param.searchLicensePlate}" class="form-control" placeholder="Nhập biển số xe" />
+            </div>
+
+            <div class="col-md-4">
+                <label for="searchEmail" class="form-label">Email / SĐT</label>
+                <input type="text" id="searchEmail" name="searchEmail" value="${param.searchEmail}" class="form-control" placeholder="Nhập email hoặc SĐT" />
+            </div>
+        </div>
+
+        <div class="mt-4 d-flex justify-content-between align-items-center">
+            <button type="submit" class="btn btn-success">
+                🔍 Tìm kiếm
+            </button>
+            <label>
+                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                Tạo ngày
+            </label>
+            <input type="date" name="fromDate" value="${param.fromDate}" placeholder="dd/mm/yyyy" />
+
+            <label>
+                <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                Đến ngày
+            </label>
+            <input type="date" name="toDate" value="${param.toDate}" placeholder="dd/mm/yyyy" />
+
+            <select id="sortOrder" name="sortOrder" class="form-select w-auto">
+                <option value="newest" ${param.sortOrder == 'newest' ? 'selected' : ''}>Mới nhất</option>
+                <option value="oldest" ${param.sortOrder == 'oldest' ? 'selected' : ''}>Cũ nhất</option>
+            </select>
+        </div>
+    </form>
+
+    <!-- CUSTOMER TABLE -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Danh sách khách hàng</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>STT</th>
+                    <th>Tên khách hàng</th>
+                    <th>Biển số xe</th>
+                    <th>Email</th>
+                    <th>Số điện thoại</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <c:choose>
+                    <c:when test="${empty customerList}">
+                        <tr class="text-center text-muted">
+                            <td colspan="5">Chưa có dữ liệu hiển thị</td>
                         </tr>
-                        </thead>
-                        <tbody>
-                        <c:forEach var="v" items="${c.vehicles}">
+                    </c:when>
+                    <c:otherwise>
+                        <c:forEach var="c" items="${customerList}" varStatus="loop">
                             <tr>
-                                <td>${v.licensePlate}</td>
-                                <td>${v.brand}</td>
-                                <td>${v.model}</td>
-                                <td>${v.yearManufacture}</td>
+                                <td>${loop.index + 1}</td>
+                                <td>
+                                    <a href="${pageContext.request.contextPath}/customer-detail?id=${customer.customerId}">
+                                        ${c.fullName}
+                                    </a>
+                                </td>
+                                <td>
+                                    <c:forEach var="v" items="${c.vehicles}" varStatus="vs">
+                                        ${v.licensePlate}
+                                        <c:if test="${!vs.last}">, </c:if>
+                                    </c:forEach>
+                                </td>
+                                <td>${c.email}</td>
+                                <td>${c.phoneNumber}</td>
                             </tr>
                         </c:forEach>
-                        </tbody>
-                    </table>
-                </td>
-            </tr>
-        </c:forEach>
-        </tbody>
-    </table>
-</c:if>
-
-<c:if test="${empty customerList and param.fullName != null}">
-    <div class="no-result">❌ Không tìm thấy khách hàng phù hợp.</div>
-</c:if>
+                    </c:otherwise>
+                </c:choose>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 </body>
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const fromDate = document.querySelector('input[name="fromDate"]').value;
+        const toDate = document.querySelector('input[name="toDate"]').value;
+
+        if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
+            e.preventDefault();
+            alert("❌ Ngày bắt đầu không được lớn hơn ngày kết thúc!");
+        }
+    });
+</script>
 </html>

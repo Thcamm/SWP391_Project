@@ -306,8 +306,8 @@
                 ${message}
         </div>
     </c:if>
-    <form action="create-customer" method="post" id="customerForm">
-        <!-- Thông tin khách hàng -->
+    <form action="${pageContext.request.contextPath}/create-customer" method="post" id="customerForm">
+
         <div class="section">
             <div class="section-title">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -379,10 +379,6 @@
                 <textarea name="address" placeholder="Nhập địa chỉ đầy đủ"></textarea>
             </div>
 
-            <div class="form-group full-width">
-                <label>Ghi chú</label>
-                <textarea name="note" placeholder="Ghi chú thêm về khách hàng"></textarea>
-            </div>
         </div>
 
         <div class="form-actions">
@@ -391,8 +387,6 @@
         </div>
     </form>
 </div>
-
-
 
 </body>
 </html>

@@ -20,9 +20,9 @@ public class CreateCustomerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false); // ❗ Không tạo mới session
+        HttpSession session = request.getSession(false);
 
-        // ❌ Chưa đăng nhập
+
         if (session == null || session.getAttribute("user") == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
@@ -30,23 +30,33 @@ public class CreateCustomerServlet extends HttpServlet {
 
         User currentUser = (User) session.getAttribute("user");
 
-        // ⚠️ Kiểm tra role: chỉ Customer Service (ví dụ RoleID = 3)
-        if (currentUser.getRoleId() != 3) {
-            response.sendRedirect(request.getContextPath() + "/error-permission.jsp");
+        if (currentUser.getRoleId() != 2) {
+            response.sendRedirect(request.getContextPath() + "/customer/error-permission.jsp");
             return;
         }
 
-        request.getRequestDispatcher("/create-customer.jsp").forward(request, response);
+        request.getRequestDispatcher("/customer/create-customer.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser.getRoleId() != 2) {
+            response.sendRedirect(request.getContextPath() + "/customer/error-permission.jsp");
+            return;
+        }
+
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
-        // === Lấy dữ liệu từ form ===
         String fullName = request.getParameter("fullName");
         String email = request.getParameter("email");
         String phoneNumber = request.getParameter("phone");
@@ -57,7 +67,7 @@ public class CreateCustomerServlet extends HttpServlet {
 
         if (birthDateStr != null && !birthDateStr.isEmpty()) {
             try {
-                birthDate = Date.valueOf(birthDateStr); // yyyy-MM-dd
+                birthDate = Date.valueOf(birthDateStr);
             } catch (IllegalArgumentException e) {
                 System.out.println("⚠️ Định dạng ngày không hợp lệ: " + birthDateStr);
             }
@@ -82,7 +92,7 @@ public class CreateCustomerServlet extends HttpServlet {
         if (isDuplicate) {
             request.setAttribute("message", "⚠️ Email đã tồn tại!");
             request.setAttribute("messageType", "warning");
-            request.getRequestDispatcher("/create-customer.jsp").forward(request, response);
+            request.getRequestDispatcher("/customer/create-customer.jsp").forward(request, response);
             return;
         }
 
@@ -94,6 +104,6 @@ public class CreateCustomerServlet extends HttpServlet {
             request.setAttribute("message", "❌ Không thể thêm khách hàng. Vui lòng thử lại.");
             request.setAttribute("messageType", "error");
         }
-        request.getRequestDispatcher("/create-customer.jsp").forward(request, response);
+        request.getRequestDispatcher("/customer/create-customer.jsp").forward(request, response);
     }
 }
