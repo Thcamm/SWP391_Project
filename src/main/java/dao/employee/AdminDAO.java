@@ -250,6 +250,60 @@ public class AdminDAO extends DbContext {
     }
 
     /**
+     * ADMIN FUNCTION: Get UserDisplay by ID with role info
+     */
+    public UserDisplay getUserDisplayById(int userId) throws SQLException {
+        String sql = "SELECT u.UserID, u.RoleID, u.FullName, u.UserName, u.Email, u.PhoneNumber, " +
+                "u.ActiveStatus, u.CreatedAt, u.UpdatedAt, r.RoleName " +
+                "FROM User u LEFT JOIN RoleInfo r ON u.RoleID = r.RoleID " +
+                "WHERE u.UserID = ?";
+
+        System.out.println(" AdminDAO.getUserDisplayById() called for ID: " + userId);
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    UserDisplay user = extractUserDisplay(rs);
+                    System.out.println(" User found: " + user.getUserName());
+                    return user;
+                } else {
+                    System.out.println(" No user found for ID: " + userId);
+                    return null;
+                }
+            }
+        }
+    }
+
+    /**
+     * ADMIN FUNCTION: Update user status (enable/disable)
+     */
+    public boolean updateUserStatus(int userId, boolean newStatus, String currentUser) throws SQLException {
+        String sql = "UPDATE User SET ActiveStatus = ?, UpdatedAt = NOW() WHERE UserID = ?";
+
+        System.out.println(" AdminDAO.updateUserStatus() called");
+        System.out.println("    User ID: " + userId);
+        System.out.println("    New Status: " + newStatus);
+        System.out.println("    Updated by: " + currentUser);
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setBoolean(1, newStatus);
+            ps.setInt(2, userId);
+
+            int rowsAffected = ps.executeUpdate();
+            boolean success = rowsAffected > 0;
+
+            System.out.println(" Update result: " + rowsAffected + " rows affected, success: " + success);
+            return success;
+        }
+    }
+
+    /**
      * ADMIN FUNCTION: Get user by username (including inactive)
      */
     public User getUserByUsername(String userName) throws SQLException {

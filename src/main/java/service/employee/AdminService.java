@@ -65,7 +65,7 @@ public class AdminService {
     }
 
     /**
-     * NEW METHOD: Check admin permission by role name/characteristics
+     * Check admin permission by role name/characteristics
      */
     private boolean checkAdminPermissionByRole(int roleId) {
         try {
@@ -107,23 +107,6 @@ public class AdminService {
     }
 
     /**
-     * ALTERNATIVE: Check specific permission (if you implement Permission system)
-     */
-    private boolean checkSpecificPermission(int roleId, String permissionCode) {
-        try {
-            // Example:
-            // return rolePermissionDAO.hasPermission(roleId, permissionCode);
-
-            System.out.println("Permission check not implemented yet - using fallback");
-            return false; // For now, return false to use role name check
-
-        } catch (Exception e) {
-            System.err.println("Error checking specific permission: " + e.getMessage());
-            return false;
-        }
-    }
-
-    /**
      * ALTERNATIVE: Completely bypass permission check for development
      */
     public boolean isAdminForDevelopment(String userName) {
@@ -139,8 +122,6 @@ public class AdminService {
             return false;
         }
     }
-
-    // ===== ALL OTHER EXISTING METHODS (unchanged) =====
 
     public List<User> getAllUsers() {
         try {
@@ -178,8 +159,6 @@ public class AdminService {
         }
     }
 
-    // ... (keep all other existing methods unchanged)
-
     public boolean createUser(String fullName, String userName, String email, int roleId, String currentUser) {
         try {
             if (currentUser == null || currentUser.trim().isEmpty()) {
@@ -215,7 +194,7 @@ public class AdminService {
         }
     }
 
-    // ===== SEARCH METHODS (unchanged) =====
+    // ===== SEARCH METHODS =====
 
     public ArrayList<UserDisplay> searchUsers(String keyword, Integer roleId, Boolean activeStatus) {
         try {
@@ -255,6 +234,29 @@ public class AdminService {
             System.err.println("ADMIN Error searching users: " + e.getMessage());
             e.printStackTrace();
             return new ArrayList<>();
+        }
+    }
+
+    // NEW: Method with pagination support
+    public common.utils.PaginationUtils.PaginationResult<UserDisplay> searchUsersWithPagination(
+            String keyword, Integer roleId, Boolean activeStatus, String sortBy,
+            int currentPage, int itemsPerPage) {
+        try {
+            // Get all results first
+            ArrayList<UserDisplay> allResults = adminDAO.searchAllUsersWithRole(keyword, roleId, activeStatus, sortBy);
+
+            // Apply pagination
+            common.utils.PaginationUtils.PaginationResult<UserDisplay> paginatedResult = common.utils.PaginationUtils
+                    .paginate(allResults, currentPage, itemsPerPage);
+
+            System.out.println(" Pagination: Page " + currentPage + "/" + paginatedResult.getTotalPages() +
+                    " - Showing " + paginatedResult.getPaginatedData().size() + "/" + paginatedResult.getTotalItems());
+
+            return paginatedResult;
+        } catch (SQLException e) {
+            System.err.println("ADMIN Error searching users with pagination: " + e.getMessage());
+            e.printStackTrace();
+            return new common.utils.PaginationUtils.PaginationResult<>(new ArrayList<>(), 0, 0, 1, itemsPerPage);
         }
     }
 
@@ -309,7 +311,7 @@ public class AdminService {
     public int getAdminUsersCount() {
         try {
             // Get all users and count those with admin roles (dynamic approach)
-            ArrayList<UserDisplay> allUsers = adminDAO.searchAllUsersWithRole(null, null, null, null);
+            ArrayList<UserDisplay> allUsers = adminDAO.searchAllUsersWithRole(null, 1, null, null);
             int adminCount = 0;
 
             for (UserDisplay user : allUsers) {
@@ -329,6 +331,54 @@ public class AdminService {
             } catch (SQLException fallbackError) {
                 return 0;
             }
+        }
+    }
+
+    // ===== User Detail =====
+
+    /**
+     * GET USER BY ID: Lấy thông tin chi tiết user theo ID
+     */
+    public UserDisplay getUserById(int userId) {
+        try {
+            System.out.println(" AdminService.getUserById() called for ID: " + userId);
+            UserDisplay user = adminDAO.getUserDisplayById(userId);
+
+            if (user != null) {
+                System.out.println("User found: " + user.getUserName());
+            } else {
+                System.out.println(" User not found for ID: " + userId);
+            }
+
+            return user;
+        } catch (SQLException e) {
+            System.err.println(" Error getting user by ID " + userId + ": " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * TOGGLE USER STATUS
+     */
+    public boolean toggleUserStatus(int userId, boolean newStatus, String currentUser) {
+        try {
+            System.out.println(" AdminService.toggleUserStatus() called");
+            System.out.println("    User ID: " + userId);
+            System.out.println("    New Status: " + (newStatus ? "ACTIVE" : "INACTIVE"));
+            System.out.println("    Actor: " + currentUser);
+
+            boolean success = adminDAO.updateUserStatus(userId, newStatus, currentUser);
+
+            if (success) {
+                System.out.println(" User status updated successfully");
+            } else {
+                System.out.println(" Failed to update user status");
+            }
+
+            return success;
+        } catch (SQLException e) {
+            System.err.println(" Error toggling user status for ID " + userId + ": " + e.getMessage());
+            return false;
         }
     }
 
