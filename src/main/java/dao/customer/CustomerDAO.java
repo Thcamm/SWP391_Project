@@ -158,7 +158,7 @@ public class CustomerDAO extends DbContext {
         sql.append("ORDER BY u.CreatedAt ");
         sql.append("oldest".equalsIgnoreCase(sortOrder) ? "ASC" : "DESC");
 
-        try (PreparedStatement ps = DbContext.getConnection().prepareStatement(sql.toString())) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql.toString())) {
             int index = 1;
 
             if (name != null && !name.trim().isEmpty()) {
@@ -302,5 +302,6 @@ public class CustomerDAO extends DbContext {
         }
         return null;
     }
+
 
 }

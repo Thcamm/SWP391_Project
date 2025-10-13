@@ -12,26 +12,38 @@ import java.util.List;
 
 
 public class AppointmentDAO extends DbContext {
-    public void getAllAppointments() {
-        String sql = "SELECT * FROM Appointment";
+
+    public List<Appointment> getAllAppointments() {
+        String sql = "SELECT * FROM Appointment ORDER BY Date DESC";
+        List<Appointment> appointments = new ArrayList<>();
+
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
             ResultSet rs = st.executeQuery();
-            List<Appointment> appointments = new ArrayList<>();
             while (rs.next()) {
                 Appointment appointment = new Appointment();
                 appointment.setAppointmentID(rs.getInt("AppointmentID"));
                 appointment.setCustomerID(rs.getInt("CustomerID"));
                 appointment.setVehicleID(rs.getInt("VehicleID"));
-                appointment.setAppointmentDate(rs.getDate("Date").toLocalDate());
+
+                // vì cột trong DB là DATETIME nên dùng getTimestamp thay vì getDate
+                appointment.setAppointmentDate(
+                        rs.getTimestamp("Date").toLocalDateTime().toLocalDate()
+                );
+
                 appointment.setStatus(rs.getString("Status"));
                 appointment.setDescription(rs.getString("Description"));
                 appointments.add(appointment);
             }
-            // Xử lý danh sách cuộc hẹn theo nhu cầu của bạn
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new RuntimeException("Lỗi khi lấy danh sách cuộc hẹn", e);
         }
+
+        return appointments;
     }
+
+
+
 
     public void getAppointmentById(int appointmentID) {
         String sql = "SELECT * FROM Appointment WHERE AppointmentID = ?";
@@ -128,5 +140,80 @@ public class AppointmentDAO extends DbContext {
         } catch (SQLException e) {
             throw new RuntimeException("Lỗi khi lấy danh sách cuộc hẹn theo ID khách hàng", e);
         }
+    }
+    //
+//    public boolean updateStatus(int appointmentId, String newStatus) {
+//        String sql = "UPDATE appointment SET status = ? WHERE appointment_id = ?";
+//        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+//            ps.setString(1, newStatus);
+//            ps.setInt(2, appointmentId);
+//            return ps.executeUpdate() > 0;
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+//    }
+    public List<Appointment> searchAppointment(String fromDate, String toDate,
+                                               String[] statusList, String sortOrder) throws SQLException {
+
+        List<Appointment> list = new ArrayList<>();
+
+
+        StringBuilder sql = new StringBuilder("SELECT * FROM Appointment WHERE 1=1");
+
+        if (fromDate != null && !fromDate.isEmpty()) {
+            sql.append(" AND Date >= ?");
+        }
+        if (toDate != null && !toDate.isEmpty()) {
+            sql.append(" AND Date <= ?");
+        }
+
+        if (statusList != null && statusList.length > 0) {
+            sql.append(" AND Status IN (");
+            for (int i = 0; i < statusList.length; i++) {
+                sql.append("?");
+                if (i < statusList.length - 1) sql.append(", ");
+            }
+            sql.append(")");
+        }
+
+        if ("oldest".equalsIgnoreCase(sortOrder)) {
+            sql.append(" ORDER BY Date ASC");
+        } else {
+            sql.append(" ORDER BY Date DESC");
+        }
+
+        try (PreparedStatement st = getConnection().prepareStatement(sql.toString())){
+            int index = 1;
+            if (fromDate != null && !fromDate.isEmpty()) {
+                st.setString(index++, fromDate);
+            }
+            if (toDate != null && !toDate.isEmpty()) {
+                st.setString(index++, toDate);
+            }
+            if (statusList != null && statusList.length > 0) {
+                for (String status : statusList) {
+                    st.setString(index++, status.toUpperCase());
+                }
+            }
+
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                Appointment a = new Appointment();
+                a.setAppointmentID(rs.getInt("AppointmentID"));
+                a.setCustomerID(rs.getInt("CustomerID"));
+                a.setVehicleID(rs.getInt("VehicleID"));
+                a.setAppointmentDate(
+                        rs.getTimestamp("Date").toLocalDateTime().toLocalDate()
+                );
+                a.setStatus(rs.getString("Status"));
+                a.setDescription(rs.getString("Description"));
+                list.add(a);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Lỗi khi lấy danh sách cuộc hẹn", e);
+        }
+        return list;
     }
 }

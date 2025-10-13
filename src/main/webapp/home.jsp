@@ -397,10 +397,10 @@
         <a href="#" class="menu-item">
             <span>THƯ VIỆN DỰ ÁN</span>
         </a>
-        <a href="#" class="menu-item">
+        <a href="${pageContext.request.contextPath}/customer_service/search-customer" class="menu-item">
             <span>ĐÀO TẠO NGHỀ</span>
         </a>
-        <a href="#" class="menu-item">
+        <a href="${pageContext.request.contextPath}/customer_service/appointment-list" class="menu-item">
             <span>TIN TỨC</span>
         </a>
         <a href="AppointmentScheduling" class="menu-item">

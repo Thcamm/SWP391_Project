@@ -5,7 +5,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8" />
-    <title>Tìm kiếm khách hàng</title>
+    <title>Search Customer</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
@@ -15,9 +15,9 @@
 
     <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>Tìm kiếm khách hàng</h3>
-        <a href="${pageContext.request.contextPath}/customer/create-customer.jsp" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Tạo khách hàng
+        <h3>Search Customer</h3>
+        <a href="${pageContext.request.contextPath}/employee.cutomer_service/create-customer.jsp" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Create Customer
         </a>
     </div>
 
@@ -25,24 +25,24 @@
     <form action="${pageContext.request.contextPath}/search-customer" method="get" class="card p-4 mb-4">
         <div class="row g-3">
             <div class="col-md-4">
-                <label for="searchName" class="form-label">Tên khách hàng</label>
+                <label for="searchName" class="form-label">Customer Name</label>
                 <input type="text" id="searchName" name="searchName" value="${param.searchName}" class="form-control" placeholder="Nhập tên khách hàng" />
             </div>
 
             <div class="col-md-4">
-                <label for="searchLicensePlate" class="form-label">Biển số xe</label>
+                <label for="searchLicensePlate" class="form-label">License Plate</label>
                 <input type="text" id="searchLicensePlate" name="searchLicensePlate" value="${param.searchLicensePlate}" class="form-control" placeholder="Nhập biển số xe" />
             </div>
 
             <div class="col-md-4">
-                <label for="searchEmail" class="form-label">Email / SĐT</label>
+                <label for="searchEmail" class="form-label">Email / Phone Number</label>
                 <input type="text" id="searchEmail" name="searchEmail" value="${param.searchEmail}" class="form-control" placeholder="Nhập email hoặc SĐT" />
             </div>
         </div>
 
         <div class="mt-4 d-flex justify-content-between align-items-center">
             <button type="submit" class="btn btn-success">
-                🔍 Tìm kiếm
+                🔍
             </button>
             <label>
                 <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -51,7 +51,7 @@
                     <line x1="8" y1="2" x2="8" y2="6"></line>
                     <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg>
-                Tạo ngày
+                From Date
             </label>
             <input type="date" name="fromDate" value="${param.fromDate}" placeholder="dd/mm/yyyy" />
 
@@ -62,13 +62,13 @@
                     <line x1="8" y1="2" x2="8" y2="6"></line>
                     <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg>
-                Đến ngày
+                To Date
             </label>
             <input type="date" name="toDate" value="${param.toDate}" placeholder="dd/mm/yyyy" />
 
             <select id="sortOrder" name="sortOrder" class="form-select w-auto">
-                <option value="newest" ${param.sortOrder == 'newest' ? 'selected' : ''}>Mới nhất</option>
-                <option value="oldest" ${param.sortOrder == 'oldest' ? 'selected' : ''}>Cũ nhất</option>
+                <option value="newest" ${param.sortOrder == 'newest' ? 'selected' : ''}>Newest</option>
+                <option value="oldest" ${param.sortOrder == 'oldest' ? 'selected' : ''}>Oldest</option>
             </select>
         </div>
     </form>
@@ -76,18 +76,18 @@
     <!-- CUSTOMER TABLE -->
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <span>Danh sách khách hàng</span>
+            <span>List Of Customer</span>
         </div>
 
         <div class="table-responsive">
             <table class="table table-bordered align-middle mb-0">
                 <thead class="table-light">
                 <tr>
-                    <th>STT</th>
-                    <th>Tên khách hàng</th>
-                    <th>Biển số xe</th>
+                    <th>No</th>
+                    <th>Customer Name</th>
+                    <th>Lience Plate</th>
                     <th>Email</th>
-                    <th>Số điện thoại</th>
+                    <th>Phone Number</th>
                 </tr>
                 </thead>
 
@@ -95,7 +95,7 @@
                 <c:choose>
                     <c:when test="${empty customerList}">
                         <tr class="text-center text-muted">
-                            <td colspan="5">Chưa có dữ liệu hiển thị</td>
+                            <td colspan="5">Nothing</td>
                         </tr>
                     </c:when>
                     <c:otherwise>
@@ -133,7 +133,7 @@
 
         if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
             e.preventDefault();
-            alert("❌ Ngày bắt đầu không được lớn hơn ngày kết thúc!");
+            alert("❌ The start date cannot be greater than the end date!");
         }
     });
 </script>

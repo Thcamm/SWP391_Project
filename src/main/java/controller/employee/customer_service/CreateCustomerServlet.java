@@ -1,4 +1,4 @@
-package controller.customer;
+package controller.employee.customer_service;
 
 import common.utils.RandomString;
 import dao.customer.CustomerDAO;
@@ -13,46 +13,46 @@ import model.user.User;
 import java.io.IOException;
 import java.sql.Date;
 
-@WebServlet("/create-customer")
+@WebServlet("/customer_service/create-customer")
 public class CreateCustomerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
+//        HttpSession session = request.getSession(false);
+//
+//
+//        if (session == null || session.getAttribute("user") == null) {
+//            response.sendRedirect(request.getContextPath() + "/login");
+//            return;
+//        }
+//
+//        User currentUser = (User) session.getAttribute("user");
+//
+//        if (currentUser.getRoleId() != 2) {
+//            response.sendRedirect(request.getContextPath() + "/employee.customer_service/error-permission.jsp");
+//            return;
+//        }
 
-
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
-        User currentUser = (User) session.getAttribute("user");
-
-        if (currentUser.getRoleId() != 2) {
-            response.sendRedirect(request.getContextPath() + "/customer/error-permission.jsp");
-            return;
-        }
-
-        request.getRequestDispatcher("/customer/create-customer.jsp").forward(request, response);
+        request.getRequestDispatcher("/employee/customer_service/create-customer.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser.getRoleId() != 2) {
-            response.sendRedirect(request.getContextPath() + "/customer/error-permission.jsp");
-            return;
-        }
+//        HttpSession session = request.getSession(false);
+//        if (session == null || session.getAttribute("user") == null) {
+//            response.sendRedirect(request.getContextPath() + "/login");
+//            return;
+//        }
+//
+//        User currentUser = (User) session.getAttribute("user");
+//        if (currentUser.getRoleId() != 2) {
+//            response.sendRedirect(request.getContextPath() + "/employee.customer_service/error-permission.jsp");
+//            return;
+//        }
 
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
@@ -92,7 +92,7 @@ public class CreateCustomerServlet extends HttpServlet {
         if (isDuplicate) {
             request.setAttribute("message", "⚠️ Email đã tồn tại!");
             request.setAttribute("messageType", "warning");
-            request.getRequestDispatcher("/customer/create-customer.jsp").forward(request, response);
+            request.getRequestDispatcher("/employee.customer_service/create-customer.jsp").forward(request, response);
             return;
         }
 
@@ -104,6 +104,6 @@ public class CreateCustomerServlet extends HttpServlet {
             request.setAttribute("message", "❌ Không thể thêm khách hàng. Vui lòng thử lại.");
             request.setAttribute("messageType", "error");
         }
-        request.getRequestDispatcher("/customer/create-customer.jsp").forward(request, response);
+        request.getRequestDispatcher("/employee/customer_service/create-customer.jsp").forward(request, response);
     }
 }
