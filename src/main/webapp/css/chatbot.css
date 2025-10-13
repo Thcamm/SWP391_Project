@@ -1,0 +1,175 @@
+/* chatbot.css - Phong cách màu đỏ hiện đại */
+
+/* Nút bấm để mở chat - Màu đỏ */
+#chat-toggle-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #dc3545, #ff4757);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+    transition: all 0.3s ease;
+    z-index: 1001;
+}
+
+#chat-toggle-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.6);
+    background: linear-gradient(135deg, #ff4757, #dc3545);
+}
+
+#chat-toggle-btn:active {
+    transform: scale(0.95);
+}
+
+/* Hiệu ứng khi mở chat */
+#chat-toggle-btn.active {
+    background: linear-gradient(135deg, #c82333, #bd2130);
+}
+
+/* Khung chat chính */
+#chatbox {
+    display: none;
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 350px;
+    height: 450px;
+    flex-direction: column;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    background-color: white;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+#chatbox.show {
+    display: flex;
+}
+
+/* Header của khung chat - Màu đỏ */
+#chat-header {
+    background: linear-gradient(135deg, #dc3545, #ff4757);
+    color: white;
+    padding: 15px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    border-bottom: none;
+}
+
+#chat-header i {
+    color: white !important;
+}
+
+/* Khu vực hiển thị tin nhắn */
+#chat-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Tin nhắn nói chung */
+.message {
+    display: flex;
+    max-width: 80%;
+    line-height: 1.4;
+    font-size: 15px;
+}
+
+/* Tin nhắn của Bot (bên trái, màu xám) */
+.message.bot {
+    align-self: flex-start;
+}
+.message.bot .text {
+    background-color: #e4e6eb;
+    color: #050505;
+    border-radius: 20px;
+    padding: 10px 15px;
+}
+
+/* Tin nhắn của User (bên phải, màu đỏ) */
+.message.user {
+    align-self: flex-end;
+}
+.message.user .text {
+    background: linear-gradient(135deg, #dc3545, #ff4757);
+    color: white;
+    border-radius: 20px;
+    padding: 10px 15px;
+}
+
+/* Khu vực nhập liệu */
+#chat-input-area {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-top: 1px solid #eee;
+    background-color: #ffffff;
+}
+
+#user-input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background-color: #f0f2f5;
+    border-radius: 20px;
+    outline: none;
+    font-size: 15px;
+    margin-right: 10px;
+}
+
+#user-input:focus {
+    background-color: #e8eaed;
+}
+
+#send-btn {
+    background-color: transparent;
+    color: #dc3545;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.2s ease;
+}
+
+#send-btn:hover {
+    color: #ff4757;
+    transform: scale(1.1);
+}
+
+#send-btn:active {
+    transform: scale(0.9);
+}
+
+/* Scrollbar tùy chỉnh cho khu vực chat */
+#chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+#chat-messages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#chat-messages::-webkit-scrollbar-thumb {
+    background: #dc3545;
+    border-radius: 10px;
+}
+
+#chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #c82333;
+}

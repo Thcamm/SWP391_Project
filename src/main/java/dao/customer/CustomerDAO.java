@@ -268,5 +268,39 @@ public class CustomerDAO extends DbContext {
         return new ArrayList<>(customerMap.values());
     }
 
+    public int getCustomerIdByUserId(int userId) {
+        String sql = "SELECT CustomerID FROM Customer WHERE UserID = ?";
+
+        try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
+            st.setInt(1, userId);
+            ResultSet rs = st.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("CustomerID");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return -1; // Không tìm thấy
+    }
+    public Customer getCustomerByUserId(int userId) throws SQLException {
+        String sql = "SELECT * FROM Customer WHERE UserID = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Customer customer = new Customer();
+                    customer.setCustomerId(rs.getInt("CustomerID"));
+                    customer.setUserId(rs.getInt("UserID"));
+                    // Set các thuộc tính khác nếu có...
+                    return customer;
+                }
+            }
+        }
+        return null;
+    }
 
 }

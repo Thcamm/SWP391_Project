@@ -20,6 +20,14 @@ public class Vehicle {
         this.yearManufacture = yearManufacture;
     }
 
+    public Vehicle(String brand, int customerID, String licensePlate, String model, int yearManufacture) {
+        this.brand = brand;
+        this.customerID = customerID;
+        this.licensePlate = licensePlate;
+        this.model = model;
+        this.yearManufacture = yearManufacture;
+    }
+
     public int getVehicleID() { return vehicleID; }
     public void setVehicleID(int vehicleID) { this.vehicleID = vehicleID; }
 
