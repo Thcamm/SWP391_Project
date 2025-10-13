@@ -338,7 +338,7 @@
     </div>
     <nav class="main-navbar">
         <div class="container d-flex justify-content-between align-items-center">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="Home">
                 CS<span>CARSPA.VN</span>
             </a>
             <div class="nav-icons d-flex align-items-center">

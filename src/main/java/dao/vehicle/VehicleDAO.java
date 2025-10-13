@@ -30,10 +30,80 @@ public class VehicleDAO extends DbContext {
                 v.setYearManufacture(rs.getInt("YearManufacture"));
                 list.add(v);
             }
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
         return list;
+    }
+
+    public int insertVehicle(Vehicle vehicle) {
+        String sql = "INSERT INTO vehicle (CustomerID, LicensePlate, Brand, Model, YearManufacture) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql,
+                PreparedStatement.RETURN_GENERATED_KEYS)) { // ← Thêm flag này
+
+            st.setInt(1, vehicle.getCustomerID());
+            st.setString(2, vehicle.getLicensePlate());
+            st.setString(3, vehicle.getBrand());
+            st.setString(4, vehicle.getModel());
+            st.setInt(5, vehicle.getYearManufacture());
+
+            int rowsAffected = st.executeUpdate();
+
+            if (rowsAffected > 0) {
+                // Lấy ID vừa được tạo
+                ResultSet generatedKeys = st.getGeneratedKeys();
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1); // Trả về VehicleID mới
+                }
+            }
+            return -1; // Thất bại
+        } catch (SQLException e) {
+            throw new RuntimeException("Lỗi khi chèn xe mới", e);
+        }
+    }
+
+    public int getAllVehiclesCount() {
+        String sql = "SELECT COUNT(*) FROM vehicle";
+        try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1); // Trả về số lượng xe
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Lỗi khi đếm số lượng xe", e);
+        }
+        return 0; // Trả về 0 nếu có lỗi hoặc không có xe
+    }
+
+    public boolean checkLicensePlateExists(String licensePlate) {
+        String sql = "SELECT COUNT(*) FROM vehicle WHERE LicensePlate = ?";
+        try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
+            st.setString(1, licensePlate);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                return count > 0; // Trả về true nếu tồn tại
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Lỗi khi kiểm tra biển số xe", e);
+        }
+        return false; // Trả về false nếu không tồn tại
+    }
+
+    public int getVehicleIdByLicensePlate(String licensePlate) {
+        String sql = "SELECT VehicleID FROM vehicle WHERE LicensePlate = ?";
+        try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
+            st.setString(1, licensePlate);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                int vehicleID = rs.getInt("VehicleID");
+                // Xử lý vehicleID theo nhu cầu của bạn
+                return vehicleID;
+            }
+            return -1;
+        } catch (SQLException e) {
+            throw new RuntimeException("Lỗi khi lấy VehicleID theo biển số xe", e);
+        }
     }
 }

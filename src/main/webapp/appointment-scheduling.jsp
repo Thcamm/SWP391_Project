@@ -72,8 +72,29 @@
                 <h2 class="mb-4" style="font-size: 32px; font-weight: 700; color: #000;">
                     ĐẶT LỊCH SỬA XE VÀ BẢO DƯỠNG
                 </h2>
+                <%-- Hiển thị success message ---%>
+                <% if (session.getAttribute("successMessage") != null) { %>
+                <div class="alert alert-success">
+                    <%= session.getAttribute("successMessage") %>
+                </div>
+                <% session.removeAttribute("successMessage"); %>
+                <% } %>
 
-                <form action="AppointmentServlet" method="post">
+                <%-- Hiển thị error message ---%>
+                <% if (request.getAttribute("errorMessage") != null) { %>
+                <div class="alert alert-danger">
+                    <%= request.getAttribute("errorMessage") %>
+                </div>
+                <% } %>
+
+                <%-- Debug info ---%>
+                <% if (request.getAttribute("debugInfo") != null) { %>
+                <div class="alert alert-info">
+                    <strong>Debug:</strong> <%= request.getAttribute("debugInfo") %>
+                </div>
+                <% } %>
+
+                <form action="Appointment" method="post">
                     <!-- Row 1: Họ và tên + Số điện thoại -->
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -107,41 +128,6 @@
                             </label>
                             <input type="text" class="form-control" id="licensePlate" name="licensePlate"
                                    placeholder="Ví dụ: 51A-12345" required>
-                        </div>
-                    </div>
-
-                    <!-- Dịch vụ - Full width -->
-                    <div class="mb-3">
-                        <label class="form-label">
-                            Dịch vụ <span class="required">*</span>
-                        </label>
-                        <div class="service-option">
-                            <input type="radio" class="form-check-input" id="service1"
-                                   name="service" value="Rửa xe" required>
-                            <label class="form-check-label ms-2" for="service1">
-                                <i class="fas fa-car-wash"></i> Rửa xe
-                            </label>
-                        </div>
-                        <div class="service-option">
-                            <input type="radio" class="form-check-input" id="service2"
-                                   name="service" value="Bảo dưỡng">
-                            <label class="form-check-label ms-2" for="service2">
-                                <i class="fas fa-tools"></i> Bảo dưỡng
-                            </label>
-                        </div>
-                        <div class="service-option">
-                            <input type="radio" class="form-check-input" id="service3"
-                                   name="service" value="Sửa chữa">
-                            <label class="form-check-label ms-2" for="service3">
-                                <i class="fas fa-wrench"></i> Sửa chữa
-                            </label>
-                        </div>
-                        <div class="service-option">
-                            <input type="radio" class="form-check-input" id="service4"
-                                   name="service" value="Phủ ceramic">
-                            <label class="form-check-label ms-2" for="service4">
-                                <i class="fas fa-spray-can"></i> Phủ ceramic
-                            </label>
                         </div>
                     </div>
 

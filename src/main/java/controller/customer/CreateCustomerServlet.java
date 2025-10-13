@@ -34,8 +34,8 @@ public class CreateCustomerServlet extends HttpServlet {
         if (birthDateRaw != null && !birthDateRaw.isEmpty()) {
             birthDate = LocalDate.parse(birthDateRaw);
         }
-
-        Customer customer = new Customer(fullName, email, phoneNumber, gender, address, birthDate);
+        //sửa lại chỗ này nhé
+        Customer customer = new Customer();
         CustomerDAO dao = new CustomerDAO();
 
         boolean isDuplicate = dao.isCustomerDuplicate(email, phoneNumber);
@@ -45,7 +45,8 @@ public class CreateCustomerServlet extends HttpServlet {
             request.getRequestDispatcher("/create-customer.jsp").forward(request, response);
             return;
         }
-        boolean success = dao.insertCustomer(customer);
+        //boolean success = dao.insertCustomer(customer);
+        boolean success = false; // Thay vì gọi dao.insertCustomer(customer), tạm thời đặt là false
         if (success) {
             request.setAttribute("message", "✅ Thêm khách hàng thành công!");
             request.setAttribute("messageType", "success");

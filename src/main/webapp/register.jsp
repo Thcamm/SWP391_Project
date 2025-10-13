@@ -1,12 +1,9 @@
-<%-- Created by IntelliJ IDEA. User: ADMIN Date: 10/1/2025 Time: 4:58 AM To
-change this template use File | Settings | File Templates. --%> <%@ page
-contentType="text/html;charset=UTF-8" language="java" %>
-<%-- Created by IntelliJ IDEA. User: ADMIN Date: 10/1/2025 Time: 4:58 AM To
-change this template use File | Settings | File Templates. --%> <%@ page
-contentType="text/html;charset=UTF-8" language="java" %>
-<html>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html lang="vi">
   <head>
-  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register - Garage System</title>
     <link
       rel="stylesheet"
@@ -14,279 +11,291 @@ contentType="text/html;charset=UTF-8" language="java" %>
     />
     <link
       rel="stylesheet"
-      href="https://unpkg.com/bs-brain@2.0.4/components/registrations/registration-3/assets/css/registration-3.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     />
+    <link href="css/register.css" rel="stylesheet" />
   </head>
   <body>
-    <!-- Registration 3 - Bootstrap Brain Component -->
-    <section class="p-3 p-md-4 p-xl-5">
-      <div class="container">
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/bs-brain@2.0.4/components/registrations/registration-3/assets/css/registration-3.css"
-    />
-  </head>
-  <body>
-    <!-- Registration 3 - Bootstrap Brain Component -->
-    <section class="p-3 p-md-4 p-xl-5">
-      <div class="container">
-        <div class="row">
-          <div class="col-12 col-md-6 bsb-tpl-bg-platinum">
-            <div
-              class="d-flex flex-column justify-content-between h-100 p-3 p-md-4 p-xl-5"
-            >
-              <h3 class="m-0">Welcome!</h3>
-              <img
-                class="img-fluid rounded mx-auto my-4"
-                loading="lazy"
-                src="./assets/img/bsb-logo.svg"
-                width="245"
-                height="80"
-                alt="BootstrapBrain Logo"
-              />
-              <p class="mb-0">
-                Join us today!
-                <a
-                  href="register.jsp"
-                  class="link-secondary text-decoration-none"
-                  >Register now</a
+    <div class="registration-container">
+      <!-- Left Panel - Welcome Image -->
+      <div class="left-panel">
+        <img src="./assets/img/bsb-logo.svg" alt="Welcome to Garage System" />
+      </div>
+
+      <!-- Right Panel - Registration Form -->
+      <div class="right-panel">
+        <div class="form-wrapper">
+          <!-- Logo -->
+          <div class="logo-container">
+            <img src="./assets/img/bsb-logo.svg" alt="BootstrapBrain Logo" />
+          </div>
+
+          <div class="form-header">
+            <h2>Create Your Account</h2>
+            <p>Join us today and get started</p>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-container">
+            <div class="progress">
+              <div
+                class="progress-bar"
+                id="progressBar"
+                role="progressbar"
+                style="width: 33%"
+              ></div>
+            </div>
+            <div class="progress-info">
+              <span>Step <span id="currentStep">1</span> of 3</span>
+              <span><span id="progressPercent">33</span>% Complete</span>
+            </div>
+          </div>
+
+          <!-- Alert Messages -->
+          <% if (request.getAttribute("error") != null) { %>
+          <div
+            class="alert alert-danger alert-dismissible fade show"
+            role="alert"
+          >
+            <%= request.getAttribute("error") %>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+            ></button>
+          </div>
+          <% } %> <% if (request.getParameter("success") != null) { %>
+          <div
+            class="alert alert-success alert-dismissible fade show"
+            role="alert"
+          >
+            Registration successful! Please login.
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+            ></button>
+          </div>
+          <% } %>
+
+          <form
+            id="registrationForm"
+            action="Register"
+            method="POST"
+            novalidate
+          >
+            <!-- Step 1: Personal Information -->
+            <div class="step active" id="step1">
+              <h3 class="step-title">Personal Information</h3>
+              <p class="step-description">
+                Let's start with your basic information
+              </p>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="firstName" class="form-label"
+                    >First Name <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="firstName"
+                    name="firstName"
+                    placeholder="Enter first name"
+                    required
+                  />
+                  <div id="firstNameValidation" class="validation-text"></div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="lastName" class="form-label"
+                    >Last Name <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="lastName"
+                    name="lastName"
+                    placeholder="Enter last name"
+                    required
+                  />
+                  <div id="lastNameValidation" class="validation-text"></div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="phoneNumber" class="form-label"
+                  >Phone Number <span class="text-danger">*</span></label
                 >
+                <input
+                  type="tel"
+                  class="form-control"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  placeholder="Enter your phone number"
+                  required
+                />
+                <div id="phoneNumberValidation" class="validation-text"></div>
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label"
+                  >Email <span class="text-danger">*</span></label
+                >
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  name="email"
+                  placeholder="name@example.com"
+                  required
+                />
+                <div id="emailValidation" class="validation-text"></div>
+              </div>
+
+              <div class="navigation-buttons">
+                <div></div>
+                <button
+                  type="button"
+                  class="btn btn-primary btn-nav"
+                  id="nextStep1"
+                >
+                  Next <i class="bi bi-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Step 2: Address Information -->
+            <div class="step" id="step2">
+              <h3 class="step-title">Address Information</h3>
+              <p class="step-description">Where can we reach you?</p>
+
+              <div class="mb-3">
+                <label for="address" class="form-label"
+                  >Address <span class="text-danger">*</span></label
+                >
+                <textarea
+                  class="form-control"
+                  id="address"
+                  name="address"
+                  rows="3"
+                  placeholder="Enter your detailed address"
+                  required
+                ></textarea>
+                <div id="addressValidation" class="validation-text"></div>
+              </div>
+
+              <div class="navigation-buttons">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary btn-nav"
+                  id="prevStep2"
+                >
+                  <i class="bi bi-arrow-left"></i> Previous
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-primary btn-nav"
+                  id="nextStep2"
+                >
+                  Next <i class="bi bi-arrow-right"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Step 3: Account Information -->
+            <div class="step" id="step3">
+              <h3 class="step-title">Account Information</h3>
+              <p class="step-description">Create your login credentials</p>
+
+              <div class="mb-3">
+                <label for="userName" class="form-label"
+                  >Username <span class="text-danger">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="userName"
+                  name="userName"
+                  placeholder="Choose a username"
+                  required
+                />
+                <div id="userNameValidation" class="validation-text"></div>
+              </div>
+
+              <div class="mb-3">
+                <label for="password" class="form-label"
+                  >Password <span class="text-danger">*</span></label
+                >
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  name="password"
+                  placeholder="Create a strong password"
+                  required
+                />
+                <div id="passwordValidation" class="validation-text"></div>
+              </div>
+
+              <div class="mb-3">
+                <label for="confirmPassword" class="form-label"
+                  >Confirm Password <span class="text-danger">*</span></label
+                >
+                <input
+                  type="password"
+                  class="form-control"
+                  id="confirmPassword"
+                  placeholder="Re-enter your password"
+                  required
+                />
+                <div
+                  id="confirmPasswordValidation"
+                  class="validation-text"
+                ></div>
+              </div>
+
+              <div class="form-check mb-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="iAgree"
+                  name="iAgree"
+                  required
+                />
+                <label class="form-check-label" for="iAgree">
+                  I agree to the <a href="#!">terms and conditions</a>
+                </label>
+              </div>
+
+              <div class="navigation-buttons">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary btn-nav"
+                  id="prevStep3"
+                >
+                  <i class="bi bi-arrow-left"></i> Previous
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-success btn-nav"
+                  id="submitForm"
+                >
+                  <i class="bi bi-check-circle"></i> Sign up
+                </button>
+              </div>
+            </div>
+
+            <div class="footer-link">
+              <p class="text-muted mb-0">
+                Already have an account? <a href="login.jsp">Sign in</a>
               </p>
             </div>
-          </div>
-          <div class="col-12 col-md-6 bsb-tpl-bg-lotion">
-            <div class="p-3 p-md-4 p-xl-5">
-              <div class="row">
-                <div class="col-12">
-                  <div class="mb-5">
-                    <h2 class="h3">Registration</h2>
-                    <h3 class="fs-6 fw-normal text-secondary m-0">
-                      Enter your details to register
-                    </h3>
-                  </div>
-                </div>
-              </div>
-          <div class="col-12 col-md-6 bsb-tpl-bg-platinum">
-            <div
-              class="d-flex flex-column justify-content-between h-100 p-3 p-md-4 p-xl-5"
-            >
-              <h3 class="m-0">Welcome!</h3>
-              <img
-                class="img-fluid rounded mx-auto my-4"
-                loading="lazy"
-                src="./assets/img/bsb-logo.svg"
-                width="245"
-                height="80"
-                alt="BootstrapBrain Logo"
-              />
-              <p class="mb-0">
-                Join us today!
-                <a
-                  href="register.jsp"
-                  class="link-secondary text-decoration-none"
-                  >Register now</a
-                >
-              </p>
-            </div>
-          </div>
-          <div class="col-12 col-md-6 bsb-tpl-bg-lotion">
-            <div class="p-3 p-md-4 p-xl-5">
-              <div class="row">
-                <div class="col-12">
-                  <div class="mb-5">
-                    <h2 class="h3">Registration</h2>
-                    <h3 class="fs-6 fw-normal text-secondary m-0">
-                      Enter your details to register
-                    </h3>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Hiển thị thông báo lỗi nếu có -->
-              <% if (request.getAttribute("error") != null) { %>
-              <div
-                class="alert alert-danger alert-dismissible fade show"
-                role="alert"
-              >
-                <%= request.getAttribute("error") %>
-                <button
-                  type="button"
-                  class="btn-close"
-                  data-bs-dismiss="alert"
-                  aria-label="Close"
-                ></button>
-              </div>
-              <% } %>
-              <!-- Hiển thị thông báo lỗi nếu có -->
-              <% if (request.getAttribute("error") != null) { %>
-              <div
-                class="alert alert-danger alert-dismissible fade show"
-                role="alert"
-              >
-                <%= request.getAttribute("error") %>
-                <button
-                  type="button"
-                  class="btn-close"
-                  data-bs-dismiss="alert"
-                  aria-label="Close"
-                ></button>
-              </div>
-              <% } %>
-
-              <!-- Hiển thị thông báo thành công nếu có -->
-              <% if (request.getParameter("success") != null) { %>
-              <div
-                class="alert alert-success alert-dismissible fade show"
-                role="alert"
-              >
-                Đăng ký thành công! Vui lòng đăng nhập.
-                <button
-                  type="button"
-                  class="btn-close"
-                  data-bs-dismiss="alert"
-                  aria-label="Close"
-                ></button>
-              </div>
-              <% } %>
-              <!-- Hiển thị thông báo thành công nếu có -->
-              <% if (request.getParameter("success") != null) { %>
-              <div
-                class="alert alert-success alert-dismissible fade show"
-                role="alert"
-              >
-                Đăng ký thành công! Vui lòng đăng nhập.
-                <button
-                  type="button"
-                  class="btn-close"
-                  data-bs-dismiss="alert"
-                  aria-label="Close"
-                ></button>
-              </div>
-              <% } %>
-
-              <form action="Register" method="POST">
-                <div class="row gy-3 gy-md-4 overflow-hidden">
-                  <div class="col-12">
-                    <label for="fullName" class="form-label"
-                      >Full Name <span class="text-danger">*</span></label
-                    >
-                    <input
-                      type="text"
-                      class="form-control"
-                      name="fullName"
-                      id="fullName"
-                      placeholder="Enter your full name"
-                      required
-                    />
-                  </div>
-                  <div class="col-12">
-                    <label for="userName" class="form-label"
-                      >Username <span class="text-danger">*</span></label
-                    >
-                    <input
-                      type="text"
-                      class="form-control"
-                      name="userName"
-                      id="userName"
-                      placeholder="Enter your username"
-                      required
-                    />
-                  </div>
-                  <div class="col-12">
-                    <label for="phoneNumber" class="form-label"
-                      >Phone Number <span class="text-danger">*</span></label
-                    >
-                    <input
-                      type="tel"
-                      class="form-control"
-                      name="phoneNumber"
-                      id="phoneNumber"
-                      placeholder="Enter your phone number"
-                      required
-                    />
-                  </div>
-                  <div class="col-12">
-                    <label for="email" class="form-label"
-                      >Email <span class="text-danger">*</span></label
-                    >
-                    <input
-                      type="email"
-                      class="form-control"
-                      name="email"
-                      id="email"
-                      placeholder="name@example.com"
-                      required
-                    />
-                  </div>
-                  <div class="col-12">
-                    <label for="password" class="form-label"
-                      >Password <span class="text-danger">*</span></label
-                    >
-                    <input
-                      type="password"
-                      class="form-control"
-                      name="password"
-                      id="password"
-                      placeholder="Enter your password"
-                      required
-                    />
-                  </div>
-                  <div class="col-12">
-                    <div class="form-check">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        value=""
-                        name="iAgree"
-                        id="iAgree"
-                        required
-                      />
-                      <label
-                        class="form-check-label text-secondary"
-                        for="iAgree"
-                      >
-                        I agree to the
-                        <a href="#!" class="link-primary text-decoration-none"
-                          >terms and conditions</a
-                        >
-                      </label>
-                    </div>
-                  </div>
-                  <div class="col-12">
-                    <div class="d-grid">
-                      <button class="btn bsb-btn-xl btn-primary" type="submit">
-                        Sign up
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </form>
-              <div class="row">
-                <div class="col-12">
-                  <hr class="mt-5 mb-4 border-secondary-subtle" />
-                  <p class="m-0 text-secondary text-end">
-                    Already have an account?
-                    <a
-                      href="login.jsp"
-                      class="link-primary text-decoration-none"
-                      >Sign in</a
-                    >
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          </form>
         </div>
       </div>
-    </section>
+    </div>
+
     <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  </body>
-      </div>
-    </section>
-    <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/register.js"></script>
   </body>
 </html>
