@@ -100,6 +100,9 @@
     <form method="post" action="${pageContext.request.contextPath}/admin/rbac/roles/save" class="permission-form">
         <input type="hidden" name="roleId" value="${roleId}"/>
 
+        <c:if test="${not empty managePermId}">
+            <input type="hidden" name="permIds" value="${managePermId}"/>
+        </c:if>
         <div class="table-responsive">
             <table class="data-table permission-table">
                 <thead>
@@ -116,6 +119,7 @@
                 <c:forEach var="p" items="${pager.data}" varStatus="st">
                     <tr class="<c:if test="${checkedPermsIds.contains(p.permId)}">checked-row</c:if>">
                         <td class="col-checkbox">
+                            <input type="hidden" name="pagePermIds" value="${p.permId}"/>
                             <input type="checkbox" name="permIds" value="${p.permId}" class="perm-checkbox"
                                    <c:if test="${checkedPermsIds.contains(p.permId)}">checked</c:if> />
                         </td>
@@ -124,8 +128,8 @@
                         <td class="perm-category"><span class="badge badge-category"><c:out value="${p.category}"/></span></td>
                         <td>
 
-                            <a href="${pageContext.request.contextPath}/admin/permissions?action=edit&id=${p.permId}" class="btn btn-edit">Edit</a>
-                            <a href="${pageContext.request.contextPath}/admin/permissions?action=delete&id=${p.permId}"
+                            <a href="${pageContext.request.contextPath}/admin/rbac/permissions?action=edit&id=${p.permId}" class="btn btn-edit">Edit</a>
+                            <a href="${pageContext.request.contextPath}/admin/rbac/permissions?action=delete&id=${p.permId}"
                                class="btn btn-delete" onclick="return confirm('Delete this permission?');">Delete</a>
                         </td>
                     </tr>

@@ -38,21 +38,21 @@ public class UserCreateController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Get current user from session
+//        // Get current user from session
         String currentUser = getCurrentUser(request);
-
-        // Check if user is logged in
-        if (currentUser == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
-        // Permission check
-        if (!adminService.isAdmin(currentUser)) {
-            request.setAttribute("errorMessage", "Bạn không có quyền truy cập trang này!");
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
-            return;
-        }
+//
+//        // Check if user is logged in
+//        if (currentUser == null) {
+//            response.sendRedirect(request.getContextPath() + "/login");
+//            return;
+//        }
+//
+//        // Permission check
+//        if (!adminService.isAdmin(currentUser)) {
+//            request.setAttribute("errorMessage", "Bạn không có quyền truy cập trang này!");
+//            request.getRequestDispatcher("/error.jsp").forward(request, response);
+//            return;
+//        }
 
         try {
             ArrayList<Role> availableRoles = adminService.getAvailableRoles();

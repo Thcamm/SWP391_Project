@@ -94,7 +94,7 @@ public class PermissionFilter implements Filter {
 
             try {
                 if(!auth.hasPermission(userId, required)) {
-                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "You have not permission to access this resource");
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "You have not permission to access this resource" + required);
                     return;
                 }
             } catch (Exception e) {
