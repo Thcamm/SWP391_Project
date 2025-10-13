@@ -11,6 +11,7 @@ import service.user.UserLoginService;
 import util.PasswordUtil;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 @WebServlet("/login")
 public class Login extends HttpServlet {
@@ -32,9 +33,14 @@ public class Login extends HttpServlet {
         UserLoginService userService = new UserLoginService(userDAO);
         User user = userService.findByUserName(username);
 
+
+
         if (user != null && PasswordUtil.checkPassword(password, user.getPasswordHash())) {
 
+            String roleCode = new dao.employee.admin.rbac.RoleDao()
+                    .findRoleCodeById(user.getRoleId());
             // Mật khẩu đúng!
+            request.getSession().setAttribute("roleCode", roleCode);
             request.getSession().setAttribute("user", user);
             request.getSession().setAttribute("userName", user.getUserName());
             request.getSession().setMaxInactiveInterval(30 * 60);

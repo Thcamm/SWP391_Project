@@ -1,4 +1,4 @@
-package model.rbac;
+package model.employee.admin.rbac;
 
 public class Permission {
     public int permId;

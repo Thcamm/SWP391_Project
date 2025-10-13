@@ -25,7 +25,7 @@
         </div>
     </c:if>
 
-    <form action="${pageContext.request.contextPath}/permissions" method="post" class="main-form">
+    <form action="${pageContext.request.contextPath}/admin/rbac/permissions" method="post" class="main-form">
         <input type="hidden" name="action" value="${isEdit ? 'update' : 'create'}">
 
         <c:if test="${isEdit}">
@@ -71,7 +71,7 @@
 
         <div class="form-actions">
             <input type="submit" value="${isEdit ? 'Update' : 'Create'}" class="btn btn-primary form-submit-btn">
-            <a href="${pageContext.request.contextPath}/rbac/roles" class="btn btn-secondary">Cancel</a>
+            <a href="${pageContext.request.contextPath}/admin/rbac/roles" class="btn btn-secondary">Cancel</a>
         </div>
 
     </form>

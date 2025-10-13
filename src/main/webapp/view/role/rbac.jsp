@@ -5,6 +5,7 @@
   Description: Role-Based Access Control (RBAC) Management
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<c:set var="RBAC_BASE" value="/admin/rbac" />
 <html>
 <head>
     <title>Role Permission Management (RBAC)</title>
@@ -36,7 +37,7 @@
     <h1 class="page-title">Role -> Permission (RBAC)</h1>
 
     <div class="back-link-container">
-        <a href="${pageContext.request.contextPath}/roles?action=list" class="btn btn-back">
+        <a href="${pageContext.request.contextPath}/admin/rbac/rolesList?action=list" class="btn btn-back">
             &laquo; Back to Role List
         </a>
     </div>
@@ -53,7 +54,7 @@
     </c:if>
 
 
-    <form class="filter-form" method="get" action="${pageContext.request.contextPath}/rbac/roles">
+    <form class="filter-form" method="get" action="${pageContext.request.contextPath}/admin/rbac/roles">
 
         <div class="form-group role-select-group">
             <label class="form-label">
@@ -92,11 +93,11 @@
     </form>
 
     <div style="margin: 10px 0;">
-        <a href="${pageContext.request.contextPath}/permissions?action=new" class="btn btn-primary">
+        <a href="${pageContext.request.contextPath}/admin/rbac/permissions?action=new" class="btn btn-primary">
              Create New Permission
         </a>
     </div>
-    <form method="post" action="${pageContext.request.contextPath}/rbac/roles/save" class="permission-form">
+    <form method="post" action="${pageContext.request.contextPath}/admin/rbac/roles/save" class="permission-form">
         <input type="hidden" name="roleId" value="${roleId}"/>
 
         <div class="table-responsive">
@@ -123,8 +124,8 @@
                         <td class="perm-category"><span class="badge badge-category"><c:out value="${p.category}"/></span></td>
                         <td>
 
-                            <a href="${pageContext.request.contextPath}/permissions?action=edit&id=${p.permId}" class="btn btn-edit">Edit</a>
-                            <a href="${pageContext.request.contextPath}/permissions?action=delete&id=${p.permId}"
+                            <a href="${pageContext.request.contextPath}/admin/permissions?action=edit&id=${p.permId}" class="btn btn-edit">Edit</a>
+                            <a href="${pageContext.request.contextPath}/admin/permissions?action=delete&id=${p.permId}"
                                class="btn btn-delete" onclick="return confirm('Delete this permission?');">Delete</a>
                         </td>
                     </tr>
@@ -141,7 +142,7 @@
 
         <div class="form-toolbar">
             <button class="btn btn-primary" type="submit">Save</button>
-            <a class="btn btn-reset" href="${pageContext.request.contextPath}/rbac/roles?roleId=${roleId}">Reset</a>
+            <a class="btn btn-reset" href="${pageContext.request.contextPath}/admin/rbac/roles?roleId=${roleId}">Reset</a>
         </div>
     </form>
 
@@ -173,7 +174,7 @@
         </div>
 
 
-        <form method="get" action="${pageContext.request.contextPath}/rbac/roles" class="size-config-form">
+        <form method="get" action="${pageContext.request.contextPath}/admin/rbac/roles" class="size-config-form">
             <input type="hidden" name="roleId" value="${roleId}"/>
             <input type="hidden" name="keyword" value="${param.keyword}">
             <input type="hidden" name="category" value="${param.category}">

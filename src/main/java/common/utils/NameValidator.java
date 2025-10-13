@@ -1,7 +1,5 @@
 package common.utils;
 
-import dao.rbac.RoleDao;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;

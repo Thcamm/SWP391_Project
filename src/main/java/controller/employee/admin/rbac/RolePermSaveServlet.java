@@ -1,8 +1,9 @@
-package controller.rbac;
+package controller.employee.admin.rbac;
 
-import dao.rbac.MenuDao;
-import dao.rbac.PermissionDao;
-import dao.rbac.RoleDao;
+import dao.employee.admin.rbac.MenuDao;
+import dao.employee.admin.rbac.PermissionDao;
+import dao.employee.admin.rbac.RoleDao;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,7 +11,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import service.auth.AuthService;
 import service.rbac.RbacService;
 
-@WebServlet(urlPatterns = "/rbac/roles/save")
+import java.io.IOException;
+
+@WebServlet(urlPatterns = "/admin/rbac/roles/save")
 public class RolePermSaveServlet extends HttpServlet {
     private RbacService rbacService;
     private AuthService authService;
@@ -26,37 +29,24 @@ public class RolePermSaveServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws jakarta.servlet.ServletException, java.io.IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             req.setCharacterEncoding("UTF-8");
 
-            final String REQUIRED_PERMISSION = "role_permission_manage";
             Integer userIdObj = (Integer) req.getSession().getAttribute("userId");
-            if (userIdObj == null || userIdObj <= 0) {
-                resp.sendRedirect(resp.encodeRedirectURL(req.getContextPath() + "/login"));
-                return;
-            }
+
             int actorUserId = userIdObj;
 
-            if (!authService.hasPermission(actorUserId, REQUIRED_PERMISSION)) {
-                resp.sendError(HttpServletResponse.SC_FORBIDDEN,
-                        "You have not permission to access role manage");
-                return;
-            }
-
             int roleId = Integer.parseInt(req.getParameter("roleId"));
-
-
             String[] permIds = req.getParameterValues("permIds");
 
             java.util.Set<Integer> selected = new java.util.HashSet<>();
-            if (permIds != null) {
-                for (String pid : permIds) selected.add(Integer.parseInt(pid));
-            }
+            if (permIds != null) for (String pid : permIds) selected.add(Integer.parseInt(pid));
 
+
+            final String REQUIRED_PERMISSION = "role_permission_manage";
             int currentUserRoleId = new dao.user.UserDAO().findRoleIdByUserId(actorUserId);
-            int managePermId = new dao.rbac.PermissionDao().findPermIdByCode(REQUIRED_PERMISSION);
+            int managePermId = new PermissionDao().findPermIdByCode(REQUIRED_PERMISSION);
             if (roleId == currentUserRoleId && !selected.contains(managePermId)) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST,
                         "Dont remove yourself from role '" + currentUserRoleId + "' permission '" + REQUIRED_PERMISSION + "'");
@@ -64,9 +54,7 @@ public class RolePermSaveServlet extends HttpServlet {
             }
 
             rbacService.assignPermissions(roleId, new java.util.ArrayList<>(selected), actorUserId);
-
-            resp.sendRedirect(resp.encodeRedirectURL(
-                    req.getContextPath() + "/rbac/roles?roleId=" + roleId + "&saved=1"));
+            resp.sendRedirect(resp.encodeRedirectURL(req.getContextPath() + "/admin/rbac/roles?roleId=" + roleId + "&saved=1"));
 
         } catch (NumberFormatException e) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid role ID or Permission ID");
@@ -74,4 +62,5 @@ public class RolePermSaveServlet extends HttpServlet {
             throw new RuntimeException(e);
         }
     }
+
 }

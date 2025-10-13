@@ -1,8 +1,8 @@
-package controller.rbac;
+package controller.employee.admin.rbac;
 
-import dao.rbac.MenuDao;
-import dao.rbac.PermissionDao;
-import dao.rbac.RoleDao;
+import dao.employee.admin.rbac.MenuDao;
+import dao.employee.admin.rbac.PermissionDao;
+import dao.employee.admin.rbac.RoleDao;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import service.auth.AuthService;
 import service.rbac.RbacService;
 
-@WebServlet(urlPatterns = "/rbac/roles")
+@WebServlet(urlPatterns = "/admin/rbac/roles")
 public class RolePageServlet extends HttpServlet {
     private RbacService rbacService;
     private AuthService authService;

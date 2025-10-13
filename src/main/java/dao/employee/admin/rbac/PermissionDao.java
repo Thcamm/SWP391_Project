@@ -1,7 +1,7 @@
-package dao.rbac;
+package dao.employee.admin.rbac;
 
 import common.DbContext;
-import model.rbac.Permission;
+import model.employee.admin.rbac.Permission;
 
 import java.sql.*;
 import java.util.*;

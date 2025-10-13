@@ -1,8 +1,8 @@
 package service.rbac;
 
 import common.utils.NameValidator;
-import dao.rbac.PermissionDao;
-import model.rbac.Permission;
+import dao.employee.admin.rbac.PermissionDao;
+import model.employee.admin.rbac.Permission;
 
 import java.sql.SQLException;
 import java.util.Set;

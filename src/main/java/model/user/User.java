@@ -19,6 +19,8 @@ public class User {
     private Date birthDate;
     private String address;
 
+    private String roleCode;
+
     public User() {
     }
 
@@ -140,5 +142,13 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(userId);
+    }
+
+    public String getRoleCode() {
+        return roleCode;
+    }
+
+    public void setRoleCode(String roleCode) {
+        this.roleCode = roleCode;
     }
 }

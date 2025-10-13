@@ -1,6 +1,6 @@
 package service.auth;
 
-import dao.rbac.RoleDao;
+import dao.employee.admin.rbac.RoleDao;
 
 import java.util.Set;
 

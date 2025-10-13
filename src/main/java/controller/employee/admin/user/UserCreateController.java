@@ -1,9 +1,9 @@
-package controller.employee.admin;
+package controller.employee.admin.user;
 
 // Required imports from Jakarta Servlet API
 
 import service.employee.AdminService;
-import model.rbac.Role;
+import model.employee.admin.rbac.Role;
 import java.util.ArrayList;
 
 import jakarta.servlet.ServletException;
@@ -14,7 +14,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 /**
  * Basic Servlet Template for Jakarta EE (Using Jakarta Servlet API 6.0+).

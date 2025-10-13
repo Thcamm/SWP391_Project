@@ -1,19 +1,19 @@
-package controller.rbac;
+package controller.employee.admin.rbac;
 
-import dao.rbac.PermissionDao;
+import dao.employee.admin.rbac.PermissionDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import model.rbac.Permission;
+import model.employee.admin.rbac.Permission;
 import service.rbac.PermissionService;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 
-@WebServlet("/permissions")
+@WebServlet("/admin/rbac/permissions")
 public class PermissionServlet extends HttpServlet {
     private PermissionService service;
 
@@ -40,7 +40,7 @@ public class PermissionServlet extends HttpServlet {
                     deletePermission(req, resp);
                     break;
                 default:
-                    resp.sendRedirect(req.getContextPath() + "/rbac/roles");
+                    resp.sendRedirect(req.getContextPath() + "/admin/rbac/roles");
                     break;
             }
         } catch (Exception ex) {
@@ -68,7 +68,7 @@ public class PermissionServlet extends HttpServlet {
                 int id = parseIntOrDefault(idStr, 0);
                 service.updatePermission(id, code, name, category, description);
             }
-            resp.sendRedirect(req.getContextPath() + "/rbac/roles?saved=1");
+            resp.sendRedirect(req.getContextPath() + "/admin/rbac/roles?saved=1");
         } catch (IllegalArgumentException e) {
             req.setAttribute("error", e.getMessage());
 
@@ -122,14 +122,14 @@ public class PermissionServlet extends HttpServlet {
             throws ServletException, IOException {
         int id = parseIntOrDefault(req.getParameter("id"), 0);
         if (id <= 0) {
-            resp.sendRedirect(req.getContextPath() + "/rbac/roles");
+            resp.sendRedirect(req.getContextPath() + "/admin/rbac/roles");
             return;
         }
         try {
             Permission p = service.getById(id);
             if (p == null) {
                 req.getSession().setAttribute("error", "Permission not found.");
-                resp.sendRedirect(req.getContextPath() + "/rbac/roles");
+                resp.sendRedirect(req.getContextPath() + "/admin/rbac/roles");
                 return;
             }
             req.setAttribute("perm", p);
@@ -153,7 +153,7 @@ public class PermissionServlet extends HttpServlet {
             req.getSession().setAttribute("error", "Dont delete permission: " + ex.getMessage());
         }
 
-        resp.sendRedirect(req.getContextPath() + "/rbac/roles?deleted=1");
+        resp.sendRedirect(req.getContextPath() + "/admin/rbac/roles?deleted=1");
     }
 
 
