@@ -179,7 +179,21 @@ public class UserDAO extends DbContext {
             }
         }
     }
+    public boolean updatePassword(int userId, String newPasswordHash) throws SQLException {
+        // Tên cột và bảng cần khớp với database của bạn
+        String sql = "UPDATE User SET PasswordHash = ? WHERE UserID = ?";
 
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newPasswordHash);
+            ps.setInt(2, userId);
+
+            int rowsAffected = ps.executeUpdate();
+
+            return rowsAffected > 0;
+        }
+    }
 
     // Helper method để map ResultSet sang đối tượng User
     private User extractUser(ResultSet rs) throws SQLException {

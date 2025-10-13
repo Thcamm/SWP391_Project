@@ -1,7 +1,9 @@
 package dao.customer;
 
 import common.DbContext;
+import model.customer.Customer;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -88,6 +90,24 @@ public class CustomerDAO extends DbContext {
         }
 
         return -1; // Không tìm thấy
+    }
+    public Customer getCustomerByUserId(int userId) throws SQLException {
+        String sql = "SELECT * FROM Customer WHERE UserID = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Customer customer = new Customer();
+                    customer.setCustomerId(rs.getInt("CustomerID"));
+                    customer.setUserId(rs.getInt("UserID"));
+                    // Set các thuộc tính khác nếu có...
+                    return customer;
+                }
+            }
+        }
+        return null;
     }
 
 //    public List<Customer> searchCustomers(String fullName, String contact, String licensePlate) {

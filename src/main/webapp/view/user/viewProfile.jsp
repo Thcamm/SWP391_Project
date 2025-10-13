@@ -31,8 +31,7 @@
             <input type="hidden" name="action" value="edit"/>
             <button type="submit" class="btn btn-primary">Edit Profile</button>
         </form>
-        <button type="button" class="btn btn-disabled" disabled>Change Password</button>
-    </div>
+        <a href="${pageContext.request.contextPath}/changePassword" class="btn btn-secondary">Change Password</a>    </div>
 
     <h2>Service History</h2>
     <table class="service-table">
