@@ -101,8 +101,25 @@
 
                 <!-- Step 2: Address Information -->
                 <div class="step" id="step2">
-                    <h3 class="step-title">Address Information</h3>
-                    <p class="step-description">Where can we reach you?</p>
+                    <h3 class="step-title">Personal Details</h3>
+                    <p class="step-description">Tell us more about yourself</p>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="dateOfBirth" class="form-label">Birth Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="birthDate" name="birthDate" required>
+                            <div id="birthDateValidation" class="validation-text"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="gender" class="form-label">Gender <span class="text-danger">*</span></label>
+                            <select class="form-select" id="gender" name="gender" required>
+                                <option value="">Select gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                            <div id="genderValidation" class="validation-text"></div>
+                        </div>
+                    </div>
 
                     <div class="mb-3">
                         <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
@@ -120,6 +137,7 @@
                         </button>
                     </div>
                 </div>
+
 
                 <!-- Step 3: Account Information -->
                 <div class="step" id="step3">
