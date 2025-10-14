@@ -391,10 +391,10 @@
         </button>
     </div>
     <nav class="sidebar-nav">
-        <a href="#" class="menu-item">
+        <a href="${pageContext.request.contextPath}/view/vehicle/addVehicle" class="menu-item">
             <span>DỊCH VỤ</span>
         </a>
-        <a href="#" class="menu-item">
+        <a href="${pageContext.request.contextPath}/view/vehicle/editVehicle" class="menu-item">
             <span>THƯ VIỆN DỰ ÁN</span>
         </a>
         <a href="${pageContext.request.contextPath}/employee/customer_service/search-customer" class="menu-item">

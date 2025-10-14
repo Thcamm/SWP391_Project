@@ -46,7 +46,7 @@ public class Login extends HttpServlet {
                 session.removeAttribute("redirectAfterLogin"); // dọn dẹp
                 response.sendRedirect(redirectAfterLogin);
             } else {
-                response.sendRedirect(request.getContextPath() + "/create-customer");
+                response.sendRedirect(request.getContextPath() + "/home.jsp");
             }
         } else {
             errorMessage = "Invalid username or password.";

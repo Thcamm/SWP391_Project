@@ -19,6 +19,7 @@ public class AppointmentListServlet extends HttpServlet {
     @Override
     protected void doGet (HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         String name = request.getParameter("searchName");
         String fromDate = request.getParameter("fromDate");
         String toDate = request.getParameter("toDate");
