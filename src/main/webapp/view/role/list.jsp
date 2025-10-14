@@ -37,17 +37,17 @@
 
 
     <div class="action-buttons-container">
-        <a href ="${pageContext.request.contextPath}/roles?action=new" class="btn btn-primary">
+        <a href ="${pageContext.request.contextPath}/admin/rbac/rolesList?action=new" class="btn btn-primary">
             Add New Role
         </a>
 
-        <a href="${pageContext.request.contextPath}/rbac/roles" class="btn btn-secondary">
+        <a href="${pageContext.request.contextPath}/admin/rbac/roles" class="btn btn-secondary">
             Manage Role Permissions
         </a>
     </div>
 
 
-    <form action="${pageContext.request.contextPath}/roles" method="get" class="search-form">
+    <form action="${pageContext.request.contextPath}/admin/rbac/rolesList" method="get" class="search-form">
         <input type="hidden" name="action" value="list">
 
         <div class="form-group search-input-group">
@@ -90,10 +90,10 @@
                         <c:out value="${not empty role.description ? role.description : 'N/A'}"/>
                     </td>
                     <td class="action-column">
-                        <a href="${pageContext.request.contextPath}/roles?action=edit&id=${role.roleId}" class="action-link edit-link">
+                        <a href="${pageContext.request.contextPath}/admin/rbac/rolesList?action=edit&id=${role.roleId}" class="action-link edit-link">
                             Edit
                         </a>
-                        <a href="${pageContext.request.contextPath}/roles?action=delete&id=${role.roleId}"
+                        <a href="${pageContext.request.contextPath}/admin/rbac/rolesList?action=delete&id=${role.roleId}"
                            onclick="return confirm('Are you sure to delete this role');" class="action-link delete-link">
                             Delete
                         </a>
@@ -118,7 +118,7 @@
                 <c:set var="totalPages" value="${pager.totalPages}" />
                 <c:set var="pageSize" value="${pager.itemsPerPage}" />
                 <c:set var="keywordParam" value="${not empty keyword ? '&keyword=' : ''}"/>
-                <c:set var="baseUrl" value="${pageContext.request.contextPath}/roles?action=list&size=${pageSize}${keywordParam}${keyword}"/>
+                <c:set var="baseUrl" value="${pageContext.request.contextPath}/admin/rbac/rolesList?action=list&size=${pageSize}${keywordParam}${keyword}"/>
 
 
                 <li class="page-item <c:if test="${currentPage == 1}">disabled</c:if>">

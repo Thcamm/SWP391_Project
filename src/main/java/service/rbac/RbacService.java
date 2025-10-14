@@ -1,13 +1,13 @@
 package service.rbac;
 
 import common.utils.PaginationUtils;
-import dao.rbac.MenuDao;
-import dao.rbac.PermissionDao;
-import dao.rbac.RoleDao;
+import dao.employee.admin.rbac.MenuDao;
+import dao.employee.admin.rbac.PermissionDao;
+import dao.employee.admin.rbac.RoleDao;
 import model.pagination.PaginationResponse;
-import model.rbac.MenuItem;
-import model.rbac.Permission;
-import model.rbac.Role;
+import model.employee.admin.rbac.MenuItem;
+import model.employee.admin.rbac.Permission;
+import model.employee.admin.rbac.Role;
 
 import java.sql.SQLException;
 import java.util.List;

@@ -12,7 +12,7 @@ import util.GoogleConfig;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@WebServlet(name = "GoogleCallback", urlPatterns = {"/auth/google/callback"})
+@WebServlet(name = "GoogleCallback", urlPatterns = { "/auth/google/callback" })
 public class GoogleCallback extends HttpServlet {
 
     @Override

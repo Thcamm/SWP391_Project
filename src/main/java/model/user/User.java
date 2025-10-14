@@ -21,7 +21,9 @@ public class User {
 
     public User() {}
 
-    public User(String address, boolean activeStatus, Date birthDate, Timestamp createdAt, String email, String fullName, String gender, String passwordHash, String phoneNumber, int roleId, Timestamp updatedAt, Integer userId, String userName) {
+    public User(String address, boolean activeStatus, Date birthDate, Timestamp createdAt, String email,
+            String fullName, String gender, String passwordHash, String phoneNumber, int roleId, Timestamp updatedAt,
+            Integer userId, String userName) {
         this.address = address;
         this.activeStatus = activeStatus;
         this.birthDate = birthDate;
@@ -37,7 +39,7 @@ public class User {
         this.userName = userName;
     }
 
-    //<editor-fold defaultstate="collapsed" desc="Getters and Setters">
+    // <editor-fold defaultstate="collapsed" desc="Getters and Setters">
     public Integer getUserId() {
         return userId;
     }
