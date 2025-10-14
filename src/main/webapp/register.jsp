@@ -13,7 +13,10 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     />
-    <link href="css/register.css" rel="stylesheet" />
+    <link
+      href="${pageContext.request.contextPath}/css/register.css"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div class="registration-container">
@@ -296,6 +299,6 @@
     </div>
 
     <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/register.js"></script>
+    <script src="${pageContext.request.contextPath}/js/register.js"></script>
   </body>
 </html>
