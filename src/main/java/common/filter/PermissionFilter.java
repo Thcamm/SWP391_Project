@@ -6,9 +6,11 @@ import dao.employee.admin.rbac.RoleDao;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import service.auth.AuthService;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,8 +30,8 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/admin/rbac/roles/save", "role_permission_manage");
         routePerm.put("GET:/admin/rbac/permissions", "role_permission_manage");
         routePerm.put("POST:/admin/rbac/permissions", "role_permission_manage");
-        routePerm.put("GET:/admin/rbac/roleList", "role_permission_manage");
-        routePerm.put("POST:/admin/rbac/roleList", "role_permission_manage");
+        routePerm.put("GET:/admin/rbac/rolesList", "role_permission_manage");
+        routePerm.put("POST:/admin/rbac/rolesList", "role_permission_manage");
 
         //User (Admin) (Anh em tu dien url va permission code) ung voi phan minh code
         routePerm.put("GET:/admin/users", "user_read");
@@ -72,40 +74,73 @@ public class PermissionFilter implements Filter {
 
 
 
+
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        HttpServletRequest request = (HttpServletRequest) servletRequest;
-        HttpServletResponse response = (HttpServletResponse) servletResponse;
+    public void doFilter(ServletRequest sr, ServletResponse ss, FilterChain chain)
+            throws IOException, ServletException {
 
-        final String ctx = request.getContextPath();
-        final String path = request.getRequestURI().substring(ctx.length());
-        final String method = request.getMethod();
-        final String key = method + ":" + path;
+        HttpServletRequest req  = (HttpServletRequest) sr;
+        HttpServletResponse res = (HttpServletResponse) ss;
+
+        String ctx    = req.getContextPath();
+        String path   = req.getRequestURI().substring(ctx.length());
+        path = normalizePath(path);
+        String method = req.getMethod();
+        String key    = method + ":" + path;
+
+        if (isPublic(path)) { chain.doFilter(sr, ss); return; }
+
+        HttpSession session = req.getSession(false);
+        Integer userId = (session == null) ? null : (Integer) session.getAttribute("userId");
+        if (userId == null || userId <= 0) {
+            String back = req.getRequestURI() + (req.getQueryString() != null ? "?" + req.getQueryString() : "");
+            String encoded = URLEncoder.encode(back, "UTF-8");
+            res.sendRedirect(res.encodeRedirectURL(ctx + "/login?back=" + encoded));
+            return;
+        }
 
         String required = routePerm.get(key);
         if (required != null) {
-            Integer userId = (Integer) request.getSession().getAttribute("userId");
-            if(userId == null || userId <= 0) {
-                ((HttpServletResponse) servletResponse).sendRedirect(((HttpServletResponse) servletResponse).encodeRedirectURL(ctx + "/login"));
-                return;
-            }
-
             try {
-                if(!auth.hasPermission(userId, required)) {
-                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "You have not permission to access this resource" + required);
+                if (!auth.hasPermission(userId, required)) {
+                    res.sendError(HttpServletResponse.SC_FORBIDDEN, "Missing permission: " + required);
                     return;
                 }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            } catch (Exception e) { throw new ServletException(e); }
         }
-        filterChain.doFilter(servletRequest, servletResponse);
+
+        // No-cache cho tài nguyên bảo vệ
+        res.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
+        res.setHeader("Pragma","no-cache");
+        res.setDateHeader("Expires",0);
+
+        chain.doFilter(sr, ss);
     }
 
-    @Override
-    public void destroy() {
-        Filter.super.destroy();
+    @Override public void destroy() {}
+
+    private boolean isPublic(String path) {
+        return path.equals("/") ||
+                path.startsWith("/assets/") ||
+                path.startsWith("/login") ||
+                path.startsWith("/logout") ||
+                path.startsWith("/register") ||
+                path.startsWith("/public/") ||
+                path.startsWith("/mock/") ||
+                path.startsWith("/favicon") ||
+                path.startsWith("/error");
     }
+
+
+    private String normalizePath(String p) {
+        if (p == null || p.isEmpty()) return "/";
+
+        p = p.replaceAll("/{2,}", "/");
+
+        if (p.length() > 1 && p.endsWith("/")) p = p.substring(0, p.length()-1);
+        return p;
+    }
+
 }
