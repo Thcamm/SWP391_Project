@@ -1,12 +1,12 @@
 package dao.user;
 
-import dao.DbContext;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import model.user.User;
+import common.DbContext;
 
 public class UserDAO extends DbContext {
 

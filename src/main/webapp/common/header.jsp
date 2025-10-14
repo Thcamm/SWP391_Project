@@ -348,4 +348,57 @@
         </div>
     </nav>
     </header>
+<!-- Overlay -->
+<div class="menu-overlay" id="menuOverlay"></div>
+
+<!-- Sidebar Menu -->
+<div class="sidebar-menu" id="sidebarMenu">
+    <div class="sidebar-header">
+        <button class="close-btn" id="closeMenu">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="#" class="menu-item">
+            <span>DỊCH VỤ</span>
+        </a>
+        <a href="#" class="menu-item">
+            <span>THƯ VIỆN DỰ ÁN</span>
+        </a>
+        <a href="#" class="menu-item">
+            <span>ĐÀO TẠO NGHỀ</span>
+        </a>
+        <a href="#" class="menu-item">
+            <span>TIN TỨC</span>
+        </a>
+        <a href="AppointmentScheduling" class="menu-item">
+            <span>Lien he dat lich</span>
+        </a>
+    </nav>
+</div>
 </body>
+<script>
+    // Toggle Sidebar Menu
+    const menuIcon = document.querySelector('.fa-bars');
+    const sidebarMenu = document.getElementById('sidebarMenu');
+    const menuOverlay = document.getElementById('menuOverlay');
+    const closeMenuBtn = document.getElementById('closeMenu');
+
+    // Mở menu
+    menuIcon.addEventListener('click', function () {
+        sidebarMenu.classList.add('active');
+        menuOverlay.classList.add('active');
+    });
+
+    // Đóng menu khi click nút X
+    closeMenuBtn.addEventListener('click', function () {
+        sidebarMenu.classList.remove('active');
+        menuOverlay.classList.remove('active');
+    });
+
+    // Đóng menu khi click overlay
+    menuOverlay.addEventListener('click', function () {
+        sidebarMenu.classList.remove('active');
+        menuOverlay.classList.remove('active');
+    });
+</script>
