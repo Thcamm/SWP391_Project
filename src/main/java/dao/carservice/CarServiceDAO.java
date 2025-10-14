@@ -3,65 +3,68 @@ package dao.carservice;
 import common.DbContext;
 import model.servicetype.Service;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-public class CarServiceDAO {
+public class CarServiceDAO extends DbContext {
 
-    public void getAllServices() {
-        String sql = "SELECT * FROM ServiceType";
-        try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
-            ResultSet rs = st.executeQuery();
-            List<Service> services = new ArrayList<>();
+    public List<Service> getAllServices() throws SQLException {
+        List<Service> services = new ArrayList<>();
+        String sql = "SELECT ServiceID, ServiceName, Category, UnitPrice FROM Service_Type";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+
             while (rs.next()) {
-                Service service = new Service();
-                service.setServiceTypeID(rs.getInt("ServiceTypeID"));
-                service.setServiceName(rs.getString("ServiceName"));
-                service.setCategory(rs.getString("Category"));
-                service.setPrice(rs.getDouble("Price"));
-                services.add(service);
+                services.add(extractServiceFromResultSet(rs));
             }
-            // Xử lý danh sách dịch vụ theo nhu cầu của bạn
-        } catch (SQLException e) {
-            throw new RuntimeException("Lỗi khi lấy danh sách dịch vụ", e);
         }
+        return services;
     }
 
+    public List<Service> getAllServicesByCategory(String category) throws SQLException {
+        List<Service> services = new ArrayList<>();
+        String sql = "SELECT ServiceID, ServiceName, Category, UnitPrice FROM Service_Type WHERE Category = ?";
 
-    public void getAllServicesByCategory(String category) {
-        String sql = "SELECT * FROM Service WHERE Category = ?";
-        try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql)) {
+
             st.setString(1, category);
-            ResultSet rs = st.executeQuery();
-            List<Service> services = new ArrayList<>();
-            while (rs.next()) {
-                Service service = new Service();
-                service.setServiceTypeID(rs.getInt("ServiceTypeID"));
-                service.setServiceName(rs.getString("ServiceName"));
-                service.setCategory(rs.getString("Category"));
-                service.setPrice(rs.getDouble("Price"));
-                services.add(service);
+            try (ResultSet rs = st.executeQuery()) {
+                while (rs.next()) {
+                    services.add(extractServiceFromResultSet(rs));
+                }
             }
-            // Xử lý danh sách dịch vụ theo nhu cầu của bạn
-        } catch (SQLException e) {
-            throw new RuntimeException("Lỗi khi lấy danh sách dịch vụ theo loại", e);
         }
+        return services;
     }
-    public void getAllCategories() {
-        String sql = "SELECT DISTINCT Category FROM ServiceType";
-        try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
-            ResultSet rs = st.executeQuery();
-            List<String> categories = new ArrayList<>();
+
+    public List<String> getAllCategories() throws SQLException {
+        List<String> categories = new ArrayList<>();
+        String sql = "SELECT DISTINCT Category FROM Service_Type WHERE Category IS NOT NULL";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+
             while (rs.next()) {
                 categories.add(rs.getString("Category"));
             }
-            // Xử lý danh sách loại dịch vụ theo nhu cầu của bạn
-        } catch (SQLException e) {
-            throw new RuntimeException("Lỗi khi lấy danh sách loại dịch vụ", e);
         }
+        return categories;
+    }
+
+    private Service extractServiceFromResultSet(ResultSet rs) throws SQLException {
+        Service service = new Service();
+        service.setServiceTypeID(rs.getInt("ServiceID"));
+        service.setServiceName(rs.getString("ServiceName"));
+        service.setCategory(rs.getString("Category"));
+        service.setPrice(rs.getDouble("UnitPrice"));
+        return service;
     }
 }

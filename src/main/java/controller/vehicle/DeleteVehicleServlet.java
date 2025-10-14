@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@WebServlet(name = "DeleteVehicleServlet", urlPatterns = {"/deleteVehicle"})
+@WebServlet(name = "DeleteVehicleServlet", urlPatterns = {"/customer/deleteVehicle"})
 public class DeleteVehicleServlet extends HttpServlet {
 
     @Override
@@ -22,11 +22,14 @@ public class DeleteVehicleServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         Customer customer = (Customer) session.getAttribute("customer");
+        String contextPath = request.getContextPath();
 
         if (customer == null) {
-            response.sendRedirect("login");
+            response.sendRedirect(contextPath + "/login");
             return;
         }
+
+        String redirectTo = contextPath + "/customer/garage";
 
         try {
             int vehicleId = Integer.parseInt(request.getParameter("vehicleId"));
@@ -45,6 +48,6 @@ public class DeleteVehicleServlet extends HttpServlet {
             session.setAttribute("error", "An error occurred while deleting the vehicle.");
         }
 
-        response.sendRedirect("garage");
+        response.sendRedirect(redirectTo);
     }
 }

@@ -14,12 +14,12 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@WebServlet(name = "ChangePasswordServlet", urlPatterns = {"/changePassword"})
+// Change URL pattern here
+@WebServlet(name = "ChangePasswordServlet", urlPatterns = {"/user/changePassword"})
 public class ChangePasswordServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Simply display the change password form
         request.getRequestDispatcher("/view/user/changePassword.jsp").forward(request, response);
     }
 
@@ -27,9 +27,10 @@ public class ChangePasswordServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
+        String contextPath = request.getContextPath();
 
         if (user == null) {
-            response.sendRedirect("login");
+            response.sendRedirect(contextPath + "/login"); // Use contextPath
             return;
         }
 
@@ -47,7 +48,7 @@ public class ChangePasswordServlet extends HttpServlet {
         try {
             User currentUser = userDAO.getUserById(user.getUserId());
             if (currentUser == null) {
-                response.sendRedirect("login");
+                response.sendRedirect(contextPath + "/login"); // Use contextPath
                 return;
             }
 
