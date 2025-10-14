@@ -1,6 +1,6 @@
 package dao.user;
 
-import dao.DbContext;
+import common.DbContext;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -141,6 +141,7 @@ public class UserDAO extends DbContext {
             return ps.executeUpdate();
         }
     }
+
     public boolean isEmailExists(String email, int currentUserId) throws SQLException {
         String sql = "SELECT 1 FROM `User` WHERE Email = ? AND UserID != ?";
         try (Connection conn = DbContext.getConnection();
@@ -152,6 +153,7 @@ public class UserDAO extends DbContext {
             }
         }
     }
+
     public boolean updateUserProfile(User user) throws SQLException {
         String sql = "UPDATE `User` SET FullName=?, Email=?, PhoneNumber=?, gender=?, birthdate=?, address=? WHERE UserID=?";
         try (Connection conn = DbContext.getConnection();
@@ -178,21 +180,6 @@ public class UserDAO extends DbContext {
                 }
                 return -1;
             }
-        }
-    }
-    public boolean updatePassword(int userId, String newPasswordHash) throws SQLException {
-        // Tên cột và bảng cần khớp với database của bạn
-        String sql = "UPDATE User SET PasswordHash = ? WHERE UserID = ?";
-
-        try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, newPasswordHash);
-            ps.setInt(2, userId);
-
-            int rowsAffected = ps.executeUpdate();
-
-            return rowsAffected > 0;
         }
     }
 
