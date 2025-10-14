@@ -1,4 +1,4 @@
-package controller.employee.customer_service;
+package controller.employee.customerservice;
 
 import dao.appointment.AppointmentDAO;
 import jakarta.servlet.ServletException;
@@ -6,7 +6,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import model.appointment.Appointment;
 import service.appointment.AppointmentService;
 
 import java.io.IOException;
@@ -14,7 +13,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-@WebServlet("/employee/customer_service/appointment-list")
+@WebServlet("/customerservice/appointment-list")
 public class AppointmentListServlet extends HttpServlet {
     @Override
     protected void doGet (HttpServletRequest request, HttpServletResponse response)
@@ -46,7 +45,7 @@ public class AppointmentListServlet extends HttpServlet {
             }
         }
         request.setAttribute("appointments", appointments);
-        request.getRequestDispatcher("/employee/customer_service/appointment-list.jsp")
+        request.getRequestDispatcher("/customerservice/appointment-list.jsp")
                 .forward(request, response);
 
     }
@@ -70,14 +69,13 @@ public class AppointmentListServlet extends HttpServlet {
 
             boolean success = service.checkUpdateStatus(appointmentID, status);
 
-            // Nếu update thành công thì quay lại list
             if (success) {
                 dao.updateStatus(appointmentID, status);
-                response.sendRedirect(request.getContextPath() + "/employee/customer_service/appointment-list");
+                response.sendRedirect(request.getContextPath() + "/customerservice/appointment-list");
             } else {
                 // Nếu thất bại, báo lỗi
                 request.setAttribute("errorMessage", "Failed to update appointment status.");
-                request.getRequestDispatcher("/employee/customer_service/appointment-list.jsp")
+                request.getRequestDispatcher("/customerservice/appointment-list.jsp")
                         .forward(request, response);
             }
 
