@@ -34,8 +34,8 @@ public class AdminService {
     }
 
     public boolean promoteCustomerToEmployee(int userId, String newRoleName,
-                                             String employeeCode, double salary,
-                                             int managedByEmployeeId, String currentUser) {
+            String employeeCode, double salary,
+            int managedByEmployeeId, String currentUser) {
 
         try {
             int createdByEmployeeId = getCreatedByEmployeeId(currentUser);
@@ -54,7 +54,8 @@ public class AdminService {
         try {
             User user = userDAO.getUserById(userId);
 
-            if (user == null) return false;
+            if (user == null)
+                return false;
 
             user.setFullName(fullName);
             user.setEmail(email);
@@ -164,43 +165,45 @@ public class AdminService {
         }
     }
 
-//    public List<User> getAllUsers() {
-//        try {
-//            return userDAO.getAllActiveUsers();
-//        } catch (SQLException e) {
-//            System.out.println("Lỗi khi lấy danh sách users: " + e.getMessage());
-//            return new ArrayList<>();
-//        }
-//    }
-//
-//    public List<User> searchUsers(String keyword) {
-//        try {
-//            List<User> allUsers = userDAO.getAllActiveUsers();
-//            List<User> result = new ArrayList<>();
-//
-//            if (keyword == null || keyword.trim().isEmpty()) {
-//                return allUsers;
-//            }
-//
-//            String searchKeyword = keyword.toLowerCase();
-//            for (User user : allUsers) {
-//                if (user.getUserName().toLowerCase().contains(searchKeyword) ||
-//                        user.getEmail().toLowerCase().contains(searchKeyword) ||
-//                        user.getFullName().toLowerCase().contains(searchKeyword)) {
-//                    result.add(user);
-//                }
-//            }
-//
-//            System.out.println("Tìm thấy " + result.size() + " users với từ khóa: " + keyword);
-//            return result;
-//
-//        } catch (SQLException e) {
-//            System.out.println("Lỗi khi tìm kiếm: " + e.getMessage());
-//            return new ArrayList<>();
-//        }
-//    }
+    // public List<User> getAllUsers() {
+    // try {
+    // return userDAO.getAllActiveUsers();
+    // } catch (SQLException e) {
+    // System.out.println("Lỗi khi lấy danh sách users: " + e.getMessage());
+    // return new ArrayList<>();
+    // }
+    // }
+    //
+    // public List<User> searchUsers(String keyword) {
+    // try {
+    // List<User> allUsers = userDAO.getAllActiveUsers();
+    // List<User> result = new ArrayList<>();
+    //
+    // if (keyword == null || keyword.trim().isEmpty()) {
+    // return allUsers;
+    // }
+    //
+    // String searchKeyword = keyword.toLowerCase();
+    // for (User user : allUsers) {
+    // if (user.getUserName().toLowerCase().contains(searchKeyword) ||
+    // user.getEmail().toLowerCase().contains(searchKeyword) ||
+    // user.getFullName().toLowerCase().contains(searchKeyword)) {
+    // result.add(user);
+    // }
+    // }
+    //
+    // System.out.println("Tìm thấy " + result.size() + " users với từ khóa: " +
+    // keyword);
+    // return result;
+    //
+    // } catch (SQLException e) {
+    // System.out.println("Lỗi khi tìm kiếm: " + e.getMessage());
+    // return new ArrayList<>();
+    // }
+    // }
 
-    public boolean createUser(String fullName, String userName, String email, int roleId, String gender, String currentUser) {
+    public boolean createUser(String fullName, String userName, String email, int roleId, String gender,
+            String currentUser) {
         try {
             if (currentUser == null || currentUser.trim().isEmpty()) {
                 System.out.println("Lỗi: Không có thông tin user hiện tại!");
@@ -238,46 +241,53 @@ public class AdminService {
 
     // ===== SEARCH METHODS =====
 
-//    public ArrayList<UserDisplay> searchUsers(String keyword, Integer roleId, Boolean activeStatus) {
-//        try {
-//            System.out.println(" DEBUG AdminService.searchUsers() called with:");
-//            System.out.println("   keyword: " + keyword);
-//            System.out.println("   roleId: " + roleId);
-//            System.out.println("   activeStatus: " + activeStatus);
-//
-//            // TEST: Try simple query first
-//            try {
-//                ArrayList<User> simpleUsers = adminDAO.getAllUsersForAdmin();
-//                System.out.println(" DEBUG: Simple query returned " + simpleUsers.size() + " users");
-//            } catch (Exception e) {
-//                System.err.println(" DEBUG: Simple query failed: " + e.getMessage());
-//            }
-//
-//            ArrayList<UserDisplay> result = adminDAO.searchAllUsersWithRole(keyword, roleId, activeStatus, "userid");
-//            System.out.println("DEBUG AdminService.searchUsers() returned " + result.size() + " users");
-//            return result;
-//        } catch (SQLException e) {
-//            System.err.println("ADMIN Error searching users: " + e.getMessage());
-//            e.printStackTrace();
-//            return new ArrayList<>();
-//        }
-//    }
-//
-//    // New method with sort parameter
-//    public ArrayList<UserDisplay> searchUsers(String keyword, Integer roleId, Boolean activeStatus, String sortBy) {
-//        try {
-//            System.out.println(" DEBUG AdminService.searchUsers() with sort called");
-//            System.out.println("   sortBy: " + sortBy);
-//
-//            ArrayList<UserDisplay> result = adminDAO.searchAllUsersWithRole(keyword, roleId, activeStatus, sortBy);
-//            System.out.println(" DEBUG AdminService.searchUsers() returned " + result.size() + " users");
-//            return result;
-//        } catch (SQLException e) {
-//            System.err.println("ADMIN Error searching users: " + e.getMessage());
-//            e.printStackTrace();
-//            return new ArrayList<>();
-//        }
-//    }
+    // public ArrayList<UserDisplay> searchUsers(String keyword, Integer roleId,
+    // Boolean activeStatus) {
+    // try {
+    // System.out.println(" DEBUG AdminService.searchUsers() called with:");
+    // System.out.println(" keyword: " + keyword);
+    // System.out.println(" roleId: " + roleId);
+    // System.out.println(" activeStatus: " + activeStatus);
+    //
+    // // TEST: Try simple query first
+    // try {
+    // ArrayList<User> simpleUsers = adminDAO.getAllUsersForAdmin();
+    // System.out.println(" DEBUG: Simple query returned " + simpleUsers.size() + "
+    // users");
+    // } catch (Exception e) {
+    // System.err.println(" DEBUG: Simple query failed: " + e.getMessage());
+    // }
+    //
+    // ArrayList<UserDisplay> result = adminDAO.searchAllUsersWithRole(keyword,
+    // roleId, activeStatus, "userid");
+    // System.out.println("DEBUG AdminService.searchUsers() returned " +
+    // result.size() + " users");
+    // return result;
+    // } catch (SQLException e) {
+    // System.err.println("ADMIN Error searching users: " + e.getMessage());
+    // e.printStackTrace();
+    // return new ArrayList<>();
+    // }
+    // }
+    //
+    // // New method with sort parameter
+    // public ArrayList<UserDisplay> searchUsers(String keyword, Integer roleId,
+    // Boolean activeStatus, String sortBy) {
+    // try {
+    // System.out.println(" DEBUG AdminService.searchUsers() with sort called");
+    // System.out.println(" sortBy: " + sortBy);
+    //
+    // ArrayList<UserDisplay> result = adminDAO.searchAllUsersWithRole(keyword,
+    // roleId, activeStatus, sortBy);
+    // System.out.println(" DEBUG AdminService.searchUsers() returned " +
+    // result.size() + " users");
+    // return result;
+    // } catch (SQLException e) {
+    // System.err.println("ADMIN Error searching users: " + e.getMessage());
+    // e.printStackTrace();
+    // return new ArrayList<>();
+    // }
+    // }
 
     // NEW: Method with pagination support
     public common.utils.PaginationUtils.PaginationResult<UserDisplay> searchUsersWithPagination(
@@ -302,14 +312,15 @@ public class AdminService {
         }
     }
 
-//    public int getSearchResultCount(String keyword, Integer roleId, Boolean activeStatus) {
-//        try {
-//            return adminDAO.countSearchResults(keyword, roleId, activeStatus);
-//        } catch (SQLException e) {
-//            System.err.println("ADMIN Error counting search results: " + e.getMessage());
-//            return 0;
-//        }
-//    }
+    // public int getSearchResultCount(String keyword, Integer roleId, Boolean
+    // activeStatus) {
+    // try {
+    // return adminDAO.countSearchResults(keyword, roleId, activeStatus);
+    // } catch (SQLException e) {
+    // System.err.println("ADMIN Error counting search results: " + e.getMessage());
+    // return 0;
+    // }
+    // }
 
     public ArrayList<Role> getAvailableRoles() {
         try {
