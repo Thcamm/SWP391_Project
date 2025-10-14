@@ -102,14 +102,21 @@ public class PermissionFilter implements Filter {
         }
 
         String required = routePerm.get(key);
+        if (required == null && !isPublic(path)) {
+            res.sendError(HttpServletResponse.SC_FORBIDDEN, "Permission mapping missing for: " + key);
+            return;
+        }
         if (required != null) {
             try {
                 if (!auth.hasPermission(userId, required)) {
                     res.sendError(HttpServletResponse.SC_FORBIDDEN, "Missing permission: " + required);
                     return;
                 }
-            } catch (Exception e) { throw new ServletException(e); }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
+
 
         // No-cache cho tài nguyên bảo vệ
         res.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
@@ -126,11 +133,14 @@ public class PermissionFilter implements Filter {
                 path.startsWith("/assets/") ||
                 path.startsWith("/login") ||
                 path.startsWith("/logout") ||
-                path.startsWith("/register") ||
+                path.startsWith("/Register") ||
                 path.startsWith("/public/") ||
                 path.startsWith("/mock/") ||
                 path.startsWith("/favicon") ||
-                path.startsWith("/error");
+                path.startsWith("/error") ||
+                path.startsWith("/register.jsp") ||
+                path.startsWith("/Home") ||
+                path.startsWith("/home.jsp") ;
     }
 
 

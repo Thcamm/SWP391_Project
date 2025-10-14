@@ -41,6 +41,7 @@ public class Login extends HttpServlet {
                     .findRoleCodeById(user.getRoleId());
             // Mật khẩu đúng!
             request.getSession().setAttribute("roleCode", roleCode);
+            request.getSession().setAttribute("userId", user.getUserId()); //them dong nay
             request.getSession().setAttribute("user", user);
             request.getSession().setAttribute("userName", user.getUserName());
             request.getSession().setMaxInactiveInterval(30 * 60);

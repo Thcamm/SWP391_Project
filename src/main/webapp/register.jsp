@@ -86,7 +86,7 @@ contentType="text/html;charset=UTF-8" language="java" %>
               </div>
               <% } %>
 
-              <form action="Register" method="POST">
+              <form action="${pageContext.request.contextPath}/Register" method="POST">
                 <div class="row gy-3 gy-md-4 overflow-hidden">
                   <div class="col-12">
                     <label for="fullName" class="form-label"
