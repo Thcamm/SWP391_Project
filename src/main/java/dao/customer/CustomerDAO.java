@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CustomerDAO extends DbContext {
 
@@ -164,4 +166,26 @@ public class CustomerDAO extends DbContext {
 //
 //        return list;
 //    }
+public List<Customer> getAllActiveCustomers() throws SQLException {
+    List<Customer> customers = new ArrayList<>();
+    String sql = "SELECT c.CustomerID, c.UserID, u.FullName " +
+            "FROM Customer c JOIN User u ON c.UserID = u.UserID " +
+            "WHERE u.ActiveStatus = 1 ORDER BY u.FullName";
+
+    try (Connection conn = getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+            Customer customer = new Customer();
+            customer.setCustomerId(rs.getInt("CustomerID"));
+            customer.setUserId(rs.getInt("UserID"));
+
+            customer.setFullName(rs.getString("FullName"));
+
+            customers.add(customer);
+        }
+    }
+    return customers;
+}
 }

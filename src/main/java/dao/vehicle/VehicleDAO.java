@@ -65,6 +65,18 @@ public class VehicleDAO extends DbContext {
         }
     }
 
+    public boolean checkLicensePlateExists(String licensePlate, int vehicleIdToExclude) throws SQLException {
+        String sql = "SELECT 1 FROM vehicle WHERE LicensePlate = ? AND VehicleID != ? LIMIT 1";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setString(1, licensePlate);
+            st.setInt(2, vehicleIdToExclude);
+            try (ResultSet rs = st.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
     public int getVehicleIdByLicensePlate(String licensePlate) {
         String sql = "SELECT VehicleID FROM vehicle WHERE LicensePlate = ?";
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
@@ -72,7 +84,6 @@ public class VehicleDAO extends DbContext {
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
                 int vehicleID = rs.getInt("VehicleID");
-                // Xử lý vehicleID theo nhu cầu của bạn
                 return vehicleID;
             }
             return -1;

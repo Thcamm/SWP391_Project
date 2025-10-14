@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet(name = "VehicleServlet", urlPatterns = {"/garage"})
+@WebServlet(name = "VehicleServlet", urlPatterns = {"/customer/garage"})
 public class VehicleServlet extends HttpServlet {
 
     @Override
