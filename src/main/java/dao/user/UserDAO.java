@@ -70,7 +70,8 @@ public class UserDAO extends DbContext {
 
     // Thêm user mới
     public boolean addUser(User user) throws SQLException {
-        String sql = "INSERT INTO User (RoleID, FullName, UserName, Email, PhoneNumber, Gender, BirthDate, Address, PasswordHash, ActiveStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO User (RoleID, FullName, UserName, Email, PhoneNumber, " +
+                "Gender, BirthDate, Address, PasswordHash, ActiveStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, user.getRoleId());

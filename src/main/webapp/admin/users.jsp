@@ -634,7 +634,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
               >
               |
               <a
-                href="${pageContext.request.contextPath}/rbac/roles/"
+                href="${pageContext.request.contextPath}/admin/rbac/roles"
                 class="text-decoration-none"
                 >Manage Roles</a
               >

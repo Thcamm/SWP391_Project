@@ -47,19 +47,19 @@ public class UserController extends HttpServlet {
         System.out.println("   Path Info: " + pathInfo);
         System.out.println("   Servlet Path: " + request.getServletPath());
 
-        String currentUser = getCurrentUser(request);
+        // String currentUser = getCurrentUser(request);
 
         // Check if user is logged in
-        if (currentUser == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
+        // if (currentUser == null) {
+        // response.sendRedirect(request.getContextPath() + "/login");
+        // return;
+        // }
 
         // Permission check
-        if (!adminService.isAdmin(currentUser)) {
-            handleUnauthorized(request, response);
-            return;
-        }
+        // if (!adminService.isAdmin(currentUser)) {
+        // handleUnauthorized(request, response);
+        // return;
+        // }
 
         try {
             // Route based on path
@@ -67,16 +67,12 @@ public class UserController extends HttpServlet {
                 // Default: Show user list
                 handleUserList(request, response);
             } else if (pathInfo.equals("/create")) {
-                // Show create user form
                 handleCreateForm(request, response);
             } else if (pathInfo.startsWith("/view/")) {
-                // View user details
                 handleViewUser(request, response, pathInfo);
             } else if (pathInfo.startsWith("/edit/")) {
-                // Edit user form
                 handleEditUser(request, response, pathInfo);
             } else {
-                // Invalid path
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
             }
         } catch (Exception e) {
@@ -94,27 +90,23 @@ public class UserController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
 
         String pathInfo = request.getPathInfo();
-        String currentUser = getCurrentUser(request);
-
-        // Check if user is logged in
-        if (currentUser == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
+//        String currentUser = getCurrentUser(request);
+//
+//        // Check if user is logged in
+//        if (currentUser == null) {
+//            response.sendRedirect(request.getContextPath() + "/login");
+//            return;
+//        }
 
         try {
             // Route based on path
             if (pathInfo == null || pathInfo.equals("/")) {
-                // Handle search/filter from main page
                 handleSearch(request, response);
             } else if (pathInfo.equals("/create")) {
-                // Process create user
                 handleCreateUser(request, response);
             } else if (pathInfo.startsWith("/edit/")) {
-                // Process edit user
                 handleUpdateUser(request, response, pathInfo);
             } else if (pathInfo.startsWith("/toggle/")) {
-                // Toggle user status
                 handleToggleStatus(request, response, pathInfo);
             } else {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -287,7 +279,10 @@ public class UserController extends HttpServlet {
         String fullName = request.getParameter("fullName");
         String userName = request.getParameter("userName");
         String email = request.getParameter("email");
-        // String phoneNumber = request.getParameter("phoneNumber"); // TODO: Add phone
+        String phoneNumber = request.getParameter("phoneNumber");
+        String gender = request.getParameter("gender");
+        String birthDate = request.getParameter("birthDate");
+        String address = request.getParameter("address");
         // number support
         String roleParam = request.getParameter("role");
 
@@ -317,7 +312,7 @@ public class UserController extends HttpServlet {
 
         // Create user
         boolean success = adminService.createUser(fullName.trim(), userName.trim(),
-                email.trim(), roleId, getCurrentUser(request));
+                email.trim(), roleId, gender, getCurrentUser(request));
 
         if (success) {
             System.out.println("UserController - User created successfully: " + userName +
@@ -380,7 +375,8 @@ public class UserController extends HttpServlet {
                         userId, newRole.getRoleName(), employeeCode, salary, managedBy, getCurrentUser(request));
 
                 if (success) {
-                    successMessage = "Thăng cấp thành công! User " + userId + " đã được chuyển sang vai trò " + newRole.getRoleName();
+                    successMessage = "Thăng cấp thành công! User " + userId + " đã được chuyển sang vai trò "
+                            + newRole.getRoleName();
                 } else {
                     errorMessage = "Thăng cấp thất bại! (Lỗi DB hoặc đã có hồ sơ Employee).";
                 }
@@ -392,7 +388,8 @@ public class UserController extends HttpServlet {
             if (success) {
                 redirectWithMessage(response, request.getContextPath() + "/admin/users", successMessage, "success");
             } else {
-                redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId, errorMessage, "error");
+                redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId, errorMessage,
+                        "error");
             }
 
         } catch (Exception e) {
@@ -449,11 +446,11 @@ public class UserController extends HttpServlet {
         return null;
     }
 
-    private void handleUnauthorized(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        request.setAttribute("errorMessage", "Bạn không có quyền truy cập trang quản lý users!");
-        request.getRequestDispatcher("/error.jsp").forward(request, response);
-    }
+//    private void handleUnauthorized(HttpServletRequest request, HttpServletResponse response)
+//            throws ServletException, IOException {
+//        request.setAttribute("errorMessage", "Bạn không có quyền truy cập trang quản lý users!");
+//        request.getRequestDispatcher("/error.jsp").forward(request, response);
+//    }
 
     private void handleError(HttpServletRequest request, HttpServletResponse response, String errorMessage)
             throws ServletException, IOException {
