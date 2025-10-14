@@ -23,6 +23,50 @@ public class AdminService {
         this.roleDao = new RoleDao();
     }
 
+    public Role getRoleById(int roleId) throws SQLException {
+        return roleDao.findById(roleId);
+    }
+
+    private int getCreatedByEmployeeId(String userName) throws SQLException {
+        Integer employeeId = adminDAO.getEmployeeIdByUsername(userName);
+        // Dùng ID 1 làm ID mặc định nếu Admin không có hồ sơ trong bảng Employee
+        return employeeId != null ? employeeId : 1;
+    }
+
+    public boolean promoteCustomerToEmployee(int userId, String newRoleName,
+                                             String employeeCode, double salary,
+                                             int managedByEmployeeId, String currentUser) {
+
+        try {
+            int createdByEmployeeId = getCreatedByEmployeeId(currentUser);
+
+            return adminDAO.executePromoteToEmployeeSP(
+                    userId, newRoleName, employeeCode, salary,
+                    managedByEmployeeId, createdByEmployeeId);
+
+        } catch (SQLException e) {
+            System.err.println("SERVICE Lỗi thăng cấp Customer -> Employee: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean updateUserBasicInfo(int userId, String fullName, String email, int roleId, String currentUser) {
+        try {
+            User user = userDAO.getUserById(userId);
+
+            if (user == null) return false;
+
+            user.setFullName(fullName);
+            user.setEmail(email);
+            user.setRoleId(roleId);
+
+            return adminDAO.updateUserBasicInfo(user);
+        } catch (SQLException e) {
+            System.err.println("SERVICE Lỗi cập nhật user cơ bản: " + e.getMessage());
+            return false;
+        }
+    }
+
     public boolean isAdmin(String userName) {
         try {
 
@@ -76,7 +120,6 @@ public class AdminService {
 
             if (role != null) {
                 String roleName = role.getRoleName().toLowerCase();
-                System.out.println("Found role: " + roleName);
 
                 // FLEXIBLE: Check by role name patterns
                 boolean isAdminRole = roleName.contains("admin") ||
@@ -85,8 +128,6 @@ public class AdminService {
                         roleName.equals("tech manager") ||
                         roleName.contains("quản lý") || // Vietnamese
                         roleName.contains("admin"); // Any admin variant
-
-                System.out.println("Role '" + roleName + "' is admin role: " + isAdminRole);
                 return isAdminRole;
 
             } else {

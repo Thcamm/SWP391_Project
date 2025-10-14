@@ -380,4 +380,67 @@ public class AdminDAO extends DbContext {
         }
     }
 
+    //Get EmployeeID associated with a given userName
+    public Integer getEmployeeIdByUsername(String userName) throws SQLException {
+        // SQL: Find EmployeeID by joining Employee and User tables on UserID
+        String sql = "SELECT e.EmployeeID FROM Employee e " +
+                "JOIN User u ON e.UserID = u.UserID " +
+                "WHERE u.UserName = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, userName);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("EmployeeID");
+                }
+            }
+        }
+        return null;
+    }
+    public boolean executePromoteToEmployeeSP(int userId, String newRoleName,
+                                              String employeeCode, double salary,
+                                              int managedByEmployeeId, int createdByEmployeeId)
+            throws SQLException {
+
+        // Đảm bảo bạn đã import java.sql.CallableStatement
+        String sql = "{CALL SP_PromoteCustomerToEmployee(?, ?, ?, ?, ?, ?)}";
+
+        try (Connection conn = getConnection();
+             java.sql.CallableStatement cs = conn.prepareCall(sql)) { // Sử dụng CallableStatement
+
+            cs.setInt(1, userId);
+            cs.setString(2, newRoleName);
+            cs.setString(3, employeeCode);
+            cs.setDouble(4, salary);
+            cs.setInt(5, managedByEmployeeId);
+            cs.setInt(6, createdByEmployeeId);
+
+            cs.execute();
+            return true;
+
+        } catch (SQLException e) {
+            System.err.println(" AdminDAO SQL Error executing SP: " + e.getMessage());
+            throw e; // Bắt buộc phải re-throw để AdminService có thể bắt lỗi transaction
+        }
+    }
+
+    public boolean updateUserBasicInfo(User user) throws SQLException {
+        // Chỉ cập nhật các trường được chỉnh sửa cơ bản
+        String sql = "UPDATE User SET RoleID=?, FullName=?, Email=?, UpdatedAt=NOW() WHERE UserID=?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, user.getRoleId());
+            ps.setString(2, user.getFullName());
+            ps.setString(3, user.getEmail());
+            ps.setInt(4, user.getUserId());
+
+            return ps.executeUpdate() > 0;
+        }
+    }
+
 }

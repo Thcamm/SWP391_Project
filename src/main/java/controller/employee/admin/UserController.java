@@ -341,23 +341,65 @@ public class UserController extends HttpServlet {
             String userIdStr = pathInfo.substring("/edit/".length());
             int userId = Integer.parseInt(userIdStr);
 
-            // TODO: Implement user update functionality
-            boolean success = false;
+            // 1. Lấy dữ liệu form chung
+            String fullName = request.getParameter("fullName");
+            String email = request.getParameter("email");
+            String roleParam = request.getParameter("role");
 
-            redirectWithMessage(response, request.getContextPath() + "/admin/users",
-                    "User update functionality coming soon!", "info");
+            // ... (Validate cơ bản) ...
 
-            if (success) {
-                redirectWithMessage(response, request.getContextPath() + "/admin/users",
-                        "Cập nhật user thành công!", "success");
-            } else {
+            int newRoleId = Integer.parseInt(roleParam);
+            Role newRole = adminService.getRoleById(newRoleId);
+
+            if (newRole == null) {
                 redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId,
-                        "Cập nhật user thất bại!", "error");
+                        "Vai trò không hợp lệ.", "error");
+                return;
             }
 
-        } catch (NumberFormatException e) {
+            boolean success = false;
+            String successMessage = "Cập nhật user thành công!";
+            String errorMessage = "Cập nhật user thất bại!";
+
+            if (!newRole.getRoleName().equalsIgnoreCase("Customer")) {
+
+                String employeeCode = request.getParameter("employeeCode");
+                String salaryStr = request.getParameter("salary");
+                String managedByStr = request.getParameter("managedBy");
+
+                if (isNullOrEmpty(employeeCode) || isNullOrEmpty(salaryStr) || isNullOrEmpty(managedByStr)) {
+                    redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId,
+                            "Vai trò là Nhân viên, vui lòng điền đầy đủ Mã NV, Lương và ID Quản lý.", "error");
+                    return;
+                }
+
+                double salary = Double.parseDouble(salaryStr);
+                int managedBy = Integer.parseInt(managedByStr);
+
+                success = adminService.promoteCustomerToEmployee(
+                        userId, newRole.getRoleName(), employeeCode, salary, managedBy, getCurrentUser(request));
+
+                if (success) {
+                    successMessage = "Thăng cấp thành công! User " + userId + " đã được chuyển sang vai trò " + newRole.getRoleName();
+                } else {
+                    errorMessage = "Thăng cấp thất bại! (Lỗi DB hoặc đã có hồ sơ Employee).";
+                }
+
+            } else {
+                success = adminService.updateUserBasicInfo(userId, fullName, email, newRoleId, getCurrentUser(request));
+            }
+
+            if (success) {
+                redirectWithMessage(response, request.getContextPath() + "/admin/users", successMessage, "success");
+            } else {
+                redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId, errorMessage, "error");
+            }
+
+        } catch (Exception e) {
+            System.err.println("Lỗi xử lý Update User: " + e.getMessage());
+            e.printStackTrace();
             redirectWithMessage(response, request.getContextPath() + "/admin/users",
-                    "Invalid user ID", "error");
+                    "Lỗi dữ liệu hoặc User ID không hợp lệ: " + e.getMessage(), "error");
         }
     }
 
