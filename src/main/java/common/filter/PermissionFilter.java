@@ -125,11 +125,12 @@ public class PermissionFilter implements Filter {
                 path.startsWith("/assets/") ||
                 path.startsWith("/login") ||
                 path.startsWith("/logout") ||
-                path.startsWith("/register") ||
+                path.startsWith("/Register") ||
                 path.startsWith("/public/") ||
                 path.startsWith("/mock/") ||
                 path.startsWith("/favicon") ||
-                path.startsWith("/error");
+                path.startsWith("/error") ||
+                path.startsWith("/register.jsp");
     }
 
     private String normalizePath(String p) {
