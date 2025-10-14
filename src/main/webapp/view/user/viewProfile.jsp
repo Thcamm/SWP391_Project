@@ -31,8 +31,7 @@
             <input type="hidden" name="action" value="edit"/>
             <button type="submit" class="btn btn-primary">Edit Profile</button>
         </form>
-        <button type="button" class="btn btn-disabled" disabled>Change Password</button>
-    </div>
+        <a href="${pageContext.request.contextPath}/changePassword" class="btn btn-secondary">Change Password</a>    </div>
 
     <h2>Service History</h2>
     <table class="service-table">
@@ -53,16 +52,6 @@
     </div>
 </div>
 
-<script>
-    const services = [
-        {id: 'SV001', name: 'Oil Change', date: '2025-10-01', status: 'completed', price: '500.000đ'},
-        {id: 'SV002', name: 'Tire Rotation', date: '2025-09-15', status: 'completed', price: '300.00đ'},
-        {id: 'SV003', name: 'Oil Change', date: '2025-10-01', status: 'completed', price: '500.000đ'},
-        {id: 'SV004', name: 'Wash Car', date: '2025-09-15', status: 'completed', price: '300.00đ'},
-        {id: 'SV005', name: 'Oil Change', date: '2025-10-01', status: 'completed', price: '500.000đ'},
-        {id: 'SV006', name: 'Tire Rotation', date: '2025-09-15', status: 'completed', price: '300.00đ'}
-    ];
-</script>
 <script src="${pageContext.request.contextPath}/assets/js/user/viewProfile.js"></script>
 </body>
 </html>

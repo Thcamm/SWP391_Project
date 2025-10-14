@@ -346,11 +346,13 @@
             <div class="d-flex align-items-center gap-3">
                 <c:choose>
                     <c:when test="${not empty sessionScope.user}">
-            <span class="welcome-user">
-                <i class="fas fa-user-circle"></i>
-                Xin chào, ${sessionScope.user.fullName}
-            </span>
-                        <a href="Home?action=logout" class="btn btn-logout" name="action" value="logout">
+                        <a href="profile" class="welcome-user" style="text-decoration: none; color: white;">
+        <span>
+            <i class="fas fa-user-circle"></i>
+            Xin chào, ${sessionScope.user.fullName}
+        </span>
+                        </a>
+                        <a href="Home?action=logout" class="btn btn-logout">
                             <i class="fas fa-sign-out-alt"></i> Đăng xuất
                         </a>
                     </c:when>
@@ -395,15 +397,20 @@
         <a href="#" class="menu-item">
             <span>THƯ VIỆN DỰ ÁN</span>
         </a>
-        <a href="#" class="menu-item">
+        <a href="${pageContext.request.contextPath}/employee/customer_service/search-customer" class="menu-item">
             <span>ĐÀO TẠO NGHỀ</span>
         </a>
-        <a href="#" class="menu-item">
+        <a href="${pageContext.request.contextPath}/employee/customer_service/appointment-list" class="menu-item">
             <span>TIN TỨC</span>
         </a>
         <a href="AppointmentScheduling" class="menu-item">
             <span>Lien he dat lich</span>
         </a>
+        <c:if test="${not empty sessionScope.user}">
+            <a href="${pageContext.request.contextPath}/garage" class="menu-item">
+                <span>QUẢN LÝ XE (MY GARAGE)</span>
+            </a>
+        </c:if>
     </nav>
 </div>
 

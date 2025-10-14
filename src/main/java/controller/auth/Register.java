@@ -66,7 +66,7 @@ public class Register extends HttpServlet {
         user.setEmail(email.trim());
         user.setPhoneNumber(phoneNumber.trim());
         user.setPasswordHash(hashedPassword);
-        user.setRoleId(5); // Role mặc định là Customer
+        user.setRoleId(7); // Role mặc định là Customer
         user.setActiveStatus(true);
 
         // Nếu bảng User có trường address, thêm:
