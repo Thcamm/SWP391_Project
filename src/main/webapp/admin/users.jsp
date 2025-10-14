@@ -85,17 +85,17 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
               <li>
                 <a
                   class="dropdown-item"
-                  href="${pageContext.request.contextPath}/admin/users/bulk-disable"
+                  href="${pageContext.request.contextPath}/Home"
                 >
-                  <i class="bi bi-lock"></i> Bulk Disable
+                  <i class="bi bi-house"></i> Home
                 </a>
               </li>
               <li>
                 <a
                   class="dropdown-item"
-                  href="${pageContext.request.contextPath}/admin/roles/assign"
+                  href="${pageContext.request.contextPath}/admin/rbac/roles"
                 >
-                  <i class="bi bi-shield"></i> Assign Roles
+                  <i class="bi bi-shield"></i> Manage Roles
                 </a>
               </li>
             </ul>
@@ -226,18 +226,6 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
             <c:otherwise>
               <a href="?status=inactive" class="btn btn-outline-warning btn-sm">
                 <i class="bi bi-x-circle"></i> Inactive
-              </a>
-            </c:otherwise>
-          </c:choose>
-          <c:choose>
-            <c:when test="${selectedRole == 1}">
-              <a href="?role=1" class="btn btn-danger btn-sm">
-                <i class="bi bi-shield"></i> Admins
-              </a>
-            </c:when>
-            <c:otherwise>
-              <a href="?role=1" class="btn btn-outline-danger btn-sm">
-                <i class="bi bi-shield"></i> Admins
               </a>
             </c:otherwise>
           </c:choose>
@@ -620,9 +608,9 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
               >
               |
               <a
-                href="${pageContext.request.contextPath}/admin/users/bulk-disable"
+                href="${pageContext.request.contextPath}/Home"
                 class="text-decoration-none"
-                >Bulk Disable</a
+                >Home</a
               >
               |
               <a
