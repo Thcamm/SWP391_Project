@@ -222,7 +222,8 @@ public class AdminService {
             newUser.setEmail(email);
             newUser.setGender(gender);
             newUser.setRoleId(roleId);
-            newUser.setPasswordHash("123456");
+            // Hash password mặc định bằng PasswordUtil
+            newUser.setPasswordHash(util.PasswordUtil.hashPassword("123456"));
             newUser.setActiveStatus(true);
 
             boolean success = userDAO.addUser(newUser);

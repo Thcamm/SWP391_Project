@@ -129,14 +129,6 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
             </div>
           </div>
         </div>
-        <div class="col-md-3">
-          <div class="card bg-danger text-white">
-            <div class="card-body text-center">
-              <h4>${adminUsersCount}</h4>
-              <small>Admins</small>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- Search Form -->

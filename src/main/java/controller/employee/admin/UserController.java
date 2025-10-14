@@ -90,13 +90,13 @@ public class UserController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
 
         String pathInfo = request.getPathInfo();
-//        String currentUser = getCurrentUser(request);
-//
-//        // Check if user is logged in
-//        if (currentUser == null) {
-//            response.sendRedirect(request.getContextPath() + "/login");
-//            return;
-//        }
+        // String currentUser = getCurrentUser(request);
+        //
+        // // Check if user is logged in
+        // if (currentUser == null) {
+        // response.sendRedirect(request.getContextPath() + "/login");
+        // return;
+        // }
 
         try {
             // Route based on path
@@ -149,7 +149,7 @@ public class UserController extends HttpServlet {
                 .searchUsersWithPagination(keyword, roleId, activeStatus, sortBy, currentPage, itemsPerPage);
 
         ArrayList<UserDisplay> searchResults = new ArrayList<>(paginationResult.getPaginatedData());
-        int totalResults = paginationResult.getTotalItems();
+        int totalResults = paginationResult.getTotalItems(); // Tổng số user (tất cả trang)
 
         ArrayList<Role> availableRoles = adminService.getAvailableRoles();
 
@@ -446,11 +446,13 @@ public class UserController extends HttpServlet {
         return null;
     }
 
-//    private void handleUnauthorized(HttpServletRequest request, HttpServletResponse response)
-//            throws ServletException, IOException {
-//        request.setAttribute("errorMessage", "Bạn không có quyền truy cập trang quản lý users!");
-//        request.getRequestDispatcher("/error.jsp").forward(request, response);
-//    }
+    // private void handleUnauthorized(HttpServletRequest request,
+    // HttpServletResponse response)
+    // throws ServletException, IOException {
+    // request.setAttribute("errorMessage", "Bạn không có quyền truy cập trang quản
+    // lý users!");
+    // request.getRequestDispatcher("/error.jsp").forward(request, response);
+    // }
 
     private void handleError(HttpServletRequest request, HttpServletResponse response, String errorMessage)
             throws ServletException, IOException {
@@ -482,7 +484,7 @@ public class UserController extends HttpServlet {
             int activeCount, int inactiveCount, int adminCount, String sortBy) {
 
         request.setAttribute("users", users);
-        request.setAttribute("totalResults", totalResults);
+        request.setAttribute("totalResults", totalResults); // Truyền tổng số user cho JSP
         request.setAttribute("availableRoles", roles);
         request.setAttribute("currentUser", currentUser);
 

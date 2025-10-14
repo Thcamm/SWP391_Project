@@ -126,6 +126,8 @@ public class PermissionFilter implements Filter {
     private boolean isPublic(String path) {
         return path.equals("/") ||
                 path.startsWith("/assets/") ||
+                path.startsWith("/css/") ||
+                path.startsWith("/js/") ||
                 path.startsWith("/login") ||
                 path.startsWith("/logout") ||
                 path.startsWith("/Register") ||

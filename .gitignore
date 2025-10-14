@@ -1,6 +1,7 @@
 
 # Build output
 target/
+src/main/java/common/DbContext.java
 
 # Log files
 *.log
