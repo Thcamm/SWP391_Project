@@ -13,35 +13,14 @@ import java.io.IOException;
 import java.util.List;
 
 
-@WebServlet("/customer_service/search-customer")
+@WebServlet("/employee/customer_service/search-customer")
 public class SearchCustomerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-//        HttpSession session = request.getSession(false);
-//
-//         if (session == null || session.getAttribute("user") == null) {
-//            String currentURL = request.getRequestURL().toString();
-//            String queryString = request.getQueryString();
-//            if (queryString != null) {
-//                currentURL += "?" + queryString;
-//            }
-//
-//            session = request.getSession(true);
-//            session.setAttribute("redirectAfterLogin", currentURL);
-//
-//            response.sendRedirect(request.getContextPath() + "/login");
-//            return;
-//        }
-//
-//        User currentUser = (User) session.getAttribute("user");
-//
-//        if (currentUser.getRoleId() != 2) {
-//            response.sendRedirect(request.getContextPath() + "/employee.customer_service/error-permission.jsp");
-//            return;
-//        }
+
 
         String name = request.getParameter("searchName");
         String licensePlate = request.getParameter("searchLicensePlate");

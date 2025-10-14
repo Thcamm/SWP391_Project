@@ -52,9 +52,12 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<form action="${pageContext.request.contextPath}/customer_service/appointment-list" method="get" class="card p-4 mb-4">
+<form action="${pageContext.request.contextPath}/employee/customer_service/appointment-list" method="get" class="card p-4 mb-4">
     <div class="mt-4 d-flex justify-content-between align-items-center">
-
+        <div class="col-md-4">
+            <label for="searchName" class="form-label">Customer Name</label>
+            <input type="text" id="searchName" name="searchName" value="${param.searchName}" class="form-control" placeholder="Nhập tên khách hàng" />
+        </div>
         <label>
             <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -120,7 +123,7 @@
         <button type="submit" class="btn btn-success">
             🔍
         </button>
-        <a href="${pageContext.request.contextPath}/customer_service/appointment-list" class="btn btn-secondary">Reset</a>
+        <a href="${pageContext.request.contextPath}/employee/customer_service/appointment-list" class="btn btn-secondary">Reset</a>
     </div>
 </form>
 
@@ -143,31 +146,89 @@
     </tr>
     </thead>
     <tbody>
-    <c:forEach var="apm" items="${appointments}">
+    <c:forEach var="row" items="${appointments}">
+        <c:set var="apm" value="${row.appointment}" />
         <tr>
             <td>${apm.appointmentID}</td>
-            <td>${apm.customerID}</td>
+            <td>${row.customerName}</td>
             <td>${apm.vehicleID}</td>
             <td>${apm.appointmentDate}</td>
+
+                <%-- Cột STATUS --%>
             <td>
                 <c:choose>
-                    <c:when test="${apm.status == 'COMPLETED'}">🎉 COMPLETED</c:when>
-                    <c:when test="${apm.status == 'CANCELLED'}">❌ CANCELLED</c:when>
-                    <c:when test="${apm.status == 'ACCEPTED'}">✅ ACCEPTED</c:when>
-                    <c:when test="${apm.status == 'PENDING'}">⏳ PENDING</c:when>
-                    <c:otherwise>${apm.status}</c:otherwise>
+                    <%-- Nếu không phải PENDING thì chỉ hiển thị text và icon, không có dropdown --%>
+                <c:when test="${apm.status != 'PENDING'}">
+                <c:choose>
+                <c:when test="${apm.status == 'CANCELLED'}">❌ CANCELLED</c:when>
+                <c:when test="${apm.status == 'ACCEPTED'}">✅ ACCEPTED</c:when>
+                <c:when test="${apm.status == 'REJECTED'}">🚫 REJECTED</c:when>
+                <c:when test="${apm.status == 'COMPLETED'}">🎉 COMPLETED</c:when>
+                <c:otherwise>🔘 ${apm.status}</c:otherwise>
                 </c:choose>
-            </td>
+                </c:when>
+
+                    <%-- Nếu đang là PENDING thì mới hiển thị dropdown để đổi trạng thái --%>
+                <c:otherwise>
+                <form action="${pageContext.request.contextPath}/employee/customer_service/appointment-list"
+                      method="post" class="d-inline">
+                    <input type="hidden" name="appointmentID" value="${apm.appointmentID}">
+
+                    ⏳
+                    <select name="status" class="form-select form-select-sm d-inline-block w-auto ms-1"
+                            onchange="this.form.submit()">
+                        <option value="PENDING" selected>Pending</option>
+                        <option value="ACCEPTED">Accepted</option>
+                        <option value="REJECTED">Rejected</option>
+                    </select>
+                </form>
+                </c:otherwise>
+                </c:choose>
+
+</td>
             <td>${empty apm.description ? '-' : apm.description}</td>
-            <td><a href="appointment-detail?id=${apm.appointmentID}" class="detail-link">Detail</a></td>
+
+            <td>
+                <a href="appointment-detail?id=${apm.appointmentID}" class="btn btn-sm btn-outline-primary">
+                    Detail
+                </a>
+
+                <c:choose>
+                    <c:when test="${apm.status == 'ACCEPTED'}">
+                        <a href="create-service-order?appointmentID=${apm.appointmentID}"
+                           class="btn btn-sm btn-success ms-2">＋ SO</a>
+                    </c:when>
+                    <c:otherwise>
+                        <a class="btn btn-sm btn-success ms-2 disabled" tabindex="-1" aria-disabled="true"
+                           style="opacity: 0.5; pointer-events: none;">＋ SO</a>
+                    </c:otherwise>
+                </c:choose>
+
+            </td>
         </tr>
     </c:forEach>
 
     <c:if test="${empty appointments}">
-        <tr><td colspan="7">No appointment </td></tr>
+        <tr>
+            <td colspan="7" class="text-center">No appointments found.</td>
+        </tr>
     </c:if>
     </tbody>
 </table>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const fromDate = document.querySelector('input[name="fromDate"]').value;
+        const toDate = document.querySelector('input[name="toDate"]').value;
+
+        if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
+            e.preventDefault();
+            alert("❌ The start date cannot be greater than the end date!");
+        }
+    });
+</script>
 </body>
 </html>

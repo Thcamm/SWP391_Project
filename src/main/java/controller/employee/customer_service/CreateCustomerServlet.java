@@ -13,7 +13,7 @@ import model.user.User;
 import java.io.IOException;
 import java.sql.Date;
 
-@WebServlet("/customer_service/create-customer")
+@WebServlet("/employee/customer_service/create-customer")
 public class CreateCustomerServlet extends HttpServlet {
 
     @Override
@@ -92,7 +92,7 @@ public class CreateCustomerServlet extends HttpServlet {
         if (isDuplicate) {
             request.setAttribute("message", "⚠️ Email đã tồn tại!");
             request.setAttribute("messageType", "warning");
-            request.getRequestDispatcher("/employee.customer_service/create-customer.jsp").forward(request, response);
+            request.getRequestDispatcher("/employee/customer_service/create-customer.jsp").forward(request, response);
             return;
         }
 

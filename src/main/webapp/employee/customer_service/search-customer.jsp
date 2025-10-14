@@ -16,13 +16,13 @@
     <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>Search Customer</h3>
-        <a href="${pageContext.request.contextPath}/employee.cutomer_service/create-customer.jsp" class="btn btn-primary">
+        <a href="${pageContext.request.contextPath}/employee/customer_service/create-customer.jsp" class="btn btn-primary">
             <i class="bi bi-plus-circle"></i> Create Customer
         </a>
     </div>
 
     <!-- SEARCH FORM -->
-    <form action="${pageContext.request.contextPath}/search-customer" method="get" class="card p-4 mb-4">
+    <form action="${pageContext.request.contextPath}/employee/customer_service/search-customer" method="get" class="card p-4 mb-4">
         <div class="row g-3">
             <div class="col-md-4">
                 <label for="searchName" class="form-label">Customer Name</label>

@@ -14,7 +14,7 @@ import model.vehicle.Vehicle;
 
 import java.io.IOException;
 
-@WebServlet(name = "Appointment", urlPatterns = {"/Appointment"})
+@WebServlet(name = "AppointmentService", urlPatterns = {"/AppointmentService"})
 public class Appointment extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -22,7 +22,7 @@ public class Appointment extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         //response.setContentType("text/plain;charset=UTF-8");
-        //response.getWriter().write("Appointment GET OK");
+        //response.getWriter().write("AppointmentService GET OK");
         request.getRequestDispatcher("appointment-scheduling.jsp").forward(request, response);
     }
 
@@ -83,7 +83,7 @@ public class Appointment extends HttpServlet {
                 }
             }
 
-            // 6. Xử lý Appointment
+            // 6. Xử lý AppointmentService
             model.appointment.Appointment appointment = new model.appointment.Appointment();
             appointment.setCustomerID(customerID);
             appointment.setVehicleID(vehicleID); // QUAN TRỌNG: Gán VehicleID
@@ -96,7 +96,7 @@ public class Appointment extends HttpServlet {
             appointmentDAO.insertAppointment(appointment);
 
             // 8. Chuyển hướng sau khi thành công (PRG Pattern)
-            request.setAttribute("successMessage", "Appointment scheduled successfully!");
+            request.setAttribute("successMessage", "AppointmentService scheduled successfully!");
             request.getRequestDispatcher("appointment-scheduling.jsp").forward(request, response);
 
         } catch (IllegalArgumentException e) {
