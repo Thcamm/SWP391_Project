@@ -19,25 +19,10 @@ public class User {
     private Date birthDate;
     private String address;
 
-    public User() {}
-
-    public User(String address, boolean activeStatus, Date birthDate, Timestamp createdAt, String email, String fullName, String gender, String passwordHash, String phoneNumber, int roleId, Timestamp updatedAt, Integer userId, String userName) {
-        this.address = address;
-        this.activeStatus = activeStatus;
-        this.birthDate = birthDate;
-        this.createdAt = createdAt;
-        this.email = email;
-        this.fullName = fullName;
-        this.gender = gender;
-        this.passwordHash = passwordHash;
-        this.phoneNumber = phoneNumber;
-        this.roleId = roleId;
-        this.updatedAt = updatedAt;
-        this.userId = userId;
-        this.userName = userName;
+    public User() {
     }
 
-    //<editor-fold defaultstate="collapsed" desc="Getters and Setters">
+    // <editor-fold defaultstate="collapsed" desc="Getters and Setters">
     public Integer getUserId() {
         return userId;
     }
@@ -144,8 +129,10 @@ public class User {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         User user = (User) o;
         return Objects.equals(userId, user.userId);
     }
