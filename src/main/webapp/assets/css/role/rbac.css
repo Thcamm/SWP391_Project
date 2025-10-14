@@ -1,0 +1,298 @@
+/* ==========================================================================
+   Global Styles & Variables
+   ========================================================================== */
+:root {
+    --dark-gray: #2c3e50;         /* Xám đậm (gần như màu than) */
+    --medium-gray: #555;        /* Xám cho chữ */
+    --light-gray: #ecf0f1;        /* Xám rất nhạt cho nền */
+    --border-gray: #dfe6e9;        /* Xám nhạt cho viền */
+    --primary-blue: #3498db;      /* Xanh da trời chính */
+    --primary-blue-hover: #2980b9;/* Xanh da trời đậm hơn khi hover */
+    --white: #ffffff;
+    --success-green: #27ae60;
+    --success-bg: #eafaf1;
+    --error-red: #c0392b;
+    --error-bg: #fbeae5;
+    --orange: #f39c12;
+    --orange-hover: #e67e22;
+    --row-highlight: #eaf5fc;     /* Màu nền cho hàng được chọn */
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--light-gray);
+    color: var(--medium-gray);
+    margin: 0;
+    padding: 20px;
+}
+
+/* ==========================================================================
+   Main Container & General Elements
+   ========================================================================== */
+.rbac-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 30px;
+    background-color: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+}
+
+.page-title {
+    color: var(--dark-gray);
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.back-link-container {
+    margin-bottom: 20px;
+}
+
+/* ==========================================================================
+   Alerts & Messages
+   ========================================================================== */
+.alert {
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
+.success-message {
+    background-color: var(--success-bg);
+    color: var(--success-green);
+    border-color: #a7e3c1;
+}
+
+.error-message {
+    background-color: var(--error-bg);
+    color: var(--error-red);
+    border-color: #f7c6c0;
+}
+
+/* ==========================================================================
+   Filter Form
+   ========================================================================== */
+.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    margin-bottom: 25px;
+    border: 1px solid var(--border-gray);
+}
+
+.filter-form .form-group {
+    margin-bottom: 0;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    color: var(--dark-gray);
+}
+
+.form-control {
+    padding: 8px 12px;
+    font-size: 0.95rem;
+    border: 1px solid var(--border-gray);
+    border-radius: 4px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.select-role {
+    min-width: 180px;
+}
+
+.total-count {
+    margin-left: auto; /* Push to the right */
+    color: var(--medium-gray);
+    font-style: italic;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+.btn {
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.btn-primary { background-color: var(--primary-blue); color: var(--white); }
+.btn-primary:hover { background-color: var(--primary-blue-hover); }
+
+.btn-search { background-color: var(--success-green); color: var(--white); }
+.btn-search:hover { background-color: #229954; }
+
+.btn-back { background-color: #f0f0f0; color: var(--dark-gray); border: 1px solid var(--border-gray); }
+.btn-back:hover { background-color: #e0e0e0; }
+
+.btn-edit { background-color: var(--orange); color: var(--white); font-size: 0.8rem; padding: 5px 10px; }
+.btn-edit:hover { background-color: var(--orange-hover); }
+
+.btn-delete { background-color: var(--error-red); color: var(--white); font-size: 0.8rem; padding: 5px 10px; }
+.btn-delete:hover { background-color: #a93226; }
+
+.btn-reset { background-color: var(--medium-gray); color: var(--white); }
+.btn-reset:hover { background-color: var(--dark-gray); }
+
+/* ==========================================================================
+   Permission Table
+   ========================================================================== */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.data-table th, .data-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-gray);
+}
+
+.data-table thead th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: var(--dark-gray);
+    text-transform: uppercase;
+    font-size: 0.85em;
+    border-top: 1px solid var(--border-gray);
+}
+
+.data-table tbody tr:hover {
+    background-color: #f5f7fa;
+}
+
+.data-table tbody tr.checked-row {
+    background-color: var(--row-highlight);
+    font-weight: 500;
+}
+
+.data-table td.col-checkbox {
+    width: 40px;
+    text-align: center;
+}
+
+.perm-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary-blue);
+}
+
+.perm-category .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 0.8em;
+    font-weight: 600;
+    color: var(--white);
+    background-color: #7f8c8d; /* Màu mặc định */
+    border-radius: 12px;
+}
+
+/*!* Thêm màu cho các category phổ biến (bạn có thể tự mở rộng) *!*/
+/*.perm-category .badge:containing("USER") { background-color: #3498db; }*/
+/*.perm-category .badge:containing("ORDER") { background-color: #2ecc71; }*/
+/*.perm-category .badge:containing("SYSTEM") { background-color: #9b59b6; }*/
+/*.perm-category .badge:containing("PRODUCT") { background-color: #e67e22; }*/
+
+
+.no-data {
+    text-align: center;
+    color: #95a5a6;
+    padding: 30px 0;
+    font-style: italic;
+}
+
+/* ==========================================================================
+   Form Toolbar & Pagination
+   ========================================================================== */
+.form-toolbar {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border: 1px solid var(--border-gray);
+    border-radius: 0 0 6px 6px;
+    display: flex;
+    gap: 15px;
+}
+
+.pagination-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-gray);
+}
+
+.pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.page-link {
+    color: var(--primary-blue);
+    padding: 8px 14px;
+    text-decoration: none;
+    transition: background-color .3s;
+    border: 1px solid var(--border-gray);
+    margin: 0 2px;
+    border-radius: 4px;
+}
+
+.page-link:hover {
+    background-color: var(--light-gray);
+}
+
+.current-page {
+    background-color: var(--primary-blue);
+    color: var(--white);
+    padding: 8px 14px;
+    border: 1px solid var(--primary-blue);
+    margin: 0 2px;
+    border-radius: 4px;
+}
+
+.size-config-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.select-size {
+    width: 80px;
+}

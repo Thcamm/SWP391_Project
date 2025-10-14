@@ -20,9 +20,9 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
     <!-- Header -->
     <nav class="navbar navbar-dark bg-dark">
       <div class="container-fluid">
-        <span class="navbar-brand"
-          ><i class="bi bi-people"></i> User Management</span
-        >
+        <span class="navbar-brand">
+          <i class="bi bi-people"></i> User Management
+        </span>
         <span class="navbar-text">
           <i class="bi bi-person-circle"></i> ${currentUser} |
           <fmt:formatDate
@@ -381,11 +381,9 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                                 >${user.email}</a
                               >
                             </c:when>
-                            <c:otherwise
-                              ><span class="text-muted"
-                                >No email</span
-                              ></c:otherwise
-                            >
+                            <c:otherwise>
+                              <span class="text-muted">No email</span>
+                            </c:otherwise>
                           </c:choose>
                         </td>
                         <td>
@@ -408,23 +406,16 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                             <a
                               href="${pageContext.request.contextPath}/admin/users/view/${user.userId}"
                               class="btn btn-outline-info"
-                              title="View"
+                              title="View Details"
                             >
                               <i class="bi bi-eye"></i>
                             </a>
                             <a
                               href="${pageContext.request.contextPath}/admin/users/edit/${user.userId}"
                               class="btn btn-outline-primary"
-                              title="Edit"
+                              title="Edit User"
                             >
                               <i class="bi bi-pencil"></i>
-                            </a>
-                            <a
-                              href="${pageContext.request.contextPath}/admin/users/roles/${user.userId}"
-                              class="btn btn-outline-warning"
-                              title="Manage Roles"
-                            >
-                              <i class="bi bi-shield"></i>
                             </a>
                             <c:if test="${user.userName != currentUser}">
                               <c:choose>
@@ -432,18 +423,18 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                                   <a
                                     href="${pageContext.request.contextPath}/admin/users/disable/${user.userId}"
                                     class="btn btn-outline-danger"
-                                    title="Disable"
-                                    onclick="return confirm('Are you sure?')"
+                                    title="Disable User"
+                                    onclick="return confirm('Are you sure you want to disable this user?')"
                                   >
                                     <i class="bi bi-lock"></i>
                                   </a>
                                 </c:when>
                                 <c:otherwise>
                                   <a
-                                    href="${pageContext.request.contextPath}/admin/users/disable/${user.userId}"
+                                    href="${pageContext.request.contextPath}/admin/users/enable/${user.userId}"
                                     class="btn btn-outline-success"
-                                    title="Enable"
-                                    onclick="return confirm('Are you sure?')"
+                                    title="Enable User"
+                                    onclick="return confirm('Are you sure you want to enable this user?')"
                                   >
                                     <i class="bi bi-unlock"></i>
                                   </a>
@@ -461,6 +452,167 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
           </c:choose>
         </div>
       </div>
+
+      <!-- Pagination -->
+      <c:if test="${totalPages > 1}">
+        <div class="card mt-3">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-6">
+                <nav aria-label="User pagination">
+                  <ul class="pagination mb-0">
+                    <!-- Previous Button -->
+                    <c:choose>
+                      <c:when test="${hasPrevPage}">
+                        <li class="page-item">
+                          <a
+                            class="page-link"
+                            href="?page=${currentPage - 1}&size=${itemsPerPage}&keyword=${searchKeyword}&role=${selectedRole}&status=${selectedStatus}&sort=${currentSort}"
+                          >
+                            Previous
+                          </a>
+                        </li>
+                      </c:when>
+                      <c:otherwise>
+                        <li class="page-item disabled">
+                          <span class="page-link">Previous</span>
+                        </li>
+                      </c:otherwise>
+                    </c:choose>
+
+                    <!-- Page Numbers -->
+                    <c:set
+                      var="startPage"
+                      value="${currentPage - 2 > 0 ? currentPage - 2 : 1}"
+                    />
+                    <c:set
+                      var="endPage"
+                      value="${startPage + 4 <= totalPages ? startPage + 4 : totalPages}"
+                    />
+
+                    <c:if test="${startPage > 1}">
+                      <li class="page-item">
+                        <a
+                          class="page-link"
+                          href="?page=1&size=${itemsPerPage}&keyword=${searchKeyword}&role=${selectedRole}&status=${selectedStatus}&sort=${currentSort}"
+                          >1</a
+                        >
+                      </li>
+                      <c:if test="${startPage > 2}">
+                        <li class="page-item disabled">
+                          <span class="page-link">...</span>
+                        </li>
+                      </c:if>
+                    </c:if>
+
+                    <c:forEach var="page" begin="${startPage}" end="${endPage}">
+                      <c:choose>
+                        <c:when test="${page == currentPage}">
+                          <li class="page-item active">
+                            <span class="page-link">${page}</span>
+                          </li>
+                        </c:when>
+                        <c:otherwise>
+                          <li class="page-item">
+                            <a
+                              class="page-link"
+                              href="?page=${page}&size=${itemsPerPage}&keyword=${searchKeyword}&role=${selectedRole}&status=${selectedStatus}&sort=${currentSort}"
+                              >${page}</a
+                            >
+                          </li>
+                        </c:otherwise>
+                      </c:choose>
+                    </c:forEach>
+
+                    <c:if test="${endPage < totalPages}">
+                      <c:if test="${endPage < totalPages - 1}">
+                        <li class="page-item disabled">
+                          <span class="page-link">...</span>
+                        </li>
+                      </c:if>
+                      <li class="page-item">
+                        <a
+                          class="page-link"
+                          href="?page=${totalPages}&size=${itemsPerPage}&keyword=${searchKeyword}&role=${selectedRole}&status=${selectedStatus}&sort=${currentSort}"
+                          >${totalPages}</a
+                        >
+                      </li>
+                    </c:if>
+
+                    <!-- Next Button -->
+                    <c:choose>
+                      <c:when test="${hasNextPage}">
+                        <li class="page-item">
+                          <a
+                            class="page-link"
+                            href="?page=${currentPage + 1}&size=${itemsPerPage}&keyword=${searchKeyword}&role=${selectedRole}&status=${selectedStatus}&sort=${currentSort}"
+                          >
+                            Next
+                          </a>
+                        </li>
+                      </c:when>
+                      <c:otherwise>
+                        <li class="page-item disabled">
+                          <span class="page-link">Next</span>
+                        </li>
+                      </c:otherwise>
+                    </c:choose>
+                  </ul>
+                </nav>
+              </div>
+
+              <div class="col-md-6 text-end">
+                <div class="d-flex justify-content-end align-items-center">
+                  <span class="me-3 text-muted">
+                    Page ${currentPage} of ${totalPages} (${totalResults} total
+                    users)
+                  </span>
+
+                  <!-- Items per page selector -->
+                  <div class="btn-group">
+                    <button
+                      class="btn btn-outline-secondary btn-sm dropdown-toggle"
+                      data-bs-toggle="dropdown"
+                    >
+                      ${itemsPerPage} per page
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li>
+                        <a
+                          class="dropdown-item"
+                          href="?page=1&size=5&keyword=${searchKeyword}&role=${selectedRole}&status=${selectedStatus}&sort=${currentSort}"
+                          >5 per page</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          class="dropdown-item"
+                          href="?page=1&size=10&keyword=${searchKeyword}&role=${selectedRole}&status=${selectedStatus}&sort=${currentSort}"
+                          >10 per page</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          class="dropdown-item"
+                          href="?page=1&size=20&keyword=${searchKeyword}&role=${selectedRole}&status=${selectedStatus}&sort=${currentSort}"
+                          >20 per page</a
+                        >
+                      </li>
+                      <li>
+                        <a
+                          class="dropdown-item"
+                          href="?page=1&size=50&keyword=${searchKeyword}&role=${selectedRole}&status=${selectedStatus}&sort=${currentSort}"
+                          >50 per page</a
+                        >
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </c:if>
 
       <!-- Footer Info -->
       <div class="row mt-4">
@@ -482,15 +634,9 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
               >
               |
               <a
-                href="${pageContext.request.contextPath}/admin/roles/"
+                href="${pageContext.request.contextPath}/admin/rbac/roles"
                 class="text-decoration-none"
                 >Manage Roles</a
-              >
-              |
-              <a
-                href="${pageContext.request.contextPath}/admin/reports"
-                class="text-decoration-none"
-                >View Reports</a
               >
             </small>
           </div>

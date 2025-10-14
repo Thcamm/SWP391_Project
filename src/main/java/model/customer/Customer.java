@@ -3,15 +3,14 @@ package model.customer;
 import model.user.User;
 import model.vehicle.Vehicle;
 
-import java.sql.Date;
-import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class Customer extends User {
     private int customerId;
+    private int userId;
     private int pointLoyalty;
-    private List<Vehicle> vehicles;
 
     public Customer() {
         super();
@@ -20,17 +19,19 @@ public class Customer extends User {
     public Customer(int customerId, int userId, int pointLoyalty) {
         super();
         this.customerId = customerId;
-        this.setUserId(userId);
+        this.userId = userId;
         this.pointLoyalty = pointLoyalty;
     }
 
-    // Constructor đầy đủ
-    public Customer(String address, boolean activeStatus, Date birthDate, Timestamp createdAt, String email, String fullName, String gender, String passwordHash, String phoneNumber, int roleId, Timestamp updatedAt, Integer userId, String userName, int customerId, int pointLoyalty) {
-        super(address, activeStatus, birthDate, createdAt, email, fullName, gender, passwordHash, phoneNumber, roleId, updatedAt, userId, userName);
-        this.customerId = customerId;
-        this.pointLoyalty = pointLoyalty;
+    private List<Vehicle> vehicles = new ArrayList<>();
+
+    public Integer getUserId() {
+        return userId;
     }
 
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
     public int getCustomerId() {
         return customerId;
     }
@@ -61,28 +62,23 @@ public class Customer extends User {
         if (!(o instanceof Customer)) return false;
         if (!super.equals(o)) return false;
         Customer customer = (Customer) o;
-        return customerId == customer.customerId;
+        return customerId == customer.customerId &&
+                userId == customer.userId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), customerId);
+        return Objects.hash(super.hashCode(), customerId, userId);
     }
 
     @Override
     public String toString() {
         return "Customer{" +
                 "customerId=" + customerId +
-                ", userId=" + getUserId() +
+                ", userId=" + userId +
+                ", pointLoyalty=" + pointLoyalty +
                 ", fullName='" + getFullName() + '\'' +
                 ", email='" + getEmail() + '\'' +
-                ", phoneNumber='" + getPhoneNumber() + '\'' +
-                ", address='" + getAddress() + '\'' +
-                ", gender='" + getGender() + '\'' +
-                ", birthDate=" + getBirthDate() +
-                ", pointLoyalty=" + pointLoyalty +
-                ", createdAt=" + getCreatedAt() +
-                ", vehicles=" + vehicles +
                 '}';
     }
 }

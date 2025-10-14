@@ -6,7 +6,30 @@
          version="4.0">
 
     <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>home.jsp</welcome-file>
     </welcome-file-list>
+    
+<!--    <filter>-->
+<!--        <filter-name>RoleGuardFilter</filter-name>-->
+<!--        <filter-class>common.filter.RoleGuardFilter</filter-class>-->
+<!--    </filter>-->
+<!--    <filter-mapping>-->
+<!--        <filter-name>RoleGuardFilter</filter-name>-->
+<!--        <url-pattern>/*</url-pattern>-->
+<!--        <dispatcher>REQUEST</dispatcher>-->
+<!--        <dispatcher>FORWARD</dispatcher>-->
+<!--    </filter-mapping>-->
+
+    <filter>
+        <filter-name>PermissionFilter</filter-name>
+        <filter-class>common.filter.PermissionFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>PermissionFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
 
 </web-app>

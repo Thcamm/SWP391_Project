@@ -18,7 +18,7 @@
             <p>Try again.</p>
         </c:otherwise>
     </c:choose>
-    <p><a href="${pageContext.request.contextPath}/roles?action=list">Back list roles</a></p>
+    <p><a href="${pageContext.request.contextPath}/admin/rbac/rolesList?action=list">Back list roles</a></p>
 </div>
 </body>
 </html>

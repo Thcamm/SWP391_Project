@@ -1,6 +1,5 @@
 package controller.auth;
 
-import dao.customer.CustomerDAO;
 import dao.user.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -8,10 +7,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import model.customer.Customer;
 import model.user.User;
-import util.PasswordUtil;
 import service.user.UserLoginService;
+import util.PasswordUtil;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -30,34 +28,36 @@ public class Login extends HttpServlet {
             throws ServletException, IOException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
+        String errorMessage = null;
 
         UserDAO userDAO = new UserDAO();
         UserLoginService userService = new UserLoginService(userDAO);
         User user = userService.findByUserName(username);
 
+
+
         if (user != null && PasswordUtil.checkPassword(password, user.getPasswordHash())) {
 
-            CustomerDAO customerDAO = new CustomerDAO();
-            Customer customer = null;
-            try {
-                customer = customerDAO.getCustomerByUserId(user.getUserId());
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-
-            HttpSession session = request.getSession();
-            session.setAttribute("user", user);
-
-            if (customer != null) {
-                session.setAttribute("customer", customer);
-            }
-
-            session.setMaxInactiveInterval(30 * 60);
+            String roleCode = new dao.employee.admin.rbac.RoleDao()
+                    .findRoleCodeById(user.getRoleId());
+            // Mật khẩu đúng!
+            request.getSession().setAttribute("roleCode", roleCode);
+            request.getSession().setAttribute("user", user);
+            request.getSession().setAttribute("userName", user.getUserName());
+            request.getSession().setMaxInactiveInterval(30 * 60);
             response.sendRedirect(request.getContextPath() + "/Home");
 
+            // Kiểm tra xem có URL nào lưu trước đó không
+            String redirectAfterLogin = (String) session.getAttribute("redirectAfterLogin");
+            if (redirectAfterLogin != null) {
+                session.removeAttribute("redirectAfterLogin"); // dọn dẹp
+                response.sendRedirect(redirectAfterLogin);
+            } else {
+                response.sendRedirect(request.getContextPath() + "/create-customer");
+            }
         } else {
-            request.setAttribute("errorMessage", "Invalid username or password.");
+            errorMessage = "Invalid username or password.";
+            request.setAttribute("errorMessage", errorMessage);
             request.getRequestDispatcher("/login.jsp").forward(request, response);
         }
     }

@@ -2,18 +2,19 @@ package service.role;
 
 import common.utils.NameValidator;
 import common.utils.PaginationUtils;
+import dao.employee.admin.rbac.RoleDao;
 import model.pagination.PaginationResponse;
-import model.rbac.Role;
+import model.employee.admin.rbac.Role;
 
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
 public class RoleService {
-    private final dao.rbac.RoleDao roleDao;
+    private final RoleDao roleDao;
 //    private final int actorUserId;
 
-    public RoleService(dao.rbac.RoleDao roleDao) {
+    public RoleService(RoleDao roleDao) {
         this.roleDao = roleDao;
 //        this.actorUserId = actorUserId;
     }
@@ -41,45 +42,48 @@ public class RoleService {
         Role r = new Role();
         r.setRoleId(id);
         r.setRoleName(vr.normalizedValue);
-        r.setDesrciption(description);
+        r.setDescription(description);
         return r;
 
     }
 
     public Role renameRole(int roleId, String newName, String newDescription) throws SQLException {
-        if(roleId <= 0){
-            throw new IllegalArgumentException("Invalid role ID");
-        }
+        if (roleId <= 0) throw new IllegalArgumentException("Invalid role ID");
 
         Role current = roleDao.findById(roleId);
-        if(current == null){
-            throw new IllegalArgumentException("Invalid role ID");
-        }
+        if (current == null) throw new IllegalArgumentException("Invalid role ID");
+
+
+        String normalized = NameValidator.normalizeDisplayName(newName);
+
 
         NameValidator.ValidationResult vr = NameValidator.validateDisplayName(
-                newName,
+                normalized,
                 nm -> {
                     try {
                         return roleDao.existsByNameIgnorecaseExceptId(nm, roleId);
-                    }catch (SQLException e){
+                    } catch (SQLException e) {
                         return true;
                     }
                 },
                 current.getRoleId()
         );
+        if (!vr.valid) throw new IllegalArgumentException(String.join("; ", vr.errors));
 
-        if(!vr.valid){
-            throw new IllegalArgumentException(String.join("; ", vr.errors));
+        boolean nameChanged = (current.getRoleName() == null)
+                ? (vr.normalizedValue != null)
+                : !current.getRoleName().equals(vr.normalizedValue);
 
+        boolean descChanged = (current.getDescription() == null)
+                ? (newDescription != null && !newDescription.isEmpty())
+                : !current.getDescription().equals(newDescription);
+
+
+        if (nameChanged || descChanged) {
+            current.setRoleName(vr.normalizedValue);
+            current.setDescription(newDescription);
+            roleDao.update(current);
         }
-
-        if(vr.normalizedValue.equals(current.getRoleName())){
-            return current;
-        }
-
-        current.setRoleName(vr.normalizedValue);
-        current.setDesrciption(newDescription);
-        roleDao.update(current);
         return current;
     }
 

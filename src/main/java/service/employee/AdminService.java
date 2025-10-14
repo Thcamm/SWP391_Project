@@ -1,11 +1,11 @@
 package service.employee;
 
 import dao.user.UserDAO;
-import dao.employee.AdminDAO;
+import dao.employee.admin.AdminDAO;
 import model.user.User;
 import model.employee.admin.UserDisplay;
-import model.rbac.Role;
-import dao.rbac.RoleDao;
+import model.employee.admin.rbac.Role;
+import dao.employee.admin.rbac.RoleDao;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -23,9 +23,50 @@ public class AdminService {
         this.roleDao = new RoleDao();
     }
 
-    /**
-     * ✅ FIXED: Check admin permission by role name instead of hardcoded IDs
-     */
+    public Role getRoleById(int roleId) throws SQLException {
+        return roleDao.findById(roleId);
+    }
+
+    private int getCreatedByEmployeeId(String userName) throws SQLException {
+        Integer employeeId = adminDAO.getEmployeeIdByUsername(userName);
+        // Dùng ID 1 làm ID mặc định nếu Admin không có hồ sơ trong bảng Employee
+        return employeeId != null ? employeeId : 1;
+    }
+
+    public boolean promoteCustomerToEmployee(int userId, String newRoleName,
+                                             String employeeCode, double salary,
+                                             int managedByEmployeeId, String currentUser) {
+
+        try {
+            int createdByEmployeeId = getCreatedByEmployeeId(currentUser);
+
+            return adminDAO.executePromoteToEmployeeSP(
+                    userId, newRoleName, employeeCode, salary,
+                    managedByEmployeeId, createdByEmployeeId);
+
+        } catch (SQLException e) {
+            System.err.println("SERVICE Lỗi thăng cấp Customer -> Employee: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean updateUserBasicInfo(int userId, String fullName, String email, int roleId, String currentUser) {
+        try {
+            User user = userDAO.getUserById(userId);
+
+            if (user == null) return false;
+
+            user.setFullName(fullName);
+            user.setEmail(email);
+            user.setRoleId(roleId);
+
+            return adminDAO.updateUserBasicInfo(user);
+        } catch (SQLException e) {
+            System.err.println("SERVICE Lỗi cập nhật user cơ bản: " + e.getMessage());
+            return false;
+        }
+    }
+
     public boolean isAdmin(String userName) {
         try {
 
@@ -49,7 +90,7 @@ public class AdminService {
                 return false;
             }
 
-            // ✅ USE EXISTING findById() method
+            // USE EXISTING findById() method
             boolean hasAdminPermission = checkAdminPermissionByRole(user.getRoleId());
 
             if (hasAdminPermission) {
@@ -68,7 +109,7 @@ public class AdminService {
     }
 
     /**
-     * NEW METHOD: Check admin permission by role name/characteristics
+     * Check admin permission by role name/characteristics
      */
     private boolean checkAdminPermissionByRole(int roleId) {
         try {
@@ -79,7 +120,6 @@ public class AdminService {
 
             if (role != null) {
                 String roleName = role.getRoleName().toLowerCase();
-                System.out.println("Found role: " + roleName);
 
                 // FLEXIBLE: Check by role name patterns
                 boolean isAdminRole = roleName.contains("admin") ||
@@ -88,8 +128,6 @@ public class AdminService {
                         roleName.equals("tech manager") ||
                         roleName.contains("quản lý") || // Vietnamese
                         roleName.contains("admin"); // Any admin variant
-
-                System.out.println("Role '" + roleName + "' is admin role: " + isAdminRole);
                 return isAdminRole;
 
             } else {
@@ -101,28 +139,11 @@ public class AdminService {
             System.err.println(" Error checking role permission: " + e.getMessage());
             e.printStackTrace();
 
-            // ✅ FALLBACK: Use original hardcoded logic if database fails
+            // FALLBACK: Use original hardcoded logic if database fails
             System.out.println(" Using fallback logic - checking roleId: " + roleId);
             boolean fallbackResult = roleId == 1 || roleId == 2; // Admin or Manager
             System.out.println("Fallback result: " + fallbackResult);
             return fallbackResult;
-        }
-    }
-
-    /**
-     * ALTERNATIVE: Check specific permission (if you implement Permission system)
-     */
-    private boolean checkSpecificPermission(int roleId, String permissionCode) {
-        try {
-            // Example:
-            // return rolePermissionDAO.hasPermission(roleId, permissionCode);
-
-            System.out.println("Permission check not implemented yet - using fallback");
-            return false; // For now, return false to use role name check
-
-        } catch (Exception e) {
-            System.err.println("Error checking specific permission: " + e.getMessage());
-            return false;
         }
     }
 
@@ -143,47 +164,43 @@ public class AdminService {
         }
     }
 
-    // ===== ALL OTHER EXISTING METHODS (unchanged) =====
+//    public List<User> getAllUsers() {
+//        try {
+//            return userDAO.getAllActiveUsers();
+//        } catch (SQLException e) {
+//            System.out.println("Lỗi khi lấy danh sách users: " + e.getMessage());
+//            return new ArrayList<>();
+//        }
+//    }
+//
+//    public List<User> searchUsers(String keyword) {
+//        try {
+//            List<User> allUsers = userDAO.getAllActiveUsers();
+//            List<User> result = new ArrayList<>();
+//
+//            if (keyword == null || keyword.trim().isEmpty()) {
+//                return allUsers;
+//            }
+//
+//            String searchKeyword = keyword.toLowerCase();
+//            for (User user : allUsers) {
+//                if (user.getUserName().toLowerCase().contains(searchKeyword) ||
+//                        user.getEmail().toLowerCase().contains(searchKeyword) ||
+//                        user.getFullName().toLowerCase().contains(searchKeyword)) {
+//                    result.add(user);
+//                }
+//            }
+//
+//            System.out.println("Tìm thấy " + result.size() + " users với từ khóa: " + keyword);
+//            return result;
+//
+//        } catch (SQLException e) {
+//            System.out.println("Lỗi khi tìm kiếm: " + e.getMessage());
+//            return new ArrayList<>();
+//        }
+//    }
 
-    public List<User> getAllUsers() {
-        try {
-            return userDAO.getAllActiveUsers();
-        } catch (SQLException e) {
-            System.out.println("Lỗi khi lấy danh sách users: " + e.getMessage());
-            return new ArrayList<>();
-        }
-    }
-
-    public List<User> searchUsers(String keyword) {
-        try {
-            List<User> allUsers = userDAO.getAllActiveUsers();
-            List<User> result = new ArrayList<>();
-
-            if (keyword == null || keyword.trim().isEmpty()) {
-                return allUsers;
-            }
-
-            String searchKeyword = keyword.toLowerCase();
-            for (User user : allUsers) {
-                if (user.getUserName().toLowerCase().contains(searchKeyword) ||
-                        user.getEmail().toLowerCase().contains(searchKeyword) ||
-                        user.getFullName().toLowerCase().contains(searchKeyword)) {
-                    result.add(user);
-                }
-            }
-
-            System.out.println("Tìm thấy " + result.size() + " users với từ khóa: " + keyword);
-            return result;
-
-        } catch (SQLException e) {
-            System.out.println("Lỗi khi tìm kiếm: " + e.getMessage());
-            return new ArrayList<>();
-        }
-    }
-
-    // ... (keep all other existing methods unchanged)
-
-    public boolean createUser(String fullName, String userName, String email, int roleId, String currentUser) {
+    public boolean createUser(String fullName, String userName, String email, int roleId, String gender, String currentUser) {
         try {
             if (currentUser == null || currentUser.trim().isEmpty()) {
                 System.out.println("Lỗi: Không có thông tin user hiện tại!");
@@ -200,6 +217,7 @@ public class AdminService {
             newUser.setFullName(fullName);
             newUser.setUserName(userName);
             newUser.setEmail(email);
+            newUser.setGender(gender);
             newUser.setRoleId(roleId);
             newUser.setPasswordHash("123456");
             newUser.setActiveStatus(true);
@@ -218,57 +236,80 @@ public class AdminService {
         }
     }
 
-    // ===== SEARCH METHODS (unchanged) =====
+    // ===== SEARCH METHODS =====
 
-    public ArrayList<UserDisplay> searchUsers(String keyword, Integer roleId, Boolean activeStatus) {
+//    public ArrayList<UserDisplay> searchUsers(String keyword, Integer roleId, Boolean activeStatus) {
+//        try {
+//            System.out.println(" DEBUG AdminService.searchUsers() called with:");
+//            System.out.println("   keyword: " + keyword);
+//            System.out.println("   roleId: " + roleId);
+//            System.out.println("   activeStatus: " + activeStatus);
+//
+//            // TEST: Try simple query first
+//            try {
+//                ArrayList<User> simpleUsers = adminDAO.getAllUsersForAdmin();
+//                System.out.println(" DEBUG: Simple query returned " + simpleUsers.size() + " users");
+//            } catch (Exception e) {
+//                System.err.println(" DEBUG: Simple query failed: " + e.getMessage());
+//            }
+//
+//            ArrayList<UserDisplay> result = adminDAO.searchAllUsersWithRole(keyword, roleId, activeStatus, "userid");
+//            System.out.println("DEBUG AdminService.searchUsers() returned " + result.size() + " users");
+//            return result;
+//        } catch (SQLException e) {
+//            System.err.println("ADMIN Error searching users: " + e.getMessage());
+//            e.printStackTrace();
+//            return new ArrayList<>();
+//        }
+//    }
+//
+//    // New method with sort parameter
+//    public ArrayList<UserDisplay> searchUsers(String keyword, Integer roleId, Boolean activeStatus, String sortBy) {
+//        try {
+//            System.out.println(" DEBUG AdminService.searchUsers() with sort called");
+//            System.out.println("   sortBy: " + sortBy);
+//
+//            ArrayList<UserDisplay> result = adminDAO.searchAllUsersWithRole(keyword, roleId, activeStatus, sortBy);
+//            System.out.println(" DEBUG AdminService.searchUsers() returned " + result.size() + " users");
+//            return result;
+//        } catch (SQLException e) {
+//            System.err.println("ADMIN Error searching users: " + e.getMessage());
+//            e.printStackTrace();
+//            return new ArrayList<>();
+//        }
+//    }
+
+    // NEW: Method with pagination support
+    public common.utils.PaginationUtils.PaginationResult<UserDisplay> searchUsersWithPagination(
+            String keyword, Integer roleId, Boolean activeStatus, String sortBy,
+            int currentPage, int itemsPerPage) {
         try {
-            System.out.println("🔍 DEBUG AdminService.searchUsers() called with:");
-            System.out.println("   keyword: " + keyword);
-            System.out.println("   roleId: " + roleId);
-            System.out.println("   activeStatus: " + activeStatus);
+            // Get all results first
+            ArrayList<UserDisplay> allResults = adminDAO.searchAllUsersWithRole(keyword, roleId, activeStatus, sortBy);
 
-            // 🧪 TEST: Try simple query first
-            try {
-                ArrayList<User> simpleUsers = adminDAO.getAllUsersForAdmin();
-                System.out.println("🧪 DEBUG: Simple query returned " + simpleUsers.size() + " users");
-            } catch (Exception e) {
-                System.err.println("🚨 DEBUG: Simple query failed: " + e.getMessage());
-            }
+            // Apply pagination
+            common.utils.PaginationUtils.PaginationResult<UserDisplay> paginatedResult = common.utils.PaginationUtils
+                    .paginate(allResults, currentPage, itemsPerPage);
 
-            ArrayList<UserDisplay> result = adminDAO.searchAllUsersWithRole(keyword, roleId, activeStatus, "userid");
-            System.out.println("🔍 DEBUG AdminService.searchUsers() returned " + result.size() + " users");
-            return result;
+            System.out.println(" Pagination: Page " + currentPage + "/" + paginatedResult.getTotalPages() +
+                    " - Showing " + paginatedResult.getPaginatedData().size() + "/" + paginatedResult.getTotalItems());
+
+            return paginatedResult;
         } catch (SQLException e) {
-            System.err.println("ADMIN Error searching users: " + e.getMessage());
+            System.err.println("ADMIN Error searching users with pagination: " + e.getMessage());
             e.printStackTrace();
-            return new ArrayList<>();
+            return new common.utils.PaginationUtils.PaginationResult<>(new ArrayList<>(), 0, 0, 1, itemsPerPage);
         }
     }
 
-    // New method with sort parameter
-    public ArrayList<UserDisplay> searchUsers(String keyword, Integer roleId, Boolean activeStatus, String sortBy) {
-        try {
-            System.out.println("🔍 DEBUG AdminService.searchUsers() with sort called");
-            System.out.println("   sortBy: " + sortBy);
-
-            ArrayList<UserDisplay> result = adminDAO.searchAllUsersWithRole(keyword, roleId, activeStatus, sortBy);
-            System.out.println("🔍 DEBUG AdminService.searchUsers() returned " + result.size() + " users");
-            return result;
-        } catch (SQLException e) {
-            System.err.println("ADMIN Error searching users: " + e.getMessage());
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
-    }
-
-    public int getSearchResultCount(String keyword, Integer roleId, Boolean activeStatus) {
-        try {
-            return adminDAO.countSearchResults(keyword, roleId, activeStatus);
-        } catch (SQLException e) {
-            System.err.println("ADMIN Error counting search results: " + e.getMessage());
-            return 0;
-        }
-    }
+//    public int getSearchResultCount(String keyword, Integer roleId, Boolean activeStatus) {
+//        try {
+//            return adminDAO.countSearchResults(keyword, roleId, activeStatus);
+//        } catch (SQLException e) {
+//            System.err.println("ADMIN Error counting search results: " + e.getMessage());
+//            return 0;
+//        }
+//    }
 
     public ArrayList<Role> getAvailableRoles() {
         try {
@@ -311,7 +352,19 @@ public class AdminService {
 
     public int getAdminUsersCount() {
         try {
-            return adminDAO.countSearchResults(null, 1, null);
+            // Get all users and count those with admin roles (dynamic approach)
+            ArrayList<UserDisplay> allUsers = adminDAO.searchAllUsersWithRole(null, 1, null, null);
+            int adminCount = 0;
+
+            for (UserDisplay user : allUsers) {
+                if (checkAdminPermissionByRole(user.getRoleId())) {
+                    adminCount++;
+                }
+            }
+
+            System.out.println(" Found " + adminCount + " admin users (dynamic count)");
+            return adminCount;
+
         } catch (SQLException e) {
             System.err.println("Error counting admin users: " + e.getMessage());
             try {
@@ -320,6 +373,54 @@ public class AdminService {
             } catch (SQLException fallbackError) {
                 return 0;
             }
+        }
+    }
+
+    // ===== User Detail =====
+
+    /**
+     * GET USER BY ID: Lấy thông tin chi tiết user theo ID
+     */
+    public UserDisplay getUserById(int userId) {
+        try {
+            System.out.println(" AdminService.getUserById() called for ID: " + userId);
+            UserDisplay user = adminDAO.getUserDisplayById(userId);
+
+            if (user != null) {
+                System.out.println("User found: " + user.getUserName());
+            } else {
+                System.out.println(" User not found for ID: " + userId);
+            }
+
+            return user;
+        } catch (SQLException e) {
+            System.err.println(" Error getting user by ID " + userId + ": " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * TOGGLE USER STATUS
+     */
+    public boolean toggleUserStatus(int userId, boolean newStatus, String currentUser) {
+        try {
+            System.out.println(" AdminService.toggleUserStatus() called");
+            System.out.println("    User ID: " + userId);
+            System.out.println("    New Status: " + (newStatus ? "ACTIVE" : "INACTIVE"));
+            System.out.println("    Actor: " + currentUser);
+
+            boolean success = adminDAO.updateUserStatus(userId, newStatus, currentUser);
+
+            if (success) {
+                System.out.println(" User status updated successfully");
+            } else {
+                System.out.println(" Failed to update user status");
+            }
+
+            return success;
+        } catch (SQLException e) {
+            System.err.println(" Error toggling user status for ID " + userId + ": " + e.getMessage());
+            return false;
         }
     }
 
