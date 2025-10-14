@@ -1,13 +1,13 @@
-package controller.role;
+package controller.employee.admin.rbac;
 
-import dao.rbac.RoleDao;
+import dao.employee.admin.rbac.RoleDao;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.pagination.PaginationResponse;
-import model.rbac.Role;
+import model.employee.admin.rbac.Role;
 import service.role.RoleService;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ import java.sql.SQLException;
 import static java.lang.Integer.parseInt;
 
 
-@WebServlet("/roles")
+@WebServlet("/admin/rbac/rolesList")
 public class RoleServlet extends HttpServlet {
     private RoleService roleService;
 
@@ -86,7 +86,7 @@ public class RoleServlet extends HttpServlet {
         int id = parseIntOrDefault(req.getParameter("id"), 0);
 
         if(id <= 0){
-            resp.sendRedirect(req.getContextPath()+"/roles?action=list");
+            resp.sendRedirect(req.getContextPath()+"/admin/rbac/rolesList?action=list");
             return;
         }
 
@@ -95,7 +95,7 @@ public class RoleServlet extends HttpServlet {
             Role role =  roleService.getRoleById(id);
             if(role == null){
                 req.setAttribute("error","Dont find role with id = " + id);
-                resp.sendRedirect(req.getContextPath()+"/roles?action=list");
+                resp.sendRedirect(req.getContextPath()+"/admin/rbac/rolesList?action=list");
                 return;
             }
             req.setAttribute("mode","edit");
@@ -123,7 +123,7 @@ public class RoleServlet extends HttpServlet {
         try{
             roleService.createRole(name, description);
             req.getSession().setAttribute("flash", "Role has been created");
-            resp.sendRedirect(req.getContextPath()+"/roles?action=list");
+            resp.sendRedirect(req.getContextPath()+"/admin/rbac/rolesList?action=list");
 
         }catch (IllegalArgumentException ex){
             req.setAttribute("mode", "create");
@@ -140,7 +140,7 @@ public class RoleServlet extends HttpServlet {
         int id = parseIntOrDefault(req.getParameter("id"), 0);
 
         if(id <= 0){
-            resp.sendRedirect(req.getContextPath()+"/roles?action=list");
+            resp.sendRedirect(req.getContextPath()+"/admin/rbac/rolesList?action=list");
             return;
         }
 
@@ -150,7 +150,7 @@ public class RoleServlet extends HttpServlet {
         }catch (IllegalArgumentException | SQLException ex){
             req.getSession().setAttribute("error", "Dont delete role: " + ex.getMessage());
         }
-        resp.sendRedirect(req.getContextPath()+"/roles?action=list");
+        resp.sendRedirect(req.getContextPath()+"/admin/rbac/rolesList?action=list");
     }
 
     public void updateRole(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, SQLException {
@@ -159,14 +159,14 @@ public class RoleServlet extends HttpServlet {
         String description = req.getParameter("description");
 
         if(id <= 0){
-            resp.sendRedirect(req.getContextPath()+"/roles?action=list");
+            resp.sendRedirect(req.getContextPath()+"/admin/rbac/rolesList?action=list");
             return;
         }
 
         try{
             roleService.renameRole(id, name, description);
             req.getSession().setAttribute("flash", "Role has been updated");
-            resp.sendRedirect(req.getContextPath()+"/roles?action=list");
+            resp.sendRedirect(req.getContextPath()+"/admin/rbac/rolesList?action=list");
 
         }catch (IllegalArgumentException ex){
             req.setAttribute("mode", "edit");
@@ -174,7 +174,7 @@ public class RoleServlet extends HttpServlet {
             Role r = new Role();
             r.setRoleId(id);
             r.setRoleName(name);
-            r.setDesrciption(description);
+            r.setDescription(description);
             req.setAttribute("role",r);
             req.getRequestDispatcher("/view/role/form.jsp").forward(req, resp);
         }
@@ -197,7 +197,7 @@ public class RoleServlet extends HttpServlet {
                     updateRole(req, resp);
                     break;
                 default:
-                    resp.sendRedirect(req.getContextPath() + "roles?action=list");
+                    resp.sendRedirect(req.getContextPath() + "/admin/rbac/rolesList?action=list");
                     break;
             }
         } catch (Exception ex) {

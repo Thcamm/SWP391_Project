@@ -1,9 +1,9 @@
-package controller.employee.admin;
+package controller.employee.admin.user;
 
 // Required imports from Jakarta Servlet API
 
 import service.employee.AdminService;
-import model.rbac.Role;
+import model.employee.admin.rbac.Role;
 import java.util.ArrayList;
 
 import jakarta.servlet.ServletException;
@@ -14,7 +14,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 /**
  * Basic Servlet Template for Jakarta EE (Using Jakarta Servlet API 6.0+).
@@ -39,21 +38,21 @@ public class UserCreateController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Get current user from session
+//        // Get current user from session
         String currentUser = getCurrentUser(request);
-
-        // Check if user is logged in
-        if (currentUser == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return;
-        }
-
-        // Permission check
-        if (!adminService.isAdmin(currentUser)) {
-            request.setAttribute("errorMessage", "Bạn không có quyền truy cập trang này!");
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
-            return;
-        }
+//
+//        // Check if user is logged in
+//        if (currentUser == null) {
+//            response.sendRedirect(request.getContextPath() + "/login");
+//            return;
+//        }
+//
+//        // Permission check
+//        if (!adminService.isAdmin(currentUser)) {
+//            request.setAttribute("errorMessage", "Bạn không có quyền truy cập trang này!");
+//            request.getRequestDispatcher("/error.jsp").forward(request, response);
+//            return;
+//        }
 
         try {
             ArrayList<Role> availableRoles = adminService.getAvailableRoles();

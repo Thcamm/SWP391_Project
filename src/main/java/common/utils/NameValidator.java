@@ -1,7 +1,5 @@
 package common.utils;
 
-import dao.rbac.RoleDao;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -58,7 +56,10 @@ public class NameValidator {
 
     }
 
-    public static ValidationResult validateDisplayName(String rawName, Function<String, Boolean> existsIgnoreCase, Integer excludeId){
+    public static ValidationResult validateDisplayName(
+            String rawName,
+            Function<String, Boolean> existsIgnoreCase,
+            Integer excludeId){
         String name = normalizeDisplayName(rawName);
         List<String> errors = new ArrayList<>();
 
@@ -75,13 +76,13 @@ public class NameValidator {
         }
 
         if(errors.isEmpty() && existsIgnoreCase != null){
-            if(Boolean.TRUE.equals(existsIgnoreCase.apply(rawName))){
+            if(Boolean.TRUE.equals(existsIgnoreCase.apply(name))){
 
                 errors.add("Name already exists (case-insensitive)");
             }
         }
 
-        return errors.isEmpty() ? ValidationResult.valid(rawName) : ValidationResult.invalid(rawName, errors);
+        return errors.isEmpty() ? ValidationResult.valid(name) : ValidationResult.invalid(name, errors);
     }
 
 
