@@ -33,7 +33,7 @@ public class AdminService {
                 return false;
             }
 
-            User user = userDAO.getUserByUsername(userName);
+            User user = userDAO.getUserByUserName(userName);
             System.out.println("User found: " + (user != null));
 
             if (user == null) {
@@ -128,7 +128,7 @@ public class AdminService {
      */
     public boolean isAdminForDevelopment(String userName) {
         try {
-            User user = userDAO.getUserByUsername(userName);
+            User user = userDAO.getUserByUserName(userName);
             if (user != null && user.isActiveStatus()) {
                 System.out.println(" DEVELOPMENT MODE: Granting admin access to: " + userName);
                 return true; // Allow any active user for development
@@ -187,7 +187,7 @@ public class AdminService {
                 return false;
             }
 
-            User existingUser = userDAO.getUserByUsername(userName);
+            User existingUser = userDAO.getUserByUserName(userName);
             if (existingUser != null) {
                 System.out.println("Username đã tồn tại: " + userName);
                 return false;
