@@ -13,7 +13,8 @@ import service.user.UserProfileService.ValidationResult;
 import java.io.IOException;
 import java.sql.Date;
 
-@WebServlet(name = "ProfileController", urlPatterns = {"/profile"})
+// Change the URL pattern here
+@WebServlet(name = "ProfileController", urlPatterns = {"/user/profile"})
 public class ProfileController extends HttpServlet {
     private UserProfileService userProfileService;
 
@@ -26,9 +27,10 @@ public class ProfileController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         User sessionUser = (User) session.getAttribute("user");
+        String contextPath = request.getContextPath();
 
         if (sessionUser == null) {
-            response.sendRedirect("login");
+            response.sendRedirect(contextPath + "/login"); // Use contextPath
             return;
         }
 
@@ -45,9 +47,10 @@ public class ProfileController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         User sessionUser = (User) session.getAttribute("user");
+        String contextPath = request.getContextPath();
 
         if (sessionUser == null) {
-            response.sendRedirect("login");
+            response.sendRedirect(contextPath + "/login"); // Use contextPath
             return;
         }
 
@@ -78,7 +81,8 @@ public class ProfileController extends HttpServlet {
         if (result.isValid()) {
             session.setAttribute("success", result.getMessage());
             session.setAttribute("user", userProfileService.getUserProfile(sessionUser.getUserId()));
-            response.sendRedirect(request.getContextPath() + "/profile");
+            // Redirect to the new URL
+            response.sendRedirect(contextPath + "/user/profile");
         } else {
             request.setAttribute("error", result.getMessage());
             request.setAttribute("user", updatedUser);

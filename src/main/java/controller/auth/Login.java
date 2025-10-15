@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import model.user.User;
 import service.user.UserLoginService;
 import util.PasswordUtil;
@@ -47,6 +48,14 @@ public class Login extends HttpServlet {
             request.getSession().setMaxInactiveInterval(30 * 60);
             response.sendRedirect(request.getContextPath() + "/Home");
 
+            // Kiểm tra xem có URL nào lưu trước đó không
+            String redirectAfterLogin = (String) request.getSession().getAttribute("redirectAfterLogin");
+            if (redirectAfterLogin != null) {
+                request.getSession().removeAttribute("redirectAfterLogin"); // dọn dẹp
+                response.sendRedirect(redirectAfterLogin);
+            } else {
+                response.sendRedirect(request.getContextPath() + "/create-customer");
+            }
         } else {
             errorMessage = "Invalid username or password.";
             request.setAttribute("errorMessage", errorMessage);

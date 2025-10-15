@@ -14,10 +14,11 @@
 
 </head>
 <body>
+<%@ include file="/common/header.jsp" %>
 <main class="garage-container">
     <div class="garage-header">
         <h2>My Vehicles</h2>
-        <a href="${pageContext.request.contextPath}/addVehicle" class="btn btn-primary">Add New Vehicle</a>
+        <a href="${pageContext.request.contextPath}/customer/addVehicle" class="btn btn-primary">Add New Vehicle</a>
     </div>
 
     <c:choose>
@@ -46,8 +47,8 @@
                         <td><c:out value="${vehicle.yearManufacture}"/></td>
                         <td><c:out value="${vehicle.licensePlate}"/></td>
                         <td>
-                            <a href="${pageContext.request.contextPath}/editVehicle?id=${vehicle.vehicleID}" class="btn btn-secondary">Edit</a>
-                            <form action="${pageContext.request.contextPath}/deleteVehicle" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this vehicle?');">
+                            <a href="${pageContext.request.contextPath}/customer/editVehicle?id=${vehicle.vehicleID}" class="btn btn-secondary">Edit</a>
+                            <form action="${pageContext.request.contextPath}/customer/deleteVehicle" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this vehicle?');">
                                 <input type="hidden" name="vehicleId" value="${vehicle.vehicleID}">
                                 <button type="submit" class="btn btn-danger">Delete</button>
                             </form>
@@ -59,7 +60,7 @@
         </c:otherwise>
     </c:choose>
 </main>
-
+<%@ include file="/common/footer.jsp" %>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

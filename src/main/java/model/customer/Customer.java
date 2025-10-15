@@ -3,7 +3,9 @@ package model.customer;
 import model.user.User;
 import model.vehicle.Vehicle;
 
+import java.security.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,6 +13,8 @@ public class Customer extends User {
     private int customerId;
     private int userId;
     private int pointLoyalty;
+
+    private List<Vehicle> vehicles;
 
     public Customer() {
         super();
@@ -23,10 +27,11 @@ public class Customer extends User {
         this.pointLoyalty = pointLoyalty;
     }
 
-    private List<Vehicle> vehicles = new ArrayList<>();
-
-    public Integer getUserId() {
-        return userId;
+    // Constructor đầy đủ
+    public Customer(String address, boolean activeStatus, Date birthDate, Timestamp createdAt, String email, String fullName, String gender, String passwordHash, String phoneNumber, int roleId, Timestamp updatedAt, Integer userId, String userName, int customerId, int pointLoyalty) {
+        super();
+        this.customerId = customerId;
+        this.pointLoyalty = pointLoyalty;
     }
 
     public void setUserId(int userId) {

@@ -26,28 +26,29 @@ public class RolePageServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws jakarta.servlet.ServletException, java.io.IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws jakarta.servlet.ServletException, java.io.IOException {
         try {
-//            Integer userIdObj = (Integer)req.getSession().getAttribute("userId");
-//            final String REQUIRED_PERMISSION = "role_permission_manage";
-//
-//            if(userIdObj == null || userIdObj <= 0){
-//                resp.sendRedirect(req.getContextPath() + "/login");
-//                return;
-//            }
-//            int userId = userIdObj;
-//
-//            // kiem tra phan quyen
-//            if(!authService.hasPermission(userId, REQUIRED_PERMISSION)){
-//                resp.sendError(HttpServletResponse.SC_FORBIDDEN, "You have not permission to access role manage");
-//                return;
-//            }
+            // Integer userIdObj = (Integer)req.getSession().getAttribute("userId");
+            // final String REQUIRED_PERMISSION = "role_permission_manage";
+            //
+            // if(userIdObj == null || userIdObj <= 0){
+            // resp.sendRedirect(req.getContextPath() + "/login");
+            // return;
+            // }
+            // int userId = userIdObj;
+            //
+            // // kiem tra phan quyen
+            // if(!authService.hasPermission(userId, REQUIRED_PERMISSION)){
+            // resp.sendError(HttpServletResponse.SC_FORBIDDEN, "You have not permission to
+            // access role manage");
+            // return;
+            // }
 
             String keyword = req.getParameter("keyword");
             String category = req.getParameter("category");
             int page = parseIntOrDefault(req.getParameter("page"), 1);
             int size = parseIntOrDefault(req.getParameter("size"), 10);
-
 
             var roles = rbacService.getAllRoles();
             Integer roleId = req.getParameter("roleId") == null
@@ -80,7 +81,8 @@ public class RolePageServlet extends HttpServlet {
     }
 
     @Override
-    public void doPost(jakarta.servlet.http.HttpServletRequest req, jakarta.servlet.http.HttpServletResponse resp) throws jakarta.servlet.ServletException, java.io.IOException {
+    public void doPost(jakarta.servlet.http.HttpServletRequest req, jakarta.servlet.http.HttpServletResponse resp)
+            throws jakarta.servlet.ServletException, java.io.IOException {
         doGet(req, resp);
     }
 }

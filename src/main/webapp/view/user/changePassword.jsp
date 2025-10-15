@@ -13,7 +13,6 @@
 <div class="container">
     <h2>Change Your Password</h2>
 
-    <%-- Hiển thị thông báo thành công hoặc lỗi từ Servlet --%>
     <c:if test="${not empty success}">
         <div class="message success">${success}</div>
     </c:if>
@@ -21,7 +20,8 @@
         <div class="message error">${error}</div>
     </c:if>
 
-    <form id="changePasswordForm" action="${pageContext.request.contextPath}/changePassword" method="post">
+    <%-- Update form action to the new URL --%>
+    <form id="changePasswordForm" action="${pageContext.request.contextPath}/user/changePassword" method="post">
         <div class="form-group">
             <label for="oldPassword">Current Password:</label>
             <input type="password" id="oldPassword" name="oldPassword" required>
@@ -37,7 +37,8 @@
         </div>
         <div class="action-buttons">
             <button type="submit" class="btn btn-primary">Change Password</button>
-            <a href="${pageContext.request.contextPath}/profile" class="btn btn-secondary">Back to Profile</a>
+            <%-- Update "Back" link to the new profile URL --%>
+            <a href="${pageContext.request.contextPath}/user/profile" class="btn btn-secondary">Back to Profile</a>
         </div>
     </form>
 </div>

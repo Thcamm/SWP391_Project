@@ -346,8 +346,7 @@
             <div class="d-flex align-items-center gap-3">
                 <c:choose>
                     <c:when test="${not empty sessionScope.user}">
-                        <a href="profile" class="welcome-user" style="text-decoration: none; color: white;">
-        <span>
+                        <a href="${pageContext.request.contextPath}/user/profile" class="welcome-user" style="text-decoration: none; color: white;">        <span>
             <i class="fas fa-user-circle"></i>
             Xin chào, ${sessionScope.user.fullName}
         </span>
@@ -407,7 +406,7 @@
             <span>Lien he dat lich</span>
         </a>
         <c:if test="${not empty sessionScope.user}">
-            <a href="${pageContext.request.contextPath}/garage" class="menu-item">
+            <a href="${pageContext.request.contextPath}/customer/garage" class="menu-item">
                 <span>QUẢN LÝ XE (MY GARAGE)</span>
             </a>
         </c:if>

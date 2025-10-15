@@ -18,20 +18,21 @@
     </c:if>
 
     <table class="profile-table">
-        <tr><th>Full Name</th><td>${user.fullName}</td></tr>
-        <tr><th>Email</th><td>${user.email}</td></tr>
-        <tr><th>Phone Number</th><td>${user.phoneNumber}</td></tr>
-        <tr><th>Address</th><td>${user.address}</td></tr>
-        <tr><th>Gender</th><td>${user.gender}</td></tr>
-        <tr><th>Birthdate</th><td>${user.birthDate}</td></tr>
+        <tr><th>Full Name</th><td><c:out value="${user.fullName}"/></td></tr>
+        <tr><th>Email</th><td><c:out value="${user.email}"/></td></tr>
+        <tr><th>Phone Number</th><td><c:out value="${user.phoneNumber}"/></td></tr>
+        <tr><th>Address</th><td><c:out value="${user.address}"/></td></tr>
+        <tr><th>Gender</th><td><c:out value="${user.gender}"/></td></tr>
+        <tr><th>Birthdate</th><td><c:out value="${user.birthDate}"/></td></tr>
     </table>
 
     <div class="action-buttons">
-        <form action="profile" method="get" style="display:inline;">
+        <form action="${pageContext.request.contextPath}/user/profile" method="get" style="display:inline;">
             <input type="hidden" name="action" value="edit"/>
             <button type="submit" class="btn btn-primary">Edit Profile</button>
         </form>
-        <a href="${pageContext.request.contextPath}/changePassword" class="btn btn-secondary">Change Password</a>    </div>
+        <a href="${pageContext.request.contextPath}/user/changePassword" class="btn btn-secondary">Change Password</a>
+    </div>
 
     <h2>Service History</h2>
     <table class="service-table">

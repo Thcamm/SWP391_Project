@@ -7,11 +7,12 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/vehicle/addVehicle.css">
 </head>
 <body>
+<%--<%@ include file="/common/header.jsp" %>--%>
 <div class="form-container">
     <h2>Edit Vehicle Information</h2>
 
     <c:if test="${not empty vehicle}">
-        <form action="editVehicle" method="post" id="brandForm">
+        <form action="${pageContext.request.contextPath}/customer/editVehicle" method="post" id="brandForm">
             <input type="hidden" name="action" value="selectModel">
             <input type="hidden" name="vehicleId" value="${vehicle.vehicleID}">
             <div class="form-group">
@@ -27,7 +28,7 @@
             </div>
         </form>
 
-        <form action="editVehicle" method="post">
+        <form action="${pageContext.request.contextPath}/customer/editVehicle" method="post">
             <input type="hidden" name="action" value="saveVehicle">
             <input type="hidden" name="vehicleId" value="${vehicle.vehicleID}">
             <c:forEach var="brand" items="${brands}"><c:if test="${brand.brandId == selectedBrandId}"><input type="hidden" name="brandName" value="${brand.brandName}"></c:if></c:forEach>
@@ -56,10 +57,11 @@
 
             <div class="button-group">
                 <button type="submit" class="btn btn-primary">Save Changes</button>
-                <a href="${pageContext.request.contextPath}/garage" class="btn btn-secondary">Cancel</a>
+                <a href="${pageContext.request.contextPath}/customer/garage" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </c:if>
 </div>
+<%--<%@ include file="/common/footer.jsp" %>--%>
 </body>
 </html>

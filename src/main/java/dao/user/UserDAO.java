@@ -1,17 +1,18 @@
 package dao.user;
 
+import common.DbContext;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
-import common.DbContext;
 import model.user.User;
+import common.DbContext;
 
 public class UserDAO extends DbContext {
 
-    // Lấy user bằng ID (khi user đã active)
     public User getUserById(int userId) throws SQLException {
         String sql = "SELECT * FROM User WHERE UserID = ? AND ActiveStatus = 1";
         try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
@@ -41,11 +42,10 @@ public class UserDAO extends DbContext {
         return null;
     }
 
-    // Lấy user bằng email (khi user đã active)
     public User getUserByEmail(String email) throws SQLException {
         String sql = "SELECT * FROM User WHERE Email = ? AND ActiveStatus = 1";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -56,13 +56,12 @@ public class UserDAO extends DbContext {
         return null;
     }
 
-    // Lấy tất cả user đang active
     public ArrayList<User> getAllActiveUsers() throws SQLException {
         String sql = "SELECT * FROM User WHERE ActiveStatus = 1";
         ArrayList<User> users = new ArrayList<>();
         try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 users.add(extractUser(rs));
             }
@@ -70,9 +69,9 @@ public class UserDAO extends DbContext {
         return users;
     }
 
-    // Thêm user mới
     public boolean addUser(User user) throws SQLException {
-        String sql = "INSERT INTO User (RoleID, FullName, UserName, Email, PhoneNumber, Gender, BirthDate, Address, PasswordHash, ActiveStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO User (RoleID, FullName, UserName, Email, PhoneNumber, " +
+                "Gender, BirthDate, Address, PasswordHash, ActiveStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, user.getRoleId());
@@ -89,11 +88,10 @@ public class UserDAO extends DbContext {
         }
     }
 
-    // Thêm user mới từ Google (chỉ có email, fullname, có thể không có password)
     public boolean insertGoogleUser(User user) throws SQLException {
         String sql = "INSERT INTO User (RoleID, FullName, UserName, Email, ActiveStatus) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, user.getRoleId());
             ps.setString(2, user.getFullName());
             ps.setString(3, user.getUserName());
@@ -103,7 +101,6 @@ public class UserDAO extends DbContext {
         }
     }
 
-    // Cập nhật thông tin user
     public boolean updateUser(User user) throws SQLException {
         String sql = "UPDATE User SET RoleID=?, FullName=?, UserName=?, Email=?, PhoneNumber=?, Gender=?, BirthDate=?, Address=?, PasswordHash=?, ActiveStatus=? WHERE UserID=?";
         try (Connection conn = DbContext.getConnection();
@@ -123,19 +120,19 @@ public class UserDAO extends DbContext {
         }
     }
 
-    // "Xóa" user (thực chất là chuyển trạng thái active = 0)
     public boolean deleteUser(int userId) throws SQLException {
         String sql = "UPDATE User SET ActiveStatus = 0 WHERE UserID = ?";
         try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             return ps.executeUpdate() > 0;
         }
     }
-    public int reassignUserRole(int fromRoleId, int toRoleId) throws SQLException{
+
+    public int reassignUserRole(int fromRoleId, int toRoleId) throws SQLException {
         String sql = "UPDATE `User`  SET RoleID = ? WHERE ROLEID =?";
-        try(Connection c = DbContext.getConnection();
-            PreparedStatement ps = c.prepareStatement(sql)){
+        try (Connection c = DbContext.getConnection();
+                PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, toRoleId);
             ps.setInt(2, fromRoleId);
             return ps.executeUpdate();
@@ -155,7 +152,7 @@ public class UserDAO extends DbContext {
     public boolean updateUserProfile(User user) throws SQLException {
         String sql = "UPDATE `User` SET FullName=?, Email=?, PhoneNumber=?, gender=?, birthdate=?, address=? WHERE UserID=?";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getFullName());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getPhoneNumber());
@@ -166,10 +163,11 @@ public class UserDAO extends DbContext {
             return ps.executeUpdate() > 0;
         }
     }
+
     public int findRoleIdByUserId(int userId) throws SQLException {
         String sql = "SELECT RoleID FROM User WHERE UserID = ?";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -179,8 +177,25 @@ public class UserDAO extends DbContext {
             }
         }
     }
+
+    public List<Integer> findUserIdsByRoleName(String roleName) throws SQLException {
+        List<Integer> userIds = new ArrayList<>();
+        String sql = "SELECT u.UserID FROM User u JOIN RoleInfo r ON u.RoleID = r.RoleID WHERE r.RoleName = ?";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, roleName);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    userIds.add(rs.getInt("UserID"));
+                }
+            }
+        }
+        return userIds;
+    }
+
     public boolean updatePassword(int userId, String newPasswordHash) throws SQLException {
-        // Tên cột và bảng cần khớp với database của bạn
         String sql = "UPDATE User SET PasswordHash = ? WHERE UserID = ?";
 
         try (Connection conn = DbContext.getConnection();
@@ -195,7 +210,6 @@ public class UserDAO extends DbContext {
         }
     }
 
-    // Helper method để map ResultSet sang đối tượng User
     private User extractUser(ResultSet rs) throws SQLException {
         User user = new User();
         user.setUserId(rs.getInt("UserID"));
