@@ -140,9 +140,7 @@
         <h2>carspavn@gmail.com</h2>
         <p>Hãy để đội ngũ chuyên nghiệp của chúng tôi giúp bạn giải quyết mọi vấn đề về xe. Liên hệ với chúng tôi ngay để nhận được dịch vụ tốt nhất.</p>
     </div>
-    <a href="#" class="contact-button">
-        LIÊN HỆ <i class="fa-solid fa-arrow-right"></i>
-    </a>
+
 </section>
 
 <footer class="main-footer">

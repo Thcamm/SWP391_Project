@@ -54,6 +54,16 @@ public class UserDAO extends DbContext {
         }
         return null;
     }
+    public boolean changeUserPassword(int userId, String newPasswordHash) throws SQLException {
+        String sql = "UPDATE User SET PasswordHash = ? WHERE UserID = ?";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newPasswordHash);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+            return true;
+        }
+    }
 
     // Lấy tất cả user đang active
     public ArrayList<User> getAllActiveUsers() throws SQLException {

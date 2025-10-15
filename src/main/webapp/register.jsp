@@ -13,16 +13,13 @@
 <div class="registration-container">
     <!-- Left Panel - Welcome Image -->
     <div class="left-panel">
-        <img src="./assets/img/bsb-logo.svg" alt="Welcome to Garage System">
+        <img src="https://carspa.vn/wp-content/uploads/2023/11/Xuong-862x1536.jpg" alt="Welcome to Garage System">
     </div>
 
     <!-- Right Panel - Registration Form -->
     <div class="right-panel">
         <div class="form-wrapper">
             <!-- Logo -->
-            <div class="logo-container">
-                <img src="./assets/img/bsb-logo.svg" alt="BootstrapBrain Logo">
-            </div>
 
             <div class="form-header">
                 <h2>Create Your Account</h2>
@@ -99,6 +96,7 @@
                     </div>
                 </div>
 
+
                 <!-- Step 2: Address Information -->
                 <div class="step" id="step2">
                     <h3 class="step-title">Personal Details</h3>
@@ -121,12 +119,31 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="address" class="form-label">Address <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="address" name="address" rows="3"
-                                  placeholder="Enter your detailed address" required></textarea>
-                        <div id="addressValidation" class="validation-text"></div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="province" class="form-label">Province <span class="text-danger">*</span></label>
+                            <select class="form-select" id="province" name="province" required>
+                                <option selected disabled value="">Province</option>
+                            </select>
+                            <div id="provinceValidation" class="validation-text"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="district" class="form-label">District <span class="text-danger">*</span></label>
+                            <select class="form-select" id="district" name="district" required>
+                                <option selected disabled value="">District</option>
+                            </select>
+                            <div id="districtValidation" class="validation-text"></div>
+                        </div>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="addressDetail" class="form-label">Detailed address <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="addressDetail" name="addressDetail" rows="2"
+                                  placeholder="Số nhà, tên đường..." required></textarea>
+                        <div id="addressDetailValidation" class="validation-text"></div>
+                    </div>
+
+                    <input type="hidden" id="address" name="address">
 
                     <div class="navigation-buttons">
                         <button type="button" class="btn btn-outline-secondary btn-nav" id="prevStep2">
@@ -137,6 +154,7 @@
                         </button>
                     </div>
                 </div>
+
 
 
                 <!-- Step 3: Account Information -->
@@ -183,7 +201,7 @@
                 </div>
 
                 <div class="footer-link">
-                    <p class="text-muted mb-0">Already have an account? <a href="login.jsp">Sign in</a></p>
+                    <p class="text-muted mb-0">Already have an account? <a href="login">Sign in</a></p>
                 </div>
             </form>
         </div>
@@ -192,5 +210,7 @@
 
 <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/register.js"></script>
+<script src="js/address.js"></script>
+
 </body>
 </html>

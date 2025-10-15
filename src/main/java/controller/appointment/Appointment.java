@@ -32,6 +32,11 @@ public class Appointment extends HttpServlet {
         // TODO: handle POST
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
+        String fullName = (String) session.getAttribute("fullName");
+        String phoneNumber = (String) session.getAttribute("phoneNumber");
+        request.setAttribute("fullName", user.getUserName());
+        request.setAttribute("phoneNumber", user.getPhoneNumber());
+
 
         // 1. Kiểm tra người dùng đã đăng nhập chưa
         if (user == null) {
@@ -86,9 +91,9 @@ public class Appointment extends HttpServlet {
             // 6. Xử lý Appointment
             model.appointment.Appointment appointment = new model.appointment.Appointment();
             appointment.setCustomerID(customerID);
-            appointment.setVehicleID(vehicleID); // QUAN TRỌNG: Gán VehicleID
+            appointment.setVehicleID(vehicleID);
             java.time.LocalDateTime dateTime = java.time.LocalDateTime.parse(dateStr);
-            appointment.setAppointmentDate(dateTime.toLocalDate());// Đặt trong try-catch
+            appointment.setAppointmentDate(dateTime);
             appointment.setDescription(description);
             appointment.setStatus("CONFIRM"); // Gán trạng thái ban đầu
 
