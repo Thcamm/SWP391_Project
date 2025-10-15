@@ -3,7 +3,9 @@ package model.customer;
 import model.user.User;
 import model.vehicle.Vehicle;
 
+import java.security.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,6 +13,8 @@ public class Customer extends User {
     private int customerId;
     private int userId;
     private int pointLoyalty;
+
+    private List<Vehicle> vehicles;
 
     public Customer() {
         super();

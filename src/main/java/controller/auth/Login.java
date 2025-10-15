@@ -49,9 +49,9 @@ public class Login extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/Home");
 
             // Kiểm tra xem có URL nào lưu trước đó không
-            String redirectAfterLogin = (String) session.getAttribute("redirectAfterLogin");
+            String redirectAfterLogin = (String) request.getSession().getAttribute("redirectAfterLogin");
             if (redirectAfterLogin != null) {
-                session.removeAttribute("redirectAfterLogin"); // dọn dẹp
+                request.getSession().removeAttribute("redirectAfterLogin"); // dọn dẹp
                 response.sendRedirect(redirectAfterLogin);
             } else {
                 response.sendRedirect(request.getContextPath() + "/create-customer");

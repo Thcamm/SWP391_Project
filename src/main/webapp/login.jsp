@@ -52,7 +52,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
                                     <c:if test="${not empty errorMessage}">
                                         <div class="alert alert-danger text-center mb-3">${errorMessage}</div>
                                     </c:if>
-                                    <form action="login" method="post">
+                                    <form action="${pageContext.request.contextPath}/login" method="post">
                                         <div class="row gy-3 overflow-hidden">
                                             <div class="col-12">
                                                 <div class="form-floating mb-3">
@@ -148,7 +148,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
                           ${errorMessage}
                         </div>
                       </c:if>
-                      <form action="login" method="post">
+                      <form action="${pageContext.request.contextPath}/login" method="post">
                         <div class="row gy-3 overflow-hidden">
                           <div class="col-12">
                             <div class="form-floating mb-3">

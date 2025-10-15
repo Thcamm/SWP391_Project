@@ -18,25 +18,36 @@ import java.util.Map;
 public class PermissionFilter implements Filter {
     private AuthService auth;
     private Map<String, String> routePerm;
+    private Map<String, String> areaGate;
 
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         this.auth = new AuthService(new RoleDao());
         this.routePerm = new HashMap<>();
+        this.areaGate = new HashMap<>();
 
         // RBAC (Admin)
-        routePerm.put("GET:/admin/rbac/roles", "role_permission_manage");
-        routePerm.put("POST:/admin/rbac/roles/save", "role_permission_manage");
-        routePerm.put("GET:/admin/rbac/permissions", "role_permission_manage");
-        routePerm.put("POST:/admin/rbac/permissions", "role_permission_manage");
-        routePerm.put("GET:/admin/rbac/rolesList", "role_permission_manage");
-        routePerm.put("POST:/admin/rbac/rolesList", "role_permission_manage");
+//        routePerm.put("GET:/admin/rbac/roles", "role_permission_manage");
+//        routePerm.put("POST:/admin/rbac/roles/save", "role_permission_manage");
+//        routePerm.put("GET:/admin/rbac/permissions", "role_permission_manage");
+//        routePerm.put("POST:/admin/rbac/permissions", "role_permission_manage");
+//        routePerm.put("GET:/admin/rbac/rolesList", "role_permission_manage");
+//        routePerm.put("POST:/admin/rbac/rolesList", "role_permission_manage");
+        routePerm.put("GET:/view/role/rbac.jsp", "role_permission_manage");
+        routePerm.put("GET:/view/role/list.jsp", "role_permission_manage");
+        routePerm.put("GET:/view/role/permission_form.jsp", "role_permission_manage");
+        routePerm.put("GET:/view/role/form.jsp", "role_permission_manage");
+        routePerm.put("POST:/view/role/form.jsp", "role_permission_manage");
+
+
 
         // User (Admin) (Anh em tu dien url va permission code) ung voi phan minh code
         routePerm.put("GET:/admin/users", "user_read");
         routePerm.put("GET:/admin/users/create", "user_create");
         routePerm.put("POST:/admin/users/create", "user_create");
+        routePerm.put("GET:/admin/users.jsp", "user_read");
+
 
 
         // Customer Service
@@ -73,7 +84,13 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/app/comments", "comment_create_by_customer");
 
 
-
+        areaGate.put("/admin/", "role_permission_manage");
+        areaGate.put("/cs/",            "cs_access");              // Customer Service
+        areaGate.put("/tech-manager/",  "tech_manager_access");    // Tech Manager
+        areaGate.put("/technician/",    "technician_access");      // Technician
+        areaGate.put("/inventory/",     "inventory_access");       // Store Keeper
+        areaGate.put("/accounting/",    "accounting_access");      // Accountant
+        areaGate.put("/app/",           "customer_access");
 
     }
 
@@ -102,7 +119,17 @@ public class PermissionFilter implements Filter {
         }
 
         String required = routePerm.get(key);
-        if (required == null && !isPublic(path)) {
+
+        if (required == null) {
+            for (Map.Entry<String, String> e : areaGate.entrySet()) {
+                if(path.startsWith(e.getKey())) {
+                    required = e.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (required == null) {
             res.sendError(HttpServletResponse.SC_FORBIDDEN, "Permission mapping missing for: " + key);
             return;
         }

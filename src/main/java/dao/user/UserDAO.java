@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+
 import model.user.User;
 import common.DbContext;
 
@@ -191,6 +193,21 @@ public class UserDAO extends DbContext {
             }
         }
         return userIds;
+    }
+
+    public boolean updatePassword(int userId, String newPasswordHash) throws SQLException {
+        String sql = "UPDATE User SET PasswordHash = ? WHERE UserID = ?";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newPasswordHash);
+            ps.setInt(2, userId);
+
+            int rowsAffected = ps.executeUpdate();
+
+            return rowsAffected > 0;
+        }
     }
 
     private User extractUser(ResultSet rs) throws SQLException {
