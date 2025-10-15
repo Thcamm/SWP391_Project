@@ -1,59 +1,38 @@
 package model.customer;
 
+import model.user.User;
 import model.vehicle.Vehicle;
 
-import java.time.LocalDate;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class Customer {
+public class Customer extends User {
     private int customerId;
     private int userId;
-    private String fullName;
-    private String email;
-    private String phoneNumber;
-    private String address;
-    private String gender;
-    private LocalDate birthDate;
     private int pointLoyalty;
-    private Date createdAt;
-
-    private List<Vehicle> vehicles;
 
     public Customer() {
+        super();
     }
 
-    public Customer(String fullName, String email, String phoneNumber, String gender,String address,  LocalDate birthDate) {
-        this.fullName = fullName;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.address = address;
-        this.gender = gender;
-        this.birthDate = birthDate;
-    }
-
-    public Customer(int userId, int customerId, String fullName, String email, String phoneNumber, String address, String gender, int pointLoyalty, Date createdAt) {
-        this.userId = userId;
+    public Customer(int customerId, int userId, int pointLoyalty) {
+        super();
         this.customerId = customerId;
-        this.fullName = fullName;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.address = address;
-        this.gender = gender;
-        this.birthDate = birthDate;
+        this.userId = userId;
         this.pointLoyalty = pointLoyalty;
-        this.createdAt = createdAt;
     }
 
-    public LocalDate getBirthDate() {
-        return birthDate;
+    // Constructor đầy đủ
+    public Customer(String address, boolean activeStatus, Date birthDate, Timestamp createdAt, String email, String fullName, String gender, String passwordHash, String phoneNumber, int roleId, Timestamp updatedAt, Integer userId, String userName, int customerId, int pointLoyalty) {
+        super();
+        this.customerId = customerId;
+        this.pointLoyalty = pointLoyalty;
     }
 
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
-
     public int getCustomerId() {
         return customerId;
     }
@@ -62,68 +41,12 @@ public class Customer {
         this.customerId = customerId;
     }
 
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
     public int getPointLoyalty() {
         return pointLoyalty;
     }
 
     public void setPointLoyalty(int pointLoyalty) {
         this.pointLoyalty = pointLoyalty;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
     }
 
     public List<Vehicle> getVehicles() {
@@ -136,13 +59,17 @@ public class Customer {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Customer customer)) return false;
-        return customerId == customer.customerId && userId == customer.userId && pointLoyalty == customer.pointLoyalty && Objects.equals(fullName, customer.fullName) && Objects.equals(email, customer.email) && Objects.equals(phoneNumber, customer.phoneNumber)  && Objects.equals(createdAt, customer.createdAt);
+        if (this == o) return true;
+        if (!(o instanceof Customer)) return false;
+        if (!super.equals(o)) return false;
+        Customer customer = (Customer) o;
+        return customerId == customer.customerId &&
+                userId == customer.userId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(customerId, userId, fullName, email, phoneNumber, pointLoyalty, createdAt);
+        return Objects.hash(super.hashCode(), customerId, userId);
     }
 
     @Override
@@ -150,14 +77,9 @@ public class Customer {
         return "Customer{" +
                 "customerId=" + customerId +
                 ", userId=" + userId +
-                ", fullName='" + fullName + '\'' +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", address='" + address + '\'' +
-                ", gender='" + gender + '\'' +
-                ", birthDate=" + birthDate +
                 ", pointLoyalty=" + pointLoyalty +
-                ", createdAt=" + createdAt +
+                ", fullName='" + getFullName() + '\'' +
+                ", email='" + getEmail() + '\'' +
                 '}';
     }
 }

@@ -18,20 +18,20 @@
     </c:if>
 
     <table class="profile-table">
-        <tr><th>Full Name</th><td>${user.fullName}</td></tr>
-        <tr><th>Email</th><td>${user.email}</td></tr>
-        <tr><th>Phone Number</th><td>${user.phoneNumber}</td></tr>
-        <tr><th>Address</th><td>${user.address}</td></tr>
-        <tr><th>Gender</th><td>${user.gender}</td></tr>
-        <tr><th>Birthdate</th><td>${user.birthDate}</td></tr>
+        <tr><th>Full Name</th><td><c:out value="${user.fullName}"/></td></tr>
+        <tr><th>Email</th><td><c:out value="${user.email}"/></td></tr>
+        <tr><th>Phone Number</th><td><c:out value="${user.phoneNumber}"/></td></tr>
+        <tr><th>Address</th><td><c:out value="${user.address}"/></td></tr>
+        <tr><th>Gender</th><td><c:out value="${user.gender}"/></td></tr>
+        <tr><th>Birthdate</th><td><c:out value="${user.birthDate}"/></td></tr>
     </table>
 
     <div class="action-buttons">
-        <form action="profile" method="get" style="display:inline;">
+        <form action="${pageContext.request.contextPath}/user/profile" method="get" style="display:inline;">
             <input type="hidden" name="action" value="edit"/>
             <button type="submit" class="btn btn-primary">Edit Profile</button>
         </form>
-        <button type="button" class="btn btn-disabled" disabled>Change Password</button>
+        <a href="${pageContext.request.contextPath}/user/changePassword" class="btn btn-secondary">Change Password</a>
     </div>
 
     <h2>Service History</h2>
@@ -53,16 +53,6 @@
     </div>
 </div>
 
-<script>
-    const services = [
-        {id: 'SV001', name: 'Oil Change', date: '2025-10-01', status: 'completed', price: '500.000đ'},
-        {id: 'SV002', name: 'Tire Rotation', date: '2025-09-15', status: 'completed', price: '300.00đ'},
-        {id: 'SV003', name: 'Oil Change', date: '2025-10-01', status: 'completed', price: '500.000đ'},
-        {id: 'SV004', name: 'Wash Car', date: '2025-09-15', status: 'completed', price: '300.00đ'},
-        {id: 'SV005', name: 'Oil Change', date: '2025-10-01', status: 'completed', price: '500.000đ'},
-        {id: 'SV006', name: 'Tire Rotation', date: '2025-09-15', status: 'completed', price: '300.00đ'}
-    ];
-</script>
 <script src="${pageContext.request.contextPath}/assets/js/user/viewProfile.js"></script>
 </body>
 </html>

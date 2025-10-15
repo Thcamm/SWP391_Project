@@ -16,10 +16,10 @@ public class MockLoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
 
-        req.getSession().setAttribute("userId",999);
+        req.getSession().setAttribute("userId", 999);
         req.getSession().setAttribute("roleCode", "ADMIN");
+        req.getSession().setAttribute("userName", "admin");
         resp.sendRedirect(resp.encodeRedirectURL(req.getContextPath() + "/admin/rbac/roles"));
-
 
     }
 }

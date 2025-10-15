@@ -16,16 +16,16 @@ public class AdminDAO extends DbContext {
             String sortBy)
             throws SQLException {
 
-        // 🔧 SUPER SIMPLE TEST: Just count how many users exist
+        // SUPER SIMPLE TEST: Just count how many users exist
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement("SELECT COUNT(*) FROM User");
                 ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 int userCount = rs.getInt(1);
-                System.out.println("🔧 SIMPLE COUNT TEST: Database has " + userCount + " users in User table");
+                System.out.println(" SIMPLE COUNT TEST: Database has " + userCount + " users in User table");
             }
         } catch (SQLException e) {
-            System.err.println("🚨 SIMPLE COUNT FAILED: " + e.getMessage());
+            System.err.println("  SIMPLE COUNT FAILED: " + e.getMessage());
         }
 
         StringBuilder sql = new StringBuilder(
@@ -108,7 +108,7 @@ public class AdminDAO extends DbContext {
                 }
             }
         } catch (SQLException e) {
-            System.err.println(" DEBUG SQL ERROR: " + e.getMessage());
+            System.err.println("  DEBUG SQL ERROR: " + e.getMessage());
             System.err.println(" DEBUG SQL State: " + e.getSQLState());
             System.err.println(" DEBUG Error Code: " + e.getErrorCode());
             e.printStackTrace();
@@ -250,6 +250,60 @@ public class AdminDAO extends DbContext {
     }
 
     /**
+     * ADMIN FUNCTION: Get UserDisplay by ID with role info
+     */
+    public UserDisplay getUserDisplayById(int userId) throws SQLException {
+        String sql = "SELECT u.UserID, u.RoleID, u.FullName, u.UserName, u.Email, u.PhoneNumber, " +
+                "u.ActiveStatus, u.CreatedAt, u.UpdatedAt, r.RoleName " +
+                "FROM User u LEFT JOIN RoleInfo r ON u.RoleID = r.RoleID " +
+                "WHERE u.UserID = ?";
+
+        System.out.println(" AdminDAO.getUserDisplayById() called for ID: " + userId);
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    UserDisplay user = extractUserDisplay(rs);
+                    System.out.println(" User found: " + user.getUserName());
+                    return user;
+                } else {
+                    System.out.println(" No user found for ID: " + userId);
+                    return null;
+                }
+            }
+        }
+    }
+
+    /**
+     * ADMIN FUNCTION: Update user status (enable/disable)
+     */
+    public boolean updateUserStatus(int userId, boolean newStatus, String currentUser) throws SQLException {
+        String sql = "UPDATE User SET ActiveStatus = ?, UpdatedAt = NOW() WHERE UserID = ?";
+
+        System.out.println(" AdminDAO.updateUserStatus() called");
+        System.out.println("    User ID: " + userId);
+        System.out.println("    New Status: " + newStatus);
+        System.out.println("    Updated by: " + currentUser);
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setBoolean(1, newStatus);
+            ps.setInt(2, userId);
+
+            int rowsAffected = ps.executeUpdate();
+            boolean success = rowsAffected > 0;
+
+            System.out.println(" Update result: " + rowsAffected + " rows affected, success: " + success);
+            return success;
+        }
+    }
+
+    /**
      * ADMIN FUNCTION: Get user by username (including inactive)
      */
     public User getUserByUsername(String userName) throws SQLException {
@@ -323,6 +377,69 @@ public class AdminDAO extends DbContext {
                 return "bg-secondary"; // Guest
             default:
                 return "bg-dark"; // Unknown
+        }
+    }
+
+    //Get EmployeeID associated with a given userName
+    public Integer getEmployeeIdByUsername(String userName) throws SQLException {
+        // SQL: Find EmployeeID by joining Employee and User tables on UserID
+        String sql = "SELECT e.EmployeeID FROM Employee e " +
+                "JOIN User u ON e.UserID = u.UserID " +
+                "WHERE u.UserName = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, userName);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("EmployeeID");
+                }
+            }
+        }
+        return null;
+    }
+    public boolean executePromoteToEmployeeSP(int userId, String newRoleName,
+                                              String employeeCode, double salary,
+                                              int managedByEmployeeId, int createdByEmployeeId)
+            throws SQLException {
+
+        // Đảm bảo bạn đã import java.sql.CallableStatement
+        String sql = "{CALL SP_PromoteCustomerToEmployee(?, ?, ?, ?, ?, ?)}";
+
+        try (Connection conn = getConnection();
+             java.sql.CallableStatement cs = conn.prepareCall(sql)) { // Sử dụng CallableStatement
+
+            cs.setInt(1, userId);
+            cs.setString(2, newRoleName);
+            cs.setString(3, employeeCode);
+            cs.setDouble(4, salary);
+            cs.setInt(5, managedByEmployeeId);
+            cs.setInt(6, createdByEmployeeId);
+
+            cs.execute();
+            return true;
+
+        } catch (SQLException e) {
+            System.err.println(" AdminDAO SQL Error executing SP: " + e.getMessage());
+            throw e; // Bắt buộc phải re-throw để AdminService có thể bắt lỗi transaction
+        }
+    }
+
+    public boolean updateUserBasicInfo(User user) throws SQLException {
+        // Chỉ cập nhật các trường được chỉnh sửa cơ bản
+        String sql = "UPDATE User SET RoleID=?, FullName=?, Email=?, UpdatedAt=NOW() WHERE UserID=?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, user.getRoleId());
+            ps.setString(2, user.getFullName());
+            ps.setString(3, user.getEmail());
+            ps.setInt(4, user.getUserId());
+
+            return ps.executeUpdate() > 0;
         }
     }
 
