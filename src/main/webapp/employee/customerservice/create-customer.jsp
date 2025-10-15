@@ -306,7 +306,7 @@
                 ${message}
         </div>
     </c:if>
-    <form action="${pageContext.request.contextPath}/create-customer" method="post" id="customerForm">
+    <form action="${pageContext.request.contextPath}/customerservice/create-customer" method="post" id="customerForm">
 
         <div class="section">
             <div class="section-title">

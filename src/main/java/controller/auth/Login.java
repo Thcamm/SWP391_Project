@@ -10,8 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.customer.Customer;
 import model.user.User;
-import util.PasswordUtil;
 import service.user.UserLoginService;
+import util.PasswordUtil;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -28,12 +28,15 @@ public class Login extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String username = request.getParameter("username").trim();
-        String password = request.getParameter("password").trim();
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        String errorMessage = null;
 
         UserDAO userDAO = new UserDAO();
         UserLoginService userService = new UserLoginService(userDAO);
         User user = userService.findByUserName(username);
+
+
 
         if (user != null && PasswordUtil.checkPassword(password, user.getPasswordHash())) {
 
@@ -50,12 +53,16 @@ public class Login extends HttpServlet {
                     request.getSession().setAttribute("customer", customer);
                 }
             } catch (SQLException e) {
-                e.printStackTrace();
+                e.printStackTrace(); // Log lỗi
             }
             request.getSession().setMaxInactiveInterval(30 * 60);
-
+            String redirectAfterLogin = (String) request.getSession().getAttribute("redirectAfterLogin");
+            if (redirectAfterLogin != null && !redirectAfterLogin.isEmpty()) {
+                request.getSession().removeAttribute("redirectAfterLogin");
+                response.sendRedirect(redirectAfterLogin);
+                return;
+            }
             response.sendRedirect(request.getContextPath() + "/Home");
-
         } else {
             request.setAttribute("errorMessage", "Invalid username or password.");
             request.getRequestDispatcher("/login.jsp").forward(request, response);

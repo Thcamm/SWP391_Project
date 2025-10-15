@@ -94,7 +94,7 @@
                 </div>
                 <% } %>
 
-                <form action="Appointment" method="post">
+                <form action="${pageContext.request.contextPath}/customer/AppointmentService" method="post">
                     <!-- Row 1: Họ và tên + Số điện thoại -->
                     <div class="row">
                         <div class="col-md-6 mb-3">

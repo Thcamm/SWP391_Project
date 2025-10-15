@@ -3,13 +3,15 @@ package model.customer;
 import model.user.User;
 import model.vehicle.Vehicle;
 
-import java.sql.Date;
-import java.sql.Timestamp;
+import java.security.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 public class Customer extends User {
     private int customerId;
+    private int userId;
     private int pointLoyalty;
     private List<Vehicle> vehicles;
 
@@ -20,7 +22,7 @@ public class Customer extends User {
     public Customer(int customerId, int userId, int pointLoyalty) {
         super();
         this.customerId = customerId;
-        this.setUserId(userId);
+        this.userId = userId;
         this.pointLoyalty = pointLoyalty;
     }
 
@@ -73,16 +75,10 @@ public class Customer extends User {
     public String toString() {
         return "Customer{" +
                 "customerId=" + customerId +
-                ", userId=" + getUserId() +
+                ", userId=" + userId +
+                ", pointLoyalty=" + pointLoyalty +
                 ", fullName='" + getFullName() + '\'' +
                 ", email='" + getEmail() + '\'' +
-                ", phoneNumber='" + getPhoneNumber() + '\'' +
-                ", address='" + getAddress() + '\'' +
-                ", gender='" + getGender() + '\'' +
-                ", birthDate=" + getBirthDate() +
-                ", pointLoyalty=" + pointLoyalty +
-                ", createdAt=" + getCreatedAt() +
-                ", vehicles=" + vehicles +
                 '}';
     }
 }
