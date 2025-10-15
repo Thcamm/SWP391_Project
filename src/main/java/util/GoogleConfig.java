@@ -30,4 +30,5 @@ public class GoogleConfig {
     public static String getRedirectUri() {
         return properties.getProperty("google.redirect.uri");
     }
+
 }

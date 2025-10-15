@@ -73,11 +73,11 @@
                     ĐẶT LỊCH SỬA XE VÀ BẢO DƯỠNG
                 </h2>
                 <%-- Hiển thị success message ---%>
-                <% if (session.getAttribute("successMessage") != null) { %>
+                <% if (request.getAttribute("successMessage") != null) { %>
                 <div class="alert alert-success">
-                    <%= session.getAttribute("successMessage") %>
+                    <%= request.getAttribute("successMessage") %>
                 </div>
-                <% session.removeAttribute("successMessage"); %>
+                <% request.removeAttribute("successMessage"); %>
                 <% } %>
 
                 <%-- Hiển thị error message ---%>
@@ -101,14 +101,14 @@
                             <label for="fullName" class="form-label">
                                 Họ và tên <span class="required">*</span>
                             </label>
-                            <input type="text" class="form-control" id="fullName" name="fullName"
+                            <input type="text" class="form-control" id="fullName" name="fullName" value="<%= ((User)session.getAttribute("user")).getUserName() %>"
                                    placeholder="Nhập họ và tên" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="phoneNumber" class="form-label">
                                 Số điện thoại <span class="required">*</span>
                             </label>
-                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber"
+                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="<%= ((User)session.getAttribute("user")).getPhoneNumber() %>"
                                    placeholder="Nhập số điện thoại" pattern="[0-9]{10}" required>
                         </div>
                     </div>

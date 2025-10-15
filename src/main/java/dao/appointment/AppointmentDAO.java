@@ -36,6 +36,7 @@ public class AppointmentDAO extends DbContext {
                 appointment.setCustomerID(rs.getInt("CustomerID"));
                 appointment.setVehicleID(rs.getInt("VehicleID"));
                 appointment.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime().toLocalDate());
+                appointment.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime());
                 appointment.setStatus(rs.getString("Status"));
                 appointment.setDescription(rs.getString("Description"));
 
@@ -67,7 +68,7 @@ public class AppointmentDAO extends DbContext {
                 appointment.setAppointmentID(rs.getInt("AppointmentID"));
                 appointment.setCustomerID(rs.getInt("CustomerID"));
                 appointment.setVehicleID(rs.getInt("VehicleID"));
-                appointment.setAppointmentDate(rs.getDate("Date").toLocalDate());
+                appointment.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime());
                 appointment.setStatus(rs.getString("Status"));
                 appointment.setDescription(rs.getString("Description"));
                 return appointment;
@@ -87,7 +88,7 @@ public class AppointmentDAO extends DbContext {
             st.setInt(2, appointment.getVehicleID());
             // Kiểm tra null và set date an toàn
             if (appointment.getAppointmentDate() != null) {
-                st.setDate(3, java.sql.Date.valueOf(appointment.getAppointmentDate()));
+                st.setTimestamp(3, java.sql.Timestamp.valueOf(appointment.getAppointmentDate()));
             } else {
                 throw new IllegalArgumentException("AppointmentService date cannot be null");
             }
@@ -108,7 +109,7 @@ public class AppointmentDAO extends DbContext {
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
             st.setInt(1, appointment.getCustomerID());
             st.setInt(2, appointment.getVehicleID());
-            st.setDate(3, java.sql.Date.valueOf(appointment.getAppointmentDate()));
+            st.setTimestamp(3, java.sql.Timestamp.valueOf(appointment.getAppointmentDate()));
             st.setString(4, appointment.getStatus());
             st.setString(5, appointment.getDescription());
             st.setInt(6, appointment.getAppointmentID());
@@ -144,7 +145,7 @@ public class AppointmentDAO extends DbContext {
                 appointment.setAppointmentID(rs.getInt("AppointmentID"));
                 appointment.setCustomerID(rs.getInt("CustomerID"));
                 appointment.setVehicleID(rs.getInt("VehicleID"));
-                appointment.setAppointmentDate(rs.getDate("Date").toLocalDate());
+                appointment.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime());
                 appointment.setStatus(rs.getString("Status"));
                 appointment.setDescription(rs.getString("Description"));
                 appointments.add(appointment);
