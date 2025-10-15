@@ -118,7 +118,7 @@ public class PermissionFilter implements Filter {
         }
 
 
-        // No-cache cho tài nguyên bảo vệ
+
         res.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
         res.setHeader("Pragma","no-cache");
         res.setDateHeader("Expires",0);
