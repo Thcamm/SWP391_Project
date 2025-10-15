@@ -34,7 +34,7 @@ public class DbContext {
         public static Connection getConnection() throws SQLException {
                 String url = "jdbc:mysql://localhost:3306/garage_mgmt";
                 String user = "root";
-                String pass = "1111";
+                String pass = "admin";
                 try {
                         Class.forName("com.mysql.cj.jdbc.Driver");
                 } catch (ClassNotFoundException ignored) {

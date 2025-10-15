@@ -1,8 +1,5 @@
 package dao.user;
 
-<<<<<<<<<Temporary merge branch 1
-
-import dao.DbContext;=========>>>>>>>>>Temporary merge branch 2
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,11 +13,7 @@ public class UserDAO extends DbContext {
     public User getUserById(int userId) throws SQLException {
         String sql = "SELECT * FROM User WHERE UserID = ? AND ActiveStatus = 1";
         try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
-<<<<<<<<< Temporary merge branch 1
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-=========
-             PreparedStatement ps = conn.prepareStatement(sql)) {
->>>>>>>>> Temporary merge branch 2
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -31,19 +24,10 @@ public class UserDAO extends DbContext {
         return null;
     }
 
-<<<<<<<<< Temporary merge branch 1
-
     public User getUserByUserName(String userName) throws SQLException {
         String sql = "SELECT * FROM User WHERE UserName = ? AND ActiveStatus = 1";
         try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-=========
-    // Lấy user bằng username (khi user đã active), đã bỏ phương thức bị trùng
-    public User getUserByUserName(String userName) throws SQLException {
-        String sql = "SELECT * FROM User WHERE UserName = ? AND ActiveStatus = 1";
-        try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
-             PreparedStatement ps = conn.prepareStatement(sql)) {
->>>>>>>>> Temporary merge branch 2
             ps.setString(1, userName);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -85,11 +69,7 @@ public class UserDAO extends DbContext {
         String sql = "INSERT INTO User (RoleID, FullName, UserName, Email, PhoneNumber, " +
                 "Gender, BirthDate, Address, PasswordHash, ActiveStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
-<<<<<<<<< Temporary merge branch 1
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-=========
-             PreparedStatement ps = conn.prepareStatement(sql)) {
->>>>>>>>> Temporary merge branch 2
             ps.setInt(1, user.getRoleId());
             ps.setString(2, user.getFullName());
             ps.setString(3, user.getUserName());
@@ -120,11 +100,7 @@ public class UserDAO extends DbContext {
     public boolean updateUser(User user) throws SQLException {
         String sql = "UPDATE User SET RoleID=?, FullName=?, UserName=?, Email=?, PhoneNumber=?, Gender=?, BirthDate=?, Address=?, PasswordHash=?, ActiveStatus=? WHERE UserID=?";
         try (Connection conn = DbContext.getConnection();
-<<<<<<<<< Temporary merge branch 1
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-=========
-             PreparedStatement ps = conn.prepareStatement(sql)) {
->>>>>>>>> Temporary merge branch 2
             ps.setInt(1, user.getRoleId());
             ps.setString(2, user.getFullName());
             ps.setString(3, user.getUserName());
@@ -162,11 +138,7 @@ public class UserDAO extends DbContext {
     public boolean isEmailExists(String email, int currentUserId) throws SQLException {
         String sql = "SELECT 1 FROM `User` WHERE Email = ? AND UserID != ?";
         try (Connection conn = DbContext.getConnection();
-<<<<<<<<< Temporary merge branch 1
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-=========
-             PreparedStatement ps = conn.prepareStatement(sql)) {
->>>>>>>>> Temporary merge branch 2
             ps.setString(1, email);
             ps.setInt(2, currentUserId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -204,23 +176,7 @@ public class UserDAO extends DbContext {
         }
     }
 
-    public List<Integer> findUserIdsByRoleName(String roleName) throws SQLException {
-        List<Integer> userIds = new ArrayList<>();
-        String sql = "SELECT u.UserID FROM User u JOIN RoleInfo r ON u.RoleID = r.RoleID WHERE r.RoleName = ?";
-
-        try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, roleName);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    userIds.add(rs.getInt("UserID"));
-                }
-            }
-        }
-        return userIds;
-    }
-
+    // Helper method để map ResultSet sang đối tượng User
     private User extractUser(ResultSet rs) throws SQLException {
         User user = new User();
         user.setUserId(rs.getInt("UserID"));
