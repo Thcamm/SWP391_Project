@@ -35,7 +35,6 @@ public class AppointmentDAO extends DbContext {
                 appointment.setAppointmentID(rs.getInt("AppointmentID"));
                 appointment.setCustomerID(rs.getInt("CustomerID"));
                 appointment.setVehicleID(rs.getInt("VehicleID"));
-                appointment.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime().toLocalDate());
                 appointment.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime());
                 appointment.setStatus(rs.getString("Status"));
                 appointment.setDescription(rs.getString("Description"));
@@ -212,7 +211,7 @@ public class AppointmentDAO extends DbContext {
                 apm.setAppointmentID(rs.getInt("AppointmentID"));
                 apm.setCustomerID(rs.getInt("CustomerID"));
                 apm.setVehicleID(rs.getInt("VehicleID"));
-                apm.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime().toLocalDate());
+                apm.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime());
                 apm.setStatus(rs.getString("Status"));
                 apm.setDescription(rs.getString("Description"));
 

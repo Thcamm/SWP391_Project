@@ -402,14 +402,12 @@
         <a href="${pageContext.request.contextPath}/employee/customer_service/appointment-list" class="menu-item">
             <span>TIN TỨC</span>
         </a>
-        <a href="AppointmentScheduling" class="menu-item">
+        <a href="${pageContext.request.contextPath}/customer/AppointmentService" class="menu-item">
             <span>Lien he dat lich</span>
         </a>
-        <c:if test="${not empty sessionScope.user}">
             <a href="${pageContext.request.contextPath}/customer/garage" class="menu-item">
                 <span>QUẢN LÝ XE (MY GARAGE)</span>
             </a>
-        </c:if>
     </nav>
 </div>
 

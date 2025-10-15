@@ -14,7 +14,7 @@ import model.vehicle.Vehicle;
 
 import java.io.IOException;
 
-@WebServlet(name = "AppointmentService", urlPatterns = {"/AppointmentService"})
+@WebServlet(name = "AppointmentService", urlPatterns = {"/customer/AppointmentService"})
 public class Appointment extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -23,7 +23,7 @@ public class Appointment extends HttpServlet {
             throws ServletException, IOException {
         //response.setContentType("text/plain;charset=UTF-8");
         //response.getWriter().write("AppointmentService GET OK");
-        request.getRequestDispatcher("appointment-scheduling.jsp").forward(request, response);
+        request.getRequestDispatcher("/appointment-scheduling.jsp").forward(request, response);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class Appointment extends HttpServlet {
         // (Tùy chọn) Validation: Kiểm tra các trường bắt buộc không bị trống
         if (licensePlate == null || licensePlate.trim().isEmpty() || dateStr == null || dateStr.trim().isEmpty()) {
             request.setAttribute("errorMessage", "License plate and date are required.");
-            request.getRequestDispatcher("appointment-scheduling.jsp").forward(request, response);
+            request.getRequestDispatcher("/appointment-scheduling.jsp").forward(request, response);
             return;
         }
 
@@ -102,19 +102,19 @@ public class Appointment extends HttpServlet {
 
             // 8. Chuyển hướng sau khi thành công (PRG Pattern)
             request.setAttribute("successMessage", "AppointmentService scheduled successfully!");
-            request.getRequestDispatcher("appointment-scheduling.jsp").forward(request, response);
+            request.getRequestDispatcher("/appointment-scheduling.jsp").forward(request, response);
 
         } catch (IllegalArgumentException e) {
             // Bắt lỗi nếu định dạng ngày sai
             request.setAttribute("errorMessage", "Invalid date format. Please use YYYY-MM-DD.");
-            request.getRequestDispatcher("appointment-scheduling.jsp").forward(request, response);
+            request.getRequestDispatcher("/appointment-scheduling.jsp").forward(request, response);
         } catch (Exception e) {
             // Bắt các lỗi khác (lỗi DB, etc.)
             e.printStackTrace(); // Ghi log lỗi ra console
             // Hiển thị lỗi chi tiết trên màn hình
             String detailError = "An error occurred: " + e.getMessage() + " | Type: " + e.getClass().getSimpleName();
             request.setAttribute("errorMessage", detailError);
-            request.getRequestDispatcher("appointment-scheduling.jsp").forward(request, response);
+            request.getRequestDispatcher("/appointment-scheduling.jsp").forward(request, response);
         }
     }
 }

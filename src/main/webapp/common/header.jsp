@@ -374,7 +374,7 @@
         <a href="#" class="menu-item">
             <span>TIN TỨC</span>
         </a>
-        <a href="AppointmentScheduling" class="menu-item">
+        <a href="${pageContext.request.contextPath}/customer/AppointmentService" class="menu-item">
             <span>Lien he dat lich</span>
         </a>
     </nav>

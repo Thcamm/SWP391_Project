@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+
 import model.user.User;
 import common.DbContext;
 
@@ -172,6 +174,8 @@ public class UserDAO extends DbContext {
         }
     }
 
+
+
     public int findRoleIdByUserId(int userId) throws SQLException {
         String sql = "SELECT RoleID FROM User WHERE UserID = ?";
         try (Connection conn = DbContext.getConnection();
@@ -185,7 +189,37 @@ public class UserDAO extends DbContext {
             }
         }
     }
+    public boolean updatePassword(int userId, String newPasswordHash) throws SQLException {
+        String sql = "UPDATE User SET PasswordHash = ? WHERE UserID = ?";
 
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newPasswordHash);
+            ps.setInt(2, userId);
+
+            int rowsAffected = ps.executeUpdate();
+
+            return rowsAffected > 0;
+        }
+    }
+
+    public List<Integer> findUserIdsByRoleName(String roleName) throws SQLException {
+        List<Integer> userIds = new ArrayList<>();
+        String sql = "SELECT u.UserID FROM User u JOIN RoleInfo r ON u.RoleID = r.RoleID WHERE r.RoleName = ?";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, roleName);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    userIds.add(rs.getInt("UserID"));
+                }
+            }
+        }
+        return userIds;
+    }
     // Helper method để map ResultSet sang đối tượng User
     private User extractUser(ResultSet rs) throws SQLException {
         User user = new User();
