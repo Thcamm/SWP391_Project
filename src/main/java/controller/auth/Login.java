@@ -42,6 +42,7 @@ public class Login extends HttpServlet {
             // Mật khẩu đúng!
             request.getSession().setAttribute("roleCode", roleCode);
             request.getSession().setAttribute("user", user);
+            request.getSession().setAttribute("userId", user.getUserId());
             request.getSession().setAttribute("userName", user.getUserName());
             request.getSession().setMaxInactiveInterval(30 * 60);
             response.sendRedirect(request.getContextPath() + "/Home");

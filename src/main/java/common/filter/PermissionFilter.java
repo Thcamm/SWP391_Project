@@ -5,6 +5,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import service.auth.AuthService;
 
 import java.io.IOException;
@@ -90,7 +91,8 @@ public class PermissionFilter implements Filter {
         HttpSession session = req.getSession(false);
         Integer userId = (session == null) ? null : (Integer) session.getAttribute("userId");
         if (userId == null || userId <= 0) {
-            String back = req.getRequestURI() + (req.getQueryString() != null ? "?" + req.getQueryString() : "");
+            String back = req.getRequestURI() + (req.getQueryString() != null ? "?" +
+                    req.getQueryString() : "");
             String encoded = URLEncoder.encode(back, "UTF-8");
             res.sendRedirect(res.encodeRedirectURL(ctx + "/login?back=" + encoded));
             return;
@@ -100,7 +102,8 @@ public class PermissionFilter implements Filter {
         if (required != null) {
             try {
                 if (!auth.hasPermission(userId, required)) {
-                    res.sendError(HttpServletResponse.SC_FORBIDDEN, "Missing permission: " + required);
+                    res.sendError(HttpServletResponse.SC_FORBIDDEN, "Missing permission: " +
+                            required);
                     return;
                 }
             } catch (Exception e) {
@@ -123,13 +126,16 @@ public class PermissionFilter implements Filter {
     private boolean isPublic(String path) {
         return path.equals("/") ||
                 path.startsWith("/assets/") ||
+                path.startsWith("/css/") ||
+                path.startsWith("/js/") ||
                 path.startsWith("/login") ||
                 path.startsWith("/logout") ||
-                path.startsWith("/register") ||
+                path.startsWith("/Register") ||
                 path.startsWith("/public/") ||
                 path.startsWith("/mock/") ||
                 path.startsWith("/favicon") ||
-                path.startsWith("/error");
+                path.startsWith("/error") ||
+                path.startsWith("/register.jsp");
     }
 
     private String normalizePath(String p) {

@@ -26,7 +26,7 @@ public class Customer extends User {
 
     // Constructor đầy đủ
     public Customer(String address, boolean activeStatus, Date birthDate, Timestamp createdAt, String email, String fullName, String gender, String passwordHash, String phoneNumber, int roleId, Timestamp updatedAt, Integer userId, String userName, int customerId, int pointLoyalty) {
-        super(address, activeStatus, birthDate, createdAt, email, fullName, gender, passwordHash, phoneNumber, roleId, updatedAt, userId, userName);
+        super();
         this.customerId = customerId;
         this.pointLoyalty = pointLoyalty;
     }

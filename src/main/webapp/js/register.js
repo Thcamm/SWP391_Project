@@ -36,8 +36,10 @@ function validateField(fieldId, regex, errorMsg) {
 
 // Step 1 validation - Personal Information
 document.getElementById('nextStep1').addEventListener('click', function() {
-    const firstNameValid = validateField('firstName', /^[a-zA-Z]{2,}$/, 'At least 2 letters');
-    const lastNameValid = validateField('lastName', /^[a-zA-Z]{2,}$/, 'At least 2 letters');
+    const nameRegex = /^[\p{L}\s'-]{2,}$/u;
+
+    const firstNameValid = validateField('firstName', nameRegex, 'Invalid first name');
+    const lastNameValid = validateField('lastName', nameRegex, 'Invalid last name');
     const phoneValid = validateField('phoneNumber', /^[0-9]{10,11}$/, 'Enter valid phone number (10-11 digits)');
     const emailValid = validateField('email', /^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Enter valid email');
 
@@ -49,9 +51,59 @@ document.getElementById('nextStep1').addEventListener('click', function() {
 
 // Step 2 validation - Address
 document.getElementById('nextStep2').addEventListener('click', function() {
+    const birthDateField = document.getElementById('birthDate');
+    const birthDateValidation = document.getElementById('birthDateValidation');
+    const genderField = document.getElementById('gender');
+    const genderValidation = document.getElementById('genderValidation');
     const addressValid = validateField('address', /^.{10,}$/, 'Address must be at least 10 characters');
 
-    if (addressValid) {
+    // Validate birth date
+    let birthDateValid = false;
+    if (birthDateField.value) {
+        const birthDate = new Date(birthDateField.value);
+        const today = new Date();
+        const age = today.getFullYear() - birthDate.getFullYear();
+
+        if (age >= 18 && age <= 100) {
+            birthDateField.classList.remove('is-invalid');
+            birthDateField.classList.add('is-valid');
+            birthDateValidation.textContent = '✓ Valid';
+            birthDateValidation.classList.remove('invalid');
+            birthDateValidation.classList.add('valid');
+            birthDateValid = true;
+        } else {
+            birthDateField.classList.remove('is-valid');
+            birthDateField.classList.add('is-invalid');
+            birthDateValidation.textContent = 'You must be between 18 and 100 years old';
+            birthDateValidation.classList.remove('valid');
+            birthDateValidation.classList.add('invalid');
+        }
+    } else {
+        birthDateField.classList.remove('is-valid');
+        birthDateField.classList.add('is-invalid');
+        birthDateValidation.textContent = 'Please select your birth date';
+        birthDateValidation.classList.remove('valid');
+        birthDateValidation.classList.add('invalid');
+    }
+
+    // Validate gender
+    let genderValid = false;
+    if (genderField.value) {
+        genderField.classList.remove('is-invalid');
+        genderField.classList.add('is-valid');
+        genderValidation.textContent = '✓ Valid';
+        genderValidation.classList.remove('invalid');
+        genderValidation.classList.add('valid');
+        genderValid = true;
+    } else {
+        genderField.classList.remove('is-valid');
+        genderField.classList.add('is-invalid');
+        genderValidation.textContent = 'Please select your gender';
+        genderValidation.classList.remove('valid');
+        genderValidation.classList.add('invalid');
+    }
+
+    if (birthDateValid && genderValid && addressValid) {
         currentStep = 3;
         showStep(currentStep);
     }
