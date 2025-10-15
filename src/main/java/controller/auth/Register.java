@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 
-@WebServlet(name = "Register", urlPatterns = {"/Register"})
+@WebServlet(name = "Register", urlPatterns = { "/Register" })
 public class Register extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -46,7 +46,8 @@ public class Register extends HttpServlet {
         String iAgree = request.getParameter("iAgree");
 
         // Kiểm tra thông tin bắt buộc
-        if (firstName == null || lastName == null || phoneNumber == null || email == null || gender == null || gender.trim().isEmpty() || dateOfBirth == null || dateOfBirth.trim().isEmpty() ||
+        if (firstName == null || lastName == null || phoneNumber == null || email == null || gender == null
+                || gender.trim().isEmpty() || dateOfBirth == null || dateOfBirth.trim().isEmpty() ||
                 address == null || userName == null || password == null ||
                 firstName.trim().isEmpty() || lastName.trim().isEmpty() ||
                 phoneNumber.trim().isEmpty() || email.trim().isEmpty() ||
@@ -56,7 +57,6 @@ public class Register extends HttpServlet {
             request.getRequestDispatcher("/register.jsp").forward(request, response);
             return;
         }
-
 
         // Hash password
         String hashedPassword = util.PasswordUtil.hashPassword(password);
@@ -73,7 +73,7 @@ public class Register extends HttpServlet {
         user.setPasswordHash(hashedPassword);
         user.setGender(gender.trim());
         user.setBirthDate(sqlDateOfBirth);
-        user.setRoleId(5); // Role mặc định là Customer
+        user.setRoleId(6); // Role mặc định là Customer
         user.setActiveStatus(true);
         user.setAddress(address.trim());
 
@@ -90,9 +90,9 @@ public class Register extends HttpServlet {
 
             // Kiểm tra email đã tồn tại (nếu có method)
             // if (userDAO.getUserByEmail(email) != null) {
-            //     request.setAttribute("error", "Email đã được sử dụng.");
-            //     request.getRequestDispatcher("/register.jsp").forward(request, response);
-            //     return;
+            // request.setAttribute("error", "Email đã được sử dụng.");
+            // request.getRequestDispatcher("/register.jsp").forward(request, response);
+            // return;
             // }
 
             boolean success = userDAO.addUser(user);

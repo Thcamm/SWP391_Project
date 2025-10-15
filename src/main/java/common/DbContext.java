@@ -34,12 +34,14 @@ public class DbContext {
         public static Connection getConnection() throws SQLException {
                 String url = "jdbc:mysql://localhost:3306/garage_mgmt";
                 String user = "root";
-                String pass = "admin";
+                String pass = "1111";
                 try {
                         Class.forName("com.mysql.cj.jdbc.Driver");
                 } catch (ClassNotFoundException ignored) {
                 }
                 return DriverManager.getConnection(url, user, pass);
         }
+
+}
 
 }

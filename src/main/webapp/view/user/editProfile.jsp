@@ -16,7 +16,7 @@
             <div class="error-message">${error}</div>
         </c:if>
 
-        <form action="profile" method="post" id="editProfileForm">
+        <form action="${pageContext.request.contextPath}/user/profile" method="post" id="editProfileForm">
             <table class="form-table">
                 <tr>
                     <td>Full Name <span class="required">*</span>:</td>
@@ -53,7 +53,7 @@
 
             <div class="button-group">
                 <button type="submit" class="btn btn-primary">Save Changes</button>
-                <a href="${pageContext.request.contextPath}/profile" class="btn btn-secondary">Back</a>
+                <a href="${pageContext.request.contextPath}/user/profile" class="btn btn-secondary">Back</a>
             </div>
         </form>
     </div>
