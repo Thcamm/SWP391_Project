@@ -4,24 +4,24 @@ import java.util.Objects;
 
 public class SupportCategory {
 
-    private int categoryId;
+    private Integer categoryId;
     private String categoryName;
     private String description;
 
     public SupportCategory() {
     }
 
-    public SupportCategory(int categoryId, String categoryName, String description) {
+    public SupportCategory(Integer categoryId, String categoryName, String description) {
         this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.description = description;
     }
 
-    public int getCategoryId() {
+    public Integer getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(int categoryId) {
+    public void setCategoryId(Integer categoryId) {
         this.categoryId = categoryId;
     }
 

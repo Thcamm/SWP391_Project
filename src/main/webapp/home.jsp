@@ -391,14 +391,14 @@
         </button>
     </div>
     <nav class="sidebar-nav">
-        <a href="${pageContext.request.contextPath}/view/vehicle/addVehicle" class="menu-item">
+        <a href="${pageContext.request.contextPath}/customerservice/view-support-request" class="menu-item">
             <span>DỊCH VỤ</span>
         </a>
-        <a href="${pageContext.request.contextPath}/view/vehicle/editVehicle" class="menu-item">
+        <a href="${pageContext.request.contextPath}/support-faq" class="menu-item">
             <span>THƯ VIỆN DỰ ÁN</span>
         </a>
-        <a href="${pageContext.request.contextPath}/customerservice/search-customer" class="menu-item">
-            <span>ĐÀO TẠO NGHỀ</span>
+        <a href="${pageContext.request.contextPath}/customer/create-support-request" class="menu-item">
+            <span>SEARCH CUSTOMER</span>
         </a>
         <a href="${pageContext.request.contextPath}/customerservice/appointment-list" class="menu-item">
             <span>TIN TỨC</span>

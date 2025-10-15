@@ -33,13 +33,13 @@ public class SearchCustomerServlet extends HttpServlet {
                 (fromDate == null || fromDate.isEmpty()) &&
                 (toDate == null || toDate.isEmpty())) {
 
-            customers = dao.getAllCustomers(sortOrder);
+            customers = dao.getAllCustomers();
         } else {
             customers = dao.searchCustomers(name, emailOrPhone, licensePlate, sortOrder, fromDate, toDate);
         }
 
         request.setAttribute("customerList", customers);
 
-        request.getRequestDispatcher("/customerservice/search-customer.jsp").forward(request, response);
+        request.getRequestDispatcher("/employee/customerservice/search-customer.jsp").forward(request, response);
     }
 }

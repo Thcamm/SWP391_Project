@@ -19,7 +19,7 @@ public class CreateCustomerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.getRequestDispatcher("/customerservice/create-customer.jsp").forward(request, response);
+        request.getRequestDispatcher("employee/customerservice/create-customer.jsp").forward(request, response);
     }
 
     @Override
@@ -36,13 +36,14 @@ public class CreateCustomerServlet extends HttpServlet {
         String gender = request.getParameter("gender");
         String address = request.getParameter("address");
         String birthDateStr = request.getParameter("birthDate");
+        String password = RandomString.generateRandomString(12);
         Date birthDate = null;
 
         if (birthDateStr != null && !birthDateStr.isEmpty()) {
             try {
                 birthDate = Date.valueOf(birthDateStr);
             } catch (IllegalArgumentException e) {
-                System.out.println("⚠️ Định dạng ngày không hợp lệ: " + birthDateStr);
+                System.out.println("Định dạng ngày không hợp lệ: " + birthDateStr);
             }
         }
         Customer customer = new Customer();
@@ -55,7 +56,7 @@ public class CreateCustomerServlet extends HttpServlet {
         customer.setAddress(address);
         customer.setActiveStatus(true);
         customer.setUserName(email);
-        customer.setPasswordHash(RandomString.generateRandomString(12));
+        customer.setPasswordHash(util.PasswordUtil.hashPassword(email));
         customer.setPointLoyalty(0);
 
 
@@ -65,7 +66,7 @@ public class CreateCustomerServlet extends HttpServlet {
         if (isDuplicate) {
             request.setAttribute("message", " Email đã tồn tại!");
             request.setAttribute("messageType", "warning");
-            request.getRequestDispatcher("/customerservice/create-customer.jsp").forward(request, response);
+            request.getRequestDispatcher("/employee/customerservice/create-customer.jsp").forward(request, response);
             return;
         }
 
@@ -77,6 +78,6 @@ public class CreateCustomerServlet extends HttpServlet {
             request.setAttribute("message", " Không thể thêm khách hàng. Vui lòng thử lại.");
             request.setAttribute("messageType", "error");
         }
-        request.getRequestDispatcher("/customerservice/create-customer.jsp").forward(request, response);
+        request.getRequestDispatcher("/employee/customerservice/create-customer.jsp").forward(request, response);
     }
 }

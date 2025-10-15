@@ -27,7 +27,7 @@ public class CustomerDAO extends DbContext {
 
         try {
             conn = DbContext.getConnection();
-            conn.setAutoCommit(false); // 🔹 Bắt đầu transaction
+            conn.setAutoCommit(false);
 
             // === 1. Insert vào bảng User ===
             stUser = conn.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS);
@@ -217,7 +217,7 @@ public class CustomerDAO extends DbContext {
     }
 
 
-    public List<Customer> getAllCustomers(String sortOrder) {
+    public List<Customer> getAllCustomers() {
         Map<Integer, Customer> customerMap = new LinkedHashMap<>();
 
         String sql = "SELECT c.CustomerID, u.UserID, u.FullName, u.Email, u.PhoneNumber, u.CreatedAt, " +
@@ -225,7 +225,7 @@ public class CustomerDAO extends DbContext {
                 "FROM customer c " +
                 "JOIN user u ON c.UserID = u.UserID " +
                 "LEFT JOIN vehicle v ON c.CustomerID = v.CustomerID " +
-                "ORDER BY u.CreatedAt " + ("oldest".equalsIgnoreCase(sortOrder) ? "ASC" : "DESC");
+                "ORDER BY u.CreatedAt" ;
 
         try (PreparedStatement ps = DbContext.getConnection().prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {

@@ -43,11 +43,11 @@ public class PermissionFilter implements Filter {
 //        routePerm.put("POST:/cs/appointements/create", "appointment_create");
 //        routePerm.put("POST:/cs/appointements/update", "appointment_update");
 //        routePerm.put("POST:/cs/appointements/delete", "appointment_delete");
-        routePerm.put("GET:/customerservice/search-customer", "search_customer");
-        routePerm.put("GET:/customerservice/create-customer", "view_create_customer_form");
-        routePerm.put("POST:/customerservice/create-customer", "create_customer");
-        routePerm.put("GET:/customerservice/appointment-list", "appointment_list");
-        routePerm.put("POST:/customerservice/appointment-list", "appointment_status_update");
+//        routePerm.put("GET:/customerservice/search-customer", "search_customer");
+//        routePerm.put("GET:/customerservice/create-customer", "view_create_customer_form");
+//        routePerm.put("POST:/customerservice/create-customer", "create_customer");
+//        routePerm.put("GET:/customerservice/appointment-list", "appointment_list");
+//        routePerm.put("POST:/customerservice/appointment-list", "appointment_status_update");
 
 
         //Tech manager
@@ -123,7 +123,6 @@ public class PermissionFilter implements Filter {
         }
 
 
-        // No-cache cho tài nguyên bảo vệ
         res.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
         res.setHeader("Pragma","no-cache");
         res.setDateHeader("Expires",0);
@@ -145,7 +144,8 @@ public class PermissionFilter implements Filter {
                 path.startsWith("/error") ||
                 path.startsWith("/register.jsp") ||
                 path.startsWith("/Home") ||
-                path.startsWith("/home.jsp") ;
+                path.startsWith("/home.jsp") ||
+                path.startsWith("/support-fa");
     }
 
 
