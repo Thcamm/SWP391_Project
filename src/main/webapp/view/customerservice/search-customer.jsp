@@ -7,6 +7,8 @@
     <meta charset="UTF-8" />
     <title>Search Customer</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customerservice/search-customer.css">
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
@@ -124,17 +126,7 @@
         </div>
     </div>
 </div>
+<script src="${pageContext.request.contextPath}/assets/js/customerservice/search-customer.js"></script>
 
 </body>
-<script>
-    document.querySelector('form').addEventListener('submit', function(e) {
-        const fromDate = document.querySelector('input[name="fromDate"]').value;
-        const toDate = document.querySelector('input[name="toDate"]').value;
-
-        if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
-            e.preventDefault();
-            alert("The start date cannot be greater than the end date!");
-        }
-    });
-</script>
 </html>

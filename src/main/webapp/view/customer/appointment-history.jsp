@@ -5,18 +5,13 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Appointment List</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customerservice/appointment-list.css">
-
+    <title>Appointment History</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customer/appointment-history.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<form action="${pageContext.request.contextPath}/customerservice/appointment-list" method="get" class="card p-4 mb-4">
+<form action="${pageContext.request.contextPath}/customer/appointment-history" method="get" class="card p-4 mb-4">
     <div class="mt-4 d-flex justify-content-between align-items-center">
-        <div class="col-md-4">
-            <label for="searchName" class="form-label">Customer Name</label>
-            <input type="text" id="searchName" name="searchName" value="${param.searchName}" class="form-control" placeholder="Enter customer name" />
-        </div>
         <label>
             <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -46,29 +41,29 @@
             <ul class="dropdown-menu p-3" aria-labelledby="statusDropdown" style="min-width: 200px;">
                 <li>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="status" value="pending"
-                               <c:if test="${fn:contains(fn:join(paramValues.status, ','), 'pending')}">checked</c:if> />
+                        <input class="form-check-input" type="checkbox" name="status" value="PENDING"
+                               <c:if test="${fn:contains(fn:join(paramValues.status, ','), 'PENDING')}">PENDING</c:if> />
                         <label class="form-check-label">Pending</label>
                     </div>
                 </li>
                 <li>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="status" value="accepted"
-                               <c:if test="${fn:contains(fn:join(paramValues.status, ','), 'accepted')}">checked</c:if> />
+                        <input class="form-check-input" type="checkbox" name="status" value="ACCEPTED"
+                               <c:if test="${fn:contains(fn:join(paramValues.status, ','), 'ACCEPTED')}">checked</c:if> />
                         <label class="form-check-label">Accepted</label>
                     </div>
                 </li>
                 <li>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="status" value="rejected"
-                               <c:if test="${fn:contains(fn:join(paramValues.status, ','), 'rejected')}">checked</c:if> />
+                        <input class="form-check-input" type="checkbox" name="status" value="REJECTED"
+                               <c:if test="${fn:contains(fn:join(paramValues.status, ','), 'REJECTED')}">checked</c:if> />
                         <label class="form-check-label">Rejected</label>
                     </div>
                 </li>
                 <li>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="status" value="cancelled"
-                               <c:if test="${fn:contains(fn:join(paramValues.status, ','), 'cancelled')}">checked</c:if> />
+                        <input class="form-check-input" type="checkbox" name="status" value="CANCELLED"
+                               <c:if test="${fn:contains(fn:join(paramValues.status, ','), 'CANCELLED')}">checked</c:if> />
                         <label class="form-check-label">Cancelled</label>
                     </div>
                 </li>
@@ -82,11 +77,11 @@
         <button type="submit" class="btn btn-success">
             🔍
         </button>
-        <a href="${pageContext.request.contextPath}/customerservice/appointment-list" class="btn btn-secondary">Reset</a>
+        <a href="${pageContext.request.contextPath}/customer/appointment-history" class="btn btn-secondary">Reset</a>
     </div>
 </form>
 
-<h2>📅 Appointment List</h2>
+<h2>📅 Appointment History</h2>
 
 <c:if test="${not empty error}">
     <p class="error">${error}</p>
@@ -96,7 +91,6 @@
     <thead>
     <tr>
         <th>ID</th>
-        <th>Customer</th>
         <th>Vehicle</th>
         <th>Appointment Date</th>
         <th>Status</th>
@@ -105,45 +99,37 @@
     </tr>
     </thead>
     <tbody>
-    <c:forEach var="row" items="${appointments}">
-        <c:set var="apm" value="${row.appointment}" />
+    <c:forEach var="apm" items="${appointments}">
         <tr>
             <td>${apm.appointmentID}</td>
-            <td>${row.customerName}</td>
             <td>${apm.vehicleID}</td>
             <td>${apm.appointmentDate}</td>
-
-                <%-- Cột STATUS --%>
             <td>
                 <c:choose>
-                    <%-- Nếu không phải PENDING thì chỉ hiển thị text và icon, không có dropdown --%>
-                <c:when test="${apm.status != 'PENDING'}">
-                <c:choose>
-                <c:when test="${apm.status == 'CANCELLED'}"> CANCELLED</c:when>
-                <c:when test="${apm.status == 'ACCEPTED'}"> ACCEPTED</c:when>
-                <c:when test="${apm.status == 'REJECTED'}"> REJECTED</c:when>
-                <c:when test="${apm.status == 'COMPLETED'}"> COMPLETED</c:when>
-                <c:otherwise>🔘 ${apm.status}</c:otherwise>
-                </c:choose>
-                </c:when>
+                    <c:when test="${apm.status != 'PENDING'}">
+                        <c:choose>
+                            <c:when test="${apm.status == 'CANCELLED'}"> CANCELLED</c:when>
+                            <c:when test="${apm.status == 'ACCEPTED'}"> ACCEPTED</c:when>
+                            <c:when test="${apm.status == 'REJECTED'}"> REJECTED</c:when>
+                            <c:when test="${apm.status == 'COMPLETED'}"> COMPLETED</c:when>
+                            <c:otherwise>🔘 ${apm.status}</c:otherwise>
+                        </c:choose>
+                    </c:when>
 
-                <c:otherwise>
-                <form action="${pageContext.request.contextPath}/customerservice/appointment-list"
-                      method="post" class="d-inline">
-                    <input type="hidden" name="appointmentID" value="${apm.appointmentID}">
-
-                    ⏳
-                    <select name="status" class="form-select form-select-sm d-inline-block w-auto ms-1"
-                            onchange="this.form.submit()">
-                        <option value="PENDING" selected>Pending</option>
-                        <option value="ACCEPTED">Accepted</option>
-                        <option value="REJECTED">Rejected</option>
-                    </select>
-                </form>
-                </c:otherwise>
+                    <c:otherwise>
+                        <form action="${pageContext.request.contextPath}/customer/appointment-history"
+                              method="post" class="d-inline">
+                            <input type="hidden" name="appointmentID" value="${apm.appointmentID}">
+                            <select name="status" class="form-select form-select-sm d-inline-block w-auto ms-1"
+                                    onchange="this.form.submit()">
+                                <option value="PENDING" selected>PENDING</option>
+                                <option value="CANCELLED" >CANCELLED</option>
+                            </select>
+                        </form>
+                    </c:otherwise>
                 </c:choose>
 
-</td>
+            </td>
             <td>${empty apm.description ? '-' : apm.description}</td>
 
             <td>
@@ -151,16 +137,16 @@
                     Detail
                 </a>
 
-                <c:choose>
-                    <c:when test="${apm.status == 'ACCEPTED'}">
-                        <a href="create-service-order?appointmentID=${apm.appointmentID}"
-                           class="btn btn-sm btn-success ms-2">＋ SO</a>
-                    </c:when>
-                    <c:otherwise>
-                        <a class="btn btn-sm btn-success ms-2 disabled" tabindex="-1" aria-disabled="true"
-                           style="opacity: 0.5; pointer-events: none;">＋ SO</a>
-                    </c:otherwise>
-                </c:choose>
+
+<%--                    <c:when test="${apm.status == 'ACCEPTED'}">--%>
+<%--                        <a href="/customer/appointment-history?appointmentID=${apm.appointmentID}"--%>
+<%--                           class="btn btn-sm btn-success ms-2">＋ SO</a>--%>
+<%--                    </c:when>--%>
+<%--                    <c:otherwise>--%>
+<%--                        <a class="btn btn-sm btn-success ms-2 disabled" tabindex="-1" aria-disabled="true"--%>
+<%--                           style="opacity: 0.5; pointer-events: none;">＋ SO</a>--%>
+<%--                    </c:otherwise>--%>
+<%--                </c:choose>--%>
 
             </td>
         </tr>
@@ -176,7 +162,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<script src="${pageContext.request.contextPath}/assets/js/customerservice/appointment-list.js"></script>
-
+<script src="${pageContext.request.contextPath}/assets/js/customer/appointment-history.js"></script>
 </body>
 </html>

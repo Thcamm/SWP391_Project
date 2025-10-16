@@ -113,6 +113,8 @@ public class SupportDAO extends DbContext {
                     statuses.add(s.trim());
                 }
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return statuses;
     }
@@ -251,6 +253,34 @@ public class SupportDAO extends DbContext {
         }
         return null;
     }
+
+    public SupportRequest getSupportRequestById(int requestId) throws SQLException {
+        String sql = "SELECT * FROM SupportRequest WHERE RequestID = ?";
+        try (PreparedStatement st = getConnection().prepareStatement(sql)) {
+            st.setInt(1, requestId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    SupportRequest sr = new SupportRequest();
+                    sr.setRequestId(rs.getInt("RequestID"));
+                    sr.setCustomerId(rs.getInt("CustomerID"));
+
+                    // Có thể null → dùng getObject()
+                    sr.setWorkOrderId((Integer) rs.getObject("WorkOrderID"));
+                    sr.setAppointmentId((Integer) rs.getObject("AppointmentID"));
+
+                    sr.setCategoryId(rs.getInt("CategoryID"));
+                    sr.setDescription(rs.getString("Description"));
+                    sr.setAttachmentPath(rs.getString("AttachmentPath"));
+                    sr.setStatus(rs.getString("Status"));
+                    sr.setCreatedAt(rs.getDate("CreatedAt"));
+                    sr.setUpdatedAt(rs.getDate("UpdatedAt"));
+                    return sr;
+                }
+            }
+        }
+        return null;
+    }
+
 
 
 }

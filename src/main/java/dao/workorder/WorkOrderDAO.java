@@ -1,14 +1,4 @@
-package dao.work_order;
-
-import common.DbContext;
-import model.workorder.WorkOrder;
-import model.workorder.WorkOrderDetail;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+package dao.workorder;
 
 public class WorkOrderDAO {
 //    public List<WorkOrder> getWorkOrdersByCustomerId(int customerId) {

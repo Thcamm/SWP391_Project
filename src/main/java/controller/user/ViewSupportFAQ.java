@@ -1,4 +1,4 @@
-package controller.support;
+package controller.user;
 
 import dao.support.SupportDAO;
 import jakarta.servlet.ServletException;
@@ -18,6 +18,7 @@ public class ViewSupportFAQ extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         String keyword = request.getParameter("q");
         String idParam = request.getParameter("id");
 
@@ -28,7 +29,7 @@ public class ViewSupportFAQ extends HttpServlet {
                 int id = Integer.parseInt(idParam);
                 SupportFAQ faq = dao.getFAQById(id);
                 request.setAttribute("faqDetail", faq);
-                request.getRequestDispatcher("/support/supportFAQ_detail.jsp").forward(request, response);
+                request.getRequestDispatcher("/view/common/supportFAQ-detail.jsp").forward(request, response);
             } else {
                 List<SupportFAQ> faqs;
                 if (keyword != null && !keyword.trim().isEmpty()) {
@@ -37,11 +38,11 @@ public class ViewSupportFAQ extends HttpServlet {
                     faqs = dao.getAllFAQs();
                 }
                 request.setAttribute("faqs", faqs);
-                request.getRequestDispatcher("/support/supportFAQ.jsp").forward(request, response);
+                request.getRequestDispatcher("/view/common/supportFAQ.jsp").forward(request, response);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            response.sendError(500, "Lỗi truy vấn dữ liệu FAQ");
+            response.sendError(500, "Error retrieving FAQ data from the database.");
         }
     }
 }
