@@ -35,7 +35,7 @@ public class AppointmentDAO extends DbContext {
                 appointment.setAppointmentID(rs.getInt("AppointmentID"));
                 appointment.setCustomerID(rs.getInt("CustomerID"));
                 appointment.setVehicleID(rs.getInt("VehicleID"));
-                appointment.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime().toLocalDate());
+                appointment.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime());
                 appointment.setStatus(rs.getString("Status"));
                 appointment.setDescription(rs.getString("Description"));
 
@@ -71,9 +71,6 @@ public class AppointmentDAO extends DbContext {
         }
         return statuses;
     }
-
-
-
     public Appointment getAppointmentById(int appointmentID) {
         String sql = "SELECT * FROM Appointment WHERE AppointmentID = ?";
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
@@ -84,7 +81,7 @@ public class AppointmentDAO extends DbContext {
                 appointment.setAppointmentID(rs.getInt("AppointmentID"));
                 appointment.setCustomerID(rs.getInt("CustomerID"));
                 appointment.setVehicleID(rs.getInt("VehicleID"));
-                appointment.setAppointmentDate(rs.getDate("Date").toLocalDate());
+                appointment.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime());
                 appointment.setStatus(rs.getString("Status"));
                 appointment.setDescription(rs.getString("Description"));
                 return appointment;
@@ -104,7 +101,7 @@ public class AppointmentDAO extends DbContext {
             st.setInt(2, appointment.getVehicleID());
             // Kiểm tra null và set date an toàn
             if (appointment.getAppointmentDate() != null) {
-                st.setDate(3, java.sql.Date.valueOf(appointment.getAppointmentDate()));
+                st.setTimestamp(3, java.sql.Timestamp.valueOf(appointment.getAppointmentDate()));
             } else {
                 throw new IllegalArgumentException("AppointmentService date cannot be null");
             }
@@ -125,7 +122,7 @@ public class AppointmentDAO extends DbContext {
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
             st.setInt(1, appointment.getCustomerID());
             st.setInt(2, appointment.getVehicleID());
-            st.setDate(3, java.sql.Date.valueOf(appointment.getAppointmentDate()));
+            st.setTimestamp(3, java.sql.Timestamp.valueOf(appointment.getAppointmentDate()));
             st.setString(4, appointment.getStatus());
             st.setString(5, appointment.getDescription());
             st.setInt(6, appointment.getAppointmentID());
@@ -161,7 +158,7 @@ public class AppointmentDAO extends DbContext {
                 appointment.setAppointmentID(rs.getInt("AppointmentID"));
                 appointment.setCustomerID(rs.getInt("CustomerID"));
                 appointment.setVehicleID(rs.getInt("VehicleID"));
-                appointment.setAppointmentDate(rs.getDate("Date").toLocalDate());
+                appointment.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime());
                 appointment.setStatus(rs.getString("Status"));
                 appointment.setDescription(rs.getString("Description"));
                 appointments.add(appointment);
@@ -207,7 +204,7 @@ public class AppointmentDAO extends DbContext {
                 a.setAppointmentID(rs.getInt("AppointmentID"));
                 a.setCustomerID(rs.getInt("CustomerID"));
                 a.setVehicleID(rs.getInt("VehicleID"));
-                a.setAppointmentDate(rs.getDate("Date").toLocalDate());
+                a.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime());
                 a.setStatus(rs.getString("Status"));
                 a.setDescription(rs.getString("Description"));
                 appointments.add(a);
@@ -276,7 +273,7 @@ public class AppointmentDAO extends DbContext {
                 apm.setAppointmentID(rs.getInt("AppointmentID"));
                 apm.setCustomerID(rs.getInt("CustomerID"));
                 apm.setVehicleID(rs.getInt("VehicleID"));
-                apm.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime().toLocalDate());
+                apm.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime());
                 apm.setStatus(rs.getString("Status"));
                 apm.setDescription(rs.getString("Description"));
 

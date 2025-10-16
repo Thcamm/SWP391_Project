@@ -24,18 +24,6 @@ public class Admin extends Employee {
         return getRoleId() == 1;
     }
 
-    public boolean canManageUser(int targetRoleId) {
-        if (this.getRoleId() == 1) {
-            return true;
-        } else if (this.getRoleId() == 2) {
-            return targetRoleId > 2;
-        }
-        return false;
-    }
-
-    public String getAdminDisplayName() {
-        return this.getFullName() + " (" + this.getPosition() + ")";
-    }
 
 
 

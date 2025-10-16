@@ -6,7 +6,8 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/user/viewProfile.css">
 </head>
 <body>
-<div class="container">
+<jsp:include page="/common/header.jsp" />
+<div class="container profile-content">
     <h2>User Profile</h2>
 
     <c:if test="${not empty sessionScope.success}">
@@ -52,7 +53,7 @@
         </div>
     </div>
 </div>
-
+<jsp:include page="/common/footer.jsp" />
 <script src="${pageContext.request.contextPath}/assets/js/user/viewProfile.js"></script>
 </body>
 </html>

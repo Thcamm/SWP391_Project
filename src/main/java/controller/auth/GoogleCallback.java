@@ -46,7 +46,7 @@ public class GoogleCallback extends HttpServlet {
                 user.setEmail(email);
                 user.setFullName(name);
                 user.setUserName(email);
-                user.setRoleId(2); // Role mặc định
+                user.setRoleId(5); // Role mặc định
                 user.setActiveStatus(true);
                 userDAO.insertGoogleUser(user);
                 user = userDAO.getUserByEmail(email);

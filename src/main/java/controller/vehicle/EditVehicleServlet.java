@@ -58,7 +58,7 @@ public class EditVehicleServlet extends HttpServlet {
 
                 request.setAttribute("vehicle", vehicleToEdit);
                 request.setAttribute("brands", brands);
-                request.getRequestDispatcher("/view/vehicle/editVehicle.jsp").forward(request, response);
+                request.getRequestDispatcher("/view/customer/editVehicle.jsp").forward(request, response);
             } else {
                 response.sendRedirect(contextPath + "/customer/garage");
             }
@@ -96,7 +96,7 @@ public class EditVehicleServlet extends HttpServlet {
         request.setAttribute("brands", brands);
         request.setAttribute("models", models);
         request.setAttribute("selectedBrandId", brandId);
-        request.getRequestDispatcher("/view/vehicle/editVehicle.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/customer/editVehicle.jsp").forward(request, response);
     }
 
     private void handleUpdateVehicle(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -159,6 +159,6 @@ public class EditVehicleServlet extends HttpServlet {
             request.setAttribute("selectedBrandId", currentBrandId);
         }
 
-        request.getRequestDispatcher("/view/vehicle/editVehicle.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/customer/editVehicle.jsp").forward(request, response);
     }
 }

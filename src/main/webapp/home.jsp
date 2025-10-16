@@ -10,7 +10,7 @@
     <%@ page import="model.user.User" %>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/chatbot.css">
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/assets/css/user/chatbot.css">
 
     <style>
         :root {
@@ -351,7 +351,7 @@
             Xin chào, ${sessionScope.user.fullName}
         </span>
                         </a>
-                        <a href="Home?action=logout" class="btn btn-logout">
+                        <a href="${pageContext.request.contextPath}/Home?action=logout" class="btn btn-logout">
                             <i class="fas fa-sign-out-alt"></i> Đăng xuất
                         </a>
                     </c:when>
@@ -402,14 +402,12 @@
         <a href="${pageContext.request.contextPath}/customerservice/appointment-list" class="menu-item">
             <span>TIN TỨC</span>
         </a>
-        <a href="AppointmentScheduling" class="menu-item">
+        <a href="${pageContext.request.contextPath}/customer/AppointmentService" class="menu-item">
             <span>Lien he dat lich</span>
         </a>
-        <c:if test="${not empty sessionScope.user}">
             <a href="${pageContext.request.contextPath}/customer/garage" class="menu-item">
                 <span>QUẢN LÝ XE (MY GARAGE)</span>
             </a>
-        </c:if>
     </nav>
 </div>
 
@@ -452,7 +450,7 @@
 
 <%@ include file="/common/footer.jsp" %>
 <!-- Bootstrap JS -->
-<script src="${pageContext.request.contextPath}/js/chatbot.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/user/chatbot.js"></script>
 <!-- Chat widget inline script (Gemini UI behaviour) -->
 </body>
 <script>

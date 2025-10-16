@@ -1,5 +1,7 @@
+
 # Build output
 target/
+src/main/java/common/DbContext.java
 
 # Log files
 *.log
@@ -14,11 +16,13 @@ dependency-reduced-pom.xml
 
 # Google OAuth credentials
 src/main/resources/google.properties
-src/main/java/common/DbContext.java
-src/webapp/META-INF/context.xml
 
 ### IntelliJ IDEA ###
 .idea/
+!.idea/modules.xml
+!.idea/compiler.xml
+!.idea/artifacts/
+*.iws
 *.iml
 *.iws
 # The following files are safe to share
