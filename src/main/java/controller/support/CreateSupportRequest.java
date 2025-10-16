@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@WebServlet("/app/create-support-request")
+@WebServlet("/customer/create-support-request")
 @MultipartConfig
 public class CreateSupportRequest extends HttpServlet {
 

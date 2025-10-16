@@ -16,7 +16,7 @@
     <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>Search Customer</h3>
-        <a href="${pageContext.request.contextPath}/employee/customerservice/create-customer.jsp" class="btn btn-primary">
+        <a href="${pageContext.request.contextPath}/view/customerservice/create-customer.jsp" class="btn btn-primary">
             <i class="bi bi-plus-circle"></i> Create Customer
         </a>
     </div>

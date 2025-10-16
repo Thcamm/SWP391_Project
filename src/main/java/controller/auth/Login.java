@@ -53,7 +53,7 @@ public class Login extends HttpServlet {
                     request.getSession().setAttribute("customer", customer);
                 }
             } catch (SQLException e) {
-                e.printStackTrace(); // Log lỗi
+                e.printStackTrace();
             }
             request.getSession().setMaxInactiveInterval(30 * 60);
             String redirectAfterLogin = (String) request.getSession().getAttribute("redirectAfterLogin");

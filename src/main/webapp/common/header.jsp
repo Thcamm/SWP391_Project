@@ -338,7 +338,7 @@
     </div>
     <nav class="main-navbar">
         <div class="container d-flex justify-content-between align-items-center">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}Home">
+            <a class="navbar-brand" href="${pageContext.request.contextPath}/Home">
                 CS<span>CARSPA.VN</span>
             </a>
             <div class="nav-icons d-flex align-items-center">
@@ -376,6 +376,9 @@
         </a>
         <a href="${pageContext.request.contextPath}/customer/AppointmentService" class="menu-item">
             <span>Lien he dat lich</span>
+        </a>
+        <a href="${pageContext.request.contextPath}/customer/garage" class="menu-item">
+            <span>QUẢN LÝ XE (MY GARAGE)</span>
         </a>
     </nav>
 </div>

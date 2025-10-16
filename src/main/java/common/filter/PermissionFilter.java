@@ -48,17 +48,17 @@ public class PermissionFilter implements Filter {
 
 
         // Customer Service
-        routePerm.put("GET:/cs/appointements", "appointment_read");
+        routePerm.put("GET:/view/cs/appointements", "appointment_read");
         routePerm.put("POST:/cs/appointements/create", "appointment_create");
         routePerm.put("POST:/cs/appointements/update", "appointment_update");
         routePerm.put("POST:/cs/appointements/delete", "appointment_delete");
-        routePerm.put("GET:/customerservice/appointment-list", "cs_access");
-        routePerm.put("POST:/customerservice/appointment-list", "cs_access");
-        routePerm.put("GET:/customerservice/create-customer", "cs_access");
-        routePerm.put("POST:/customerservice/create-customer", "cs_access");
-        routePerm.put("POST:/customerservice/search-customer", "cs_access");
-        routePerm.put("GET:/customerservice/view-support-request", "cs_access");
-        routePerm.put("POST:/customerservice/view-support-request", "cs_access");
+        routePerm.put("GET:/view/customerservice/appointment-list.jsp", "cs_access");
+        routePerm.put("POST:/view/customerservice/appointment-list.jsp", "cs_access");
+//        routePerm.put("GET:/customerservice/create-customer", "cs_access");
+//        routePerm.put("POST:/customerservice/create-customer", "cs_access");
+//        routePerm.put("POST:/customerservice/search-customer", "cs_access");
+//        routePerm.put("GET:/customerservice/view-support-request", "cs_access");
+//        routePerm.put("POST:/customerservice/view-support-request", "cs_access");
 
 
         // Tech manager
@@ -89,27 +89,31 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/app/comments", "comment_create_by_customer");
         routePerm.put("GET:/app/create-support-request", "customer_access");
         routePerm.put("POST:/app/create-support-request", "customer_access");
-        routePerm.put("GET:/customer/garage", "customer_access");
-        routePerm.put("POST:/customer/garage", "customer_access");
-        routePerm.put("GET:/view/vehicle/garage.jsp", "customer_access");
-        routePerm.put("GET:/customer/addVehicle", "customer_access");
-        routePerm.put("POST:/customer/addVehicle", "customer_access");
-        routePerm.put(" GET:/view/vehicle/addVehicle.jsp", "customer_access");
-        routePerm.put("GET:/customer/editVehicle", "customer_access");
-        routePerm.put("POST:/customer/editVehicle", "customer_access");
-        routePerm.put("GET:view/vehicle/editVehicle.jsp", "customer_access");
-        routePerm.put("POST:/customer/deleteVehicle", "customer_access");
+        routePerm.put("GET:/view/customer/appointment-scheduling.jsp", "customer_access");
+        routePerm.put("POST:/view/customer/appointment-scheduling.jsp", "customer_access");
+        routePerm.put("GET:/view/customer/garage.jsp", "customer_access");
+        routePerm.put("POST:/view/customer/garage.jsp", "customer_access");
+        routePerm.put("GET:/view/customer/addVehicle.jsp", "customer_access");
+        routePerm.put("POST:/view/customer/addVehicle.jsp", "customer_access");
+        routePerm.put("GET:/view/customer/editVehicle.jsp", "customer_access");
+        routePerm.put("POST:/view/customer/editVehicle.jsp", "customer_access");
 
-
+        //User
+        routePerm.put("GET:/view/user/viewProfile.jsp", "user_access");
+        routePerm.put("POST:/view/user/viewProfile.jsp", "user_access");
+        routePerm.put("GET:/view/user/editProfile.jsp", "user_access");
+        routePerm.put("POST:/view/user/editProfile.jsp", "user_access");
+        routePerm.put("GET:/view/user/changePassword.jsp", "user_access");
+        routePerm.put("POST:/view/user/changePassword.jsp", "user_access");
 
         areaGate.put("/admin/", "role_permission_manage");
-        areaGate.put("/customerservice/",            "cs_access");              // Customer Service
+        areaGate.put("/customerservice/",            "cs_access");
         areaGate.put("/tech-manager/",  "tech_manager_access");    // Tech Manager
         areaGate.put("/technician/",    "technician_access");      // Technician
         areaGate.put("/inventory/",     "inventory_access");       // Store Keeper
         areaGate.put("/accounting/",    "accounting_access");      // Accountant
-        areaGate.put("/app/",           "customer_access");
-
+        areaGate.put("/customer/",           "customer_access");   // Customer
+        areaGate.put("/user/",                  "user_access");    // User
     }
 
     @Override
@@ -187,6 +191,7 @@ public class PermissionFilter implements Filter {
                 path.startsWith("/error") ||
                 path.startsWith("/register.jsp") ||
                 path.startsWith("/Home") ||
+                path.startsWith("/forgotpassword") ||
                 path.startsWith("/home.jsp") ||
                 path.startsWith("/support-faq") ;
     }

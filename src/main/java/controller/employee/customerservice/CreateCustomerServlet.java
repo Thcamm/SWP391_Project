@@ -19,7 +19,7 @@ public class CreateCustomerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.getRequestDispatcher("employee/customerservice/create-customer.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/customerservice/create-customer.jsp").forward(request, response);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class CreateCustomerServlet extends HttpServlet {
         if (isDuplicate) {
             request.setAttribute("message", " Email đã tồn tại!");
             request.setAttribute("messageType", "warning");
-            request.getRequestDispatcher("/employee/customerservice/create-customer.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/customerservice/create-customer.jsp").forward(request, response);
             return;
         }
 
@@ -78,6 +78,6 @@ public class CreateCustomerServlet extends HttpServlet {
             request.setAttribute("message", " Không thể thêm khách hàng. Vui lòng thử lại.");
             request.setAttribute("messageType", "error");
         }
-        request.getRequestDispatcher("/employee/customerservice/create-customer.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/customerservice/create-customer.jsp").forward(request, response);
     }
 }
