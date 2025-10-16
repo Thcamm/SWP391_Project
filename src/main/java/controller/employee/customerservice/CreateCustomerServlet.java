@@ -1,4 +1,4 @@
-package controller.employee.customer_service;
+package controller.employee.customerservice;
 
 import common.utils.RandomString;
 import dao.customer.CustomerDAO;
@@ -7,52 +7,25 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import model.customer.Customer;
-import model.user.User;
+
 import java.io.IOException;
 import java.sql.Date;
 
-@WebServlet("/employee/customer_service/create-customer")
+@WebServlet("/customerservice/create-customer")
 public class CreateCustomerServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-//        HttpSession session = request.getSession(false);
-//
-//
-//        if (session == null || session.getAttribute("user") == null) {
-//            response.sendRedirect(request.getContextPath() + "/login");
-//            return;
-//        }
-//
-//        User currentUser = (User) session.getAttribute("user");
-//
-//        if (currentUser.getRoleId() != 2) {
-//            response.sendRedirect(request.getContextPath() + "/employee.customer_service/error-permission.jsp");
-//            return;
-//        }
-
-        request.getRequestDispatcher("/employee/customer_service/create-customer.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/customerservice/create-customer.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-//        HttpSession session = request.getSession(false);
-//        if (session == null || session.getAttribute("user") == null) {
-//            response.sendRedirect(request.getContextPath() + "/login");
-//            return;
-//        }
-//
-//        User currentUser = (User) session.getAttribute("user");
-//        if (currentUser.getRoleId() != 2) {
-//            response.sendRedirect(request.getContextPath() + "/employee.customer_service/error-permission.jsp");
-//            return;
-//        }
 
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
@@ -63,13 +36,14 @@ public class CreateCustomerServlet extends HttpServlet {
         String gender = request.getParameter("gender");
         String address = request.getParameter("address");
         String birthDateStr = request.getParameter("birthDate");
+        String password = RandomString.generateRandomString(12);
         Date birthDate = null;
 
         if (birthDateStr != null && !birthDateStr.isEmpty()) {
             try {
                 birthDate = Date.valueOf(birthDateStr);
             } catch (IllegalArgumentException e) {
-                System.out.println("⚠️ Định dạng ngày không hợp lệ: " + birthDateStr);
+                System.out.println("Định dạng ngày không hợp lệ: " + birthDateStr);
             }
         }
         Customer customer = new Customer();
@@ -82,7 +56,7 @@ public class CreateCustomerServlet extends HttpServlet {
         customer.setAddress(address);
         customer.setActiveStatus(true);
         customer.setUserName(email);
-        customer.setPasswordHash(RandomString.generateRandomString(12));
+        customer.setPasswordHash(util.PasswordUtil.hashPassword(email));
         customer.setPointLoyalty(0);
 
 
@@ -90,20 +64,20 @@ public class CreateCustomerServlet extends HttpServlet {
 
         boolean isDuplicate = dao.isCustomerDuplicate(email);
         if (isDuplicate) {
-            request.setAttribute("message", "⚠️ Email đã tồn tại!");
+            request.setAttribute("message", " Email đã tồn tại!");
             request.setAttribute("messageType", "warning");
-            request.getRequestDispatcher("/employee/customer_service/create-customer.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/customerservice/create-customer.jsp").forward(request, response);
             return;
         }
 
         boolean success = dao.insertCustomer(customer);
         if (success) {
-            request.setAttribute("message", "✅ Thêm khách hàng thành công!");
+            request.setAttribute("message", " Thêm khách hàng thành công!");
             request.setAttribute("messageType", "success");
         } else {
-            request.setAttribute("message", "❌ Không thể thêm khách hàng. Vui lòng thử lại.");
+            request.setAttribute("message", " Không thể thêm khách hàng. Vui lòng thử lại.");
             request.setAttribute("messageType", "error");
         }
-        request.getRequestDispatcher("/employee/customer_service/create-customer.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/customerservice/create-customer.jsp").forward(request, response);
     }
 }

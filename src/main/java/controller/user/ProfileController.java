@@ -30,7 +30,7 @@ public class ProfileController extends HttpServlet {
         String contextPath = request.getContextPath();
 
         if (sessionUser == null) {
-            response.sendRedirect(contextPath + "/login"); // Use contextPath
+            response.sendRedirect(contextPath + "/login");
             return;
         }
 
@@ -50,7 +50,7 @@ public class ProfileController extends HttpServlet {
         String contextPath = request.getContextPath();
 
         if (sessionUser == null) {
-            response.sendRedirect(contextPath + "/login"); // Use contextPath
+            response.sendRedirect(contextPath + "/login");
             return;
         }
 

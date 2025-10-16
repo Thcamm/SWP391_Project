@@ -41,7 +41,7 @@ public class VehicleServlet extends HttpServlet {
             request.setAttribute("vehicleList", vehicleList);
 
             // 4. Forward to the JSP page for display
-            request.getRequestDispatcher("/view/vehicle/garage.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/customer/garage.jsp").forward(request, response);
 
         } catch (SQLException e) {
             e.printStackTrace();

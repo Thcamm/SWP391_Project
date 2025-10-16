@@ -3,7 +3,9 @@ package model.customer;
 import model.user.User;
 import model.vehicle.Vehicle;
 
+import java.security.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,6 +13,7 @@ public class Customer extends User {
     private int customerId;
     private int userId;
     private int pointLoyalty;
+    private List<Vehicle> vehicles;
 
     public Customer() {
         super();
@@ -30,9 +33,6 @@ public class Customer extends User {
         this.pointLoyalty = pointLoyalty;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
     public int getCustomerId() {
         return customerId;
     }
@@ -63,13 +63,12 @@ public class Customer extends User {
         if (!(o instanceof Customer)) return false;
         if (!super.equals(o)) return false;
         Customer customer = (Customer) o;
-        return customerId == customer.customerId &&
-                userId == customer.userId;
+        return customerId == customer.customerId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), customerId, userId);
+        return Objects.hash(super.hashCode(), customerId);
     }
 
     @Override

@@ -1,16 +1,303 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: Admin
-  Date: 14/10/2025
-  Time: 17:19
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html>
+<html lang="vi">
 <head>
-    <title>Title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Câu hỏi thường gặp</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        h2 {
+            text-align: center;
+            color: #fff;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            display: flex;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 50px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid transparent;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            background: #f5f5f5;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            background: #fff;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button[type="submit"] {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        button[type="submit"]:active {
+            transform: translateY(0);
+        }
+
+        hr {
+            max-width: 800px;
+            margin: 30px auto;
+            border: none;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        p {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        ul {
+            list-style: none;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        li {
+            background: rgba(255, 255, 255, 0.95);
+            margin-bottom: 15px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        li:hover {
+            transform: translateX(10px);
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+            background: #fff;
+        }
+
+        li a {
+            display: block;
+            padding: 20px 25px;
+            text-decoration: none;
+            color: #333;
+            font-size: 1.1rem;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        li a::before {
+            content: "❓";
+            margin-right: 12px;
+            font-size: 1.2rem;
+        }
+
+        li:hover a {
+            color: #667eea;
+        }
+
+        li a::after {
+            content: "→";
+            position: absolute;
+            right: 25px;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        li:hover a::after {
+            opacity: 1;
+            right: 20px;
+        }
+
+        /* Nút liên hệ trợ giúp */
+        .help-widget {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 9999;
+        }
+
+        .help-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            font-size: 28px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .help-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .help-options {
+            display: none;
+            flex-direction: column;
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            animation: fadeInUp 0.3s ease forwards;
+        }
+
+        .help-options.open {
+            display: flex;
+        }
+
+        .help-options a {
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #eee;
+        }
+
+        .help-options a:hover {
+            background: #f5f5f5;
+        }
+
+        .help-options a:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 2rem;
+            }
+
+            form {
+                flex-direction: column;
+                border-radius: 15px;
+                padding: 20px;
+            }
+
+            input[type="text"],
+            button[type="submit"] {
+                border-radius: 10px;
+                width: 100%;
+            }
+
+            li:hover {
+                transform: translateX(5px);
+            }
+        }
+    </style>
 </head>
 <body>
+<h2>Câu hỏi thường gặp</h2>
+
+<form method="get" action="support-faq">
+    <input type="text" name="q" placeholder="Tìm kiếm câu hỏi..." value="${param.q}">
+    <button type="submit">Tìm kiếm</button>
+    <a href="support-faq" style="align-self:center; color:#fff; margin-left:10px;">Reset</a>
+</form>
+
+<hr>
+
+<c:if test="${empty faqs}">
+    <p>Không tìm thấy câu hỏi nào phù hợp.</p>
+</c:if>
+
+<ul>
+    <c:forEach var="faq" items="${faqs}">
+        <li>
+            <a href="${pageContext.request.contextPath}/support-faq?id=${faq.FAQId}">
+                    ${faq.question}
+            </a>
+        </li>
+    </c:forEach>
+</ul>
+
+<!-- Nút Liên hệ trợ giúp nổi -->
+<div class="help-widget">
+    <button id="helpToggle" class="help-btn">💡</button>
+    <div id="helpOptions" class="help-options">
+        <a href="#" title="Chatbot">💬 Chat bot</a>
+        <a href="tel:19001234" title="Hotline">📞 Hotline</a>
+        <a href="mailto:support@garage.vn" title="Send email">📧 Send email</a>
+        <a href="${pageContext.request.contextPath}/app/create-support-request" title="Send Request">❓ Send Request</a>
+    </div>
+</div>
+
+<script>
+    const helpToggle = document.getElementById("helpToggle");
+    const helpOptions = document.getElementById("helpOptions");
+
+    helpToggle.addEventListener("click", () => {
+        helpOptions.classList.toggle("open");
+    });
+
+    // Đóng menu khi click ra ngoài
+    document.addEventListener("click", (e) => {
+        if (!helpOptions.contains(e.target) && !helpToggle.contains(e.target)) {
+            helpOptions.classList.remove("open");
+        }
+    });
+</script>
 
 </body>
 </html>
