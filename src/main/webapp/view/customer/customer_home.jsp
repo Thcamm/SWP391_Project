@@ -396,11 +396,11 @@
         <a href="${pageContext.request.contextPath}/customer/" class="menu-item">
             <span>THƯ VIỆN DỰ ÁN</span>
         </a>
-        <a href="${pageContext.request.contextPath}/customerservice/view-support-request" class="menu-item">
-            <span>SEARCH CUSTOMER</span>
+        <a href="${pageContext.request.contextPath}/customer/appointment-history" class="menu-item">
+            <span>APPOINTMENT HISTORY</span>
         </a>
-        <a href="${pageContext.request.contextPath}/customerservice/appointment-list" class="menu-item">
-            <span>TIN TỨC</span>
+        <a href="${pageContext.request.contextPath}/support-faq" class="menu-item">
+            <span>SUPPORT</span>
         </a>
         <a href="AppointmentScheduling" class="menu-item">
             <span>Lien he dat lich</span>

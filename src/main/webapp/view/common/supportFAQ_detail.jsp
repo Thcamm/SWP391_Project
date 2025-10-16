@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi tiết câu hỏi</title>
+    <title>Question Detail</title>
     <style>
         * {
             margin: 0;
@@ -168,18 +168,19 @@
     </style>
 </head>
 <body>
-<div class="container">
+<<div class="container">
     <h2>${faqDetail.question}</h2>
     <p>${faqDetail.answer}</p>
-    <a href="support-faq" class="back-link">Quay lại danh sách</a>
+    <a href="support-faq" class="back-link">← Back to FAQ List</a>
 </div>
+
 <div class="help-widget">
     <button id="helpToggle" class="help-btn">💡</button>
     <div id="helpOptions" class="help-options">
-        <a href="#" title="Chatbot">💬 Chat bot</a>
+        <a href="#" title="Chatbot">💬 Chatbot</a>
         <a href="tel:19001234" title="Hotline">📞 Hotline</a>
-        <a href="mailto:support@garage.vn" title="Send email">📧 Send email</a>
-        <a href="${pageContext.request.contextPath}/create-support-request" title="Send Request">❓ Send Request</a>
+        <a href="mailto:support@garage.vn" title="Send Email">📧 Send Email</a>
+        <a href="${pageContext.request.contextPath}/customer/create-support-request" title="Submit Request">❓ Submit Request</a>
     </div>
 </div>
 
@@ -191,7 +192,6 @@
         helpOptions.classList.toggle("open");
     });
 
-    // Đóng menu khi click ra ngoài
     document.addEventListener("click", (e) => {
         if (!helpOptions.contains(e.target) && !helpToggle.contains(e.target)) {
             helpOptions.classList.remove("open");
@@ -199,4 +199,5 @@
     });
 </script>
 </body>
+
 </html>

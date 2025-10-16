@@ -1,4 +1,4 @@
-package controller.employee.customerservice;
+package controller.customerservice;
 
 import common.utils.RandomString;
 import dao.customer.CustomerDAO;
@@ -18,14 +18,12 @@ public class CreateCustomerServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        request.getRequestDispatcher("employee/customerservice/create-customer.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/customerservice/create-customer.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
 
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
@@ -43,9 +41,10 @@ public class CreateCustomerServlet extends HttpServlet {
             try {
                 birthDate = Date.valueOf(birthDateStr);
             } catch (IllegalArgumentException e) {
-                System.out.println("Định dạng ngày không hợp lệ: " + birthDateStr);
+                System.out.println("Invalid date format: " + birthDateStr);
             }
         }
+
         Customer customer = new Customer();
         customer.setRoleId(7);
         customer.setFullName(fullName);
@@ -59,25 +58,25 @@ public class CreateCustomerServlet extends HttpServlet {
         customer.setPasswordHash(util.PasswordUtil.hashPassword(email));
         customer.setPointLoyalty(0);
 
-
         CustomerDAO dao = new CustomerDAO();
 
         boolean isDuplicate = dao.isCustomerDuplicate(email);
         if (isDuplicate) {
-            request.setAttribute("message", " Email đã tồn tại!");
+            request.setAttribute("message", "Email already exists!");
             request.setAttribute("messageType", "warning");
-            request.getRequestDispatcher("/employee/customerservice/create-customer.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/customerservice/create-customer.jsp").forward(request, response);
             return;
         }
 
         boolean success = dao.insertCustomer(customer);
         if (success) {
-            request.setAttribute("message", " Thêm khách hàng thành công!");
+            request.setAttribute("message", "Customer added successfully!");
             request.setAttribute("messageType", "success");
         } else {
-            request.setAttribute("message", " Không thể thêm khách hàng. Vui lòng thử lại.");
+            request.setAttribute("message", "Unable to add customer. Please try again.");
             request.setAttribute("messageType", "error");
         }
-        request.getRequestDispatcher("/employee/customerservice/create-customer.jsp").forward(request, response);
+
+        request.getRequestDispatcher("/view/customerservice/create-customer.jsp").forward(request, response);
     }
 }

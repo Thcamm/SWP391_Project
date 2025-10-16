@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Câu hỏi thường gặp</title>
+    <title> Frequently asked questions</title>
     <style>
         * {
             margin: 0;
@@ -248,18 +248,18 @@
     </style>
 </head>
 <body>
-<h2>Câu hỏi thường gặp</h2>
+<h2>Frequently asked questions</h2>
 
 <form method="get" action="support-faq">
-    <input type="text" name="q" placeholder="Tìm kiếm câu hỏi..." value="${param.q}">
-    <button type="submit">Tìm kiếm</button>
+    <input type="text" name="q" placeholder="Search for a question..." value="${param.q}">
+    <button type="submit">Search</button>
     <a href="support-faq" style="align-self:center; color:#fff; margin-left:10px;">Reset</a>
 </form>
 
 <hr>
 
 <c:if test="${empty faqs}">
-    <p>Không tìm thấy câu hỏi nào phù hợp.</p>
+    <p>No matching questions found.</p>
 </c:if>
 
 <ul>
@@ -272,14 +272,13 @@
     </c:forEach>
 </ul>
 
-<!-- Nút Liên hệ trợ giúp nổi -->
 <div class="help-widget">
     <button id="helpToggle" class="help-btn">💡</button>
     <div id="helpOptions" class="help-options">
-        <a href="#" title="Chatbot">💬 Chat bot</a>
+        <a href="#" title="Chatbot">💬 Chatbot</a>
         <a href="tel:19001234" title="Hotline">📞 Hotline</a>
-        <a href="mailto:support@garage.vn" title="Send email">📧 Send email</a>
-        <a href="${pageContext.request.contextPath}/app/create-support-request" title="Send Request">❓ Send Request</a>
+        <a href="mailto:support@garage.vn" title="Send Email">📧 Send Email</a>
+        <a href="${pageContext.request.contextPath}/app/create-support-request" title="Submit Request">❓ Submit Request</a>
     </div>
 </div>
 
@@ -291,13 +290,11 @@
         helpOptions.classList.toggle("open");
     });
 
-    // Đóng menu khi click ra ngoài
     document.addEventListener("click", (e) => {
         if (!helpOptions.contains(e.target) && !helpToggle.contains(e.target)) {
             helpOptions.classList.remove("open");
         }
     });
 </script>
-
 </body>
 </html>

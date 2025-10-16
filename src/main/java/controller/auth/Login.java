@@ -40,26 +40,27 @@ public class Login extends HttpServlet {
 
             String roleCode = new dao.employee.admin.rbac.RoleDao()
                     .findRoleCodeById(user.getRoleId());
-            // Mật khẩu đúng!
-            request.getSession().setAttribute("roleCode", roleCode);
-            request.getSession().setAttribute("userId", user.getUserId()); //them dong nay
-            request.getSession().setAttribute("user", user);
-            request.getSession().setAttribute("userName", user.getUserName());
-            request.getSession().setMaxInactiveInterval(30 * 60);
-            response.sendRedirect(request.getContextPath() + "/Home");
 
-            // Kiểm tra xem có URL nào lưu trước đó không
-            String redirectAfterLogin = (String) request.getSession().getAttribute("redirectAfterLogin");
+            HttpSession session = request.getSession();
+            session.setAttribute("roleCode", roleCode);
+            session.setAttribute("userId", user.getUserId());
+            session.setAttribute("user", user);
+            session.setAttribute("userName", user.getUserName());
+            session.setMaxInactiveInterval(30 * 60);
+
+            String redirectAfterLogin = (String) session.getAttribute("redirectAfterLogin");
             if (redirectAfterLogin != null) {
-                request.getSession().removeAttribute("redirectAfterLogin"); // dọn dẹp
+                session.removeAttribute("redirectAfterLogin");
                 response.sendRedirect(redirectAfterLogin);
             } else {
-                response.sendRedirect(request.getContextPath() + "/create-customer");
+                response.sendRedirect(request.getContextPath() + "/customerservice/home");
             }
+
         } else {
             errorMessage = "Invalid username or password.";
             request.setAttribute("errorMessage", errorMessage);
             request.getRequestDispatcher("/login.jsp").forward(request, response);
         }
+
     }
 }

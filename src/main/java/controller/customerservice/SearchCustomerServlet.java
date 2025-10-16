@@ -1,4 +1,4 @@
-package controller.employee.customerservice;
+package controller.customerservice;
 import dao.customer.CustomerDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -40,6 +40,6 @@ public class SearchCustomerServlet extends HttpServlet {
 
         request.setAttribute("customerList", customers);
 
-        request.getRequestDispatcher("/employee/customerservice/search-customer.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/customerservice/search-customer.jsp").forward(request, response);
     }
 }

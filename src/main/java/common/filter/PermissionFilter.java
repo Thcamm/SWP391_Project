@@ -86,12 +86,14 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/accounting/confirm", "payment_confirm");
 
         // Customer
-        routePerm.put("GET:/app/bookings", "booking_read_own");
-        routePerm.put("POST:/app/bookings", "booking_create");
-        routePerm.put("GET:/app/vehicles/status", "view_vehicle_status");
-        routePerm.put("POST:/app/comments", "comment_create_by_customer");
-        routePerm.put("GET:/app/create-support-request", "customer_access");
-        routePerm.put("POST:/app/create-support-request", "customer_access");
+        routePerm.put("GET:/customer/bookings", "booking_read_own");
+        routePerm.put("POST:/customer/bookings", "booking_create");
+        routePerm.put("GET:/customer/vehicles/status", "view_vehicle_status");
+        routePerm.put("POST:/customer/comments", "comment_create_by_customer");
+        routePerm.put("GET:/customer/create-support-request", "customer_access");
+        routePerm.put("POST:/customer/create-support-request", "customer_access");
+        routePerm.put("GET:/customer/appointment-history", "customer_access");
+        routePerm.put("POST:/customer/appointment-history", "customer_access");
 
 
         areaGate.put("/admin/", "role_permission_manage");
@@ -100,7 +102,7 @@ public class PermissionFilter implements Filter {
         areaGate.put("/technician/",    "technician_access");      // Technician
         areaGate.put("/inventory/",     "inventory_access");       // Store Keeper
         areaGate.put("/accounting/",    "accounting_access");      // Accountant
-        areaGate.put("/app/",           "customer_access");
+        areaGate.put("/customer/",           "customer_access");
 
     }
 

@@ -5,7 +5,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Danh sách cuộc hẹn</title>
+    <title>Appointment List</title>
     <style>
         body {
             font-family: Arial, sans-serif;

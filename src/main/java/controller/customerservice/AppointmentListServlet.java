@@ -1,4 +1,4 @@
-package controller.employee.customerservice;
+package controller.customerservice;
 
 import dao.appointment.AppointmentDAO;
 import jakarta.servlet.ServletException;
@@ -45,7 +45,7 @@ public class AppointmentListServlet extends HttpServlet {
             }
         }
         request.setAttribute("appointments", appointments);
-        request.getRequestDispatcher("/employee/customerservice/appointment-list.jsp")
+        request.getRequestDispatcher("/view/customerservice/appointment-list.jsp")
                 .forward(request, response);
 
     }
@@ -71,11 +71,11 @@ public class AppointmentListServlet extends HttpServlet {
 
             if (success) {
                 dao.updateStatus(appointmentID, status);
-                response.sendRedirect(request.getContextPath() + "/employee/customerservice/appointment-list");
+                response.sendRedirect(request.getContextPath() + "/view/customerservice/appointment-list");
             } else {
                 // Nếu thất bại, báo lỗi
                 request.setAttribute("errorMessage", "Failed to update appointment status.");
-                request.getRequestDispatcher("/employee/customerservice/appointment-list.jsp")
+                request.getRequestDispatcher("/view/customerservice/appointment-list.jsp")
                         .forward(request, response);
             }
 
