@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet(name = "Home", urlPatterns = {"/Home"})
+@WebServlet(name = "Home", urlPatterns = { "/Home" })
 public class Home extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -23,7 +23,6 @@ public class Home extends HttpServlet {
         }
         request.getRequestDispatcher("home.jsp").forward(request, response);
     }
-
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

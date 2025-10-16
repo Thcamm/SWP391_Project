@@ -32,11 +32,12 @@ public class Login extends HttpServlet {
         UserLoginService userService = new UserLoginService(userDAO);
         User user = userService.findByUserName(username);
 
-        if (user != null && PasswordUtil.checkPassword(password, user.getPasswordHash())) {
+        if (user != null && user.isActiveStatus() && PasswordUtil.checkPassword(password, user.getPasswordHash())) {
 
             // Mật khẩu đúng!
             request.getSession().setAttribute("user", user);
             request.getSession().setAttribute("userName", user.getUserName());
+            request.getSession().setAttribute("userId", user.getUserId()); // Add userId for PermissionFilter
             request.getSession().setMaxInactiveInterval(30 * 60);
             response.sendRedirect(request.getContextPath() + "/Home");
 
