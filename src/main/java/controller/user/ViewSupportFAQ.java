@@ -29,7 +29,7 @@ public class ViewSupportFAQ extends HttpServlet {
                 int id = Integer.parseInt(idParam);
                 SupportFAQ faq = dao.getFAQById(id);
                 request.setAttribute("faqDetail", faq);
-                request.getRequestDispatcher("/view/common/supportFAQ_detail.jsp").forward(request, response);
+                request.getRequestDispatcher("/view/common/supportFAQ-detail.jsp").forward(request, response);
             } else {
                 List<SupportFAQ> faqs;
                 if (keyword != null && !keyword.trim().isEmpty()) {

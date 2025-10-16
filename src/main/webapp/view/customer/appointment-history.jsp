@@ -6,49 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Appointment History</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 30px;
-            background-color: #fafafa;
-        }
-        table {
-            width: 95%;
-            margin: auto;
-            border-collapse: collapse;
-            background-color: #fff;
-            box-shadow: 0 0 6px rgba(0,0,0,0.1);
-        }
-        th, td {
-            padding: 10px 15px;
-            border-bottom: 1px solid #ddd;
-            text-align: center;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        a.detail-link {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-        }
-        a.detail-link:hover {
-            text-decoration: underline;
-        }
-        .error {
-            color: red;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customer/appointment-history.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -204,17 +162,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-
-<script>
-    document.querySelector('form').addEventListener('submit', function(e) {
-        const fromDate = document.querySelector('input[name="fromDate"]').value;
-        const toDate = document.querySelector('input[name="toDate"]').value;
-
-        if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
-            e.preventDefault();
-            alert("The start date cannot be greater than the end date!");
-        }
-    });
-</script>
+<script src="${pageContext.request.contextPath}/assets/js/customer/appointment-history.js"></script>
 </body>
 </html>

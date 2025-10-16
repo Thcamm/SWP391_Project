@@ -53,7 +53,7 @@ public class Login extends HttpServlet {
                 session.removeAttribute("redirectAfterLogin");
                 response.sendRedirect(redirectAfterLogin);
             } else {
-                response.sendRedirect(request.getContextPath() + "/customerservice/home");
+                response.sendRedirect(request.getContextPath() + "/customer/home");
             }
 
         } else {

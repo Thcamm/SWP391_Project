@@ -24,7 +24,7 @@ public class CreateSupportRequestServlet extends HttpServlet {
         SupportDAO dao = new SupportDAO();
         try {
             request.setAttribute("categories", dao.getAllSupportCategories());
-            request.getRequestDispatcher("/view/customer/create_support_request.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/customer/create-support-request.jsp").forward(request, response);
         } catch (SQLException e) {
             e.printStackTrace();
             response.sendError(500, "Unable to load support categories.");
@@ -95,6 +95,6 @@ public class CreateSupportRequestServlet extends HttpServlet {
             request.setAttribute("message", "Error occurred while submitting the support request.");
         }
 
-        request.getRequestDispatcher("/view/customer/create_support_request.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/customer/create-support-request.jsp").forward(request, response);
     }
 }

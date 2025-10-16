@@ -79,7 +79,7 @@ public class ViewSupportRequestServlet extends HttpServlet {
             request.setAttribute("categories", categories);
             request.setAttribute("statuses", statuses);
 
-            request.getRequestDispatcher("/view/customerservice/support_request_list.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/customerservice/support-request-list.jsp").forward(request, response);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -114,7 +114,7 @@ public class ViewSupportRequestServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/customerservice/view-support-request");
             } else {
                 request.setAttribute("errorMessage", "Failed to update support request status.");
-                request.getRequestDispatcher("/view/customerservice/support_request_list.jsp")
+                request.getRequestDispatcher("/view/customerservice/support-request-list.jsp")
                         .forward(request, response);
             }
 
