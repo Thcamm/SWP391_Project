@@ -6,13 +6,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import model.user.User;
-import service.user.UserLoginService;
 import util.PasswordUtil;
+import service.user.UserLoginService;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 @WebServlet("/login")
 public class Login extends HttpServlet {
@@ -34,28 +32,14 @@ public class Login extends HttpServlet {
         UserLoginService userService = new UserLoginService(userDAO);
         User user = userService.findByUserName(username);
 
-
-
         if (user != null && PasswordUtil.checkPassword(password, user.getPasswordHash())) {
 
-            String roleCode = new dao.employee.admin.rbac.RoleDao()
-                    .findRoleCodeById(user.getRoleId());
             // Mật khẩu đúng!
-            request.getSession().setAttribute("roleCode", roleCode);
             request.getSession().setAttribute("user", user);
-            request.getSession().setAttribute("userId", user.getUserId());
             request.getSession().setAttribute("userName", user.getUserName());
             request.getSession().setMaxInactiveInterval(30 * 60);
             response.sendRedirect(request.getContextPath() + "/Home");
 
-            // Kiểm tra xem có URL nào lưu trước đó không
-            String redirectAfterLogin = (String) session.getAttribute("redirectAfterLogin");
-            if (redirectAfterLogin != null) {
-                session.removeAttribute("redirectAfterLogin"); // dọn dẹp
-                response.sendRedirect(redirectAfterLogin);
-            } else {
-                response.sendRedirect(request.getContextPath() + "/create-customer");
-            }
         } else {
             errorMessage = "Invalid username or password.";
             request.setAttribute("errorMessage", errorMessage);

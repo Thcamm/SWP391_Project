@@ -1,4 +1,4 @@
-package model.servicerequest;
+package model.servicetype;
 
 import java.sql.Timestamp;
 
@@ -14,7 +14,8 @@ public class ServiceRequest {
     public ServiceRequest() {
     }
 
-    public ServiceRequest(int requestID, int customerID, int vehicleID, int serviceID, Integer appointmentID, Timestamp requestDate, String status) {
+    public ServiceRequest(int requestID, int customerID, int vehicleID, int serviceID, Integer appointmentID,
+            Timestamp requestDate, String status) {
         this.requestID = requestID;
         this.customerID = customerID;
         this.vehicleID = vehicleID;

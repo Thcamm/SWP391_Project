@@ -3,7 +3,9 @@ package model.customer;
 import model.user.User;
 import model.vehicle.Vehicle;
 
+import java.security.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,6 +13,7 @@ public class Customer extends User {
     private int customerId;
     private int userId;
     private int pointLoyalty;
+    private List<Vehicle> vehicles;
 
     public Customer() {
         super();
@@ -24,15 +27,14 @@ public class Customer extends User {
     }
 
     // Constructor đầy đủ
-    public Customer(String address, boolean activeStatus, Date birthDate, Timestamp createdAt, String email, String fullName, String gender, String passwordHash, String phoneNumber, int roleId, Timestamp updatedAt, Integer userId, String userName, int customerId, int pointLoyalty) {
+    public Customer(String address, boolean activeStatus, Date birthDate, Timestamp createdAt, String email,
+            String fullName, String gender, String passwordHash, String phoneNumber, int roleId, Timestamp updatedAt,
+            Integer userId, String userName, int customerId, int pointLoyalty) {
         super();
         this.customerId = customerId;
         this.pointLoyalty = pointLoyalty;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
     public int getCustomerId() {
         return customerId;
     }
@@ -59,17 +61,19 @@ public class Customer extends User {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Customer)) return false;
-        if (!super.equals(o)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Customer))
+            return false;
+        if (!super.equals(o))
+            return false;
         Customer customer = (Customer) o;
-        return customerId == customer.customerId &&
-                userId == customer.userId;
+        return customerId == customer.customerId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), customerId, userId);
+        return Objects.hash(super.hashCode(), customerId);
     }
 
     @Override
