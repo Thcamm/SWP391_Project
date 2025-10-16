@@ -41,10 +41,20 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/cs/appointements/update", "appointment_update");
         routePerm.put("POST:/cs/appointements/delete", "appointment_delete");
 
-        // Tech manager
-        routePerm.put("GET:/tech-manager/orders", "workorder_read");
-        routePerm.put("POST:/tech-manager/orders", "workorder_create");
-        routePerm.put("POST:/tech-manager/assign", "technician_assign");
+        // Tech manager - chỉ dashboard, workorders được forward đến WorkOrderController
+        routePerm.put("GET:/techmanager/dashboard", "techmanager_read");
+
+        // WorkOrder management - tất cả operations được xử lý bởi WorkOrderController
+        routePerm.put("GET:/workorders/list", "workorder_read");
+        routePerm.put("GET:/workorders/create", "workorder_create");
+        routePerm.put("POST:/workorders/create", "workorder_create");
+        routePerm.put("GET:/workorders/details", "workorder_read");
+        routePerm.put("POST:/workorders/add-detail", "workorder_update");
+        routePerm.put("GET:/workorders/edit-detail", "workorder_update");
+        routePerm.put("POST:/workorders/edit-detail", "workorder_update");
+        routePerm.put("POST:/workorders/delete-detail", "workorder_delete");
+        routePerm.put("POST:/workorders/approve-detail", "workorder_approve");
+        routePerm.put("POST:/workorders/decline-detail", "workorder_approve");
 
         // Technician
         routePerm.put("GET:/technician/jobs", "job_read");

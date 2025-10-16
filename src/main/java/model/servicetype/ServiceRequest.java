@@ -80,4 +80,21 @@ public class ServiceRequest {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    // Business methods
+    public boolean isApproved() {
+        return "APPROVED".equalsIgnoreCase(this.status);
+    }
+
+    public boolean isPending() {
+        return "PENDING".equalsIgnoreCase(this.status);
+    }
+
+    public boolean isCompleted() {
+        return "COMPLETED".equalsIgnoreCase(this.status);
+    }
+
+    public boolean canCreateWorkOrder() {
+        return isApproved();
+    }
 }

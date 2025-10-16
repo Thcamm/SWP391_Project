@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import model.user.User;
 import common.DbContext;
 
@@ -199,6 +200,21 @@ public class UserDAO extends DbContext {
                 return -1;
             }
         }
+    }
+
+    public List<User> getUsersByRoleId(int roleId) throws SQLException {
+        String sql = "SELECT * FROM User WHERE RoleID = ? AND ActiveStatus = 1";
+        List<User> users = new ArrayList<>();
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, roleId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    users.add(extractUser(rs));
+                }
+            }
+        }
+        return users;
     }
 
     // Helper method để map ResultSet sang đối tượng User

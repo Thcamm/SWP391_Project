@@ -10,18 +10,26 @@ public class TechManager extends Employee {
     }
 
     public TechManager(int employeeId, String employeeCode, java.math.BigDecimal salary,
-                      Integer managedBy, Integer createBy) {
+            Integer managedBy, Integer createBy) {
         super(employeeId, employeeCode, salary, managedBy, createBy);
     }
 
-    // Business methods for TechManager
-    public boolean isTechManager() {
-        // Assuming RoleID 3 is Tech Manager (check RoleInfo table)
-        return getRoleId() == 3;
+    public TechManager(Employee employee) {
+        super(employee.getEmployeeId(), employee.getEmployeeCode(), employee.getSalary(),
+                employee.getManagedBy(), employee.getCreateBy());
+        this.setUserId(employee.getUserId());
+        this.setRoleId(employee.getRoleId());
+        this.setFullName(employee.getFullName());
+        this.setUserName(employee.getUserName());
+        this.setEmail(employee.getEmail());
+        this.setPhoneNumber(employee.getPhoneNumber());
+        this.setPasswordHash(employee.getPasswordHash());
+        this.setActiveStatus(employee.isActiveStatus());
     }
 
-    // Can add methods like:
-    // - createWorkOrderFromRequest(ServiceRequest request)
-    // - assignTasksToTechnicians(WorkOrder workOrder, List<Employee> technicians)
-    // - approveWorkOrderDetails(List<WorkOrderDetail> details)
+    public boolean isTechManager() {
+        // Assuming RoleID 2 is Tech Manager (check RoleInfo table)
+        return getRoleId() == 2;
+    }
+
 }

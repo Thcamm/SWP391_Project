@@ -1,6 +1,9 @@
 package service.work;
 
 import dao.workorder.WorkOrderDAO;
+import dao.workorder.WorkOrderDetailDAO;
+import model.servicetype.ServiceRequest;
+import model.employee.techmanager.TechManager;
 import model.workorder.WorkOrder;
 import model.workorder.WorkOrderDetail;
 
@@ -10,9 +13,11 @@ import java.util.List;
 
 public class WorkOrderService {
     private WorkOrderDAO workOrderDAO;
+    // private WorkOrderDetailDAO workOrderDetailDAO;
 
     public WorkOrderService() {
         this.workOrderDAO = new WorkOrderDAO();
+        // this.workOrderDetailDAO = new WorkOrderDetailDAO();
     }
 
     // Create WorkOrder from approved ServiceRequest
@@ -53,5 +58,25 @@ public class WorkOrderService {
             return workOrder.calculateTotalEstimate();
         }
         return BigDecimal.ZERO;
+    }
+
+    // Create WorkOrder from approved ServiceRequest
+    public WorkOrder createWorkOrderFromServiceRequest(TechManager techManager, ServiceRequest serviceRequest, BigDecimal estimateAmount) throws SQLException {
+        if (!serviceRequest.canCreateWorkOrder()) {
+            throw new IllegalArgumentException("ServiceRequest must be approved to create WorkOrder");
+        }
+
+        if (!techManager.isTechManager()) {
+            throw new IllegalArgumentException("Only TechManager can create WorkOrder");
+        }
+
+        return createWorkOrder(techManager.getEmployeeId(), serviceRequest.getRequestID(), estimateAmount);
+    }
+
+    // Get WorkOrders by ServiceRequest
+    public List<WorkOrder> getWorkOrdersByServiceRequest(int requestId) throws SQLException {
+        // This would need to be implemented in WorkOrderDAO
+        // For now, we'll return empty list
+        return new java.util.ArrayList<>();
     }
 }

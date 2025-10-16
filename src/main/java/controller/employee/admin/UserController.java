@@ -174,7 +174,7 @@ public class UserController extends HttpServlet {
                 ", Results: " + searchResults.size() + "/" + totalResults);
 
         // Forward to users.jsp
-        request.getRequestDispatcher("/employee/admin/users.jsp")
+        request.getRequestDispatcher("/view/admin/users.jsp")
                 .forward(request, response);
     }
 
@@ -196,7 +196,7 @@ public class UserController extends HttpServlet {
         System.out.println("UserController - Displaying create form for user: " + getCurrentUser(request));
 
         // Forward to create JSP
-        request.getRequestDispatcher("/employee/admin/create-user.jsp")
+        request.getRequestDispatcher("/view/admin/create-user.jsp")
                 .forward(request, response);
     }
 
@@ -217,7 +217,7 @@ public class UserController extends HttpServlet {
 
             request.setAttribute("user", user);
             request.setAttribute("currentUser", getCurrentUser(request));
-            request.getRequestDispatcher("/employee/admin/user-details.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/admin/user-details.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID");
@@ -244,7 +244,7 @@ public class UserController extends HttpServlet {
             request.setAttribute("user", user);
             request.setAttribute("availableRoles", availableRoles);
             request.setAttribute("currentUser", getCurrentUser(request));
-            request.getRequestDispatcher("/employee/admin/user-edit.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/admin/user-edit.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID");
