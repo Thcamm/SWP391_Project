@@ -35,7 +35,12 @@ public class Register extends HttpServlet {
 
         // Step 2: Information
         String gender = request.getParameter("gender");
-        String address = request.getParameter("address");
+
+        String province = request.getParameter("province");
+        String district = request.getParameter("district");
+        String detailAddress = request.getParameter("addressDetail");
+        String address = detailAddress + ", " + district + ", " + province;
+
         String dateOfBirth = request.getParameter("birthDate");
         java.sql.Date sqlDateOfBirth = null;
         LocalDate localDate = LocalDate.parse(dateOfBirth);
@@ -81,19 +86,17 @@ public class Register extends HttpServlet {
         try {
             dao.user.UserDAO userDAO = new dao.user.UserDAO();
 
-            // Kiểm tra username đã tồn tại
             if (userDAO.getUserByUserName(userName) != null) {
                 request.setAttribute("error", "Tên đăng nhập đã tồn tại.");
                 request.getRequestDispatcher("/register.jsp").forward(request, response);
                 return;
             }
 
-            // Kiểm tra email đã tồn tại (nếu có method)
-            // if (userDAO.getUserByEmail(email) != null) {
-            // request.setAttribute("error", "Email đã được sử dụng.");
-            // request.getRequestDispatcher("/register.jsp").forward(request, response);
-            // return;
-            // }
+            if (userDAO.getUserByEmail(email) != null) {
+                request.setAttribute("error", "Email đã được sử dụng.");
+                request.getRequestDispatcher("/register.jsp").forward(request, response);
+                return;
+            }
 
             boolean success = userDAO.addUser(user);
 

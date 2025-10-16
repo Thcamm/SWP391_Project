@@ -359,6 +359,9 @@
         </button>
     </div>
     <nav class="sidebar-nav">
+        <a href="Home" class="menu-item">
+            <span>TRANG CHỦ</span>
+        </a>
         <a href="#" class="menu-item">
             <span>DỊCH VỤ</span>
         </a>
