@@ -1,4 +1,4 @@
-package controller.customerservice;
+package controller.employee.customerservice;
 import dao.customer.CustomerDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

@@ -1,4 +1,4 @@
-package controller.customerservice;
+package controller.employee.customerservice;
 
 import dao.customer.CustomerDAO;
 import dao.support.SupportDAO;

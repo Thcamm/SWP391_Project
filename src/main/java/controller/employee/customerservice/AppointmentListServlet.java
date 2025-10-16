@@ -1,4 +1,4 @@
-package controller.customerservice;
+package controller.employee.customerservice;
 
 import dao.appointment.AppointmentDAO;
 import jakarta.servlet.ServletException;
