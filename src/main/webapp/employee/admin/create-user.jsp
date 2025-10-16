@@ -39,7 +39,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
         <ol class="breadcrumb">
           <li class="breadcrumb-item">
             <a
-              href="${pageContext.request.contextPath}/admin/users"
+              href="${pageContext.request.contextPath}/employee/admin/users"
               class="text-decoration-none"
             >
               User Management
@@ -87,7 +87,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
             <div class="card-body">
               <form
                 method="POST"
-                action="${pageContext.request.contextPath}/admin/users/create"
+                action="${pageContext.request.contextPath}/employee/admin/users/create"
               >
                 <div class="row">
                   <!-- Left Column -->
@@ -177,7 +177,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                     <hr />
                     <div class="d-flex justify-content-between">
                       <a
-                        href="${pageContext.request.contextPath}/admin/users"
+                        href="${pageContext.request.contextPath}/employee/admin/users"
                         class="btn btn-secondary"
                       >
                         Back to Users

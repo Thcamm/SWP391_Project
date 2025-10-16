@@ -7,24 +7,23 @@ public class Admin extends Employee {
         super();
     }
 
-    public Admin(int userId, int roleId, String fullName, String userName, String email, String phoneNumber,
-                 String passwordHash, boolean activeStatus, int employeeId, String position, String department) {
-        super(userId, roleId, fullName, userName, email, phoneNumber, passwordHash, activeStatus, employeeId,
-                position, department);
-    }
-
     public Admin(Employee employee) {
-        super(employee.getUserId(), employee.getRoleId(), employee.getFullName(), employee.getUserName(),
-                employee.getEmail(), employee.getPhoneNumber(), employee.getPasswordHash(), employee.isActiveStatus(),
-                employee.getEmployeeId(), employee.getPosition(), employee.getDepartment());
+        super(employee.getEmployeeId(), employee.getEmployeeCode(), employee.getSalary(),
+              employee.getManagedBy(), employee.getCreateBy());
+        // Copy User fields
+        this.setUserId(employee.getUserId());
+        this.setRoleId(employee.getRoleId());
+        this.setFullName(employee.getFullName());
+        this.setUserName(employee.getUserName());
+        this.setEmail(employee.getEmail());
+        this.setPhoneNumber(employee.getPhoneNumber());
+        this.setPasswordHash(employee.getPasswordHash());
+        this.setActiveStatus(employee.isActiveStatus());
     }
 
-    //Check admin
+    // Check admin
     public boolean isAdmin() {
         return getRoleId() == 1;
     }
-
-
-
 
 }

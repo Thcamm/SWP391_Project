@@ -70,7 +70,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
         <div class="col-md-4 text-end">
           <div class="btn-group">
             <a
-              href="${pageContext.request.contextPath}/admin/users/create"
+              href="${pageContext.request.contextPath}/employee/admin/users/create"
               class="btn btn-success"
             >
               <i class="bi bi-plus-circle"></i> Create User
@@ -93,7 +93,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
               <li>
                 <a
                   class="dropdown-item"
-                  href="${pageContext.request.contextPath}/admin/rbac/roles"
+                  href="${pageContext.request.contextPath}/employee/admin/rbac/roles"
                 >
                   <i class="bi bi-shield"></i> Manage Roles
                 </a>
@@ -254,7 +254,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                 <h5 class="text-muted mt-3">No users found</h5>
                 <p class="text-muted">Try adjusting your search criteria</p>
                 <a
-                  href="${pageContext.request.contextPath}/admin/users/create"
+                  href="${pageContext.request.contextPath}/employee/admin/users/create"
                   class="btn btn-success"
                 >
                   <i class="bi bi-plus-circle"></i> Create First User
@@ -384,14 +384,14 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                         <td>
                           <div class="btn-group btn-group-sm">
                             <a
-                              href="${pageContext.request.contextPath}/admin/users/view/${user.userId}"
+                              href="${pageContext.request.contextPath}/employee/admin/users/view/${user.userId}"
                               class="btn btn-outline-info"
                               title="View Details"
                             >
                               <i class="bi bi-eye"></i>
                             </a>
                             <a
-                              href="${pageContext.request.contextPath}/admin/users/edit/${user.userId}"
+                              href="${pageContext.request.contextPath}/employee/admin/users/edit/${user.userId}"
                               class="btn btn-outline-primary"
                               title="Edit User"
                             >
@@ -401,7 +401,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                               <c:choose>
                                 <c:when test="${user.activeStatus}">
                                   <a
-                                    href="${pageContext.request.contextPath}/admin/users/disable/${user.userId}"
+                                    href="${pageContext.request.contextPath}/employee/admin/users/disable/${user.userId}"
                                     class="btn btn-outline-danger"
                                     title="Disable User"
                                     onclick="return confirm('Are you sure you want to disable this user?')"
@@ -411,7 +411,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                                 </c:when>
                                 <c:otherwise>
                                   <a
-                                    href="${pageContext.request.contextPath}/admin/users/enable/${user.userId}"
+                                    href="${pageContext.request.contextPath}/employee/admin/users/enable/${user.userId}"
                                     class="btn btn-outline-success"
                                     title="Enable User"
                                     onclick="return confirm('Are you sure you want to enable this user?')"
@@ -602,7 +602,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
               <i class="bi bi-info-circle"></i>
               <strong>Quick Actions:</strong>
               <a
-                href="${pageContext.request.contextPath}/admin/users/create"
+                href="${pageContext.request.contextPath}/employee/admin/users/create"
                 class="text-decoration-none"
                 >Create User</a
               >
@@ -614,7 +614,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
               >
               |
               <a
-                href="${pageContext.request.contextPath}/admin/rbac/roles"
+                href="${pageContext.request.contextPath}/employee/admin/rbac/roles"
                 class="text-decoration-none"
                 >Manage Roles</a
               >

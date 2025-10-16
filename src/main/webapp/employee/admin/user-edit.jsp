@@ -66,13 +66,13 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
       <div class="row mb-3">
         <div class="col-12">
           <a
-            href="${pageContext.request.contextPath}/admin/users/view/${user.userId}"
+            href="${pageContext.request.contextPath}/employee/admin/users/view/${user.userId}"
             class="btn btn-outline-info"
           >
             <i class="bi bi-arrow-left"></i> Back to User Details
           </a>
           <a
-            href="${pageContext.request.contextPath}/admin/users"
+            href="${pageContext.request.contextPath}/employee/admin/users"
             class="btn btn-outline-secondary ms-2"
           >
             <i class="bi bi-list"></i> User List
@@ -92,7 +92,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
             <div class="card-body">
               <form
                 method="POST"
-                action="${pageContext.request.contextPath}/admin/users/edit/${user.userId}"
+                action="${pageContext.request.contextPath}/employee/admin/users/edit/${user.userId}"
               >
                 <div class="row">
                   <div class="col-md-6">
@@ -233,7 +233,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                       </div>
                       <div>
                         <a
-                          href="${pageContext.request.contextPath}/admin/users/view/${user.userId}"
+                          href="${pageContext.request.contextPath}/employee/admin/users/view/${user.userId}"
                           class="btn btn-outline-secondary"
                         >
                           <i class="bi bi-x-circle"></i> Cancel
@@ -297,19 +297,19 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
             <div class="card-body">
               <div class="d-grid gap-2">
                 <a
-                  href="${pageContext.request.contextPath}/admin/users/view/${user.userId}"
+                  href="${pageContext.request.contextPath}/employee/admin/users/view/${user.userId}"
                   class="btn btn-outline-info btn-sm"
                 >
                   <i class="bi bi-eye"></i> View Details
                 </a>
                 <a
-                  href="${pageContext.request.contextPath}/admin/users"
+                  href="${pageContext.request.contextPath}/employee/admin/users"
                   class="btn btn-outline-secondary btn-sm"
                 >
                   <i class="bi bi-list"></i> All Users
                 </a>
                 <a
-                  href="${pageContext.request.contextPath}/admin/users/create"
+                  href="${pageContext.request.contextPath}/employee/admin/users/create"
                   class="btn btn-outline-success btn-sm"
                 >
                   <i class="bi bi-plus-circle"></i> Create New User

@@ -1,20 +1,26 @@
 package model.employee;
 
-import model.user.User;
-public class Employee extends User{
-    private int employeeId;
-    private String position;
-    private String department;
+import java.math.BigDecimal;
 
-    public Employee() {
-        super();
+import model.user.User;
+
+public class Employee extends User {
+    private int employeeId;
+    private String employeeCode;
+    private BigDecimal salary;
+    private Integer managedBy;
+    private Integer createBy;
+
+    public Employee(int employeeId, String employeeCode, BigDecimal salary, Integer managedBy, Integer createBy) {
+        this.employeeId = employeeId;
+        this.employeeCode = employeeCode;
+        this.salary = salary;
+        this.managedBy = managedBy;
+        this.createBy = createBy;
     }
 
-    public Employee(int userId, int roleId, String fullName, String userName, String email, String phoneNumber, String passwordHash, boolean activeStatus, int employeeId, String position, String department) {
-        super();
-        this.employeeId = employeeId;
-        this.position = position;
-        this.department = department;
+    public Employee() {
+        // Default constructor
     }
 
     public int getEmployeeId() {
@@ -25,20 +31,36 @@ public class Employee extends User{
         this.employeeId = employeeId;
     }
 
-    public String getPosition() {
-        return position;
+    public String getEmployeeCode() {
+        return employeeCode;
     }
 
-    public void setPosition(String position) {
-        this.position = position;
+    public void setEmployeeCode(String employeeCode) {
+        this.employeeCode = employeeCode;
     }
 
-    public String getDepartment() {
-        return department;
+    public BigDecimal getSalary() {
+        return salary;
     }
 
-    public void setDepartment(String department) {
-        this.department = department;
+    public void setSalary(BigDecimal salary) {
+        this.salary = salary;
+    }
+
+    public Integer getManagedBy() {
+        return managedBy;
+    }
+
+    public void setManagedBy(Integer managedBy) {
+        this.managedBy = managedBy;
+    }
+
+    public Integer getCreateBy() {
+        return createBy;
+    }
+
+    public void setCreateBy(Integer createBy) {
+        this.createBy = createBy;
     }
 
 }

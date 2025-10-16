@@ -380,7 +380,7 @@ public class AdminDAO extends DbContext {
         }
     }
 
-    //Get EmployeeID associated with a given userName
+    // Get EmployeeID associated with a given userName
     public Integer getEmployeeIdByUsername(String userName) throws SQLException {
         // SQL: Find EmployeeID by joining Employee and User tables on UserID
         String sql = "SELECT e.EmployeeID FROM Employee e " +
@@ -388,7 +388,7 @@ public class AdminDAO extends DbContext {
                 "WHERE u.UserName = ?";
 
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, userName);
 
@@ -400,16 +400,17 @@ public class AdminDAO extends DbContext {
         }
         return null;
     }
+
     public boolean executePromoteToEmployeeSP(int userId, String newRoleName,
-                                              String employeeCode, double salary,
-                                              int managedByEmployeeId, int createdByEmployeeId)
+            String employeeCode, double salary,
+            int managedByEmployeeId, int createdByEmployeeId)
             throws SQLException {
 
         // Đảm bảo bạn đã import java.sql.CallableStatement
         String sql = "{CALL SP_PromoteCustomerToEmployee(?, ?, ?, ?, ?, ?)}";
 
         try (Connection conn = getConnection();
-             java.sql.CallableStatement cs = conn.prepareCall(sql)) { // Sử dụng CallableStatement
+                java.sql.CallableStatement cs = conn.prepareCall(sql)) { // Sử dụng CallableStatement
 
             cs.setInt(1, userId);
             cs.setString(2, newRoleName);
@@ -432,7 +433,7 @@ public class AdminDAO extends DbContext {
         String sql = "UPDATE User SET RoleID=?, FullName=?, Email=?, UpdatedAt=NOW() WHERE UserID=?";
 
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, user.getRoleId());
             ps.setString(2, user.getFullName());
