@@ -66,7 +66,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
       <div class="row mb-3">
         <div class="col-12">
           <a
-            href="${pageContext.request.contextPath}/employee/admin/users"
+            href="${pageContext.request.contextPath}/admin/users"
             class="btn btn-outline-secondary"
           >
             <i class="bi bi-arrow-left"></i> Back to User List
@@ -186,7 +186,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
             <div class="card-body">
               <div class="d-grid gap-2">
                 <a
-                  href="${pageContext.request.contextPath}/employee/admin/users/edit/${user.userId}"
+                  href="${pageContext.request.contextPath}/admin/users/edit/${user.userId}"
                   class="btn btn-primary"
                 >
                   <i class="bi bi-pencil"></i> Edit User
@@ -196,7 +196,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   <c:choose>
                     <c:when test="${user.activeStatus}">
                       <a
-                        href="${pageContext.request.contextPath}/employee/admin/users/disable/${user.userId}"
+                        href="${pageContext.request.contextPath}/admin/users/disable/${user.userId}"
                         class="btn btn-outline-danger"
                         onclick="return confirm('Are you sure you want to disable this user?')"
                       >
@@ -205,7 +205,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                     </c:when>
                     <c:otherwise>
                       <a
-                        href="${pageContext.request.contextPath}/employee/admin/users/enable/${user.userId}"
+                        href="${pageContext.request.contextPath}/admin/users/enable/${user.userId}"
                         class="btn btn-outline-success"
                         onclick="return confirm('Are you sure you want to enable this user?')"
                       >
@@ -218,14 +218,14 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                 <hr />
 
                 <a
-                  href="${pageContext.request.contextPath}/employee/admin/users"
+                  href="${pageContext.request.contextPath}/admin/users"
                   class="btn btn-outline-secondary"
                 >
                   <i class="bi bi-list"></i> All Users
                 </a>
 
                 <a
-                  href="${pageContext.request.contextPath}/employee/admin/users/create"
+                  href="${pageContext.request.contextPath}/admin/users/create"
                   class="btn btn-success"
                 >
                   <i class="bi bi-plus-circle"></i> Create New User
