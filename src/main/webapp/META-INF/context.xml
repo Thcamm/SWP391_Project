@@ -7,7 +7,7 @@
             driverClassName="com.mysql.cj.jdbc.Driver"
             url="jdbc:mysql://localhost:3306/garage_mgmt?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=Asia/Bangkok&amp;useUnicode=true&amp;charset=UTF-8"
             username="root"
-            password="thuy2005"
+            password="1234"
             initialSize="5"
             maxActive="30"
             maxIdle="10"

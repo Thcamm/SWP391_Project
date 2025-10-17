@@ -27,7 +27,6 @@ public class UserDAO extends DbContext {
         return null;
     }
 
-    // Lấy user bằng username (khi user đã active), đã bỏ phương thức bị trùng
     public User getUserByUserName(String userName) throws SQLException {
         String sql = "SELECT * FROM User WHERE UserName = ? AND ActiveStatus = 1";
         try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
@@ -54,6 +53,16 @@ public class UserDAO extends DbContext {
             }
         }
         return null;
+    }
+    public boolean changeUserPassword(int userId, String newPasswordHash) throws SQLException {
+        String sql = "UPDATE User SET PasswordHash = ? WHERE UserID = ?";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newPasswordHash);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+            return true;
+        }
     }
 
     public ArrayList<User> getAllActiveUsers() throws SQLException {
@@ -138,6 +147,7 @@ public class UserDAO extends DbContext {
             return ps.executeUpdate();
         }
     }
+
     public boolean isEmailExists(String email, int currentUserId) throws SQLException {
         String sql = "SELECT 1 FROM `User` WHERE Email = ? AND UserID != ?";
         try (Connection conn = DbContext.getConnection();
@@ -149,6 +159,7 @@ public class UserDAO extends DbContext {
             }
         }
     }
+
     public boolean updateUserProfile(User user) throws SQLException {
         String sql = "UPDATE `User` SET FullName=?, Email=?, PhoneNumber=?, gender=?, birthdate=?, address=? WHERE UserID=?";
         try (Connection conn = DbContext.getConnection();
@@ -164,6 +175,8 @@ public class UserDAO extends DbContext {
         }
     }
 
+
+
     public int findRoleIdByUserId(int userId) throws SQLException {
         String sql = "SELECT RoleID FROM User WHERE UserID = ?";
         try (Connection conn = DbContext.getConnection();
@@ -175,6 +188,20 @@ public class UserDAO extends DbContext {
                 }
                 return -1;
             }
+        }
+    }
+    public boolean updatePassword(int userId, String newPasswordHash) throws SQLException {
+        String sql = "UPDATE User SET PasswordHash = ? WHERE UserID = ?";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newPasswordHash);
+            ps.setInt(2, userId);
+
+            int rowsAffected = ps.executeUpdate();
+
+            return rowsAffected > 0;
         }
     }
 
@@ -193,21 +220,6 @@ public class UserDAO extends DbContext {
             }
         }
         return userIds;
-    }
-
-    public boolean updatePassword(int userId, String newPasswordHash) throws SQLException {
-        String sql = "UPDATE User SET PasswordHash = ? WHERE UserID = ?";
-
-        try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, newPasswordHash);
-            ps.setInt(2, userId);
-
-            int rowsAffected = ps.executeUpdate();
-
-            return rowsAffected > 0;
-        }
     }
 
     private User extractUser(ResultSet rs) throws SQLException {

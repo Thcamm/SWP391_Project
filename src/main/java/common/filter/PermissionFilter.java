@@ -55,6 +55,18 @@ public class PermissionFilter implements Filter {
 //        routePerm.put("POST:/cs/appointements/create", "appointment_create");
 //        routePerm.put("POST:/cs/appointements/update", "appointment_update");
 //        routePerm.put("POST:/cs/appointements/delete", "appointment_delete");
+        routePerm.put("GET:/view/cs/appointements", "appointment_read");
+        routePerm.put("POST:/cs/appointements/create", "appointment_create");
+        routePerm.put("POST:/cs/appointements/update", "appointment_update");
+        routePerm.put("POST:/cs/appointements/delete", "appointment_delete");
+        routePerm.put("GET:/view/customerservice/appointment-list.jsp", "cs_access");
+        routePerm.put("POST:/view/customerservice/appointment-list.jsp", "cs_access");
+//        routePerm.put("GET:/customerservice/create-customer", "cs_access");
+//        routePerm.put("POST:/customerservice/create-customer", "cs_access");
+//        routePerm.put("POST:/customerservice/search-customer", "cs_access");
+//        routePerm.put("GET:/customerservice/view-support-request", "cs_access");
+//        routePerm.put("POST:/customerservice/view-support-request", "cs_access");
+
 
         // Tech manager
         routePerm.put("GET:/tech-manager/orders", "workorder_read");
@@ -82,16 +94,33 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/app/bookings", "booking_create");
         routePerm.put("GET:/app/vehicles/status", "view_vehicle_status");
         routePerm.put("POST:/app/comments", "comment_create_by_customer");
+        routePerm.put("GET:/app/create-support-request", "customer_access");
+        routePerm.put("POST:/app/create-support-request", "customer_access");
+        routePerm.put("GET:/view/customer/appointment-scheduling.jsp", "customer_access");
+        routePerm.put("POST:/view/customer/appointment-scheduling.jsp", "customer_access");
+        routePerm.put("GET:/view/customer/garage.jsp", "customer_access");
+        routePerm.put("POST:/view/customer/garage.jsp", "customer_access");
+        routePerm.put("GET:/view/customer/addVehicle.jsp", "customer_access");
+        routePerm.put("POST:/view/customer/addVehicle.jsp", "customer_access");
+        routePerm.put("GET:/view/customer/editVehicle.jsp", "customer_access");
+        routePerm.put("POST:/view/customer/editVehicle.jsp", "customer_access");
 
+        //User
+        routePerm.put("GET:/view/user/viewProfile.jsp", "user_access");
+        routePerm.put("POST:/view/user/viewProfile.jsp", "user_access");
+        routePerm.put("GET:/view/user/editProfile.jsp", "user_access");
+        routePerm.put("POST:/view/user/editProfile.jsp", "user_access");
+        routePerm.put("GET:/view/user/changePassword.jsp", "user_access");
+        routePerm.put("POST:/view/user/changePassword.jsp", "user_access");
 
         areaGate.put("/admin/", "role_permission_manage");
-        areaGate.put("/cs/",            "cs_access");              // Customer Service
+        areaGate.put("/customerservice/",            "cs_access");
         areaGate.put("/tech-manager/",  "tech_manager_access");    // Tech Manager
         areaGate.put("/technician/",    "technician_access");      // Technician
         areaGate.put("/inventory/",     "inventory_access");       // Store Keeper
         areaGate.put("/accounting/",    "accounting_access");      // Accountant
-        areaGate.put("/app/",           "customer_access");
-
+        areaGate.put("/customer/",           "customer_access");   // Customer
+        areaGate.put("/user/",                  "user_access");    // User
     }
 
     @Override
@@ -158,6 +187,8 @@ public class PermissionFilter implements Filter {
     private boolean isPublic(String path) {
         return path.equals("/") ||
                 path.startsWith("/assets/") ||
+                path.startsWith("/css/") ||
+                path.startsWith("/js/") ||
                 path.startsWith("/login") ||
                 path.startsWith("/logout") ||
                 path.startsWith("/Register") ||
@@ -167,16 +198,20 @@ public class PermissionFilter implements Filter {
                 path.startsWith("/error") ||
                 path.startsWith("/register.jsp") ||
                 path.startsWith("/Home") ||
-                path.startsWith("/home.jsp") ;
+                path.startsWith("/forgotpassword") ||
+                path.startsWith("/home.jsp") ||
+                path.startsWith("/support-faq") ;
     }
 
 
     private String normalizePath(String p) {
-        if (p == null || p.isEmpty()) return "/";
+        if (p == null || p.isEmpty())
+            return "/";
 
         p = p.replaceAll("/{2,}", "/");
 
-        if (p.length() > 1 && p.endsWith("/")) p = p.substring(0, p.length()-1);
+        if (p.length() > 1 && p.endsWith("/"))
+            p = p.substring(0, p.length() - 1);
         return p;
     }
 

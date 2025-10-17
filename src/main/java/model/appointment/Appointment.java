@@ -1,19 +1,19 @@
 package model.appointment;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 public class Appointment {
     private int AppointmentID;
     private int CustomerID;
     private int VehicleID;
-    private LocalDate AppointmentDate;
+    private LocalDateTime AppointmentDate;
     private String Status;
     private String Description;
 
     public Appointment() {
     }
-    public Appointment(int AppointmentID, int CustomerID, int VehicleID,LocalDate AppointmentDate, String Status,String Description) {
+    public Appointment(int AppointmentID, int CustomerID, int VehicleID,LocalDateTime AppointmentDate, String Status,String Description) {
         this.AppointmentID = AppointmentID;
         this.CustomerID = CustomerID;
         this.VehicleID = VehicleID;
@@ -22,11 +22,11 @@ public class Appointment {
         this.Description = Description;
     }
 
-    public LocalDate getAppointmentDate() {
+    public LocalDateTime getAppointmentDate() {
         return AppointmentDate;
     }
 
-    public void setAppointmentDate(LocalDate appointmentDate) {
+    public void setAppointmentDate(LocalDateTime appointmentDate) {
         AppointmentDate = appointmentDate;
     }
 

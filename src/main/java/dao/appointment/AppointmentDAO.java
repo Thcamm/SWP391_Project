@@ -35,7 +35,7 @@ public class AppointmentDAO extends DbContext {
                 appointment.setAppointmentID(rs.getInt("AppointmentID"));
                 appointment.setCustomerID(rs.getInt("CustomerID"));
                 appointment.setVehicleID(rs.getInt("VehicleID"));
-                appointment.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime().toLocalDate());
+                appointment.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime());
                 appointment.setStatus(rs.getString("Status"));
                 appointment.setDescription(rs.getString("Description"));
 
@@ -53,10 +53,24 @@ public class AppointmentDAO extends DbContext {
         return resultList;
     }
 
-
-
-
-
+    public List<String> getAllStatuses() throws SQLException {
+        List<String> statuses = new ArrayList<>();
+        String sql = "SHOW COLUMNS FROM Appointment LIKE 'Status'";
+        try (PreparedStatement ps = getConnection().prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                String type = rs.getString("Type"); // enum('Pending','InProgress',...)
+                type = type.replaceAll("^enum\\('", "")
+                        .replaceAll("'\\)$", "")
+                        .replace("'", "");
+                String[] parts = type.split(",");
+                for (String s : parts) {
+                    statuses.add(s.trim());
+                }
+            }
+        }
+        return statuses;
+    }
     public Appointment getAppointmentById(int appointmentID) {
         String sql = "SELECT * FROM Appointment WHERE AppointmentID = ?";
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
@@ -67,7 +81,7 @@ public class AppointmentDAO extends DbContext {
                 appointment.setAppointmentID(rs.getInt("AppointmentID"));
                 appointment.setCustomerID(rs.getInt("CustomerID"));
                 appointment.setVehicleID(rs.getInt("VehicleID"));
-                appointment.setAppointmentDate(rs.getDate("Date").toLocalDate());
+                appointment.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime());
                 appointment.setStatus(rs.getString("Status"));
                 appointment.setDescription(rs.getString("Description"));
                 return appointment;
@@ -87,7 +101,7 @@ public class AppointmentDAO extends DbContext {
             st.setInt(2, appointment.getVehicleID());
             // Kiểm tra null và set date an toàn
             if (appointment.getAppointmentDate() != null) {
-                st.setDate(3, java.sql.Date.valueOf(appointment.getAppointmentDate()));
+                st.setTimestamp(3, java.sql.Timestamp.valueOf(appointment.getAppointmentDate()));
             } else {
                 throw new IllegalArgumentException("AppointmentService date cannot be null");
             }
@@ -108,7 +122,7 @@ public class AppointmentDAO extends DbContext {
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
             st.setInt(1, appointment.getCustomerID());
             st.setInt(2, appointment.getVehicleID());
-            st.setDate(3, java.sql.Date.valueOf(appointment.getAppointmentDate()));
+            st.setTimestamp(3, java.sql.Timestamp.valueOf(appointment.getAppointmentDate()));
             st.setString(4, appointment.getStatus());
             st.setString(5, appointment.getDescription());
             st.setInt(6, appointment.getAppointmentID());
@@ -133,8 +147,8 @@ public class AppointmentDAO extends DbContext {
         }
     }
 
-    public void getAppointmentsByCustomerId(int customerID) {
-        String sql = "SELECT * FROM Appointment WHERE CustomerID = ?";
+    public List<Appointment> getAppointmentsByCustomerId(int customerID) {
+        String sql = "SELECT * FROM Appointment WHERE CustomerID = ? ORDER BY Date DESC";
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
             st.setInt(1, customerID);
             ResultSet rs = st.executeQuery();
@@ -144,16 +158,64 @@ public class AppointmentDAO extends DbContext {
                 appointment.setAppointmentID(rs.getInt("AppointmentID"));
                 appointment.setCustomerID(rs.getInt("CustomerID"));
                 appointment.setVehicleID(rs.getInt("VehicleID"));
-                appointment.setAppointmentDate(rs.getDate("Date").toLocalDate());
+                appointment.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime());
                 appointment.setStatus(rs.getString("Status"));
                 appointment.setDescription(rs.getString("Description"));
                 appointments.add(appointment);
+
             }
-            // Xử lý danh sách cuộc hẹn theo nhu cầu của bạn
+            return appointments;
         } catch (SQLException e) {
             throw new RuntimeException("Lỗi khi lấy danh sách cuộc hẹn theo ID khách hàng", e);
         }
     }
+    public List<Appointment> getAppointmentByFilter(
+            int customerId, String fromDate, String toDate, String status, String sortOrder) {
+
+        StringBuilder sql = new StringBuilder("SELECT * FROM Appointment WHERE 1=1");
+        List<Appointment> appointments = new ArrayList<>();
+
+        if (customerId > 0)
+            sql.append(" AND CustomerID = ?");
+        if (fromDate != null && !fromDate.isEmpty())
+            sql.append(" AND Date >= ?");
+        if (toDate != null && !toDate.isEmpty())
+            sql.append(" AND Date <= ?");
+        if (status != null && !status.isEmpty())
+            sql.append(" AND Status = ?");
+
+        sql.append(" ORDER BY Date ")
+                .append("oldest".equalsIgnoreCase(sortOrder) ? "ASC" : "DESC");
+
+        try (PreparedStatement st = getConnection().prepareStatement(sql.toString())) {
+            int index = 1;
+            if (customerId > 0)
+                st.setInt(index++, customerId);
+            if (fromDate != null && !fromDate.isEmpty())
+                st.setString(index++, fromDate);
+            if (toDate != null && !toDate.isEmpty())
+                st.setString(index++, toDate);
+            if (status != null && !status.isEmpty())
+                st.setString(index++, status);
+
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                Appointment a = new Appointment();
+                a.setAppointmentID(rs.getInt("AppointmentID"));
+                a.setCustomerID(rs.getInt("CustomerID"));
+                a.setVehicleID(rs.getInt("VehicleID"));
+                a.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime());
+                a.setStatus(rs.getString("Status"));
+                a.setDescription(rs.getString("Description"));
+                appointments.add(a);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return appointments;
+    }
+
     //
 //    public boolean updateStatus(int appointmentId, String newStatus) {
 //        String sql = "UPDATE appointment SET status = ? WHERE appointment_id = ?";
@@ -211,7 +273,7 @@ public class AppointmentDAO extends DbContext {
                 apm.setAppointmentID(rs.getInt("AppointmentID"));
                 apm.setCustomerID(rs.getInt("CustomerID"));
                 apm.setVehicleID(rs.getInt("VehicleID"));
-                apm.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime().toLocalDate());
+                apm.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime());
                 apm.setStatus(rs.getString("Status"));
                 apm.setDescription(rs.getString("Description"));
 

@@ -5,8 +5,8 @@ import java.sql.Date;
 public class SupportRequest {
     private int requestId;
     private int customerId;
-    private int workOrderId;
-    private int appointmentId;
+    private Integer workOrderId;
+    private Integer appointmentId;
     private int categoryId;
     private String description;
     private String attachmentPath;
@@ -17,15 +17,15 @@ public class SupportRequest {
     public SupportRequest() {
     }
 
-    public SupportRequest(int requestId, int customerId, int workOrderId, int appointmentId, int categoryId, String description, String attachmentPath, String status, Date createdAt, Date updatedAt) {
+    public SupportRequest(int requestId, int customerId, Integer appointmentId, Integer workOrderId, int categoryId, String description, String status, String attachmentPath, Date createdAt, Date updatedAt) {
         this.requestId = requestId;
         this.customerId = customerId;
-        this.workOrderId = workOrderId;
         this.appointmentId = appointmentId;
+        this.workOrderId = workOrderId;
         this.categoryId = categoryId;
         this.description = description;
-        this.attachmentPath = attachmentPath;
         this.status = status;
+        this.attachmentPath = attachmentPath;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -46,20 +46,12 @@ public class SupportRequest {
         this.customerId = customerId;
     }
 
-    public int getWorkOrderId() {
+    public Integer getWorkOrderId() {
         return workOrderId;
     }
 
-    public void setWorkOrderId(int workOrderId) {
+    public void setWorkOrderId(Integer workOrderId) {
         this.workOrderId = workOrderId;
-    }
-
-    public int getAppointmentId() {
-        return appointmentId;
-    }
-
-    public void setAppointmentId(int appointmentId) {
-        this.appointmentId = appointmentId;
     }
 
     public int getCategoryId() {
@@ -68,6 +60,14 @@ public class SupportRequest {
 
     public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
+    }
+
+    public Integer getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(Integer appointmentId) {
+        this.appointmentId = appointmentId;
     }
 
     public String getDescription() {
