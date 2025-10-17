@@ -1,5 +1,6 @@
 package dao.user;
 
+import common.DbContext;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -52,10 +53,11 @@ public class UserDAO extends DbContext {
         }
         return null;
     }
+
     public boolean changeUserPassword(int userId, String newPasswordHash) throws SQLException {
         String sql = "UPDATE User SET PasswordHash = ? WHERE UserID = ?";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, newPasswordHash);
             ps.setInt(2, userId);
             ps.executeUpdate();
@@ -173,6 +175,20 @@ public class UserDAO extends DbContext {
         }
     }
 
+    public int findRoleIdByUserId(int userId) throws SQLException {
+        String sql = "SELECT RoleID FROM User WHERE UserID = ?";
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("RoleID");
+                }
+                return -1;
+            }
+        }
+    }
+
     public boolean updatePassword(int userId, String newPasswordHash) throws SQLException {
         String sql = "UPDATE User SET PasswordHash = ? WHERE UserID = ?";
 
@@ -188,36 +204,23 @@ public class UserDAO extends DbContext {
         }
     }
 
-    public int findRoleIdByUserId(int userId) throws SQLException {
-        String sql = "SELECT RoleID FROM User WHERE UserID = ?";
+    public List<Integer> findUserIdsByRoleName(String roleName) throws SQLException {
+        List<Integer> userIds = new ArrayList<>();
+        String sql = "SELECT u.UserID FROM User u JOIN RoleInfo r ON u.RoleID = r.RoleID WHERE r.RoleName = ?";
+
         try (Connection conn = DbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("RoleID");
-                }
-                return -1;
-            }
-        }
-    }
 
-    public List<User> getUsersByRoleId(int roleId) throws SQLException {
-        String sql = "SELECT * FROM User WHERE RoleID = ? AND ActiveStatus = 1";
-        List<User> users = new ArrayList<>();
-        try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, roleId);
+            ps.setString(1, roleName);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    users.add(extractUser(rs));
+                    userIds.add(rs.getInt("UserID"));
                 }
             }
         }
-        return users;
+        return userIds;
     }
 
-    // Helper method để map ResultSet sang đối tượng User
     private User extractUser(ResultSet rs) throws SQLException {
         User user = new User();
         user.setUserId(rs.getInt("UserID"));

@@ -41,7 +41,6 @@ public class Login extends HttpServlet {
             String roleCode = new dao.employee.admin.rbac.RoleDao().findRoleCodeById(user.getRoleId());
             request.getSession().setAttribute("user", user);
             request.getSession().setAttribute("roleCode", roleCode);
-            request.getSession().setAttribute("roleId", user.getRoleId());
             request.getSession().setAttribute("userId", user.getUserId());
             request.getSession().setAttribute("userName", user.getUserName());
 

@@ -5,58 +5,17 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Danh sách cuộc hẹn</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 30px;
-            background-color: #fafafa;
-        }
-        table {
-            width: 95%;
-            margin: auto;
-            border-collapse: collapse;
-            background-color: #fff;
-            box-shadow: 0 0 6px rgba(0,0,0,0.1);
-        }
-        th, td {
-            padding: 10px 15px;
-            border-bottom: 1px solid #ddd;
-            text-align: center;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        a.detail-link {
-            text-decoration: none;
-            color: #007bff;
-            font-weight: bold;
-        }
-        a.detail-link:hover {
-            text-decoration: underline;
-        }
-        .error {
-            color: red;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-    </style>
+    <title>Appointment List</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customerservice/appointment-list.css">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<form action="${pageContext.request.contextPath}/employee/customer_service/appointment-list" method="get" class="card p-4 mb-4">
+<form action="${pageContext.request.contextPath}/customerservice/appointment-list" method="get" class="card p-4 mb-4">
     <div class="mt-4 d-flex justify-content-between align-items-center">
         <div class="col-md-4">
             <label for="searchName" class="form-label">Customer Name</label>
-            <input type="text" id="searchName" name="searchName" value="${param.searchName}" class="form-control" placeholder="Nhập tên khách hàng" />
+            <input type="text" id="searchName" name="searchName" value="${param.searchName}" class="form-control" placeholder="Enter customer name" />
         </div>
         <label>
             <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -123,7 +82,7 @@
         <button type="submit" class="btn btn-success">
             🔍
         </button>
-        <a href="${pageContext.request.contextPath}/employee/customer_service/appointment-list" class="btn btn-secondary">Reset</a>
+        <a href="${pageContext.request.contextPath}/customerservice/appointment-list" class="btn btn-secondary">Reset</a>
     </div>
 </form>
 
@@ -160,17 +119,16 @@
                     <%-- Nếu không phải PENDING thì chỉ hiển thị text và icon, không có dropdown --%>
                 <c:when test="${apm.status != 'PENDING'}">
                 <c:choose>
-                <c:when test="${apm.status == 'CANCELLED'}">❌ CANCELLED</c:when>
-                <c:when test="${apm.status == 'ACCEPTED'}">✅ ACCEPTED</c:when>
-                <c:when test="${apm.status == 'REJECTED'}">🚫 REJECTED</c:when>
-                <c:when test="${apm.status == 'COMPLETED'}">🎉 COMPLETED</c:when>
+                <c:when test="${apm.status == 'CANCELLED'}"> CANCELLED</c:when>
+                <c:when test="${apm.status == 'ACCEPTED'}"> ACCEPTED</c:when>
+                <c:when test="${apm.status == 'REJECTED'}"> REJECTED</c:when>
+                <c:when test="${apm.status == 'COMPLETED'}"> COMPLETED</c:when>
                 <c:otherwise>🔘 ${apm.status}</c:otherwise>
                 </c:choose>
                 </c:when>
 
-                    <%-- Nếu đang là PENDING thì mới hiển thị dropdown để đổi trạng thái --%>
                 <c:otherwise>
-                <form action="${pageContext.request.contextPath}/employee/customer_service/appointment-list"
+                <form action="${pageContext.request.contextPath}/customerservice/appointment-list"
                       method="post" class="d-inline">
                     <input type="hidden" name="appointmentID" value="${apm.appointmentID}">
 
@@ -218,17 +176,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+<script src="${pageContext.request.contextPath}/assets/js/customerservice/appointment-list.js"></script>
 
-<script>
-    document.querySelector('form').addEventListener('submit', function(e) {
-        const fromDate = document.querySelector('input[name="fromDate"]').value;
-        const toDate = document.querySelector('input[name="toDate"]').value;
-
-        if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
-            e.preventDefault();
-            alert("❌ The start date cannot be greater than the end date!");
-        }
-    });
-</script>
 </body>
 </html>

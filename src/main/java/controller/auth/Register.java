@@ -86,6 +86,7 @@ public class Register extends HttpServlet {
         try {
             dao.user.UserDAO userDAO = new dao.user.UserDAO();
 
+            // Kiểm tra username đã tồn tại
             if (userDAO.getUserByUserName(userName) != null) {
                 request.setAttribute("error", "Tên đăng nhập đã tồn tại.");
                 request.getRequestDispatcher("/register.jsp").forward(request, response);

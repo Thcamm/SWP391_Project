@@ -36,7 +36,7 @@ public class AddVehicleServlet extends HttpServlet {
             e.printStackTrace();
             request.setAttribute("error", "Could not load car brands data.");
         }
-        request.getRequestDispatcher("/view/vehicle/addVehicle.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class AddVehicleServlet extends HttpServlet {
         } catch (SQLException | NumberFormatException e) {
             e.printStackTrace();
             request.setAttribute("error", "An error occurred. Please try again.");
-            request.getRequestDispatcher("/view/vehicle/addVehicle.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
         }
     }
 
@@ -72,7 +72,7 @@ public class AddVehicleServlet extends HttpServlet {
                 .findFirst()
                 .ifPresent(b -> request.setAttribute("selectedBrandName", b.getBrandName()));
 
-        request.getRequestDispatcher("/view/vehicle/addVehicle.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
     }
 
     private void handleSaveVehicle(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
@@ -149,6 +149,6 @@ public class AddVehicleServlet extends HttpServlet {
         request.setAttribute("prevYear", request.getParameter("yearManufacture"));
         request.setAttribute("prevLicensePlate", request.getParameter("licensePlate"));
 
-        request.getRequestDispatcher("/view/vehicle/addVehicle.jsp").forward(request, response);
+        request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
     }
 }

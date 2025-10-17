@@ -1,7 +1,7 @@
 package model.support;
 
 public class SupportFAQ {
-    private int FAQID ;
+    private int FAQId ;
     private String question;
     private String answer ;
     private boolean isActive ;
@@ -9,19 +9,25 @@ public class SupportFAQ {
     public SupportFAQ() {
     }
 
-    public SupportFAQ(int FAQID, String question, String answer, boolean isActive) {
-        this.FAQID = FAQID;
+    public SupportFAQ(int FAQId, String question, String answer) {
+        this.FAQId = FAQId;
+        this.question = question;
+        this.answer = answer;
+    }
+
+    public SupportFAQ(int FAQId, String question, String answer, boolean isActive) {
+        this.FAQId = FAQId;
         this.question = question;
         this.answer = answer;
         this.isActive = isActive;
     }
 
-    public int getFAQID() {
-        return FAQID;
+    public int getFAQId() {
+        return FAQId;
     }
 
-    public void setFAQID(int FAQID) {
-        this.FAQID = FAQID;
+    public void setFAQId(int FAQId) {
+        this.FAQId = FAQId;
     }
 
     public String getQuestion() {
@@ -51,7 +57,7 @@ public class SupportFAQ {
     @Override
     public String toString() {
         return "SupportFAQ{" +
-                "FAQID=" + FAQID +
+                "FAQID=" + FAQId +
                 ", question='" + question + '\'' +
                 ", answer='" + answer + '\'' +
                 ", isActive=" + isActive +

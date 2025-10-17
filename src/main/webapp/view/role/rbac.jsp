@@ -29,9 +29,9 @@
     </div>
 </c:if>
 
-<c:if test = "${param.saved == '1'}">
-    <div class="msg"> Save permission successfully!</div>
-</c:if>
+<%--<c:if test = "${param.saved == '1'}">--%>
+<%--    <div class="msg"> Save permission successfully!</div>--%>
+<%--</c:if>--%>
 
 <div class="container rbac-container">
     <h1 class="page-title">Role -> Permission (RBAC)</h1>
@@ -99,7 +99,10 @@
     </div>
     <form method="post" action="${pageContext.request.contextPath}/admin/rbac/roles/save" class="permission-form">
         <input type="hidden" name="roleId" value="${roleId}"/>
-
+        <input type="hidden" name="page"     value="${pager.currentPage}"/>
+        <input type="hidden" name="size"     value="${pager.itemsPerPage}"/>
+        <input type="hidden" name="keyword"  value="${param.keyword}"/>
+        <input type="hidden" name="category" value="${param.category}"/>
         <c:if test="${not empty managePermId}">
             <input type="hidden" name="permIds" value="${managePermId}"/>
         </c:if>

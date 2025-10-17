@@ -10,7 +10,7 @@
     <%@ page import="model.user.User" %>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/chatbot.css">
+    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/assets/css/user/chatbot.css">
 
     <style>
         :root {
@@ -338,7 +338,7 @@
     </div>
     <nav class="main-navbar">
         <div class="container d-flex justify-content-between align-items-center">
-            <a class="navbar-brand" href="Home">
+            <a class="navbar-brand" href="${pageContext.request.contextPath}/Home">
                 CS<span>CARSPA.VN</span>
             </a>
             <div class="nav-icons d-flex align-items-center">
@@ -359,23 +359,26 @@
         </button>
     </div>
     <nav class="sidebar-nav">
-        <a href="Home" class="menu-item">
+        <a href="${pageContext.request.contextPath}/Home" class="menu-item">
             <span>TRANG CHỦ</span>
         </a>
-        <a href="#" class="menu-item">
+        <a href="${pageContext.request.contextPath}/customerservice/view-support-request" class="menu-item">
             <span>DỊCH VỤ</span>
         </a>
-        <a href="#" class="menu-item">
+        <a href="${pageContext.request.contextPath}/support-faq" class="menu-item">
             <span>THƯ VIỆN DỰ ÁN</span>
         </a>
-        <a href="#" class="menu-item">
-            <span>ĐÀO TẠO NGHỀ</span>
+        <a href="${pageContext.request.contextPath}/customer/create-support-request" class="menu-item">
+            <span>SEARCH CUSTOMER</span>
         </a>
-        <a href="#" class="menu-item">
+        <a href="${pageContext.request.contextPath}/customerservice/appointment-list" class="menu-item">
             <span>TIN TỨC</span>
         </a>
-        <a href="AppointmentScheduling" class="menu-item">
+        <a href="${pageContext.request.contextPath}/customer/AppointmentService" class="menu-item">
             <span>Lien he dat lich</span>
+        </a>
+        <a href="${pageContext.request.contextPath}/customer/garage" class="menu-item">
+            <span>QUẢN LÝ XE (MY GARAGE)</span>
         </a>
     </nav>
 </div>
