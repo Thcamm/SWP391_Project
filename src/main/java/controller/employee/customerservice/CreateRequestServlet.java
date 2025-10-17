@@ -1,11 +1,10 @@
-package controller.customer;
+package controller.employee.customerservice;
 
 import dao.carservice.CarServiceDAO;
 import dao.vehicle.VehicleDAO;
 import model.customer.Customer;
 import model.servicerequest.ServiceRequest;
 import model.servicetype.Service;
-import model.user.User;
 import model.vehicle.Vehicle;
 import service.carservice.ServiceRequestService;
 
@@ -19,7 +18,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet(name = "CustomerCreateRequestServlet", urlPatterns = {"/customer/createRequest"})
+@WebServlet(name = "CustomerCreateRequestServlet", urlPatterns = {"/customerservice/createRequest"})
 public class CreateRequestServlet extends HttpServlet {
 
     @Override

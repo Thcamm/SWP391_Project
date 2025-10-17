@@ -54,7 +54,8 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/cs/appointements/delete", "appointment_delete");
         routePerm.put("GET:/view/customerservice/appointment-list.jsp", "cs_access");
         routePerm.put("POST:/view/customerservice/appointment-list.jsp", "cs_access");
-//        routePerm.put("GET:/customerservice/create-customer", "cs_access");
+        routePerm.put("GET:/view/customerservice/appointment-list", "cs_access");
+
 //        routePerm.put("POST:/customerservice/create-customer", "cs_access");
 //        routePerm.put("POST:/customerservice/search-customer", "cs_access");
 //        routePerm.put("GET:/customerservice/view-support-request", "cs_access");
