@@ -45,16 +45,16 @@ public class PermissionFilter implements Filter {
         routePerm.put("GET:/techmanager/dashboard", "techmanager_read");
 
         // WorkOrder management - tất cả operations được xử lý bởi WorkOrderController
-        routePerm.put("GET:/workorders/list", "workorder_read");
-        routePerm.put("GET:/workorders/create", "workorder_create");
-        routePerm.put("POST:/workorders/create", "workorder_create");
-        routePerm.put("GET:/workorders/details", "workorder_read");
-        routePerm.put("POST:/workorders/add-detail", "workorder_update");
-        routePerm.put("GET:/workorders/edit-detail", "workorder_update");
-        routePerm.put("POST:/workorders/edit-detail", "workorder_update");
-        routePerm.put("POST:/workorders/delete-detail", "workorder_delete");
-        routePerm.put("POST:/workorders/approve-detail", "workorder_approve");
-        routePerm.put("POST:/workorders/decline-detail", "workorder_approve");
+        routePerm.put("GET:/techmanager/workorders/list", "workorder_read");
+        routePerm.put("GET:/techmanager/workorders/create", "workorder_create");
+        routePerm.put("POST:/techmanager/workorders/create", "workorder_create");
+        routePerm.put("GET:/techmanager/workorders/details", "workorder_read");
+        routePerm.put("POST:/techmanager/workorders/add-detail", "workorder_update");
+        routePerm.put("GET:/techmanager/workorders/edit-detail", "workorder_update");
+        routePerm.put("POST:/techmanager/workorders/edit-detail", "workorder_update");
+        routePerm.put("POST:/techmanager/workorders/delete-detail", "workorder_delete");
+        routePerm.put("POST:/techmanager/workorders/approve-detail", "workorder_approve");
+        routePerm.put("POST:/techmanager/workorders/decline-detail", "workorder_approve");
 
         // Technician
         routePerm.put("GET:/technician/jobs", "job_read");

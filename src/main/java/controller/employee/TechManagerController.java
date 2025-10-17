@@ -37,7 +37,7 @@ public class TechManagerController extends HttpServlet {
                     break;
                 case "/workorders":
                     // Forward to WorkOrderController for work order management
-                    request.getRequestDispatcher("/workorders/list").forward(request, response);
+                    request.getRequestDispatcher("/techmanager/workorders/list").forward(request, response);
                     break;
                 default:
                     response.sendError(HttpServletResponse.SC_NOT_FOUND);

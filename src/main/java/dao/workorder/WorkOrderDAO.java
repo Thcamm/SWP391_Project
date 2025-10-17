@@ -17,7 +17,7 @@ public class WorkOrderDAO extends DbContext {
     public int createWorkOrder(WorkOrder workOrder) throws SQLException {
         String sql = "INSERT INTO WorkOrder (TechManagerID, RequestID, EstimateAmount, Status) VALUES (?, ?, ?, ?)";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, workOrder.getTechManagerId());
             ps.setInt(2, workOrder.getRequestId());
             ps.setBigDecimal(3, workOrder.getEstimateAmount());
@@ -37,7 +37,7 @@ public class WorkOrderDAO extends DbContext {
     public WorkOrder getWorkOrderById(int workOrderId) throws SQLException {
         String sql = "SELECT * FROM WorkOrder WHERE WorkOrderID = ?";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, workOrderId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -52,7 +52,7 @@ public class WorkOrderDAO extends DbContext {
         String sql = "SELECT * FROM WorkOrder WHERE TechManagerID = ?";
         List<WorkOrder> workOrders = new ArrayList<>();
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, techManagerId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -63,10 +63,23 @@ public class WorkOrderDAO extends DbContext {
         return workOrders;
     }
 
+    public List<WorkOrder> getAllWorkOrders() throws SQLException {
+        String sql = "SELECT * FROM WorkOrder ORDER BY CreatedAt DESC";
+        List<WorkOrder> workOrders = new ArrayList<>();
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                workOrders.add(extractWorkOrder(rs));
+            }
+        }
+        return workOrders;
+    }
+
     public boolean updateWorkOrderStatus(int workOrderId, WorkOrder.Status status) throws SQLException {
         String sql = "UPDATE WorkOrder SET Status = ? WHERE WorkOrderID = ?";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status.name());
             ps.setInt(2, workOrderId);
             return ps.executeUpdate() > 0;
@@ -76,7 +89,7 @@ public class WorkOrderDAO extends DbContext {
     public boolean addWorkOrderDetail(WorkOrderDetail detail) throws SQLException {
         String sql = "INSERT INTO WorkOrderDetail (WorkOrderID, Source, DiagnosticID, ApprovalStatus, TaskDescription, EstimateHours, EstimateAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, detail.getWorkOrderId());
             ps.setString(2, detail.getSource().name());
             if (detail.getDiagnosticId() != null) {
