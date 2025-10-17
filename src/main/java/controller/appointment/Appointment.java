@@ -95,7 +95,7 @@ public class Appointment extends HttpServlet {
             java.time.LocalDateTime dateTime = java.time.LocalDateTime.parse(dateStr);
             appointment.setAppointmentDate(dateTime);
             appointment.setDescription(description);
-            appointment.setStatus("CONFIRM"); // Gán trạng thái ban đầu
+            appointment.setStatus("PENDING"); // Gán trạng thái ban đầu
 
             // 7. Lưu vào cơ sở dữ liệu
             appointmentDAO.insertAppointment(appointment);
