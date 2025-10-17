@@ -138,13 +138,13 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
             <div class="card-body">
               <div class="d-flex gap-2 flex-wrap">
                 <a
-                  href="${pageContext.request.contextPath}/workorders/create"
+                  href="${pageContext.request.contextPath}/techmanager/workorders/create"
                   class="btn btn-success"
                 >
                   <i class="bi bi-plus-circle"></i> Tạo WorkOrder
                 </a>
                 <a
-                  href="${pageContext.request.contextPath}/workorders/list"
+                  href="${pageContext.request.contextPath}/techmanager/workorders/list"
                   class="btn btn-primary"
                 >
                   <i class="bi bi-list"></i> Xem Tất Cả WorkOrders
@@ -170,7 +170,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
             >
               <h5 class="mb-0">Recent WorkOrders</h5>
               <a
-                href="${pageContext.request.contextPath}/workorders/list"
+                href="${pageContext.request.contextPath}/techmanager/workorders/list"
                 class="btn btn-sm btn-outline-primary"
               >
                 View All
@@ -237,7 +237,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                             </td>
                             <td>
                               <a
-                                href="${pageContext.request.contextPath}/workorders/details?workOrderId=${workOrder.workOrderId}"
+                                href="${pageContext.request.contextPath}/techmanager/workorders/details?workOrderId=${workOrder.workOrderId}"
                                 class="btn btn-sm btn-outline-info"
                               >
                                 <i class="bi bi-eye"></i> View
@@ -260,7 +260,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                       Bạn chưa tạo bất kỳ work order nào.
                     </p>
                     <a
-                      href="${pageContext.request.contextPath}/workorders/create"
+                      href="${pageContext.request.contextPath}/techmanager/workorders/create"
                       class="btn btn-primary"
                     >
                       Tạo WorkOrder Đầu Tiên Của Bạn

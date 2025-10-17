@@ -41,6 +41,11 @@ public class WorkOrderService {
         return workOrderDAO.getWorkOrdersByTechManager(techManagerId);
     }
 
+    // Get all WorkOrders (for Admin)
+    public List<WorkOrder> getAllWorkOrders() throws SQLException {
+        return workOrderDAO.getAllWorkOrders();
+    }
+
     // Update WorkOrder status
     public boolean updateWorkOrderStatus(int workOrderId, WorkOrder.Status status) throws SQLException {
         return workOrderDAO.updateWorkOrderStatus(workOrderId, status);
@@ -61,7 +66,8 @@ public class WorkOrderService {
     }
 
     // Create WorkOrder from approved ServiceRequest
-    public WorkOrder createWorkOrderFromServiceRequest(TechManager techManager, ServiceRequest serviceRequest, BigDecimal estimateAmount) throws SQLException {
+    public WorkOrder createWorkOrderFromServiceRequest(TechManager techManager, ServiceRequest serviceRequest,
+            BigDecimal estimateAmount) throws SQLException {
         if (!serviceRequest.canCreateWorkOrder()) {
             throw new IllegalArgumentException("ServiceRequest must be approved to create WorkOrder");
         }
