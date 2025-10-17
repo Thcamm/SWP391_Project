@@ -51,10 +51,10 @@ public class PermissionFilter implements Filter {
 
 
         // Customer Service
-        routePerm.put("GET:/cs/appointements", "appointment_read");
-        routePerm.put("POST:/cs/appointements/create", "appointment_create");
-        routePerm.put("POST:/cs/appointements/update", "appointment_update");
-        routePerm.put("POST:/cs/appointements/delete", "appointment_delete");
+//        routePerm.put("GET:/cs/appointements", "appointment_read");
+//        routePerm.put("POST:/cs/appointements/create", "appointment_create");
+//        routePerm.put("POST:/cs/appointements/update", "appointment_update");
+//        routePerm.put("POST:/cs/appointements/delete", "appointment_delete");
 
         // Tech manager
         routePerm.put("GET:/tech-manager/orders", "workorder_read");
