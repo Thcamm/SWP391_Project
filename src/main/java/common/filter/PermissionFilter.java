@@ -61,6 +61,8 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/cs/appointements/delete", "appointment_delete");
         routePerm.put("GET:/view/customerservice/appointment-list.jsp", "cs_access");
         routePerm.put("POST:/view/customerservice/appointment-list.jsp", "cs_access");
+        routePerm.put("GET:/view/customerservice/customerservice-home.jsp", "cs_access");
+
 //        routePerm.put("GET:/customerservice/create-customer", "cs_access");
 //        routePerm.put("POST:/customerservice/create-customer", "cs_access");
 //        routePerm.put("POST:/customerservice/search-customer", "cs_access");
@@ -74,9 +76,7 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/tech-manager/assign", "technician_assign");
 
         // Technician
-        routePerm.put("GET:/technician/jobs", "job_read");
-        routePerm.put("POST:/technician/jobs/update", "job_update_progress");
-        routePerm.put("POST:/technician/diagnose", "diagnostics_run");
+        routePerm.put("GET:/view/technician/home.jsp", "technician_access");
 
         // Storekeeper (Inventory)
         routePerm.put("GET:/inventory/items", "inventory_read");

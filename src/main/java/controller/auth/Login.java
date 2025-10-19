@@ -70,7 +70,7 @@ public class Login extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/techmanager/dashboard");
                 return;
             } else if("TECHNICAL".equals(roleCode)) {
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+                response.sendRedirect(request.getContextPath() + "/technician/home");
                 return;
             } else if("ACCOUNTANT".equals(roleCode)) {
                 response.sendRedirect(request.getContextPath() + "/admin/dashboard");
