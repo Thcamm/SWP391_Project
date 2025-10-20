@@ -1,28 +1,35 @@
 package model.employee;
 
-import java.math.BigDecimal;
-
+import java.time.LocalDateTime;
 import model.user.User;
 
 public class Employee extends User {
+
     private int employeeId;
     private String employeeCode;
-    private BigDecimal salary;
-    private Integer managedBy;
-    private Integer createBy;
+    private double salary;
+    private int managedBy;
+    private int createBy;
+    private LocalDateTime createAt;
 
-    public Employee(int employeeId, String employeeCode, BigDecimal salary, Integer managedBy, Integer createBy) {
+    // Default constructor
+    public Employee() {
+        super();
+    }
+
+    // Parameterized constructor
+    public Employee(int employeeId, String employeeCode, double salary, int managedBy, int createBy,
+            LocalDateTime createAt) {
+        super(); // Gọi constructor của lớp cha User
         this.employeeId = employeeId;
         this.employeeCode = employeeCode;
         this.salary = salary;
         this.managedBy = managedBy;
         this.createBy = createBy;
+        this.createAt = createAt;
     }
 
-    public Employee() {
-        // Default constructor
-    }
-
+    // Getters and Setters
     public int getEmployeeId() {
         return employeeId;
     }
@@ -39,28 +46,35 @@ public class Employee extends User {
         this.employeeCode = employeeCode;
     }
 
-    public BigDecimal getSalary() {
+    public double getSalary() {
         return salary;
     }
 
-    public void setSalary(BigDecimal salary) {
+    public void setSalary(double salary) {
         this.salary = salary;
     }
 
-    public Integer getManagedBy() {
+    public int getManagedBy() {
         return managedBy;
     }
 
-    public void setManagedBy(Integer managedBy) {
+    public void setManagedBy(int managedBy) {
         this.managedBy = managedBy;
     }
 
-    public Integer getCreateBy() {
+    public int getCreateBy() {
         return createBy;
     }
 
-    public void setCreateBy(Integer createBy) {
+    public void setCreateBy(int createBy) {
         this.createBy = createBy;
     }
 
+    public LocalDateTime getCreateAt() {
+        return createAt;
+    }
+
+    public void setCreateAt(LocalDateTime createAt) {
+        this.createAt = createAt;
+    }
 }

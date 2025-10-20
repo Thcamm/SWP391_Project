@@ -1,22 +1,28 @@
 package model.employee.techmanager;
 
 import model.employee.Employee;
+import java.time.LocalDateTime; // Đảm bảo đã import
 
 public class TechManager extends Employee {
-    // TechManager inherits all from Employee (User fields + employee fields)
+    // TechManager kế thừa tất cả thuộc tính từ Employee
 
     public TechManager() {
         super();
     }
 
-    public TechManager(int employeeId, String employeeCode, java.math.BigDecimal salary,
-            Integer managedBy, Integer createBy) {
-        super(employeeId, employeeCode, salary, managedBy, createBy);
-    }
-
+    // Constructor đã được sửa lại
     public TechManager(Employee employee) {
-        super(employee.getEmployeeId(), employee.getEmployeeCode(), employee.getSalary(),
-                employee.getManagedBy(), employee.getCreateBy());
+        // Gọi đúng constructor của lớp cha với đủ 6 tham số
+        super(
+                employee.getEmployeeId(),
+                employee.getEmployeeCode(),
+                employee.getSalary(),
+                employee.getManagedBy(),
+                employee.getCreateBy(),
+                employee.getCreateAt() // <-- Thêm tham số còn thiếu
+        );
+
+        // Sao chép các trường của lớp User (đã được kế thừa)
         this.setUserId(employee.getUserId());
         this.setRoleId(employee.getRoleId());
         this.setFullName(employee.getFullName());
@@ -28,8 +34,7 @@ public class TechManager extends Employee {
     }
 
     public boolean isTechManager() {
-        // Assuming RoleID 2 is Tech Manager (check RoleInfo table)
+        // Giả sử RoleID 2 là Tech Manager
         return getRoleId() == 2;
     }
-
 }

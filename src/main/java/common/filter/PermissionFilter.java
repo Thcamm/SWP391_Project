@@ -24,12 +24,6 @@ public class PermissionFilter implements Filter {
         this.areaGate = new HashMap<>();
 
         // RBAC (Admin)
-        // routePerm.put("GET:/admin/rbac/roles", "role_permission_manage");
-        // routePerm.put("POST:/admin/rbac/roles/save", "role_permission_manage");
-        // routePerm.put("GET:/admin/rbac/permissions", "role_permission_manage");
-        // routePerm.put("POST:/admin/rbac/permissions", "role_permission_manage");
-        // routePerm.put("GET:/admin/rbac/rolesList", "role_permission_manage");
-        // routePerm.put("POST:/admin/rbac/rolesList", "role_permission_manage");
         routePerm.put("GET:/view/role/rbac.jsp", "role_permission_manage");
         routePerm.put("GET:/view/role/list.jsp", "role_permission_manage");
         routePerm.put("GET:/view/role/permission_form.jsp", "role_permission_manage");
@@ -64,11 +58,7 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/cs/appointements/delete", "appointment_delete");
         routePerm.put("GET:/view/customerservice/appointment-list.jsp", "cs_access");
         routePerm.put("POST:/view/customerservice/appointment-list.jsp", "cs_access");
-        // routePerm.put("GET:/customerservice/create-customer", "cs_access");
-        // routePerm.put("POST:/customerservice/create-customer", "cs_access");
-        // routePerm.put("POST:/customerservice/search-customer", "cs_access");
-        // routePerm.put("GET:/customerservice/view-support-request", "cs_access");
-        // routePerm.put("POST:/customerservice/view-support-request", "cs_access");
+        routePerm.put("GET:/view/customerservice/customerservice-home.jsp", "cs_access");
 
         // Tech manager - chỉ dashboard, workorders được forward đến WorkOrderController
         routePerm.put("GET:/techmanager/dashboard", "techmanager_access");
@@ -97,9 +87,7 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/view/techmanager/workorders/decline-detail", "tech_manager_access");
 
         // Technician
-        routePerm.put("GET:/technician/jobs", "job_read");
-        routePerm.put("POST:/technician/jobs/update", "job_update_progress");
-        routePerm.put("POST:/technician/diagnose", "diagnostics_run");
+        routePerm.put("GET:/view/technician/home.jsp", "technician_access");
 
         // Storekeeper (Inventory)
         routePerm.put("GET:/inventory/items", "inventory_read");
@@ -113,12 +101,6 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/accounting/confirm", "payment_confirm");
 
         // Customer
-        routePerm.put("GET:/app/bookings", "booking_read_own");
-        routePerm.put("POST:/app/bookings", "booking_create");
-        routePerm.put("GET:/app/vehicles/status", "view_vehicle_status");
-        routePerm.put("POST:/app/comments", "comment_create_by_customer");
-        routePerm.put("GET:/app/create-support-request", "customer_access");
-        routePerm.put("POST:/app/create-support-request", "customer_access");
         routePerm.put("GET:/view/customer/appointment-scheduling.jsp", "customer_access");
         routePerm.put("POST:/view/customer/appointment-scheduling.jsp", "customer_access");
         routePerm.put("GET:/view/customer/garage.jsp", "customer_access");

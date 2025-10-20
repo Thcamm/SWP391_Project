@@ -1,15 +1,15 @@
-package model.employee.admin;
+package model.employee.technician;
 
 import model.employee.Employee;
 import java.time.LocalDateTime; // Đảm bảo đã import
 
-public class Admin extends Employee {
+public class Technician extends Employee {
 
-    public Admin() {
+    public Technician() {
         super();
     }
 
-    public Admin(Employee employee) {
+    public Technician(Employee employee) {
         // Gọi đúng constructor của lớp cha Employee với đủ 6 tham số
         super(
                 employee.getEmployeeId(),
@@ -17,8 +17,7 @@ public class Admin extends Employee {
                 employee.getSalary(),
                 employee.getManagedBy(),
                 employee.getCreateBy(),
-                employee.getCreateAt() // <-- Thêm tham số còn thiếu
-        );
+                employee.getCreateAt());
 
         // Sao chép các trường của lớp User (đã được kế thừa)
         this.setUserId(employee.getUserId());
@@ -31,9 +30,9 @@ public class Admin extends Employee {
         this.setActiveStatus(employee.isActiveStatus());
     }
 
-    // Kiểm tra admin
-    public boolean isAdmin() {
-        // Giả sử RoleID 1 là Admin
-        return getRoleId() == 1;
+    // Kiểm tra vai trò Technician
+    public boolean isTechnician() {
+        // Giả sử RoleID 3 là Technician (để tránh trùng với Tech Manager)
+        return getRoleId() == 3;
     }
 }

@@ -4,7 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.sql.Statement;
 
 import common.DbContext;
@@ -16,49 +17,44 @@ public class EmployeeDAO extends DbContext {
      * Create new employee record
      */
     public boolean createEmployee(Employee employee) throws SQLException {
-        String sql = "INSERT INTO Employee (UserID, EmployeeCode, Salary, ManagedBy, CreatedBy) " +
-                "VALUES (?, ?, ?, ?, ?)";
+        // CHANGED: Thêm cột CreatedAt vào câu lệnh SQL
+        String sql = "INSERT INTO Employee (UserID, EmployeeCode, Salary, ManagedBy, CreatedBy, CreatedAt) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, employee.getUserId());
             ps.setString(2, employee.getEmployeeCode());
-            
-            if (employee.getSalary() != null) {
-                ps.setBigDecimal(3, employee.getSalary());
+
+            // CHANGED: double là kiểu nguyên thủy, không cần kiểm tra null
+            ps.setDouble(3, employee.getSalary());
+
+            // CHANGED: int là kiểu nguyên thủy, không cần kiểm tra null.
+            // Giả sử giá trị 0 có thể đại diện cho null trong logic ứng dụng nếu cần.
+            ps.setInt(4, employee.getManagedBy());
+            ps.setInt(5, employee.getCreateBy());
+
+            // ADDED: Thêm giá trị cho cột CreatedAt
+            if (employee.getCreateAt() != null) {
+                ps.setTimestamp(6, Timestamp.valueOf(employee.getCreateAt()));
             } else {
-                ps.setNull(3, java.sql.Types.DECIMAL);
-            }
-            
-            if (employee.getManagedBy() != null) {
-                ps.setInt(4, employee.getManagedBy());
-            } else {
-                ps.setNull(4, java.sql.Types.INTEGER);
-            }
-            
-            if (employee.getCreateBy() != null) {
-                ps.setInt(5, employee.getCreateBy());
-            } else {
-                ps.setNull(5, java.sql.Types.INTEGER);
+                ps.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now())); // Hoặc giá trị mặc định
             }
 
             int rowsAffected = ps.executeUpdate();
-            
+
             if (rowsAffected > 0) {
-                // Get the generated employee ID
                 try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
                         employee.setEmployeeId(generatedKeys.getInt(1));
                     }
                 }
-                System.out.println("Employee created successfully - ID: " + employee.getEmployeeId() + 
-                                 ", Code: " + employee.getEmployeeCode());
+                System.out.println("Employee created successfully - ID: " + employee.getEmployeeId() +
+                        ", Code: " + employee.getEmployeeCode());
                 return true;
             }
-            
             return false;
-
         } catch (SQLException e) {
             System.err.println("Error creating employee: " + e.getMessage());
             throw e;
@@ -72,7 +68,7 @@ public class EmployeeDAO extends DbContext {
         String sql = "SELECT * FROM Employee WHERE UserID = ?";
 
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
 
@@ -92,7 +88,7 @@ public class EmployeeDAO extends DbContext {
         String sql = "SELECT * FROM Employee WHERE EmployeeID = ?";
 
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, employeeId);
 
@@ -109,29 +105,22 @@ public class EmployeeDAO extends DbContext {
      * Update employee information
      */
     public boolean updateEmployee(Employee employee) throws SQLException {
+        // Lưu ý: Thường không cập nhật CreatedAt
         String sql = "UPDATE Employee SET EmployeeCode=?, Salary=?, ManagedBy=? WHERE EmployeeID=?";
-
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, employee.getEmployeeCode());
-            
-            if (employee.getSalary() != null) {
-                ps.setBigDecimal(2, employee.getSalary());
-            } else {
-                ps.setNull(2, java.sql.Types.DECIMAL);
-            }
-            
-            if (employee.getManagedBy() != null) {
-                ps.setInt(3, employee.getManagedBy());
-            } else {
-                ps.setNull(3, java.sql.Types.INTEGER);
-            }
-            
+
+            // CHANGED: double là kiểu nguyên thủy, không cần kiểm tra null
+            ps.setDouble(2, employee.getSalary());
+
+            // CHANGED: int là kiểu nguyên thủy, không cần kiểm tra null
+            ps.setInt(3, employee.getManagedBy());
+
             ps.setInt(4, employee.getEmployeeId());
 
             return ps.executeUpdate() > 0;
-
         } catch (SQLException e) {
             System.err.println("Error updating employee: " + e.getMessage());
             throw e;
@@ -143,7 +132,7 @@ public class EmployeeDAO extends DbContext {
      */
     public String generateEmployeeCode(String roleName, int userId) {
         String prefix;
-        
+
         switch (roleName.toLowerCase()) {
             case "admin":
                 prefix = "ADM";
@@ -164,7 +153,7 @@ public class EmployeeDAO extends DbContext {
                 prefix = "EMP";
                 break;
         }
-        
+
         // Generate code: PREFIX + UserID padded to 4 digits
         return prefix + String.format("%04d", userId);
     }
@@ -176,7 +165,7 @@ public class EmployeeDAO extends DbContext {
         String sql = "SELECT COUNT(*) FROM Employee WHERE UserID = ?";
 
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
 
@@ -197,16 +186,16 @@ public class EmployeeDAO extends DbContext {
         employee.setEmployeeId(rs.getInt("EmployeeID"));
         employee.setUserId(rs.getInt("UserID"));
         employee.setEmployeeCode(rs.getString("EmployeeCode"));
-        
-        BigDecimal salary = rs.getBigDecimal("Salary");
+
+        double salary = rs.getDouble("Salary");
         employee.setSalary(salary);
-        
+
         int managedBy = rs.getInt("ManagedBy");
         employee.setManagedBy(rs.wasNull() ? null : managedBy);
-        
+
         int createdBy = rs.getInt("CreatedBy");
         employee.setCreateBy(rs.wasNull() ? null : createdBy);
-        
+
         return employee;
     }
 }
