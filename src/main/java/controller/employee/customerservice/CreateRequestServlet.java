@@ -3,7 +3,7 @@ package controller.employee.customerservice;
 import dao.carservice.CarServiceDAO;
 import dao.vehicle.VehicleDAO;
 import model.customer.Customer;
-import model.servicerequest.ServiceRequest;
+import model.workorder.ServiceRequest;
 import model.servicetype.Service;
 import model.vehicle.Vehicle;
 import service.carservice.ServiceRequestService;

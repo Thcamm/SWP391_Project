@@ -1,39 +1,47 @@
 package model.workorder;
 
-import java.sql.Date;
+import java.sql.Timestamp;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.ArrayList;
 
 public class WorkOrderDetail {
     private int detailId;
     private int workOrderId;
-    private String source; // REQUEST, DIAGNOSTIC
+    private Source source;
     private Integer diagnosticId;
-    private String approvalStatus; // PENDING, APPROVED, DECLINED
+    private ApprovalStatus approvalStatus;
     private Integer approvedByUserId;
-    private Date approvedAt;
+    private Timestamp approvedAt;
     private String taskDescription;
-    private Double estimateHours;
-    private Double estimateAmount;
-    private Double actualHours;
+    private BigDecimal estimateHours;
+    private BigDecimal estimateAmount;
+    private BigDecimal actualHours;
+
+    // Relationships
+    private List<TaskAssignment> taskAssignments;
+
+    public enum Source {
+        REQUEST, DIAGNOSTIC
+    }
+
+    public enum ApprovalStatus {
+        PENDING, APPROVED, DECLINED
+    }
 
     public WorkOrderDetail() {
+        this.taskAssignments = new ArrayList<>();
     }
 
-    public WorkOrderDetail(int detailId, int workOrderId, String source, Integer diagnosticId,
-                           String approvalStatus, Integer approvedByUserId, Date approvedAt,
-                           String taskDescription, Double estimateHours, Double estimateAmount, Double actualHours) {
-        this.detailId = detailId;
+    public WorkOrderDetail(int workOrderId, Source source, String taskDescription) {
+        this();
         this.workOrderId = workOrderId;
         this.source = source;
-        this.diagnosticId = diagnosticId;
-        this.approvalStatus = approvalStatus;
-        this.approvedByUserId = approvedByUserId;
-        this.approvedAt = approvedAt;
         this.taskDescription = taskDescription;
-        this.estimateHours = estimateHours;
-        this.estimateAmount = estimateAmount;
-        this.actualHours = actualHours;
+        this.approvalStatus = ApprovalStatus.PENDING;
     }
 
+    // Getters and Setters
     public int getDetailId() {
         return detailId;
     }
@@ -50,11 +58,11 @@ public class WorkOrderDetail {
         this.workOrderId = workOrderId;
     }
 
-    public String getSource() {
+    public Source getSource() {
         return source;
     }
 
-    public void setSource(String source) {
+    public void setSource(Source source) {
         this.source = source;
     }
 
@@ -66,11 +74,11 @@ public class WorkOrderDetail {
         this.diagnosticId = diagnosticId;
     }
 
-    public String getApprovalStatus() {
+    public ApprovalStatus getApprovalStatus() {
         return approvalStatus;
     }
 
-    public void setApprovalStatus(String approvalStatus) {
+    public void setApprovalStatus(ApprovalStatus approvalStatus) {
         this.approvalStatus = approvalStatus;
     }
 
@@ -82,11 +90,11 @@ public class WorkOrderDetail {
         this.approvedByUserId = approvedByUserId;
     }
 
-    public Date getApprovedAt() {
+    public Timestamp getApprovedAt() {
         return approvedAt;
     }
 
-    public void setApprovedAt(Date approvedAt) {
+    public void setApprovedAt(Timestamp approvedAt) {
         this.approvedAt = approvedAt;
     }
 
@@ -98,44 +106,38 @@ public class WorkOrderDetail {
         this.taskDescription = taskDescription;
     }
 
-    public Double getEstimateHours() {
+    public BigDecimal getEstimateHours() {
         return estimateHours;
     }
 
-    public void setEstimateHours(Double estimateHours) {
+    public void setEstimateHours(BigDecimal estimateHours) {
         this.estimateHours = estimateHours;
     }
 
-    public Double getEstimateAmount() {
+    public BigDecimal getEstimateAmount() {
         return estimateAmount;
     }
 
-    public void setEstimateAmount(Double estimateAmount) {
+    public void setEstimateAmount(BigDecimal estimateAmount) {
         this.estimateAmount = estimateAmount;
     }
 
-    public Double getActualHours() {
+    public BigDecimal getActualHours() {
         return actualHours;
     }
 
-    public void setActualHours(Double actualHours) {
+    public void setActualHours(BigDecimal actualHours) {
         this.actualHours = actualHours;
     }
 
-    @Override
-    public String toString() {
-        return "WorkOrderDetail{" +
-                "detailId=" + detailId +
-                ", workOrderId=" + workOrderId +
-                ", source='" + source + '\'' +
-                ", diagnosticId=" + diagnosticId +
-                ", approvalStatus='" + approvalStatus + '\'' +
-                ", approvedByUserId=" + approvedByUserId +
-                ", approvedAt=" + approvedAt +
-                ", taskDescription='" + taskDescription + '\'' +
-                ", estimateHours=" + estimateHours +
-                ", estimateAmount=" + estimateAmount +
-                ", actualHours=" + actualHours +
-                '}';
+    // Business methods
+    public boolean isApproved() {
+        return ApprovalStatus.APPROVED.equals(this.approvalStatus);
+    }
+
+    public void approve(int approvedByUserId) {
+        this.approvalStatus = ApprovalStatus.APPROVED;
+        this.approvedByUserId = approvedByUserId;
+        this.approvedAt = new Timestamp(System.currentTimeMillis());
     }
 }

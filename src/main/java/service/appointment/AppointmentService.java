@@ -48,7 +48,7 @@ public class AppointmentService {
     private boolean isValidTransition(String current, String next) {
         switch (current) {
             case "PENDING":
-                return next.equals("ACCEPTED") || next.equals("REJECTED");
+                return next.equals("ACCEPTED") || next.equals("REJECTED")  || next.equals("CANCELLED");
             default:
                 return false;
         }

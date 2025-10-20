@@ -3,7 +3,6 @@ package dao.appointment;
 import common.DbContext;
 import model.appointment.Appointment;
 
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,7 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 public class AppointmentDAO extends DbContext {
 
@@ -53,9 +51,24 @@ public class AppointmentDAO extends DbContext {
         return resultList;
     }
 
-
-
-
+    public List<String> getAllStatuses() throws SQLException {
+        List<String> statuses = new ArrayList<>();
+        String sql = "SHOW COLUMNS FROM Appointment LIKE 'Status'";
+        try (PreparedStatement ps = getConnection().prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                String type = rs.getString("Type"); // enum('Pending','InProgress',...)
+                type = type.replaceAll("^enum\\('", "")
+                        .replaceAll("'\\)$", "")
+                        .replace("'", "");
+                String[] parts = type.split(",");
+                for (String s : parts) {
+                    statuses.add(s.trim());
+                }
+            }
+        }
+        return statuses;
+    }
 
     public Appointment getAppointmentById(int appointmentID) {
         String sql = "SELECT * FROM Appointment WHERE AppointmentID = ?";
@@ -102,7 +115,6 @@ public class AppointmentDAO extends DbContext {
         }
     }
 
-
     public boolean updateAppointment(Appointment appointment) {
         String sql = "UPDATE Appointment SET CustomerID = ?, VehicleID = ?, Date = ?, Status = ?, Description = ? WHERE AppointmentID = ?";
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
@@ -133,8 +145,8 @@ public class AppointmentDAO extends DbContext {
         }
     }
 
-    public void getAppointmentsByCustomerId(int customerID) {
-        String sql = "SELECT * FROM Appointment WHERE CustomerID = ?";
+    public List<Appointment> getAppointmentsByCustomerId(int customerID) {
+        String sql = "SELECT * FROM Appointment WHERE CustomerID = ? ORDER BY Date DESC";
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
             st.setInt(1, customerID);
             ResultSet rs = st.executeQuery();
@@ -148,26 +160,75 @@ public class AppointmentDAO extends DbContext {
                 appointment.setStatus(rs.getString("Status"));
                 appointment.setDescription(rs.getString("Description"));
                 appointments.add(appointment);
+
             }
-            // Xử lý danh sách cuộc hẹn theo nhu cầu của bạn
+            return appointments;
         } catch (SQLException e) {
             throw new RuntimeException("Lỗi khi lấy danh sách cuộc hẹn theo ID khách hàng", e);
         }
     }
+
+    public List<Appointment> getAppointmentByFilter(
+            int customerId, String fromDate, String toDate, String status, String sortOrder) {
+
+        StringBuilder sql = new StringBuilder("SELECT * FROM Appointment WHERE 1=1");
+        List<Appointment> appointments = new ArrayList<>();
+
+        if (customerId > 0)
+            sql.append(" AND CustomerID = ?");
+        if (fromDate != null && !fromDate.isEmpty())
+            sql.append(" AND Date >= ?");
+        if (toDate != null && !toDate.isEmpty())
+            sql.append(" AND Date <= ?");
+        if (status != null && !status.isEmpty())
+            sql.append(" AND Status = ?");
+
+        sql.append(" ORDER BY Date ")
+                .append("oldest".equalsIgnoreCase(sortOrder) ? "ASC" : "DESC");
+
+        try (PreparedStatement st = getConnection().prepareStatement(sql.toString())) {
+            int index = 1;
+            if (customerId > 0)
+                st.setInt(index++, customerId);
+            if (fromDate != null && !fromDate.isEmpty())
+                st.setString(index++, fromDate);
+            if (toDate != null && !toDate.isEmpty())
+                st.setString(index++, toDate);
+            if (status != null && !status.isEmpty())
+                st.setString(index++, status);
+
+            ResultSet rs = st.executeQuery();
+            while (rs.next()) {
+                Appointment a = new Appointment();
+                a.setAppointmentID(rs.getInt("AppointmentID"));
+                a.setCustomerID(rs.getInt("CustomerID"));
+                a.setVehicleID(rs.getInt("VehicleID"));
+                a.setAppointmentDate(rs.getTimestamp("Date").toLocalDateTime());
+                a.setStatus(rs.getString("Status"));
+                a.setDescription(rs.getString("Description"));
+                appointments.add(a);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return appointments;
+    }
+
     //
-//    public boolean updateStatus(int appointmentId, String newStatus) {
-//        String sql = "UPDATE appointment SET status = ? WHERE appointment_id = ?";
-//        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
-//            ps.setString(1, newStatus);
-//            ps.setInt(2, appointmentId);
-//            return ps.executeUpdate() > 0;
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//            return false;
-//        }
-//    }
+    // public boolean updateStatus(int appointmentId, String newStatus) {
+    // String sql = "UPDATE appointment SET status = ? WHERE appointment_id = ?";
+    // try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+    // ps.setString(1, newStatus);
+    // ps.setInt(2, appointmentId);
+    // return ps.executeUpdate() > 0;
+    // } catch (SQLException e) {
+    // e.printStackTrace();
+    // return false;
+    // }
+    // }
     public List<Map<String, Object>> searchAppointment(String customerName, String fromDate, String toDate,
-                                                       String[] statusList, String sortOrder) throws SQLException {
+            String[] statusList, String sortOrder) throws SQLException {
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder(
@@ -176,17 +237,20 @@ public class AppointmentDAO extends DbContext {
                         "FROM Appointment a " +
                         "JOIN Customer c ON a.CustomerID = c.CustomerID " +
                         "JOIN User u ON c.UserID = u.UserID " +
-                        "WHERE 1=1 "
-        );
+                        "WHERE 1=1 ");
 
-        if (customerName != null && !customerName.isEmpty()) sql.append("AND u.FullName LIKE ?  ");
-        if (fromDate != null && !fromDate.isEmpty()) sql.append("AND a.Date >= ? ");
-        if (toDate != null && !toDate.isEmpty()) sql.append("AND a.Date <= ? ");
+        if (customerName != null && !customerName.isEmpty())
+            sql.append("AND u.FullName LIKE ?  ");
+        if (fromDate != null && !fromDate.isEmpty())
+            sql.append("AND a.Date >= ? ");
+        if (toDate != null && !toDate.isEmpty())
+            sql.append("AND a.Date <= ? ");
         if (statusList != null && statusList.length > 0) {
             sql.append("AND a.Status IN (");
             for (int i = 0; i < statusList.length; i++) {
                 sql.append("?");
-                if (i < statusList.length - 1) sql.append(",");
+                if (i < statusList.length - 1)
+                    sql.append(",");
             }
             sql.append(") ");
         }
@@ -196,11 +260,15 @@ public class AppointmentDAO extends DbContext {
 
         try (PreparedStatement ps = getConnection().prepareStatement(sql.toString())) {
             int index = 1;
-            if (customerName != null && !customerName.isEmpty()) ps.setString(index++,  "%" + customerName + "%");
-            if (fromDate != null && !fromDate.isEmpty()) ps.setString(index++, fromDate);
-            if (toDate != null && !toDate.isEmpty()) ps.setString(index++, toDate);
+            if (customerName != null && !customerName.isEmpty())
+                ps.setString(index++, "%" + customerName + "%");
+            if (fromDate != null && !fromDate.isEmpty())
+                ps.setString(index++, fromDate);
+            if (toDate != null && !toDate.isEmpty())
+                ps.setString(index++, toDate);
             if (statusList != null && statusList.length > 0) {
-                for (String status : statusList) ps.setString(index++, status.toUpperCase());
+                for (String status : statusList)
+                    ps.setString(index++, status.toUpperCase());
             }
 
             ResultSet rs = ps.executeQuery();
@@ -223,10 +291,11 @@ public class AppointmentDAO extends DbContext {
 
         return resultList;
     }
+
     public boolean updateStatus(int appointmentID, String status) {
         String sql = "UPDATE Appointment SET Status = ? WHERE AppointmentID = ?";
         try (
-             PreparedStatement ps = getConnection().prepareStatement(sql)) {
+                PreparedStatement ps = getConnection().prepareStatement(sql)) {
 
             ps.setString(1, status);
             ps.setInt(2, appointmentID);
