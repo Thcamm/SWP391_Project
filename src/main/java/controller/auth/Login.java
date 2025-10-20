@@ -62,15 +62,15 @@ public class Login extends HttpServlet {
                 response.sendRedirect(redirectAfterLogin);
                 return;
             }
-            //7 roles: ADMIN, TechManager, Technical, Accountant, Store Keeper, Customer Service,Customer
+//7 roles: ADMIN, TechManager, Technical, Accountant, Store Keeper, Customer Service,Customer
             if("ADMIN".equals(roleCode)) {
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+                response.sendRedirect(request.getContextPath() + "/admin/users");
                 return;
             } else if("TECHMANAGER".equals(roleCode)) {
                 response.sendRedirect(request.getContextPath() + "/techmanager/dashboard");
                 return;
             } else if("TECHNICAL".equals(roleCode)) {
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+                response.sendRedirect(request.getContextPath() + "/technician/home");
                 return;
             } else if("ACCOUNTANT".equals(roleCode)) {
                 response.sendRedirect(request.getContextPath() + "/admin/dashboard");
@@ -79,13 +79,12 @@ public class Login extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/admin/dashboard");
                 return;
             } else if("CUSTOMER_SERVICE".equals(roleCode)) {
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+                response.sendRedirect(request.getContextPath() + "/customerservice/home");
                 return;
             } else if("CUSTOMER".equals(roleCode)) {
                 response.sendRedirect(request.getContextPath() + "/Home");
                 return;
-            }
-        } else {
+            }        } else {
             request.setAttribute("errorMessage", "Invalid username or password.");
             request.getRequestDispatcher("/login.jsp").forward(request, response);
         }

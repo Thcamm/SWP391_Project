@@ -1,183 +1,143 @@
-/* ==========================================================================
-   Global Styles & Variables
-   ========================================================================== */
-:root {
-    --dark-gray: #2c3e50;         /* Xám đậm (gần như màu than) */
-    --medium-gray: #555;        /* Xám cho chữ */
-    --light-gray: #ecf0f1;        /* Xám rất nhạt cho nền */
-    --border-gray: #bdc3c7;        /* Xám cho viền */
-    --primary-blue: #3498db;      /* Xanh da trời chính */
-    --primary-blue-hover: #2980b9;/* Xanh da trời đậm hơn khi hover */
-    --white: #ffffff;
-    --error-red: #c0392b;
-    --error-bg: #fbeae5;
+
+
+.permission-form-page {
+    font-family: system-ui, sans-serif;
+    background: #f9f9f9;
+    padding: 30px 0;
+    color: #333;
 }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: var(--light-gray);
-    color: var(--medium-gray);
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-}
-
-/* ==========================================================================
-   Form Container
-   ========================================================================== */
+/* ====== Form Container ====== */
 .form-container {
-    background-color: var(--white);
-    padding: 30px 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     max-width: 700px;
-    width: 100%;
-    border-top: 5px solid var(--primary-blue);
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin: 0 auto;
+    padding: 30px 35px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
+/* ====== Page Title ====== */
 .page-title {
-    color: var(--dark-gray);
-    font-size: 2rem;
-    font-weight: 600;
+    font-size: 1.6em;
     text-align: center;
-    margin-top: 0;
     margin-bottom: 25px;
+    font-weight: 600;
+    color: #222;
 }
 
-/* ==========================================================================
-   Form Elements
-   ========================================================================== */
+/* ====== Alert Messages ====== */
+.alert {
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 0.95em;
+}
+
+.error-message {
+    background: #fdf3f3;
+    color: #a33;
+    border: 1px solid #e3b1b1;
+}
+
+/* ====== Form ====== */
 .main-form {
-    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .form-label {
-    display: block;
-    font-weight: 600;
-    color: var(--dark-gray);
-    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
 }
 
+/* ====== Input & Textarea ====== */
 .form-control {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 1rem;
-    border: 1px solid var(--border-gray); /* Viền mỏng */
-    border-radius: 4px;
-    background-color: #fdfdfd;
-    box-sizing: border-box; /* Quan trọng để padding không làm tăng kích thước */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.form-control::placeholder {
-    color: #aab7c4;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.95em;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .form-control:focus {
+    border-color: #999;
     outline: none;
-    border-color: var(--primary-blue);
-    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.05);
 }
 
-/* Specific styling for Permission ID */
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.4;
+}
+
+/* ====== Permission ID ====== */
 .permission-id {
-    font-size: 1rem;
-    color: var(--medium-gray);
-    background-color: #f7f7f7;
-    padding: 10px;
-    border-radius: 4px;
-    border: 1px solid #e0e0e0;
+    font-size: 0.95em;
+    background: #fafafa;
+    padding: 6px 10px;
+    border-radius: 5px;
+    border: 1px solid #eee;
+    color: #555;
 }
 
-.permission-id strong {
-    color: var(--dark-gray);
-}
-
-/* ==========================================================================
-   Checkbox Styling
-   ========================================================================== */
-.form-group input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    margin-right: 10px;
-    accent-color: var(--primary-blue); /* Thay đổi màu của checkbox */
-    vertical-align: middle; /* Căn giữa với text */
-}
-
-/* Căn chỉnh label và checkbox trên cùng một hàng */
-.form-group > label[for="active"] {
-    display: inline-block;
-    margin-bottom: 0;
-}
-
-.note {
-    font-size: 0.9em;
-    color: #7f8c8d;
-    margin-left: 5px;
-}
-
-/* ==========================================================================
-   Buttons & Actions
-   ========================================================================== */
+/* ====== Form Buttons ====== */
 .form-actions {
     display: flex;
-    justify-content: flex-end; /* Đẩy button sang phải */
-    gap: 15px; /* Khoảng cách giữa các button */
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid var(--light-gray);
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
 }
 
 .btn {
-    padding: 12px 25px;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 5px;
-    border: none;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-size: 0.95em;
     cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border 0.2s ease;
     text-decoration: none;
-    text-align: center;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.btn:hover {
-    transform: translateY(-2px); /* Hiệu ứng nhấc lên khi hover */
 }
 
 .btn-primary {
-    background-color: var(--primary-blue);
-    color: var(--white);
+    background: #f5f5f5;
+    color: #222;
 }
 
 .btn-primary:hover {
-    background-color: var(--primary-blue-hover);
+    background: #eaeaea;
 }
 
 .btn-secondary {
-    background-color: #bdc3c7; /* Xám nhạt cho nút Cancel */
-    color: var(--dark-gray);
+    background: #fff;
+    color: #333;
 }
 
 .btn-secondary:hover {
-    background-color: #95a5a6;
+    background: #f8f8f8;
 }
 
-/* ==========================================================================
-   Error Message
-   ========================================================================== */
-.alert.error-message {
-    padding: 15px;
-    margin-bottom: 20px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    background-color: var(--error-bg);
-    color: var(--error-red);
-    border-color: #f7c6c0;
+/* ====== Responsive ====== */
+@media (max-width: 600px) {
+    .form-container {
+        padding: 20px;
+    }
+
+    .page-title {
+        font-size: 1.3em;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+    }
 }

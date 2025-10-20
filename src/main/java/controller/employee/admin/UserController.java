@@ -20,6 +20,11 @@ import java.io.IOException;
  * Handles all user-related operations:
  * - /admin/users - List all users with search/filter
  * - /admin/users/create - Create new user (GET: form, POST: process)
+ * - /admin/users/choose-type - Choose user type (Customer or Employee)
+ * - /admin/users/create-customer - Create Customer user (GET: form, POST:
+ * process)
+ * - /admin/users/create-employee - Create Employee user (GET: form, POST:
+ * process)
  * - /admin/users/view/{id} - View user details
  * - /admin/users/edit/{id} - Edit user (GET: form, POST: process)
  * - /admin/users/toggle/{id} - Toggle user status
@@ -68,6 +73,12 @@ public class UserController extends HttpServlet {
                 handleUserList(request, response);
             } else if (pathInfo.equals("/create")) {
                 handleCreateForm(request, response);
+            } else if (pathInfo.equals("/choose-type")) {
+                handleChooseTypeForm(request, response);
+            } else if (pathInfo.equals("/create-customer")) {
+                handleCreateCustomerForm(request, response);
+            } else if (pathInfo.equals("/create-employee")) {
+                handleCreateEmployeeForm(request, response);
             } else if (pathInfo.startsWith("/view/")) {
                 handleViewUser(request, response, pathInfo);
             } else if (pathInfo.startsWith("/edit/")) {
@@ -102,8 +113,10 @@ public class UserController extends HttpServlet {
             // Route based on path
             if (pathInfo == null || pathInfo.equals("/")) {
                 handleSearch(request, response);
-            } else if (pathInfo.equals("/create")) {
-                handleCreateUser(request, response);
+            } else if (pathInfo.equals("/create-customer")) {
+                handleCreateCustomer(request, response);
+            } else if (pathInfo.equals("/create-employee")) {
+                handleCreateEmployee(request, response);
             } else if (pathInfo.startsWith("/edit/")) {
                 handleUpdateUser(request, response, pathInfo);
             } else if (pathInfo.startsWith("/toggle/")) {
@@ -174,7 +187,7 @@ public class UserController extends HttpServlet {
                 ", Results: " + searchResults.size() + "/" + totalResults);
 
         // Forward to users.jsp
-        request.getRequestDispatcher("/admin/users.jsp")
+        request.getRequestDispatcher("/view/admin/users.jsp")
                 .forward(request, response);
     }
 
@@ -196,7 +209,65 @@ public class UserController extends HttpServlet {
         System.out.println("UserController - Displaying create form for user: " + getCurrentUser(request));
 
         // Forward to create JSP
-        request.getRequestDispatcher("/admin/create-user.jsp")
+        request.getRequestDispatcher("/view/admin/create-user.jsp")
+                .forward(request, response);
+    }
+
+    /**
+     * HANDLE CHOOSE TYPE FORM: Show user type selection form
+     */
+    private void handleChooseTypeForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        request.setAttribute("currentUser", getCurrentUser(request));
+
+        // Handle messages from redirect
+        handleMessages(request);
+
+        System.out.println("UserController - Displaying choose type form for user: " + getCurrentUser(request));
+
+        // Forward to choose type JSP
+        request.getRequestDispatcher("/view/admin/choose-user-type.jsp")
+                .forward(request, response);
+    }
+
+    /**
+     * HANDLE CREATE CUSTOMER FORM: Show Customer creation form
+     */
+    private void handleCreateCustomerForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        request.setAttribute("currentUser", getCurrentUser(request));
+
+        // Handle messages from redirect
+        handleMessages(request);
+
+        System.out.println("UserController - Displaying create customer form for user: " + getCurrentUser(request));
+
+        // Forward to create customer JSP
+        request.getRequestDispatcher("/view/admin/create-customer.jsp")
+                .forward(request, response);
+    }
+
+    /**
+     * HANDLE CREATE EMPLOYEE FORM: Show Employee creation form
+     */
+    private void handleCreateEmployeeForm(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        ArrayList<Role> availableRoles = adminService.getAvailableRoles();
+
+        // Set attributes for JSP
+        request.setAttribute("availableRoles", availableRoles);
+        request.setAttribute("currentUser", getCurrentUser(request));
+
+        // Handle messages from redirect
+        handleMessages(request);
+
+        System.out.println("UserController - Displaying create employee form for user: " + getCurrentUser(request));
+
+        // Forward to create employee JSP
+        request.getRequestDispatcher("/view/admin/create-employee.jsp")
                 .forward(request, response);
     }
 
@@ -217,7 +288,7 @@ public class UserController extends HttpServlet {
 
             request.setAttribute("user", user);
             request.setAttribute("currentUser", getCurrentUser(request));
-            request.getRequestDispatcher("/admin/user-details.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/admin/user-details.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID");
@@ -244,7 +315,7 @@ public class UserController extends HttpServlet {
             request.setAttribute("user", user);
             request.setAttribute("availableRoles", availableRoles);
             request.setAttribute("currentUser", getCurrentUser(request));
-            request.getRequestDispatcher("/admin/user-edit.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/admin/user-edit.jsp").forward(request, response);
 
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID");
@@ -270,65 +341,8 @@ public class UserController extends HttpServlet {
     }
 
     /**
-     * HANDLE CREATE USER: Process create user form
-     */
-    private void handleCreateUser(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-
-        // Get form parameters
-        String fullName = request.getParameter("fullName");
-        String userName = request.getParameter("userName");
-        String email = request.getParameter("email");
-        String phoneNumber = request.getParameter("phoneNumber");
-        String gender = request.getParameter("gender");
-        String birthDate = request.getParameter("birthDate");
-        String address = request.getParameter("address");
-        // number support
-        String roleParam = request.getParameter("role");
-
-        // Validate required fields
-        if (isNullOrEmpty(fullName) || isNullOrEmpty(userName) ||
-                isNullOrEmpty(email) || isNullOrEmpty(roleParam)) {
-
-            redirectWithMessage(response, request.getContextPath() + "/admin/users/create",
-                    "Vui lòng điền đầy đủ thông tin bắt buộc!", "error");
-            return;
-        }
-
-        // Parse and validate role
-        int roleId;
-        try {
-            roleId = Integer.parseInt(roleParam);
-            if (roleId <= 0) {
-                redirectWithMessage(response, request.getContextPath() + "/admin/users/create",
-                        "Role ID không hợp lệ!", "error");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            redirectWithMessage(response, request.getContextPath() + "/admin/users/create",
-                    "Role ID không hợp lệ!", "error");
-            return;
-        }
-
-        // Create user
-        boolean success = adminService.createUser(fullName.trim(), userName.trim(),
-                email.trim(), roleId, gender, getCurrentUser(request));
-
-        if (success) {
-            System.out.println("UserController - User created successfully: " + userName +
-                    " by " + getCurrentUser(request));
-            redirectWithMessage(response, request.getContextPath() + "/admin/users",
-                    "Đã tạo user mới thành công! Username: " + userName + ", Mật khẩu: 123456",
-                    "success");
-        } else {
-            System.out.println("UserController - User creation failed: " + userName);
-            redirectWithMessage(response, request.getContextPath() + "/admin/users/create",
-                    "Tạo user thất bại! Username có thể đã tồn tại.", "error");
-        }
-    }
-
-    /**
-     * HANDLE UPDATE USER: Process edit user form
+     * HANDLE UPDATE USER: Process edit user form with separate Customer/Employee
+     * logic
      */
     private void handleUpdateUser(HttpServletRequest request, HttpServletResponse response, String pathInfo)
             throws IOException {
@@ -336,19 +350,45 @@ public class UserController extends HttpServlet {
             String userIdStr = pathInfo.substring("/edit/".length());
             int userId = Integer.parseInt(userIdStr);
 
-            // 1. Lấy dữ liệu form chung
+            // Get current user info
+            UserDisplay currentUserData = adminService.getUserById(userId);
+            if (currentUserData == null) {
+                redirectWithMessage(response, request.getContextPath() + "/admin/users",
+                        "User không tồn tại!", "error");
+                return;
+            }
+
+            // Get form parameters - basic info
             String fullName = request.getParameter("fullName");
             String email = request.getParameter("email");
             String roleParam = request.getParameter("role");
 
-            // ... (Validate cơ bản) ...
+            // Validate basic required fields
+            if (isNullOrEmpty(fullName) || isNullOrEmpty(email) || isNullOrEmpty(roleParam)) {
+                redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId,
+                        "Vui lòng điền đầy đủ thông tin bắt buộc!", "error");
+                return;
+            }
 
-            int newRoleId = Integer.parseInt(roleParam);
+            // Parse and validate new role
+            int newRoleId;
+            try {
+                newRoleId = Integer.parseInt(roleParam);
+                if (newRoleId <= 0) {
+                    redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId,
+                            "Role ID không hợp lệ!", "error");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId,
+                        "Role ID không hợp lệ!", "error");
+                return;
+            }
+
             Role newRole = adminService.getRoleById(newRoleId);
-
             if (newRole == null) {
                 redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId,
-                        "Vai trò không hợp lệ.", "error");
+                        "Vai trò không hợp lệ!", "error");
                 return;
             }
 
@@ -356,38 +396,61 @@ public class UserController extends HttpServlet {
             String successMessage = "Cập nhật user thành công!";
             String errorMessage = "Cập nhật user thất bại!";
 
-            if (!newRole.getRoleName().equalsIgnoreCase("Customer")) {
+            // Check if role change involves Employee promotion/demotion
+            boolean oldRoleIsCustomer = "Customer".equalsIgnoreCase(currentUserData.getRoleName());
+            boolean newRoleIsCustomer = "Customer".equalsIgnoreCase(newRole.getRoleName());
 
-                String employeeCode = request.getParameter("employeeCode");
-                String salaryStr = request.getParameter("salary");
-                String managedByStr = request.getParameter("managedBy");
-
-                if (isNullOrEmpty(employeeCode) || isNullOrEmpty(salaryStr) || isNullOrEmpty(managedByStr)) {
-                    redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId,
-                            "Vai trò là Nhân viên, vui lòng điền đầy đủ Mã NV, Lương và ID Quản lý.", "error");
-                    return;
-                }
-
-                double salary = Double.parseDouble(salaryStr);
-                int managedBy = Integer.parseInt(managedByStr);
-
-                success = adminService.promoteCustomerToEmployee(
-                        userId, newRole.getRoleName(), employeeCode, salary, managedBy, getCurrentUser(request));
+            if (oldRoleIsCustomer && !newRoleIsCustomer) {
+                // Customer -> Employee: Promotion (basic update only for now)
+                success = adminService.updateUserBasicInfo(userId, fullName.trim(), email.trim(),
+                        newRoleId, getCurrentUser(request));
 
                 if (success) {
-                    successMessage = "Thăng cấp thành công! User " + userId + " đã được chuyển sang vai trò "
-                            + newRole.getRoleName();
+                    successMessage = "Thăng cấp thành công! User " + currentUserData.getUserName() +
+                            " đã được chuyển sang vai trò " + newRole.getRoleName() +
+                            " và tạo Employee record tự động.";
                 } else {
-                    errorMessage = "Thăng cấp thất bại! (Lỗi DB hoặc đã có hồ sơ Employee).";
+                    errorMessage = "Thăng cấp thất bại! Có thể do lỗi database hoặc Employee record đã tồn tại.";
+                }
+
+            } else if (!oldRoleIsCustomer && newRoleIsCustomer) {
+                // Employee -> Customer: Demotion (just update basic info, keep Employee record)
+                success = adminService.updateUserBasicInfo(userId, fullName.trim(), email.trim(),
+                        newRoleId, getCurrentUser(request));
+
+                if (success) {
+                    successMessage = "Chuyển đổi thành công! User " + currentUserData.getUserName() +
+                            " đã được chuyển về vai trò Customer.";
+                } else {
+                    errorMessage = "Chuyển đổi thất bại! Có thể do lỗi database.";
                 }
 
             } else {
-                success = adminService.updateUserBasicInfo(userId, fullName, email, newRoleId, getCurrentUser(request));
+                // Same category update (Customer -> Customer or Employee -> Employee)
+                if (newRoleIsCustomer) {
+                    // Customer -> Customer: Basic update only
+                    success = adminService.updateUserBasicInfo(userId, fullName.trim(), email.trim(),
+                            newRoleId, getCurrentUser(request));
+                } else {
+                    // Employee -> Employee: Update basic info only for now
+                    success = adminService.updateUserBasicInfo(userId, fullName.trim(), email.trim(),
+                            newRoleId, getCurrentUser(request));
+                }
+
+                if (success) {
+                    successMessage = "Cập nhật thông tin user thành công!";
+                } else {
+                    errorMessage = "Cập nhật thông tin user thất bại!";
+                }
             }
 
+            // Redirect with result
             if (success) {
+                System.out.println("UserController - User updated successfully: " + currentUserData.getUserName() +
+                        " by " + getCurrentUser(request));
                 redirectWithMessage(response, request.getContextPath() + "/admin/users", successMessage, "success");
             } else {
+                System.out.println("UserController - User update failed: " + currentUserData.getUserName());
                 redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId, errorMessage,
                         "error");
             }
@@ -555,6 +618,127 @@ public class UserController extends HttpServlet {
 
     private boolean isNullOrEmpty(String str) {
         return str == null || str.trim().isEmpty();
+    }
+
+    /**
+     * HANDLE CREATE CUSTOMER: Process Customer creation form
+     */
+    private void handleCreateCustomer(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        // Get form parameters
+        String fullName = request.getParameter("fullName");
+        String userName = request.getParameter("userName");
+        String email = request.getParameter("email");
+        String gender = request.getParameter("gender");
+
+        // Validate required fields
+        if (isNullOrEmpty(fullName) || isNullOrEmpty(userName) || isNullOrEmpty(email)) {
+            redirectWithMessage(response, request.getContextPath() + "/admin/users/create-customer",
+                    "Vui lòng điền đầy đủ thông tin bắt buộc!", "error");
+            return;
+        }
+
+        // Get Customer role ID (assuming it's 4, adjust as needed)
+        int customerRoleId = 4; // You might want to get this dynamically
+
+        // Create customer user (no Employee details needed)
+        boolean success = adminService.createUser(fullName.trim(), userName.trim(),
+                email.trim(), customerRoleId, gender, getCurrentUser(request),
+                null, null); // No employee code or salary for customer
+
+        if (success) {
+            System.out.println("UserController - Customer created successfully: " + userName +
+                    " by " + getCurrentUser(request));
+
+            String message = "Đã tạo Customer thành công! Username: " + userName + ", Mật khẩu: 123456";
+
+            redirectWithMessage(response, request.getContextPath() + "/admin/users",
+                    message, "success");
+        } else {
+            System.out.println("UserController - Customer creation failed: " + userName);
+            redirectWithMessage(response, request.getContextPath() + "/admin/users/create-customer",
+                    "Tạo Customer thất bại! Username có thể đã tồn tại.", "error");
+        }
+    }
+
+    /**
+     * HANDLE CREATE EMPLOYEE: Process Employee creation form
+     */
+    private void handleCreateEmployee(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        // Get form parameters - basic info
+        String fullName = request.getParameter("fullName");
+        String userName = request.getParameter("userName");
+        String email = request.getParameter("email");
+        String phoneNumber = request.getParameter("phoneNumber");
+        String gender = request.getParameter("gender");
+
+        // Employee specific parameters
+        String roleParam = request.getParameter("roleId");
+        String employeeCode = request.getParameter("employeeCode");
+        String salaryParam = request.getParameter("salary");
+
+        // Validate required fields
+        if (isNullOrEmpty(fullName) || isNullOrEmpty(userName) ||
+                isNullOrEmpty(email) || isNullOrEmpty(phoneNumber) || isNullOrEmpty(roleParam)) {
+            redirectWithMessage(response, request.getContextPath() + "/admin/users/create-employee",
+                    "Vui lòng điền đầy đủ thông tin bắt buộc!", "error");
+            return;
+        }
+
+        // Parse and validate role
+        int roleId;
+        try {
+            roleId = Integer.parseInt(roleParam);
+            if (roleId <= 0) {
+                redirectWithMessage(response, request.getContextPath() + "/admin/users/create-employee",
+                        "Role ID không hợp lệ!", "error");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            redirectWithMessage(response, request.getContextPath() + "/admin/users/create-employee",
+                    "Role ID không hợp lệ!", "error");
+            return;
+        }
+
+        // Parse salary
+        Double salary = null;
+        if (!isNullOrEmpty(salaryParam)) {
+            try {
+                salary = Double.parseDouble(salaryParam);
+                if (salary < 0) {
+                    redirectWithMessage(response, request.getContextPath() + "/admin/users/create-employee",
+                            "Lương không được âm!", "error");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                redirectWithMessage(response, request.getContextPath() + "/admin/users/create-employee",
+                        "Định dạng lương không hợp lệ!", "error");
+                return;
+            }
+        }
+
+        // Create employee user with Employee details
+        boolean success = adminService.createUser(fullName.trim(), userName.trim(),
+                email.trim(), roleId, gender, getCurrentUser(request),
+                employeeCode != null ? employeeCode.trim() : null, salary);
+
+        if (success) {
+            System.out.println("UserController - Employee created successfully: " + userName +
+                    " by " + getCurrentUser(request));
+
+            String message = "Đã tạo Employee thành công! Username: " + userName +
+                    ", Mật khẩu: 123456. Employee record đã được tạo tự động.";
+
+            redirectWithMessage(response, request.getContextPath() + "/admin/users",
+                    message, "success");
+        } else {
+            System.out.println("UserController - Employee creation failed: " + userName);
+            redirectWithMessage(response, request.getContextPath() + "/admin/users/create-employee",
+                    "Tạo Employee thất bại! Username có thể đã tồn tại.", "error");
+        }
     }
 
     private void redirectWithMessage(HttpServletResponse response, String url,

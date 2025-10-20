@@ -4,7 +4,7 @@ import dao.misc.NotificationDAO;
 import dao.carservice.ServiceRequestDAO;
 import dao.user.UserDAO;
 import model.misc.Notification;
-import model.servicerequest.ServiceRequest;
+import model.workorder.ServiceRequest;
 
 import java.sql.SQLException;
 import java.util.List;
