@@ -18,20 +18,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
   </head>
   <body>
     <!-- Header -->
-    <nav class="navbar navbar-dark bg-primary">
-      <div class="container-fluid">
-        <span class="navbar-brand">
-          <i class="bi bi-person-badge"></i> Create Employee User
-        </span>
-        <span class="navbar-text">
-          ${currentUser} |
-          <fmt:formatDate
-            value="<%= new java.util.Date() %>"
-            pattern="dd/MM/yyyy HH:mm"
-          />
-        </span>
-      </div>
-    </nav>
+    <%@ include file="header.jsp" %>
 
     <div class="container mt-4">
       <!-- Breadcrumb -->
@@ -381,8 +368,10 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Footer -->
+    <%@ include file="footer.jsp" %>
 
+    <!-- Custom Scripts for Employee Form -->
     <script>
       // Generate employee code suggestion based on role selection
       document.getElementById("roleId").addEventListener("change", function () {

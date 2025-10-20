@@ -62,7 +62,7 @@ public class Login extends HttpServlet {
             }
 //7 roles: ADMIN, TechManager, Technical, Accountant, Store Keeper, Customer Service,Customer
             if("ADMIN".equals(roleCode)) {
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+                response.sendRedirect(request.getContextPath() + "/admin/users");
                 return;
             } else if("TECHMANAGER".equals(roleCode)) {
                 response.sendRedirect(request.getContextPath() + "/techmanager/dashboard");

@@ -18,20 +18,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
   </head>
   <body>
     <!-- Header -->
-    <nav class="navbar navbar-dark bg-dark">
-      <div class="container-fluid">
-        <span class="navbar-brand">
-          <i class="bi bi-pencil-square"></i> Edit User
-        </span>
-        <span class="navbar-text">
-          <i class="bi bi-person-circle"></i> ${currentUser} |
-          <fmt:formatDate
-            value="<%= new java.util.Date() %>"
-            pattern="dd/MM/yyyy HH:mm"
-          />
-        </span>
-      </div>
-    </nav>
+    <%@ include file="header.jsp" %>
 
     <div class="container-fluid mt-4">
       <!-- Alert Messages -->
@@ -323,7 +310,8 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Footer -->
+    <%@ include file="footer.jsp" %>
     <script src="${pageContext.request.contextPath}/assets/js/admin/user-edit.js"></script>
   </body>
 </html>
