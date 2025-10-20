@@ -175,7 +175,6 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                         <option value="">-- Chọn giới tính --</option>
                         <option value="Male">Nam</option>
                         <option value="Female">Nữ</option>
-                        <option value="Other">Khác</option>
                       </select>
                     </div>
 

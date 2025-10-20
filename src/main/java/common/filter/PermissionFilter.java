@@ -37,15 +37,15 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/view/role/form.jsp", "role_permission_manage");
 
         // User (Admin) - Updated with new separated routes
-//        routePerm.put("GET:/admin/users", "admin");
-//        routePerm.put("POST:/admin/users", "user_read"); // For search functionality
-//        routePerm.put("GET:/admin/users/create", "user_create");
-//        routePerm.put("POST:/admin/users/create", "user_create");
-//        routePerm.put("GET:/admin/users/choose-type", "user_create");
-//        routePerm.put("GET:/admin/users/create-customer", "user_create");
-//        routePerm.put("POST:/admin/users/create-customer", "user_create");
-//        routePerm.put("GET:/admin/users/create-employee", "user_create");
-//        routePerm.put("POST:/admin/users/create-employee", "user_create");
+        // routePerm.put("GET:/admin/users", "admin");
+        // routePerm.put("POST:/admin/users", "user_read"); // For search functionality
+        // routePerm.put("GET:/admin/users/create", "user_create");
+        // routePerm.put("POST:/admin/users/create", "user_create");
+        // routePerm.put("GET:/admin/users/choose-type", "user_create");
+        // routePerm.put("GET:/admin/users/create-customer", "user_create");
+        // routePerm.put("POST:/admin/users/create-customer", "user_create");
+        // routePerm.put("GET:/admin/users/create-employee", "user_create");
+        // routePerm.put("POST:/admin/users/create-employee", "user_create");
         // Note: Dynamic routes like /admin/users/view/{id} will be handled by area gate
 
         // Admin JSP pages
@@ -74,16 +74,27 @@ public class PermissionFilter implements Filter {
         routePerm.put("GET:/techmanager/dashboard", "techmanager_access");
 
         // WorkOrder management - tất cả operations được xử lý bởi WorkOrderController
-        routePerm.put("GET:/techmanager/workorders/list", "tech_manager_access");
-        routePerm.put("GET:/techmanager/workorders/create", "tech_manager_access"); 
-        routePerm.put("POST:/techmanager/workorders/create", "tech_manager_access");
-        routePerm.put("GET:/techmanager/workorders/details", "tech_manager_access");
-        routePerm.put("POST:/techmanager/workorders/add-detail","tech_manager_access");
-        routePerm.put("GET:/techmanager/workorders/edit-detail", "tech_manager_access");
-        routePerm.put("POST:/techmanager/workorders/edit-detail", "tech_manager_access");
-        routePerm.put("POST:/techmanager/workorders/delete-detail", "tech_manager_access");
-        routePerm.put("POST:/techmanager/workorders/approve-detail", "tech_manager_access");
-        routePerm.put("POST:/techmanager/workorders/decline-detail", "tech_manager_access");
+        routePerm.put("GET:/view/techmanager/dashboard.jsp", "techmanager_access");
+        routePerm.put("GET:/view/techmanager/workorders/list", "tech_manager_access");
+        routePerm.put("GET:/view/workorders/create.jsp", "tech_manager_access");
+        routePerm.put("POST:/view/workorders/create.jsp", "tech_manager_access");
+        routePerm.put("GET:/view/workorders/details.jsp", "tech_manager_access");
+        routePerm.put("POST:/view/workorders/add-detail.jsp", "tech_manager_access");
+        routePerm.put("GET:/view/workorders/edit-detail.jsp", "tech_manager_access");
+        routePerm.put("POST:/view/workorders/edit-detail.jsp", "tech_manager_access");
+        routePerm.put("POST:/view/workorders/delete-detail.jsp", "tech_manager_access");
+        routePerm.put("POST:/view/workorders/approve-detail.jsp", "tech_manager_access");
+        routePerm.put("POST:/view/workorders/decline-detail.jsp", "tech_manager_access");
+        routePerm.put("GET:/view/techmanager/workorders/create", "tech_manager_access");
+        routePerm.put("GET:/view/workorders/list.jsp", "tech_manager_access");
+        routePerm.put("POST:/view/techmanager/workorders/create", "tech_manager_access");
+        routePerm.put("GET:/view/techmanager/workorders/details", "tech_manager_access");
+        routePerm.put("POST:/view/techmanager/workorders/add-detail", "tech_manager_access");
+        routePerm.put("GET:/view/techmanager/workorders/edit-detail", "tech_manager_access");
+        routePerm.put("POST:/view/techmanager/workorders/edit-detail", "tech_manager_access");
+        routePerm.put("POST:/view/techmanager/workorders/delete-detail", "tech_manager_access");
+        routePerm.put("POST:/view/techmanager/workorders/approve-detail", "tech_manager_access");
+        routePerm.put("POST:/view/techmanager/workorders/decline-detail", "tech_manager_access");
 
         // Technician
         routePerm.put("GET:/technician/jobs", "job_read");
@@ -127,7 +138,7 @@ public class PermissionFilter implements Filter {
 
         areaGate.put("/admin/", "user_read"); // Default admin permission for unspecified routes
         areaGate.put("/customerservice/", "cs_access");
-        areaGate.put("/tech-manager/", "tech_manager_access"); // Tech Manager
+        areaGate.put("/techmanager/", "tech_manager_access"); // Tech Manager
         areaGate.put("/technician/", "technician_access"); // Technician
         areaGate.put("/inventory/", "inventory_access"); // Store Keeper
         areaGate.put("/accounting/", "accounting_access"); // Accountant

@@ -225,10 +225,10 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                 </a>
 
                 <a
-                  href="${pageContext.request.contextPath}/admin/users/create"
+                 href="${pageContext.request.contextPath}/admin/users/choose-type"
                   class="btn btn-success"
                 >
-                  <i class="bi bi-plus-circle"></i> Create New User
+                  <i class="bi bi-plus-circle"></i> Create New User Type <Type></Type>
                 </a>
               </div>
             </div>
