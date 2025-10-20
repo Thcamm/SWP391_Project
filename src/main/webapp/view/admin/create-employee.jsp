@@ -231,8 +231,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                         readonly
                       />
                       <div class="form-text">
-                        <i class="bi bi-info-circle"></i> Mã sẽ được tạo tự động
-                        theo format: EMP001, EMP002...
+                        <i class="bi bi-info-circle"></i>
                       </div>
                     </div>
 
@@ -263,37 +262,6 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                       name="hireDate" value="<%= new
                       java.text.SimpleDateFormat("yyyy-MM-dd").format(new
                       java.util.Date()) %>">
-                    </div>
-
-                    <div class="mb-3">
-                      <label for="position" class="form-label"
-                        >Vị trí làm việc</label
-                      >
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="position"
-                        name="position"
-                        placeholder="Ví dụ: Kỹ thuật viên, Quản lý, Lễ tân..."
-                      />
-                    </div>
-
-                    <div class="mb-3">
-                      <label for="department" class="form-label"
-                        >Phòng ban</label
-                      >
-                      <select
-                        class="form-select"
-                        id="department"
-                        name="department"
-                      >
-                        <option value="">-- Chọn phòng ban --</option>
-                        <option value="Kỹ thuật">Phòng Kỹ thuật</option>
-                        <option value="Dịch vụ">Phòng Dịch vụ</option>
-                        <option value="Kinh doanh">Phòng Kinh doanh</option>
-                        <option value="Quản lý">Phòng Quản lý</option>
-                        <option value="Hành chính">Phòng Hành chính</option>
-                      </select>
                     </div>
                   </div>
                 </div>
