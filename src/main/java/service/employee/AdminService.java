@@ -204,6 +204,14 @@ public class AdminService {
 
     public boolean createUser(String fullName, String userName, String email, int roleId, String gender,
             String currentUser) {
+        return createUser(fullName, userName, email, roleId, gender, currentUser, null, null);
+    }
+
+    /**
+     * Create user with optional employee details for non-customer roles
+     */
+    public boolean createUser(String fullName, String userName, String email, int roleId, String gender,
+            String currentUser, String employeeCode, Double salary) {
         try {
             if (currentUser == null || currentUser.trim().isEmpty()) {
                 System.out.println("Lỗi: Không có thông tin user hiện tại!");
@@ -226,10 +234,24 @@ public class AdminService {
             newUser.setPasswordHash(util.PasswordUtil.hashPassword("123456"));
             newUser.setActiveStatus(true);
 
-            boolean success = userDAO.addUser(newUser);
+            // Get current user's employee ID for Employee creation
+            Integer createdByEmployeeId = null;
+            try {
+                createdByEmployeeId = adminDAO.getEmployeeIdByUsername(currentUser);
+            } catch (SQLException e) {
+                System.out.println("Warning: Could not find employee ID for current user: " + currentUser);
+            }
+
+            // Use AdminDAO's enhanced createUser method that handles Employee creation
+            boolean success = adminDAO.createUser(newUser, employeeCode, salary, createdByEmployeeId);
 
             if (success) {
                 System.out.println("User " + currentUser + " đã tạo user mới: " + userName);
+                
+                // Log if Employee record was created
+                if (isEmployeeRole(roleId)) {
+                    System.out.println("Employee record also created for non-customer user: " + userName);
+                }
             }
 
             return success;
@@ -237,6 +259,34 @@ public class AdminService {
         } catch (SQLException e) {
             System.out.println("Lỗi khi tạo user: " + e.getMessage());
             return false;
+        }
+    }
+
+    /**
+     * Check if role requires Employee record (non-Customer roles)
+     */
+    private boolean isEmployeeRole(int roleId) {
+        try {
+            Role role = roleDao.findById(roleId);
+            if (role != null) {
+                String roleName = role.getRoleName().toLowerCase();
+                return !roleName.equals("customer") && !roleName.equals("khách hàng");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking role type: " + e.getMessage());
+        }
+        return false; // Default to false if unable to determine
+    }
+
+    /**
+     * Get all available roles for user creation
+     */
+    public ArrayList<Role> getAvailableRoles() {
+        try {
+            return (ArrayList<Role>) roleDao.findAll();
+        } catch (Exception e) {
+            System.err.println("Error retrieving available roles: " + e.getMessage());
+            return new ArrayList<>();
         }
     }
 
@@ -323,21 +373,7 @@ public class AdminService {
     // }
     // }
 
-    public ArrayList<Role> getAvailableRoles() {
-        try {
-            List<Role> roles = roleDao.findAll();
-            return new ArrayList<>(roles);
-        } catch (Exception e) {
-            System.err.println("ADMIN Error getting roles: " + e.getMessage());
-            ArrayList<Role> defaultRoles = new ArrayList<>();
-            defaultRoles.add(createDefaultRole(1, "Admin"));
-            defaultRoles.add(createDefaultRole(2, "Tech Manager"));
-            defaultRoles.add(createDefaultRole(3, "Technician"));
-            defaultRoles.add(createDefaultRole(4, "Store Keeper"));
-            defaultRoles.add(createDefaultRole(5, "Accountant"));
-            return defaultRoles;
-        }
-    }
+
 
     public int getActiveUsersCount() {
         try {
@@ -437,10 +473,4 @@ public class AdminService {
     }
 
     // ===== HELPER METHODS =====
-    private Role createDefaultRole(int roleId, String roleName) {
-        Role role = new Role();
-        role.setRoleId(roleId);
-        role.setRoleName(roleName);
-        return role;
-    }
 }

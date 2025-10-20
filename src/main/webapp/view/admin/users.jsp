@@ -70,7 +70,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
         <div class="col-md-4 text-end">
           <div class="btn-group">
             <a
-              href="${pageContext.request.contextPath}/admin/users/create"
+              href="${pageContext.request.contextPath}/admin/users/choose-type"
               class="btn btn-success"
             >
               <i class="bi bi-plus-circle"></i> Create User
@@ -96,6 +96,14 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   href="${pageContext.request.contextPath}/admin/rbac/roles"
                 >
                   <i class="bi bi-shield"></i> Manage Roles
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="${pageContext.request.contextPath}/techmanager/dashboard"
+                >
+                  <i class="bi bi-tools"></i> TechManager Dashboard
                 </a>
               </li>
             </ul>
@@ -254,7 +262,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                 <h5 class="text-muted mt-3">No users found</h5>
                 <p class="text-muted">Try adjusting your search criteria</p>
                 <a
-                  href="${pageContext.request.contextPath}/admin/users/create"
+                  href="${pageContext.request.contextPath}/admin/users/choose-type"
                   class="btn btn-success"
                 >
                   <i class="bi bi-plus-circle"></i> Create First User
@@ -602,7 +610,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
               <i class="bi bi-info-circle"></i>
               <strong>Quick Actions:</strong>
               <a
-                href="${pageContext.request.contextPath}/admin/users/create"
+                href="${pageContext.request.contextPath}/admin/users/choose-type"
                 class="text-decoration-none"
                 >Create User</a
               >
@@ -617,6 +625,11 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                 href="${pageContext.request.contextPath}/admin/rbac/roles"
                 class="text-decoration-none"
                 >Manage Roles</a
+              >
+              <a
+                href="${pageContext.request.contextPath}/techmanager/dashboard"
+                class="text-decoration-none"
+                >Dashboard</a
               >
             </small>
           </div>

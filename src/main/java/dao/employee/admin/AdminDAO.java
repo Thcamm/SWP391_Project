@@ -179,28 +179,119 @@ public class AdminDAO extends DbContext {
     }
 
     /**
-     * ADMIN FUNCTION: Create new user
+     * ADMIN FUNCTION: Create new user with auto Employee record creation for non-Customer roles
      */
     public boolean createUser(User user) throws SQLException {
-        String sql = "INSERT INTO `User` (RoleID, FullName, UserName, Email, PhoneNumber, PasswordHash, ActiveStatus) "
-                +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        return createUser(user, null, null, null);
+    }
 
-        try (Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+    /**
+     * ADMIN FUNCTION: Create new user with Employee details for non-Customer roles
+     */
+    public boolean createUser(User user, String employeeCode, Double salary, Integer createdByEmployeeId) throws SQLException {
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false); // Start transaction
 
-            ps.setInt(1, user.getRoleId());
-            ps.setString(2, user.getFullName());
-            ps.setString(3, user.getUserName());
-            ps.setString(4, user.getEmail());
-            ps.setString(5, user.getPhoneNumber());
-            ps.setString(6, user.getPasswordHash());
-            ps.setBoolean(7, user.isActiveStatus());
+            // 1. Insert into User table
+            String userSql = "INSERT INTO `User` (RoleID, FullName, UserName, Email, PhoneNumber, PasswordHash, ActiveStatus) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-            boolean success = ps.executeUpdate() > 0;
-            System.out.println("ADMIN: User creation " + (success ? "successful" : "failed") +
-                    " for username: " + user.getUserName());
-            return success;
+            int newUserId;
+            try (PreparedStatement userPs = conn.prepareStatement(userSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+                userPs.setInt(1, user.getRoleId());
+                userPs.setString(2, user.getFullName());
+                userPs.setString(3, user.getUserName());
+                userPs.setString(4, user.getEmail());
+                userPs.setString(5, user.getPhoneNumber());
+                userPs.setString(6, user.getPasswordHash());
+                userPs.setBoolean(7, user.isActiveStatus());
+
+                int userResult = userPs.executeUpdate();
+                if (userResult == 0) {
+                    conn.rollback();
+                    return false;
+                }
+
+                // Get the generated UserID
+                try (ResultSet generatedKeys = userPs.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        newUserId = generatedKeys.getInt(1);
+                        user.setUserId(newUserId);
+                    } else {
+                        conn.rollback();
+                        return false;
+                    }
+                }
+            }
+
+            // 2. Check if we need to create Employee record (for non-Customer roles)
+            if (!isCustomerRole(user.getRoleId())) {
+                String roleName = getRoleNameById(user.getRoleId());
+                
+                // Generate employee code if not provided
+                if (employeeCode == null || employeeCode.trim().isEmpty()) {
+                    employeeCode = generateEmployeeCode(roleName, newUserId);
+                }
+
+                // Create Employee record
+                String empSql = "INSERT INTO Employee (UserID, EmployeeCode, Salary, ManagedBy, CreatedBy) " +
+                        "VALUES (?, ?, ?, ?, ?)";
+
+                try (PreparedStatement empPs = conn.prepareStatement(empSql)) {
+                    empPs.setInt(1, newUserId);
+                    empPs.setString(2, employeeCode);
+                    
+                    if (salary != null) {
+                        empPs.setDouble(3, salary);
+                    } else {
+                        empPs.setNull(3, java.sql.Types.DOUBLE);
+                    }
+                    
+                    empPs.setNull(4, java.sql.Types.INTEGER); // ManagedBy - set later if needed
+                    
+                    if (createdByEmployeeId != null) {
+                        empPs.setInt(5, createdByEmployeeId);
+                    } else {
+                        empPs.setNull(5, java.sql.Types.INTEGER);
+                    }
+
+                    int empResult = empPs.executeUpdate();
+                    if (empResult == 0) {
+                        conn.rollback();
+                        System.err.println("Failed to create Employee record for user: " + user.getUserName());
+                        return false;
+                    }
+
+                    System.out.println("ADMIN: Employee record created successfully - Code: " + employeeCode + 
+                                     " for user: " + user.getUserName());
+                }
+            }
+
+            conn.commit();
+            System.out.println("ADMIN: User creation successful for username: " + user.getUserName());
+            return true;
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    System.err.println("Error during rollback: " + rollbackEx.getMessage());
+                }
+            }
+            System.err.println("ADMIN: User creation failed for username: " + user.getUserName() + " - " + e.getMessage());
+            throw e;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    System.err.println("Error closing connection: " + e.getMessage());
+                }
+            }
         }
     }
 
@@ -442,6 +533,81 @@ public class AdminDAO extends DbContext {
 
             return ps.executeUpdate() > 0;
         }
+    }
+
+    /**
+     * Check if a role is Customer role
+     */
+    private boolean isCustomerRole(int roleId) throws SQLException {
+        String sql = "SELECT RoleName FROM RoleInfo WHERE RoleID = ?";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, roleId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String roleName = rs.getString("RoleName").toLowerCase();
+                    return roleName.equals("customer") || roleName.equals("khách hàng");
+                }
+            }
+        }
+        return false; // Default to false if role not found
+    }
+
+    /**
+     * Get role name by role ID
+     */
+    private String getRoleNameById(int roleId) throws SQLException {
+        String sql = "SELECT RoleName FROM RoleInfo WHERE RoleID = ?";
+        
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, roleId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("RoleName");
+                }
+            }
+        }
+        return "Unknown";
+    }
+
+    /**
+     * Generate unique employee code based on role and user ID
+     */
+    private String generateEmployeeCode(String roleName, int userId) {
+        String prefix;
+        
+        if (roleName == null) {
+            prefix = "EMP";
+        } else {
+            switch (roleName.toLowerCase()) {
+                case "admin":
+                    prefix = "ADM";
+                    break;
+                case "tech manager":
+                case "technical manager":
+                    prefix = "TM";
+                    break;
+                case "technician":
+                    prefix = "TECH";
+                    break;
+                case "accountant":
+                    prefix = "ACC";
+                    break;
+                case "storekeeper":
+                    prefix = "STORE";
+                    break;
+                default:
+                    prefix = "EMP";
+                    break;
+            }
+        }
+        
+        // Generate code: PREFIX + UserID padded to 4 digits
+        return prefix + String.format("%04d", userId);
     }
 
 }

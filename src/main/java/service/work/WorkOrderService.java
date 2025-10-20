@@ -1,8 +1,7 @@
 package service.work;
 
 import dao.workorder.WorkOrderDAO;
-import dao.workorder.WorkOrderDetailDAO;
-import model.servicetype.ServiceRequest;
+import model.workorder.ServiceRequest;
 import model.employee.techmanager.TechManager;
 import model.workorder.WorkOrder;
 import model.workorder.WorkOrderDetail;

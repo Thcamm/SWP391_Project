@@ -580,3 +580,169 @@ CREATE TABLE CarModels (
         ON DELETE CASCADE
 );
 
+-- =========================================================
+-- STORED PROCEDURES
+-- =========================================================
+
+-- Promote Customer to Employee Stored Procedure
+DELIMITER $$
+
+CREATE PROCEDURE SP_PromoteCustomerToEmployee(
+    IN p_user_id INT,
+    IN p_new_role_name VARCHAR(50),
+    IN p_employee_code VARCHAR(20),
+    IN p_salary DECIMAL(10,2),
+    IN p_managed_by_employee_id INT,
+    IN p_created_by_employee_id INT
+)
+BEGIN
+    DECLARE v_new_role_id INT;
+    DECLARE v_current_role_id INT;
+    DECLARE v_customer_role_id INT;
+    DECLARE v_existing_employee_count INT;
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        RESIGNAL;
+    END;
+
+    START TRANSACTION;
+
+    -- Get current role ID
+    SELECT RoleID INTO v_current_role_id 
+    FROM User 
+    WHERE UserID = p_user_id;
+
+    -- Get Customer role ID
+    SELECT RoleID INTO v_customer_role_id 
+    FROM RoleInfo 
+    WHERE RoleName = 'Customer' 
+    LIMIT 1;
+
+    -- Get new role ID
+    SELECT RoleID INTO v_new_role_id 
+    FROM RoleInfo 
+    WHERE RoleName = p_new_role_name 
+    LIMIT 1;
+
+    -- Validation checks
+    IF v_current_role_id IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User not found';
+    END IF;
+
+    IF v_new_role_id IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Target role not found';
+    END IF;
+
+    IF v_customer_role_id IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Customer role not found in system';
+    END IF;
+
+    IF v_current_role_id != v_customer_role_id THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User is not a Customer, cannot promote';
+    END IF;
+
+    -- Check if user already has Employee record
+    SELECT COUNT(*) INTO v_existing_employee_count 
+    FROM Employee 
+    WHERE UserID = p_user_id;
+
+    IF v_existing_employee_count > 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User already has Employee record';
+    END IF;
+
+    -- Update user role
+    UPDATE User 
+    SET RoleID = v_new_role_id, UpdatedAt = NOW() 
+    WHERE UserID = p_user_id;
+
+    -- Create Employee record
+    INSERT INTO Employee (UserID, EmployeeCode, Salary, ManagedBy, CreatedBy, CreatedAt)
+    VALUES (p_user_id, p_employee_code, p_salary, p_managed_by_employee_id, p_created_by_employee_id, NOW());
+
+    COMMIT;
+END$$
+
+DELIMITER ;
+
+-- =========================================================
+-- SAMPLE DATA
+-- =========================================================
+
+-- Insert Sample Roles
+INSERT INTO RoleInfo (RoleName, Description) VALUES 
+('Admin', 'System Administrator with full access'),
+('Tech Manager', 'Technical Manager overseeing technicians'),
+('Technician', 'Technical staff performing repairs'),
+('Customer', 'Customer using garage services'),
+('Accountant', 'Financial management staff'),
+('Storekeeper', 'Inventory management staff');
+
+-- Insert Sample Units
+INSERT INTO Unit (code, name) VALUES
+('PC', 'Piece'),
+('KG', 'Kilogram'),
+('L', 'Liter'),
+('SET', 'Set'),
+('BOX', 'Box');
+
+-- Insert Sample Permissions
+INSERT INTO Permission (Code, Name, Category, Description) VALUES
+('user_read', 'View Users', 'User Management', 'Permission to view user information'),
+('user_create', 'Create Users', 'User Management', 'Permission to create new users'),
+('user_update', 'Update Users', 'User Management', 'Permission to modify user information'),
+('user_delete', 'Delete Users', 'User Management', 'Permission to delete users'),
+('workorder_read', 'View Work Orders', 'Work Management', 'Permission to view work orders'),
+('workorder_create', 'Create Work Orders', 'Work Management', 'Permission to create work orders'),
+('workorder_update', 'Update Work Orders', 'Work Management', 'Permission to modify work orders'),
+('workorder_delete', 'Delete Work Orders', 'Work Management', 'Permission to delete work orders'),
+('workorder_approve', 'Approve Work Orders', 'Work Management', 'Permission to approve work order details'),
+('techmanager_read', 'Tech Manager Dashboard', 'Dashboard', 'Permission to access tech manager dashboard'),
+('inventory_read', 'View Inventory', 'Inventory', 'Permission to view inventory'),
+('inventory_create', 'Add Inventory', 'Inventory', 'Permission to add inventory items'),
+('inventory_update', 'Update Inventory', 'Inventory', 'Permission to modify inventory'),
+('inventory_import', 'Import Inventory', 'Inventory', 'Permission to import inventory'),
+('inventory_export', 'Export Inventory', 'Inventory', 'Permission to export inventory'),
+('appointment_read', 'View Appointments', 'Appointments', 'Permission to view appointments'),
+('appointment_create', 'Create Appointments', 'Appointments', 'Permission to create appointments'),
+('appointment_update', 'Update Appointments', 'Appointments', 'Permission to modify appointments'),
+('appointment_delete', 'Delete Appointments', 'Appointments', 'Permission to delete appointments'),
+('job_read', 'View Jobs', 'Jobs', 'Permission to view assigned jobs'),
+('job_update_progress', 'Update Job Progress', 'Jobs', 'Permission to update job progress'),
+('diagnostics_run', 'Run Diagnostics', 'Diagnostics', 'Permission to perform vehicle diagnostics');
+
+-- Assign Permissions to Roles
+-- Admin (RoleID = 1) - Full access
+INSERT INTO RolePermission (RoleID, PermID) 
+SELECT 1, PermID FROM Permission;
+
+-- Tech Manager (RoleID = 2) - Work order and tech management
+INSERT INTO RolePermission (RoleID, PermID) 
+SELECT 2, PermID FROM Permission 
+WHERE Code IN ('workorder_read', 'workorder_create', 'workorder_update', 'workorder_approve', 
+               'techmanager_read', 'job_read', 'diagnostics_run', 'appointment_read');
+
+-- Technician (RoleID = 3) - Job execution
+INSERT INTO RolePermission (RoleID, PermID) 
+SELECT 3, PermID FROM Permission 
+WHERE Code IN ('job_read', 'job_update_progress', 'diagnostics_run', 'workorder_read');
+
+-- Accountant (RoleID = 5) - Financial operations
+INSERT INTO RolePermission (RoleID, PermID) 
+SELECT 5, PermID FROM Permission 
+WHERE Code IN ('workorder_read', 'appointment_read');
+
+-- Storekeeper (RoleID = 6) - Inventory management
+INSERT INTO RolePermission (RoleID, PermID) 
+SELECT 6, PermID FROM Permission 
+WHERE Code IN ('inventory_read', 'inventory_create', 'inventory_update', 'inventory_import', 'inventory_export');
+
+-- Create Sample Admin User
+INSERT INTO User (RoleID, FullName, UserName, Email, PhoneNumber, PasswordHash, ActiveStatus) 
+VALUES (1, 'System Administrator', 'admin', 'admin@garage.com', '0123456789', 
+        '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1); -- password: password
+
+-- Create Employee record for Admin
+INSERT INTO Employee (UserID, EmployeeCode, Salary, CreatedBy) 
+VALUES (1, 'ADM0001', 50000000.00, 1);
+

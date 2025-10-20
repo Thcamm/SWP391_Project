@@ -1,7 +1,7 @@
 package controller.work;
 
 import model.employee.techmanager.TechManager;
-import model.servicetype.ServiceRequest;
+import model.workorder.ServiceRequest;
 import model.workorder.WorkOrder;
 import model.workorder.WorkOrderDetail;
 import service.employee.TechManagerService;

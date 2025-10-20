@@ -175,6 +175,62 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   </div>
                 </div>
 
+                <!-- Employee Information Section (for non-Customer roles) -->
+                <div class="row" id="employeeSection" style="display: none;">
+                  <div class="col-12">
+                    <hr />
+                    <h5 class="text-primary mb-3">
+                      <i class="bi bi-briefcase"></i> Thông tin Nhân viên
+                    </h5>
+                  </div>
+                  
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="employeeCode" class="form-label">
+                        Mã nhân viên
+                      </label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="employeeCode"
+                        name="employeeCode"
+                        placeholder="Để trống sẽ tự động tạo"
+                      />
+                      <div class="form-text">
+                        Nếu để trống, hệ thống sẽ tự động tạo mã theo format: PREFIX + UserID
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="salary" class="form-label">
+                        Lương cơ bản (VND)
+                      </label>
+                      <input
+                        type="number"
+                        class="form-control"
+                        id="salary"
+                        name="salary"
+                        placeholder="Nhập lương cơ bản"
+                        min="0"
+                        step="1000"
+                      />
+                      <div class="form-text">
+                        Có thể để trống và cập nhật sau
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-12">
+                    <div class="alert alert-warning">
+                      <i class="bi bi-info-circle"></i>
+                      <strong>Lưu ý:</strong> 
+                      Khi tạo user với role khác Customer, hệ thống sẽ tự động tạo hồ sơ Employee tương ứng.
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Action Buttons -->
                 <div class="row">
                   <div class="col-12">
@@ -235,5 +291,56 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Show/hide Employee section based on selected role
+      document.getElementById('role').addEventListener('change', function() {
+        const selectedRole = this.value;
+        const selectedText = this.options[this.selectedIndex].text.toLowerCase();
+        const employeeSection = document.getElementById('employeeSection');
+        
+        // Show Employee section for non-Customer roles
+        // Adjust this logic based on your actual role names and IDs
+        const isCustomerRole = selectedText.includes('customer') || 
+                              selectedText.includes('khách hàng') ||
+                              selectedRole === '4'; // Adjust role ID as needed
+        
+        if (selectedRole && !isCustomerRole) {
+          employeeSection.style.display = 'block';
+          
+          // Generate suggested employee code based on role
+          generateEmployeeCode(selectedText);
+        } else {
+          employeeSection.style.display = 'none';
+          document.getElementById('employeeCode').value = '';
+        }
+      });
+
+      function generateEmployeeCode(roleName) {
+        let prefix = 'EMP';
+        
+        if (roleName.includes('admin')) {
+          prefix = 'ADM';
+        } else if (roleName.includes('tech') && roleName.includes('manager')) {
+          prefix = 'TM';
+        } else if (roleName.includes('technician')) {
+          prefix = 'TECH';
+        } else if (roleName.includes('accountant')) {
+          prefix = 'ACC';
+        } else if (roleName.includes('storekeeper') || roleName.includes('store')) {
+          prefix = 'STORE';
+        }
+        
+        // Set placeholder with suggested format
+        const employeeCodeInput = document.getElementById('employeeCode');
+        employeeCodeInput.placeholder = `Ví dụ: ${prefix}0001, ${prefix}0002, ...`;
+      }
+
+      // Form reset handler
+      document.querySelector('button[type="reset"]').addEventListener('click', function() {
+        setTimeout(function() {
+          document.getElementById('employeeSection').style.display = 'none';
+        }, 10);
+      });
+    </script>
   </body>
 </html>

@@ -78,7 +78,7 @@ public class Register extends HttpServlet {
         user.setPasswordHash(hashedPassword);
         user.setGender(gender.trim());
         user.setBirthDate(sqlDateOfBirth);
-        user.setRoleId(7); // Role mặc định là Customer
+        user.setRoleId(6); // Role mặc định là Customer
         user.setActiveStatus(true);
         user.setAddress(address.trim());
 
