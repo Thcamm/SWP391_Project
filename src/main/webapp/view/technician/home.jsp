@@ -17,7 +17,7 @@
 
 <section class="welcome-section">
     <div class="welcome-left">
-        <h2>Welcome back, ${techinician.fullName}!</h2>
+        <h2>Welcome back, ${technician.fullName}!</h2>
         <p class="welcome-date">
             <jsp:useBean id="now" class="java.util.Date" />
             <fmt:formatDate value="${now}" pattern="EEEE, dd MMMM yyy"/>

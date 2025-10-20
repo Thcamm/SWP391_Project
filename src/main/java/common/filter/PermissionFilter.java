@@ -28,12 +28,6 @@ public class PermissionFilter implements Filter {
         this.areaGate = new HashMap<>();
 
         // RBAC (Admin)
-//        routePerm.put("GET:/admin/rbac/roles", "role_permission_manage");
-//        routePerm.put("POST:/admin/rbac/roles/save", "role_permission_manage");
-//        routePerm.put("GET:/admin/rbac/permissions", "role_permission_manage");
-//        routePerm.put("POST:/admin/rbac/permissions", "role_permission_manage");
-//        routePerm.put("GET:/admin/rbac/rolesList", "role_permission_manage");
-//        routePerm.put("POST:/admin/rbac/rolesList", "role_permission_manage");
         routePerm.put("GET:/view/role/rbac.jsp", "role_permission_manage");
         routePerm.put("GET:/view/role/list.jsp", "role_permission_manage");
         routePerm.put("GET:/view/role/permission_form.jsp", "role_permission_manage");
@@ -43,18 +37,11 @@ public class PermissionFilter implements Filter {
 
 
         // User (Admin) (Anh em tu dien url va permission code) ung voi phan minh code
-        routePerm.put("GET:/admin/users", "user_read");
-        routePerm.put("GET:/admin/users/create", "user_create");
-        routePerm.put("POST:/admin/users/create", "user_create");
         routePerm.put("GET:/admin/users.jsp", "user_read");
 
 
 
         // Customer Service
-//        routePerm.put("GET:/cs/appointements", "appointment_read");
-//        routePerm.put("POST:/cs/appointements/create", "appointment_create");
-//        routePerm.put("POST:/cs/appointements/update", "appointment_update");
-//        routePerm.put("POST:/cs/appointements/delete", "appointment_delete");
         routePerm.put("GET:/view/cs/appointements", "appointment_read");
         routePerm.put("POST:/cs/appointements/create", "appointment_create");
         routePerm.put("POST:/cs/appointements/update", "appointment_update");
@@ -63,11 +50,6 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/view/customerservice/appointment-list.jsp", "cs_access");
         routePerm.put("GET:/view/customerservice/customerservice-home.jsp", "cs_access");
 
-//        routePerm.put("GET:/customerservice/create-customer", "cs_access");
-//        routePerm.put("POST:/customerservice/create-customer", "cs_access");
-//        routePerm.put("POST:/customerservice/search-customer", "cs_access");
-//        routePerm.put("GET:/customerservice/view-support-request", "cs_access");
-//        routePerm.put("POST:/customerservice/view-support-request", "cs_access");
 
 
         // Tech manager
@@ -90,12 +72,6 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/accounting/confirm", "payment_confirm");
 
         // Customer
-        routePerm.put("GET:/app/bookings", "booking_read_own");
-        routePerm.put("POST:/app/bookings", "booking_create");
-        routePerm.put("GET:/app/vehicles/status", "view_vehicle_status");
-        routePerm.put("POST:/app/comments", "comment_create_by_customer");
-        routePerm.put("GET:/app/create-support-request", "customer_access");
-        routePerm.put("POST:/app/create-support-request", "customer_access");
         routePerm.put("GET:/view/customer/appointment-scheduling.jsp", "customer_access");
         routePerm.put("POST:/view/customer/appointment-scheduling.jsp", "customer_access");
         routePerm.put("GET:/view/customer/garage.jsp", "customer_access");
