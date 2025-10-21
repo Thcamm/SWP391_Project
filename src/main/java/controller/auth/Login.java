@@ -62,7 +62,7 @@ public class Login extends HttpServlet {
                 response.sendRedirect(redirectAfterLogin);
                 return;
             }
-            response.sendRedirect(request.getContextPath() + "/Home");
+            response.sendRedirect(request.getContextPath() + "/customerservice/home");
         } else {
             request.setAttribute("errorMessage", "Invalid username or password.");
             request.getRequestDispatcher("/login.jsp").forward(request, response);
