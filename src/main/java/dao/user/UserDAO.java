@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
 import model.user.User;
 import common.DbContext;
 
@@ -16,7 +15,7 @@ public class UserDAO extends DbContext {
     public User getUserById(int userId) throws SQLException {
         String sql = "SELECT * FROM User WHERE UserID = ? AND ActiveStatus = 1";
         try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -30,7 +29,7 @@ public class UserDAO extends DbContext {
     public User getUserByUserName(String userName) throws SQLException {
         String sql = "SELECT * FROM User WHERE UserName = ? AND ActiveStatus = 1";
         try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, userName);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -54,10 +53,11 @@ public class UserDAO extends DbContext {
         }
         return null;
     }
+
     public boolean changeUserPassword(int userId, String newPasswordHash) throws SQLException {
         String sql = "UPDATE User SET PasswordHash = ? WHERE UserID = ?";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, newPasswordHash);
             ps.setInt(2, userId);
             ps.executeUpdate();
@@ -82,7 +82,7 @@ public class UserDAO extends DbContext {
         String sql = "INSERT INTO User (RoleID, FullName, UserName, Email, PhoneNumber, " +
                 "Gender, BirthDate, Address, PasswordHash, ActiveStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DbContext.getConnection(); // Gọi trực tiếp
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, user.getRoleId());
             ps.setString(2, user.getFullName());
             ps.setString(3, user.getUserName());
@@ -113,7 +113,7 @@ public class UserDAO extends DbContext {
     public boolean updateUser(User user) throws SQLException {
         String sql = "UPDATE User SET RoleID=?, FullName=?, UserName=?, Email=?, PhoneNumber=?, Gender=?, BirthDate=?, Address=?, PasswordHash=?, ActiveStatus=? WHERE UserID=?";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, user.getRoleId());
             ps.setString(2, user.getFullName());
             ps.setString(3, user.getUserName());
@@ -151,7 +151,7 @@ public class UserDAO extends DbContext {
     public boolean isEmailExists(String email, int currentUserId) throws SQLException {
         String sql = "SELECT 1 FROM `User` WHERE Email = ? AND UserID != ?";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, email);
             ps.setInt(2, currentUserId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -175,8 +175,6 @@ public class UserDAO extends DbContext {
         }
     }
 
-
-
     public int findRoleIdByUserId(int userId) throws SQLException {
         String sql = "SELECT RoleID FROM User WHERE UserID = ?";
         try (Connection conn = DbContext.getConnection();
@@ -190,11 +188,12 @@ public class UserDAO extends DbContext {
             }
         }
     }
+
     public boolean updatePassword(int userId, String newPasswordHash) throws SQLException {
         String sql = "UPDATE User SET PasswordHash = ? WHERE UserID = ?";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, newPasswordHash);
             ps.setInt(2, userId);
@@ -210,7 +209,7 @@ public class UserDAO extends DbContext {
         String sql = "SELECT u.UserID FROM User u JOIN RoleInfo r ON u.RoleID = r.RoleID WHERE r.RoleName = ?";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, roleName);
             try (ResultSet rs = ps.executeQuery()) {

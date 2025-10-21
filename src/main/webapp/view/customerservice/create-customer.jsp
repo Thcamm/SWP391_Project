@@ -43,7 +43,21 @@
                 <input type="text" class="form-control" id="address" name="address">
             </div>
         </div>
-
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="gender" class="form-label">Gender</label>
+                <select class="form-select" id="gender" name="gender">
+                    <option value="">Select gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="birthDate" class="form-label">Birth Date</label>
+                <input type="date" class="form-control" id="birthDate" name="birthDate">
+            </div>
+        </div>
         <div class="mb-3">
             <label for="note" class="form-label">Note</label>
             <textarea class="form-control" id="note" name="note" rows="3"></textarea>

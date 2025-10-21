@@ -14,15 +14,15 @@ import model.vehicle.Vehicle;
 
 import java.io.IOException;
 
-@WebServlet(name = "AppointmentService", urlPatterns = {"/customer/AppointmentService"})
+@WebServlet(name = "AppointmentService", urlPatterns = { "/customer/AppointmentService" })
 public class Appointment extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //response.setContentType("text/plain;charset=UTF-8");
-        //response.getWriter().write("AppointmentService GET OK");
+        // response.setContentType("text/plain;charset=UTF-8");
+        // response.getWriter().write("AppointmentService GET OK");
         request.getRequestDispatcher("/view/customer/appointment-scheduling.jsp").forward(request, response);
     }
 
@@ -36,7 +36,6 @@ public class Appointment extends HttpServlet {
         String phoneNumber = (String) session.getAttribute("phoneNumber");
         request.setAttribute("fullName", user.getUserName());
         request.setAttribute("phoneNumber", user.getPhoneNumber());
-
 
         // 1. Kiểm tra người dùng đã đăng nhập chưa
         if (user == null) {
@@ -66,12 +65,13 @@ public class Appointment extends HttpServlet {
             // 4. Lấy CustomerID từ UserID
             int customerID = customerDAO.getCustomerIdByUserId(user.getUserId());
             if (customerID == -1) {
-                // Có thể xử lý trường hợp user có tồn tại nhưng chưa có record trong bảng Customer
+                // Có thể xử lý trường hợp user có tồn tại nhưng chưa có record trong bảng
+                // Customer
                 // Ví dụ: Tạo mới customer record rồi lấy ID
                 throw new ServletException("Customer profile not found for the logged-in user.");
             }
 
-// 5. Xử lý Vehicle: Tìm hoặc Tạo mới
+            // 5. Xử lý Vehicle: Tìm hoặc Tạo mới
             int vehicleID = vehicleDAO.getVehicleIdByLicensePlate(licensePlate);
             if (vehicleID == -1) {
                 // Nếu xe chưa tồn tại, tạo xe mới
@@ -95,7 +95,7 @@ public class Appointment extends HttpServlet {
             java.time.LocalDateTime dateTime = java.time.LocalDateTime.parse(dateStr);
             appointment.setAppointmentDate(dateTime);
             appointment.setDescription(description);
-            appointment.setStatus("CONFIRM"); // Gán trạng thái ban đầu
+            appointment.setStatus("PENDING"); // Gán trạng thái ban đầu
 
             // 7. Lưu vào cơ sở dữ liệu
             appointmentDAO.insertAppointment(appointment);

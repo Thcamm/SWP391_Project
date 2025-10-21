@@ -1,0 +1,159 @@
+
+
+.admin-header {
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+    padding: 12px 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    font-family: system-ui, sans-serif;
+}
+
+.header-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1300px;
+}
+
+/* --- Logo --- */
+.logo h1 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.logo a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* --- Navigation --- */
+.main-nav .nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 25px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    position: relative;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #555;
+    font-weight: 500;
+    padding: 6px 0;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    border-bottom: 2px solid transparent;
+}
+
+.nav-link:hover {
+    color: #000;
+    border-bottom-color: #aaa;
+}
+
+.nav-item.active > .nav-link {
+    color: #000;
+    border-bottom-color: #222;
+    font-weight: 600;
+}
+
+/* --- Dropdown Menu --- */
+.dropdown-menu {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 0;
+    list-style: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    display: none;
+    min-width: 180px;
+}
+
+.nav-item.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-menu li {
+    margin: 0;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 8px 15px;
+    color: #444;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.dropdown-menu a:hover {
+    background: #f4f4f4;
+}
+
+/* --- Right Side (User Info) --- */
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 0.9em;
+}
+
+.user-name {
+    font-weight: 500;
+    color: #333;
+}
+
+.user-role {
+    color: #777;
+    font-size: 0.8em;
+}
+
+.logout-btn {
+    background: none;
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+    border-radius: 4px;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.logout-btn:hover {
+    background: #f0f0f0;
+    color: #000;
+}
+
+/* --- Responsive --- */
+@media (max-width: 900px) {
+    .main-nav .nav-menu {
+        display: none;
+    }
+
+    .header-container {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .user-info {
+        align-items: flex-start;
+    }
+}

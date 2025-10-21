@@ -78,7 +78,7 @@ public class Register extends HttpServlet {
         user.setPasswordHash(hashedPassword);
         user.setGender(gender.trim());
         user.setBirthDate(sqlDateOfBirth);
-        user.setRoleId(7); // Role mặc định là Customer
+        user.setRoleId(6); // Role mặc định là Customer
         user.setActiveStatus(true);
         user.setAddress(address.trim());
 
@@ -93,11 +93,11 @@ public class Register extends HttpServlet {
                 return;
             }
 
-             if (userDAO.getUserByEmail(email) != null) {
-                 request.setAttribute("error", "Email đã được sử dụng.");
-                 request.getRequestDispatcher("/register.jsp").forward(request, response);
-                 return;
-             }
+            if (userDAO.getUserByEmail(email) != null) {
+                request.setAttribute("error", "Email đã được sử dụng.");
+                request.getRequestDispatcher("/register.jsp").forward(request, response);
+                return;
+            }
 
             boolean success = userDAO.addUser(user);
 

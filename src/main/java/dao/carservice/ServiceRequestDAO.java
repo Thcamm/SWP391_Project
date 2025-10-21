@@ -1,7 +1,7 @@
 package dao.carservice;
 
 import common.DbContext;
-import model.servicerequest.ServiceRequest;
+import model.workorder.ServiceRequest;
 
 import java.sql.*;
 

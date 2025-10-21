@@ -18,20 +18,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
   </head>
   <body>
     <!-- Header -->
-    <nav class="navbar navbar-dark bg-dark">
-      <div class="container-fluid">
-        <span class="navbar-brand">
-          <i class="bi bi-people"></i> User Management
-        </span>
-        <span class="navbar-text">
-          <i class="bi bi-person-circle"></i> ${currentUser} |
-          <fmt:formatDate
-            value="<%= new java.util.Date() %>"
-            pattern="dd/MM/yyyy HH:mm"
-          />
-        </span>
-      </div>
-    </nav>
+    <%@ include file="header.jsp" %>
 
     <div class="container-fluid mt-3">
       <!-- Alert Messages -->
@@ -70,7 +57,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
         <div class="col-md-4 text-end">
           <div class="btn-group">
             <a
-              href="${pageContext.request.contextPath}/admin/users/create"
+              href="${pageContext.request.contextPath}/admin/users/choose-type"
               class="btn btn-success"
             >
               <i class="bi bi-plus-circle"></i> Create User
@@ -96,6 +83,14 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   href="${pageContext.request.contextPath}/admin/rbac/roles"
                 >
                   <i class="bi bi-shield"></i> Manage Roles
+                </a>
+              </li>
+              <li>
+                <a
+                  class="dropdown-item"
+                  href="${pageContext.request.contextPath}/techmanager/dashboard"
+                >
+                  <i class="bi bi-tools"></i> TechManager Dashboard
                 </a>
               </li>
             </ul>
@@ -254,7 +249,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                 <h5 class="text-muted mt-3">No users found</h5>
                 <p class="text-muted">Try adjusting your search criteria</p>
                 <a
-                  href="${pageContext.request.contextPath}/admin/users/create"
+                  href="${pageContext.request.contextPath}/admin/users/choose-type"
                   class="btn btn-success"
                 >
                   <i class="bi bi-plus-circle"></i> Create First User
@@ -602,7 +597,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
               <i class="bi bi-info-circle"></i>
               <strong>Quick Actions:</strong>
               <a
-                href="${pageContext.request.contextPath}/admin/users/create"
+                href="${pageContext.request.contextPath}/admin/users/choose-type"
                 class="text-decoration-none"
                 >Create User</a
               >
@@ -618,12 +613,18 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                 class="text-decoration-none"
                 >Manage Roles</a
               >
+              <a
+                href="${pageContext.request.contextPath}/techmanager/dashboard"
+                class="text-decoration-none"
+                >Dashboard</a
+              >
             </small>
           </div>
         </div>
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Footer -->
+    <%@ include file="footer.jsp" %>
   </body>
 </html>

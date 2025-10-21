@@ -1,22 +1,35 @@
 package model.employee;
 
+import java.time.LocalDateTime;
 import model.user.User;
-public class Employee extends User{
-    private int employeeId;
-    private String position;
-    private String department;
 
+public class Employee extends User {
+
+    private int employeeId;
+    private String employeeCode;
+    private double salary;
+    private int managedBy;
+    private int createBy;
+    private LocalDateTime createAt;
+
+    // Default constructor
     public Employee() {
         super();
     }
 
-    public Employee(int userId, int roleId, String fullName, String userName, String email, String phoneNumber, String passwordHash, boolean activeStatus, int employeeId, String position, String department) {
-        super();
+    // Parameterized constructor
+    public Employee(int employeeId, String employeeCode, double salary, int managedBy, int createBy,
+            LocalDateTime createAt) {
+        super(); // Gọi constructor của lớp cha User
         this.employeeId = employeeId;
-        this.position = position;
-        this.department = department;
+        this.employeeCode = employeeCode;
+        this.salary = salary;
+        this.managedBy = managedBy;
+        this.createBy = createBy;
+        this.createAt = createAt;
     }
 
+    // Getters and Setters
     public int getEmployeeId() {
         return employeeId;
     }
@@ -25,20 +38,43 @@ public class Employee extends User{
         this.employeeId = employeeId;
     }
 
-    public String getPosition() {
-        return position;
+    public String getEmployeeCode() {
+        return employeeCode;
     }
 
-    public void setPosition(String position) {
-        this.position = position;
+    public void setEmployeeCode(String employeeCode) {
+        this.employeeCode = employeeCode;
     }
 
-    public String getDepartment() {
-        return department;
+    public double getSalary() {
+        return salary;
     }
 
-    public void setDepartment(String department) {
-        this.department = department;
+    public void setSalary(double salary) {
+        this.salary = salary;
     }
 
+    public int getManagedBy() {
+        return managedBy;
+    }
+
+    public void setManagedBy(int managedBy) {
+        this.managedBy = managedBy;
+    }
+
+    public int getCreateBy() {
+        return createBy;
+    }
+
+    public void setCreateBy(int createBy) {
+        this.createBy = createBy;
+    }
+
+    public LocalDateTime getCreateAt() {
+        return createAt;
+    }
+
+    public void setCreateAt(LocalDateTime createAt) {
+        this.createAt = createAt;
+    }
 }
