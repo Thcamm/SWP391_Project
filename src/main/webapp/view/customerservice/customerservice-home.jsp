@@ -3,11 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Customer Service Home</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customerservice/create-customer.css">
-
-    <script src="https://kit.fontawesome.com/a2d5b5f5e6.js" crossorigin="anonymous"></script>
+    <title>Customer Service Page</title>
 </head>
 <body>
 <div class="container">
@@ -32,5 +28,6 @@
     </a>
     </div>
 </div>
+<jsp:include page="/view/customerservice/sidebar.jsp" />
 </body>
 </html>

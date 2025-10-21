@@ -13,6 +13,8 @@
 </head>
 
 <body class="bg-light">
+<jsp:include page="/view/customerservice/sidebar.jsp" />
+
 <div class="container py-4">
 
     <!-- HEADER -->
@@ -28,17 +30,17 @@
         <div class="row g-3">
             <div class="col-md-4">
                 <label for="searchName" class="form-label">Customer Name</label>
-                <input type="text" id="searchName" name="searchName" value="${param.searchName}" class="form-control" placeholder="Nhập tên khách hàng" />
+                <input type="text" id="searchName" name="searchName" value="${param.searchName}" class="form-control" placeholder="Enter customer name" />
             </div>
 
             <div class="col-md-4">
                 <label for="searchLicensePlate" class="form-label">License Plate</label>
-                <input type="text" id="searchLicensePlate" name="searchLicensePlate" value="${param.searchLicensePlate}" class="form-control" placeholder="Nhập biển số xe" />
+                <input type="text" id="searchLicensePlate" name="searchLicensePlate" value="${param.searchLicensePlate}" class="form-control" placeholder="Enter license plate" />
             </div>
 
             <div class="col-md-4">
                 <label for="searchEmail" class="form-label">Email / Phone Number</label>
-                <input type="text" id="searchEmail" name="searchEmail" value="${param.searchEmail}" class="form-control" placeholder="Nhập email hoặc SĐT" />
+                <input type="text" id="searchEmail" name="searchEmail" value="${param.searchEmail}" class="form-control" placeholder="Enter email or phone number" />
             </div>
         </div>
 
