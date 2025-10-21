@@ -118,7 +118,7 @@
             <li>
               <a
                 class="dropdown-item text-danger"
-                href="${pageContext.request.contextPath}/Home/logout"
+                href="${pageContext.request.contextPath}/Home?action=logout"
               >
                 <i class="bi bi-box-arrow-right me-2"></i>Logout
               </a>

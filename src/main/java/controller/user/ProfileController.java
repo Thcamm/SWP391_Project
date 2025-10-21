@@ -1,17 +1,22 @@
 package controller.user;
 
+import dao.carservice.ServiceRequestDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import model.customer.Customer;
+import model.servicetype.ServiceHistoryDTO;
 import model.user.User;
 import service.user.UserProfileService;
 import service.user.UserProfileService.ValidationResult;
 
 import java.io.IOException;
 import java.sql.Date;
+import java.sql.SQLException;
+import java.util.List;
 
 // Change the URL pattern here
 @WebServlet(name = "ProfileController", urlPatterns = {"/user/profile"})
@@ -93,8 +98,23 @@ public class ProfileController extends HttpServlet {
     private void showViewProfilePage(HttpServletRequest request, HttpServletResponse response, int userId) throws ServletException, IOException {
         User user = userProfileService.getUserProfile(userId);
         request.setAttribute("user", user);
+        HttpSession session = request.getSession(false);
+
+        Customer customer = (session != null) ? (Customer) session.getAttribute("customer") : null;
+
+        if (customer != null) {
+            try {
+                ServiceRequestDAO serviceRequestDAO = new ServiceRequestDAO();
+                List<ServiceHistoryDTO> serviceHistory = serviceRequestDAO.getServiceHistoryByCustomerId(customer.getCustomerId());
+                request.setAttribute("serviceHistory", serviceHistory);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                request.setAttribute("historyError", "Could not load service history.");
+            }
+        }
         request.getRequestDispatcher("/view/user/viewProfile.jsp").forward(request, response);
     }
+
 
     private void showEditProfilePage(HttpServletRequest request, HttpServletResponse response, int userId) throws ServletException, IOException {
         User user = userProfileService.getUserProfile(userId);

@@ -90,6 +90,7 @@
                     <th>Lience Plate</th>
                     <th>Email</th>
                     <th>Phone Number</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
 
@@ -97,7 +98,7 @@
                 <c:choose>
                     <c:when test="${empty customerList}">
                         <tr class="text-center text-muted">
-                            <td colspan="5">Nothing</td>
+                            <td colspan="6">Nothing</td>
                         </tr>
                     </c:when>
                     <c:otherwise>
@@ -117,6 +118,12 @@
                                 </td>
                                 <td>${c.email}</td>
                                 <td>${c.phoneNumber}</td>
+                                <td>
+                                    <a href="${pageContext.request.contextPath}/customerservice/createRequest?customerId=${c.customerId}"
+                                       class="btn btn-sm btn-success">
+                                        Create Request
+                                    </a>
+                                </td>
                             </tr>
                         </c:forEach>
                     </c:otherwise>

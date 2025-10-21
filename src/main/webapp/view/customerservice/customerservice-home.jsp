@@ -26,6 +26,10 @@
             <i class="fa-solid fa-headset"></i>
             Support Requests
         </a>
+        <a href="${pageContext.request.contextPath}/customerservice/requests" class="card">
+        <i class="fa-solid fa-headset"></i>
+        View Service Requests
+    </a>
     </div>
 </div>
 </body>

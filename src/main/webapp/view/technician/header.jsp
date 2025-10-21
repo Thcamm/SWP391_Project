@@ -21,10 +21,10 @@
     <nav class="main-nav">
         <ul>
             <li><a href="${pageContext.request.contextPath}/technician/home" class="nav-link active">Dashboard</a></li>
-            <li><a href="${pageContext.request.contextPath}/technician/tasks" class="nav-link">My Tasks</a></li>
-            <li><a href="${pageContext.request.contextPath}/technician/diagnostics" class="nav-link">Diagnostics</a>
+            <li><a href="#" class="nav-link">My Tasks</a></li>
+            <li><a href="#" class="nav-link">Diagnostics</a>
             </li>
-            <li><a href="${pageContext.request.contextPath}/technician/parts" class="nav-link">Parts Requests</a></li>
+            <li><a href="#" class="nav-link">Parts Requests</a></li>
         </ul>
     </nav>
 
