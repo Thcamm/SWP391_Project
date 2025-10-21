@@ -17,6 +17,7 @@ dependency-reduced-pom.xml
 # Google OAuth credentials
 src/main/resources/google.properties
 
+
 ### IntelliJ IDEA ###
 .idea/
 !.idea/modules.xml

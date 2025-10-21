@@ -36,15 +36,26 @@
                 </div>
             </c:if>
 
-            <form action="forgotpassword" method="post">
+            <%-- Form 1: Gửi OTP --%>
+            <form action="forgotpassword" method="post" id="sendOtpForm">
+                <input type="hidden" name="action" value="send">
+
                 <div class="mb-3">
                     <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
                     <div class="input-group">
                         <input type="email" class="form-control" id="email" name="email"
-                               placeholder="Enter your email to receive OTP" required>
-                        <button class="btn btn-outline-secondary" type="button" id="sendOtpBtn" name="action" value="send">Send OTP</button>
+                               placeholder="Enter your email to receive OTP"
+                               value="${param.email}" required>
+                        <button class="btn btn-outline-secondary" type="submit" id="sendOtpBtn">
+                            Send OTP
+                        </button>
                     </div>
                 </div>
+            </form>
+
+            <%-- Form 2: Reset Password --%>
+            <form action="forgotpassword" method="post" id="resetPasswordForm">
+                <input type="hidden" name="action" value="reset">
 
                 <div class="mb-3">
                     <label for="otp" class="form-label">OTP Code <span class="text-danger">*</span></label>
