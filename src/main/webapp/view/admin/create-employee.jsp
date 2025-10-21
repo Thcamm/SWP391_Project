@@ -218,7 +218,6 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                         readonly
                       />
                       <div class="form-text">
-                        <i class="bi bi-info-circle"></i>
                       </div>
                     </div>
 
