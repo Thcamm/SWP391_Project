@@ -393,17 +393,11 @@
         <a href="${pageContext.request.contextPath}/customer/appointment-history" class="menu-item">
             <span>Appointment List</span>
         </a>
-        <a href="${pageContext.request.contextPath}/customer/create-support-request" class="menu-item">
-            <span>THƯ VIỆN DỰ ÁN</span>
-        </a>
-        <a href="${pageContext.request.contextPath}/customerservice/view-support-request" class="menu-item">
-            <span>View Support Request</span>
-        </a>
-        <a href="${pageContext.request.contextPath}/customerservice/appointment-list" class="menu-item">
-            <span>Appointment List</span>
-        </a>
         <a href="${pageContext.request.contextPath}/customer/AppointmentService" class="menu-item">
             <span>Create Appointment</span>
+        </a>
+        <a href="${pageContext.request.contextPath}/customer/create-support-request" class="menu-item">
+            <span>Create Support Request</span>
         </a>
             <a href="${pageContext.request.contextPath}/customer/garage" class="menu-item">
                 <span>QUẢN LÝ XE (MY GARAGE)</span>
