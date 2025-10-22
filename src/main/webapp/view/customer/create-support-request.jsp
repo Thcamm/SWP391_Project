@@ -5,11 +5,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Support Request</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customer/appointment-history.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customer/create-support-request.css">
 
 </head>
 <body>
+
 <div class="container">
+    <%@ include file="/common/header.jsp" %>
     <h2>Support Request / Report a Bug</h2>
 
     <form action="${pageContext.request.contextPath}/customer/create-support-request" method="post" enctype="multipart/form-data">
@@ -45,6 +47,8 @@
     <c:if test="${not empty message}">
         <p class="message">${message}</p>
     </c:if>
+    <%@ include file="/common/footer.jsp" %>
 </div>
+
 </body>
 </html>

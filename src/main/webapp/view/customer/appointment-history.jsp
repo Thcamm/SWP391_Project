@@ -10,6 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+<%@ include file="/common/header.jsp" %>
 <form action="${pageContext.request.contextPath}/customer/appointment-history" method="get" class="card p-4 mb-4">
     <div class="mt-4 d-flex justify-content-between align-items-center">
         <label>
@@ -159,7 +160,7 @@
     </c:if>
     </tbody>
 </table>
-
+<%@ include file="/common/footer.jsp" %>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="${pageContext.request.contextPath}/assets/js/customer/appointment-history.js"></script>
