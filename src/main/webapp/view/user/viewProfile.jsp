@@ -39,10 +39,10 @@
             <c:when test="${sessionScope.roleCode == 'ADMIN'}">
                 <c:set var="homeLink" value="${pageContext.request.contextPath}/admin/users" />
             </c:when>
-            <c:when test="${sessionScope.roleCode == 'TechManager'}">
+            <c:when test="${sessionScope.roleCode == 'TECHMANAGER'}">
                 <c:set var="homeLink" value="${pageContext.request.contextPath}/techmanager/home" />
             </c:when>
-            <c:when test="${sessionScope.roleCode == 'Technical'}">
+            <c:when test="${sessionScope.roleCode == 'TECHNICAL'}">
                 <c:set var="homeLink" value="${pageContext.request.contextPath}/technician/home" />
             </c:when>
             <c:when test="${sessionScope.roleCode == 'Store Keeper'}">
@@ -51,7 +51,7 @@
             <c:when test="${sessionScope.roleCode == 'ACCOUNTANT'}">
                 <c:set var="homeLink" value="${pageContext.request.contextPath}/accountant/home" />
             </c:when>
-            <c:when test="${sessionScope.roleCode == 'Customer Service'}">
+            <c:when test="${sessionScope.roleCode == 'CUSTOMER_SERVICE'}">
                 <c:set var="homeLink" value="${pageContext.request.contextPath}/customerservice/home" />
             </c:when>
         </c:choose>

@@ -6,7 +6,7 @@
     <!-- Logo/Brand -->
     <a
       class="navbar-brand fw-bold"
-      href="${pageContext.request.contextPath}/Home"
+      href="${pageContext.request.contextPath}/admin/users"
     >
       <i class="bi bi-gear-fill me-2"></i>
       CsCarSpa.vn
