@@ -71,9 +71,8 @@ public class AppointmentListServlet extends HttpServlet {
 
             if (success) {
                 dao.updateStatus(appointmentID, status);
-                response.sendRedirect(request.getContextPath() + "/view/customerservice/appointment-list");
+                response.sendRedirect(request.getContextPath() + "/customerservice/appointment-list");
             } else {
-                // Nếu thất bại, báo lỗi
                 request.setAttribute("errorMessage", "Failed to update appointment status.");
                 request.getRequestDispatcher("/view/customerservice/appointment-list.jsp")
                         .forward(request, response);

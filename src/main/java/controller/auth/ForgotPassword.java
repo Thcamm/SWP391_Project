@@ -1,14 +1,13 @@
 package controller.auth;
 
 import dao.user.PasswordResetDAO;
+import dao.user.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import model.user.User;
-import dao.user.UserDAO;
 import service.user.ResetPasswordService;
 import util.MailService;
 
@@ -27,12 +26,17 @@ public class ForgotPassword extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
         String action = request.getParameter("action");
         String email = request.getParameter("email");
 
+        // Validate email
         if (email == null || email.trim().isEmpty()) {
-            response.setContentType("application/json");
-            response.getWriter().write("{\"success\": false, \"message\": \"Please enter email\"}");
+            request.setAttribute("errorMessage", "Vui lòng nhập email");
+            request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
             return;
         }
 
@@ -43,66 +47,110 @@ public class ForgotPassword extends HttpServlet {
 
             ResetPasswordService service = new ResetPasswordService(resetDAO, userDAO, mailService);
 
-            // Kiểm tra action sendOtp
-            if ("sendOtp".equals(action)) {
-                // Kiểm tra email tồn tại
-                User user = userDAO.getUserByEmail(email);
-                if (user == null) {
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"success\": false, \"message\": \"Email not found\"}");
+            // Xử lý gửi OTP
+            if ("send".equals(action)) {
+                try {
+                    User user = userDAO.getUserByEmail(email);
+                    if (user == null) {
+                        request.setAttribute("errorMessage", "Email không tồn tại trong hệ thống");
+                        request.setAttribute("email", email);
+                        request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
+                        return;
+                    }
+
+                    boolean otpSent = service.sendOTP(email);
+
+                    if (otpSent) {
+                        request.setAttribute("successMessage", "Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.");
+                        request.setAttribute("email", email);
+                        request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
+                    } else {
+                        request.setAttribute("errorMessage", "Không thể gửi OTP. Vui lòng thử lại sau.");
+                        request.setAttribute("email", email);
+                        request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    request.setAttribute("errorMessage", "Lỗi khi gửi OTP. Vui lòng thử lại sau.");
+                    request.setAttribute("email", email);
+                    request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
+                }
+                return;
+            }
+
+            // Xử lý reset password với OTP
+            if ("reset".equals(action)) {
+                String otp = request.getParameter("otp");
+                String newPassword = request.getParameter("newPassword");
+                String confirmPassword = request.getParameter("confirmPassword");
+
+                // Validate các trường
+                if (otp == null || otp.trim().isEmpty()) {
+                    request.setAttribute("errorMessage", "Vui lòng nhập mã OTP");
+                    request.setAttribute("email", email);
+                    request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
                     return;
                 }
 
-                // Lấy base URL
-                String baseUrl = request.getScheme() + "://" +
-                        request.getServerName() + ":" +
-                        request.getServerPort() +
-                        request.getContextPath();
+                if (newPassword == null || newPassword.trim().isEmpty()) {
+                    request.setAttribute("errorMessage", "Vui lòng nhập mật khẩu mới");
+                    request.setAttribute("email", email);
+                    request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
+                    return;
+                }
 
-                // Gửi email reset password
-                boolean emailSent = service.requestPasswordReset(email, baseUrl);
+                if (confirmPassword == null || confirmPassword.trim().isEmpty()) {
+                    request.setAttribute("errorMessage", "Vui lòng xác nhận mật khẩu");
+                    request.setAttribute("email", email);
+                    request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
+                    return;
+                }
 
-                response.setContentType("application/json");
-                if (emailSent) {
-                    response.getWriter().write("{\"success\": true, \"message\": \"OTP sent successfully\"}");
-                } else {
-                    response.getWriter().write("{\"success\": false, \"message\": \"Failed to send email\"}");
+                // Kiểm tra mật khẩu khớp nhau
+                if (!newPassword.equals(confirmPassword)) {
+                    request.setAttribute("errorMessage", "Mật khẩu xác nhận không khớp");
+                    request.setAttribute("email", email);
+                    request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
+                    return;
+                }
+
+                // Validate độ dài mật khẩu
+                if (newPassword.length() < 6) {
+                    request.setAttribute("errorMessage", "Mật khẩu phải có ít nhất 6 ký tự");
+                    request.setAttribute("email", email);
+                    request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
+                    return;
+                }
+
+                try {
+                    // Thực hiện reset password
+                    boolean success = service.resetPasswordWithOTP(email, otp.trim(), newPassword);
+
+                    if (success) {
+                        //request.getSession().setAttribute("successMessage", "Đặt lại mật khẩu thành công! Vui lòng đăng nhập với mật khẩu mới.");
+                        response.sendRedirect("login.jsp");
+                    } else {
+                        request.setAttribute("errorMessage", "Mã OTP không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.");
+                        request.setAttribute("email", email);
+                        request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    request.setAttribute("errorMessage", "Đã có lỗi xảy ra khi đặt lại mật khẩu. Vui lòng thử lại sau.");
+                    request.setAttribute("email", email);
+                    request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
                 }
                 return;
             }
 
-            // Xử lý submit form reset password
-            String otp = request.getParameter("otp");
-            String password = request.getParameter("password");
-            String confirmPassword = request.getParameter("confirmPassword");
-
-            if (otp == null || password == null || confirmPassword == null) {
-                request.setAttribute("error", "Please fill in all fields");
-                request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
-                return;
-            }
-
-            if (!password.equals(confirmPassword)) {
-                request.setAttribute("error", "Passwords do not match");
-                request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
-                return;
-            }
-
-            // Validate OTP và reset password
-            boolean success = service.resetPassword(otp, password);
-
-            if (success) {
-                request.setAttribute("success", "Password reset successfully. Please login with your new password.");
-                response.sendRedirect("login.jsp");
-            } else {
-                request.setAttribute("error", "Invalid or expired OTP");
-                request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
-            }
+            // Nếu action không hợp lệ
+            request.setAttribute("errorMessage", "Yêu cầu không hợp lệ");
+            request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.setContentType("application/json");
-            response.getWriter().write("{\"success\": false, \"message\": \"Error: " + e.getMessage() + "\"}");
+            request.setAttribute("errorMessage", "Đã có lỗi xảy ra. Vui lòng thử lại sau.");
+            request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
         }
     }
 }

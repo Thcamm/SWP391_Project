@@ -101,13 +101,6 @@ public class UserController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
 
         String pathInfo = request.getPathInfo();
-        // String currentUser = getCurrentUser(request);
-        //
-        // // Check if user is logged in
-        // if (currentUser == null) {
-        // response.sendRedirect(request.getContextPath() + "/login");
-        // return;
-        // }
 
         try {
             // Route based on path
@@ -242,8 +235,6 @@ public class UserController extends HttpServlet {
         // Handle messages from redirect
         handleMessages(request);
 
-        System.out.println("UserController - Displaying create customer form for user: " + getCurrentUser(request));
-
         // Forward to create customer JSP
         request.getRequestDispatcher("/view/admin/create-customer.jsp")
                 .forward(request, response);
@@ -264,7 +255,6 @@ public class UserController extends HttpServlet {
         // Handle messages from redirect
         handleMessages(request);
 
-        System.out.println("UserController - Displaying create employee form for user: " + getCurrentUser(request));
 
         // Forward to create employee JSP
         request.getRequestDispatcher("/view/admin/create-employee.jsp")
@@ -349,110 +339,38 @@ public class UserController extends HttpServlet {
         try {
             String userIdStr = pathInfo.substring("/edit/".length());
             int userId = Integer.parseInt(userIdStr);
-
-            // Get current user info
-            UserDisplay currentUserData = adminService.getUserById(userId);
-            if (currentUserData == null) {
-                redirectWithMessage(response, request.getContextPath() + "/admin/users",
-                        "User không tồn tại!", "error");
-                return;
-            }
-
-            // Get form parameters - basic info
+            String currentUser = getCurrentUser(request);
             String fullName = request.getParameter("fullName");
             String email = request.getParameter("email");
             String roleParam = request.getParameter("role");
 
-            // Validate basic required fields
+            // 2. Validate
             if (isNullOrEmpty(fullName) || isNullOrEmpty(email) || isNullOrEmpty(roleParam)) {
                 redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId,
                         "Vui lòng điền đầy đủ thông tin bắt buộc!", "error");
                 return;
             }
 
-            // Parse and validate new role
-            int newRoleId;
-            try {
-                newRoleId = Integer.parseInt(roleParam);
-                if (newRoleId <= 0) {
-                    redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId,
-                            "Role ID không hợp lệ!", "error");
-                    return;
-                }
-            } catch (NumberFormatException e) {
+            Integer newRoleId = parseIntParameter(roleParam);
+            if (newRoleId == null || newRoleId <= 0) {
                 redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId,
                         "Role ID không hợp lệ!", "error");
                 return;
             }
 
-            Role newRole = adminService.getRoleById(newRoleId);
-            if (newRole == null) {
-                redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId,
-                        "Vai trò không hợp lệ!", "error");
-                return;
-            }
-
-            boolean success = false;
-            String successMessage = "Cập nhật user thành công!";
-            String errorMessage = "Cập nhật user thất bại!";
-
-            // Check if role change involves Employee promotion/demotion
-            boolean oldRoleIsCustomer = "Customer".equalsIgnoreCase(currentUserData.getRoleName());
-            boolean newRoleIsCustomer = "Customer".equalsIgnoreCase(newRole.getRoleName());
-
-            if (oldRoleIsCustomer && !newRoleIsCustomer) {
-                // Customer -> Employee: Promotion (basic update only for now)
-                success = adminService.updateUserBasicInfo(userId, fullName.trim(), email.trim(),
-                        newRoleId, getCurrentUser(request));
-
-                if (success) {
-                    successMessage = "Thăng cấp thành công! User " + currentUserData.getUserName() +
-                            " đã được chuyển sang vai trò " + newRole.getRoleName() +
-                            " và tạo Employee record tự động.";
-                } else {
-                    errorMessage = "Thăng cấp thất bại! Có thể do lỗi database hoặc Employee record đã tồn tại.";
-                }
-
-            } else if (!oldRoleIsCustomer && newRoleIsCustomer) {
-                // Employee -> Customer: Demotion (just update basic info, keep Employee record)
-                success = adminService.updateUserBasicInfo(userId, fullName.trim(), email.trim(),
-                        newRoleId, getCurrentUser(request));
-
-                if (success) {
-                    successMessage = "Chuyển đổi thành công! User " + currentUserData.getUserName() +
-                            " đã được chuyển về vai trò Customer.";
-                } else {
-                    errorMessage = "Chuyển đổi thất bại! Có thể do lỗi database.";
-                }
-
-            } else {
-                // Same category update (Customer -> Customer or Employee -> Employee)
-                if (newRoleIsCustomer) {
-                    // Customer -> Customer: Basic update only
-                    success = adminService.updateUserBasicInfo(userId, fullName.trim(), email.trim(),
-                            newRoleId, getCurrentUser(request));
-                } else {
-                    // Employee -> Employee: Update basic info only for now
-                    success = adminService.updateUserBasicInfo(userId, fullName.trim(), email.trim(),
-                            newRoleId, getCurrentUser(request));
-                }
-
-                if (success) {
-                    successMessage = "Cập nhật thông tin user thành công!";
-                } else {
-                    errorMessage = "Cập nhật thông tin user thất bại!";
-                }
-            }
-
-            // Redirect with result
+            boolean success = adminService.updateUserBasicInfo(
+                    userId,
+                    fullName.trim(),
+                    email.trim(),
+                    newRoleId,
+                    currentUser);
+            // trigger here
             if (success) {
-                System.out.println("UserController - User updated successfully: " + currentUserData.getUserName() +
-                        " by " + getCurrentUser(request));
-                redirectWithMessage(response, request.getContextPath() + "/admin/users", successMessage, "success");
+                redirectWithMessage(response, request.getContextPath() + "/admin/users",
+                        "Cập nhật thông tin user thành công!", "success");
             } else {
-                System.out.println("UserController - User update failed: " + currentUserData.getUserName());
-                redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId, errorMessage,
-                        "error");
+                redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId,
+                        "Cập nhật user thất bại!", "error");
             }
 
         } catch (Exception e) {
@@ -509,13 +427,6 @@ public class UserController extends HttpServlet {
         return null;
     }
 
-    // private void handleUnauthorized(HttpServletRequest request,
-    // HttpServletResponse response)
-    // throws ServletException, IOException {
-    // request.setAttribute("errorMessage", "Bạn không có quyền truy cập trang quản
-    // lý users!");
-    // request.getRequestDispatcher("/error.jsp").forward(request, response);
-    // }
 
     private void handleError(HttpServletRequest request, HttpServletResponse response, String errorMessage)
             throws ServletException, IOException {
@@ -639,8 +550,7 @@ public class UserController extends HttpServlet {
             return;
         }
 
-        // Get Customer role ID (assuming it's 4, adjust as needed)
-        int customerRoleId = 4; // You might want to get this dynamically
+        int customerRoleId = 6; // You might want to get this dynamically
 
         // Create customer user (no Employee details needed)
         boolean success = adminService.createUser(fullName.trim(), userName.trim(),

@@ -33,6 +33,30 @@
             <button type="submit" class="btn btn-primary">Edit Profile</button>
         </form>
         <a href="${pageContext.request.contextPath}/user/changePassword" class="btn btn-secondary">Change Password</a>
+        <c:set var="homeLink" value="${pageContext.request.contextPath}/Home" /> <%-- Default for Customer --%>
+
+        <c:choose>
+            <c:when test="${sessionScope.roleCode == 'ADMIN'}">
+                <c:set var="homeLink" value="${pageContext.request.contextPath}/admin/users" />
+            </c:when>
+            <c:when test="${sessionScope.roleCode == 'TECHMANAGER'}">
+                <c:set var="homeLink" value="${pageContext.request.contextPath}/techmanager/home" />
+            </c:when>
+            <c:when test="${sessionScope.roleCode == 'TECHNICAL'}">
+                <c:set var="homeLink" value="${pageContext.request.contextPath}/technician/home" />
+            </c:when>
+            <c:when test="${sessionScope.roleCode == 'Store Keeper'}">
+                <c:set var="homeLink" value="${pageContext.request.contextPath}/inventory/dashboard" />
+            </c:when>
+            <c:when test="${sessionScope.roleCode == 'ACCOUNTANT'}">
+                <c:set var="homeLink" value="${pageContext.request.contextPath}/accountant/home" />
+            </c:when>
+            <c:when test="${sessionScope.roleCode == 'CUSTOMER_SERVICE'}">
+                <c:set var="homeLink" value="${pageContext.request.contextPath}/customerservice/home" />
+            </c:when>
+        </c:choose>
+
+        <a href="${homeLink}" class="btn btn-info">Back to Home</a>
     </div>
 
     <h2>Service History</h2>
@@ -40,7 +64,40 @@
         <thead>
         <tr><th>Service ID</th><th>Service Name</th><th>Date</th><th>Status</th><th>Price</th></tr>
         </thead>
-        <tbody id="serviceBody"></tbody>
+        <tbody>
+        <c:if test="${not empty historyError}">
+            <tr>
+                <td colspan="5" class="text-center error-message">${historyError}</td>
+            </tr>
+        </c:if>
+
+        <c:choose>
+            <c:when test="${not empty serviceHistory}">
+                <c:forEach var="item" items="${serviceHistory}">
+                    <tr>
+                        <td>#${item.requestId}</td>
+                        <td><c:out value="${item.serviceName}"/></td>
+                        <td>
+                            <fmt:formatDate value="${item.requestDate}" pattern="dd/MM/yyyy HH:mm" />
+                        </td>
+                        <td>
+                            <span class="status status-${item.status.toLowerCase()}">
+                                    <c:out value="${item.status}"/>
+                                </span>
+                        </td>
+                        <td>
+                            <fmt:formatNumber value="${item.price}" type="currency" currencySymbol=""/> VND
+                        </td>
+                    </tr>
+                </c:forEach>
+            </c:when>
+            <c:otherwise>
+                <tr>
+                    <td colspan="5" class="text-center">No service history found.</td>
+                </tr>
+            </c:otherwise>
+        </c:choose>
+        </tbody>
     </table>
     <div class="pagination">
         <div class="pagination-info">

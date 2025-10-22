@@ -399,8 +399,9 @@ public class WorkOrderController extends HttpServlet {
 
             workOrderDetailService.updateWorkOrderDetail(detail);
 
-            response.sendRedirect(request.getContextPath() + "/techmanager/workorders/details?workOrderId=" + workOrderId
-                    + "&success=detail_updated");
+            response.sendRedirect(
+                    request.getContextPath() + "/techmanager/workorders/details?workOrderId=" + workOrderId
+                            + "&success=detail_updated");
 
         } catch (Exception e) {
             response.sendRedirect(request.getContextPath() + "/techmanager/workorders/details?workOrderId="
@@ -427,8 +428,9 @@ public class WorkOrderController extends HttpServlet {
 
             workOrderDetailService.deleteWorkOrderDetail(detailId);
 
-            response.sendRedirect(request.getContextPath() + "/techmanager/workorders/details?workOrderId=" + workOrderId
-                    + "&success=detail_deleted");
+            response.sendRedirect(
+                    request.getContextPath() + "/techmanager/workorders/details?workOrderId=" + workOrderId
+                            + "&success=detail_deleted");
 
         } catch (Exception e) {
             response.sendRedirect(request.getContextPath() + "/techmanager/workorders/details?workOrderId="
@@ -455,8 +457,9 @@ public class WorkOrderController extends HttpServlet {
 
             workOrderDetailService.approveWorkOrderDetail(detailId, techManager.getUserId());
 
-            response.sendRedirect(request.getContextPath() + "/techmanager/workorders/details?workOrderId=" + workOrderId
-                    + "&success=detail_approved");
+            response.sendRedirect(
+                    request.getContextPath() + "/techmanager/workorders/details?workOrderId=" + workOrderId
+                            + "&success=detail_approved");
 
         } catch (Exception e) {
             response.sendRedirect(request.getContextPath() + "/techmanager/workorders/details?workOrderId="
@@ -483,8 +486,9 @@ public class WorkOrderController extends HttpServlet {
 
             workOrderDetailService.declineWorkOrderDetail(detailId, techManager.getUserId());
 
-            response.sendRedirect(request.getContextPath() + "/techmanager/workorders/details?workOrderId=" + workOrderId
-                    + "&success=detail_declined");
+            response.sendRedirect(
+                    request.getContextPath() + "/techmanager/workorders/details?workOrderId=" + workOrderId
+                            + "&success=detail_declined");
 
         } catch (Exception e) {
             response.sendRedirect(request.getContextPath() + "/techmanager/workorders/details?workOrderId="

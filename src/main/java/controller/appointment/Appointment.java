@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.user.User;
 import model.vehicle.Vehicle;
+import service.vehicle.VehicleService;
 
 import java.io.IOException;
 
@@ -49,17 +50,22 @@ public class Appointment extends HttpServlet {
         String dateStr = request.getParameter("appointmentDate");
         String description = request.getParameter("description");
 
+        CustomerDAO customerDAO = new CustomerDAO();
+        VehicleDAO vehicleDAO = new VehicleDAO(); // Cần có VehicleDAO
+        AppointmentDAO appointmentDAO = new AppointmentDAO(); // Hoặc dùng Service
+        VehicleService vehicleService = new VehicleService(vehicleDAO);
+
         // (Tùy chọn) Validation: Kiểm tra các trường bắt buộc không bị trống
         if (licensePlate == null || licensePlate.trim().isEmpty() || dateStr == null || dateStr.trim().isEmpty()) {
             request.setAttribute("errorMessage", "License plate and date are required.");
             request.getRequestDispatcher("/view/customer/appointment-scheduling.jsp").forward(request, response);
             return;
         }
-
-        // 3. Khởi tạo các DAO và Service
-        CustomerDAO customerDAO = new CustomerDAO();
-        VehicleDAO vehicleDAO = new VehicleDAO(); // Cần có VehicleDAO
-        AppointmentDAO appointmentDAO = new AppointmentDAO(); // Hoặc dùng Service
+        if (!vehicleService.validateLicensePlateFormat(licensePlate)) {
+            request.setAttribute("errorMessage", "Invalid license plate format.");
+            request.getRequestDispatcher("/view/customer/appointment-scheduling.jsp").forward(request, response);
+            return;
+        }
 
         try {
             // 4. Lấy CustomerID từ UserID
