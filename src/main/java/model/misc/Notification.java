@@ -1,30 +1,23 @@
 package model.misc;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class Notification {
+
     private int notificationId;
     private int userId;
     private String title;
     private String body;
-    private Timestamp createdAt;
     private boolean isRead;
+    private LocalDateTime createdAt;
     private String entityType;
     private int entityId;
+    private Integer appointmentId;
 
     public Notification() {
     }
 
-    public Notification(int notificationId, int userId, String title, String body, Timestamp createdAt, boolean isRead, String entityType, int entityId) {
-        this.notificationId = notificationId;
-        this.userId = userId;
-        this.title = title;
-        this.body = body;
-        this.createdAt = createdAt;
-        this.isRead = isRead;
-        this.entityType = entityType;
-        this.entityId = entityId;
-    }
+    // Getters and Setters
 
     public int getNotificationId() {
         return notificationId;
@@ -58,20 +51,20 @@ public class Notification {
         this.body = body;
     }
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public boolean isRead() {
         return isRead;
     }
 
     public void setRead(boolean read) {
         isRead = read;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public String getEntityType() {
@@ -88,5 +81,13 @@ public class Notification {
 
     public void setEntityId(int entityId) {
         this.entityId = entityId;
+    }
+
+    public Integer getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(Integer appointmentId) {
+        this.appointmentId = appointmentId;
     }
 }

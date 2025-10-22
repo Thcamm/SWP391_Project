@@ -106,8 +106,7 @@ public class ViewSupportRequestServlet extends HttpServlet {
             int requestId = Integer.parseInt(requestIdParam);
             SupportDAO dao = new SupportDAO();
 
-            String currentStatus = dao.getCurrentStatus(requestId);
-            boolean success = service.checkUpdateStatus(requestId, currentStatus);
+            boolean success = service.checkUpdateStatus(requestId, newStatus);
 
             if (success) {
                 dao.updateSupportRequestStatus(requestId, newStatus);

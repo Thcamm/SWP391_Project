@@ -81,7 +81,7 @@
                 <span class="user-name">${sessionScope.userName}</span>
                 <span class="user-role">Admin</span>
             </div>
-            <a href="${pageContext.request.contextPath}/Home/logout" class="logout-btn">Logout</a>
+            <a href="${pageContext.request.contextPath}/Home?action=logout" class="logout-btn">Logout</a>
         </div>
     </div>
 </header>
