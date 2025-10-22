@@ -33,7 +33,7 @@
             <button type="submit" class="btn btn-primary">Edit Profile</button>
         </form>
         <a href="${pageContext.request.contextPath}/user/changePassword" class="btn btn-secondary">Change Password</a>
-        <c:set var="homeLink" value="${pageContext.request.contextPath}/Home" /> <%-- Default for Customer --%>
+        <c:set var="homeLink" value="${pageContext.request.contextPath}/Home" />
 
         <c:choose>
             <c:when test="${sessionScope.roleCode == 'ADMIN'}">

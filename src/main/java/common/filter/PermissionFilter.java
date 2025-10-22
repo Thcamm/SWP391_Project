@@ -126,6 +126,7 @@ public class PermissionFilter implements Filter {
 
 
 
+
         //User
         routePerm.put("GET:/view/user/viewProfile.jsp", "user_access");
         routePerm.put("POST:/view/user/viewProfile.jsp", "user_access");

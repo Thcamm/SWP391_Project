@@ -31,7 +31,7 @@
         <li class="nav-item">
           <a
             class="nav-link ${activeMenu == 'Home' ? 'active fw-bold' : ''}"
-            href="${pageContext.request.contextPath}/Home"
+            href="${pageContext.request.contextPath}/admin/users"
           >
             <i class="bi bi-house-door me-1"></i>Home
           </a>

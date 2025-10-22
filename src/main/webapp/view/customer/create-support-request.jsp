@@ -5,10 +5,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Support Request</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customer/appointment-history.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customer/create-support-request.css">
 
 </head>
 <body>
+<%@ include file="/common/header.jsp" %>
+
 <div class="container">
     <h2>Support Request / Report a Bug</h2>
 
@@ -46,5 +48,7 @@
         <p class="message">${message}</p>
     </c:if>
 </div>
+<%@ include file="/common/footer.jsp" %>
+
 </body>
 </html>

@@ -29,7 +29,7 @@
             </a>
             <a href="${pageContext.request.contextPath}/customerservice/requests" class="menu-item">
                 <div class="icon">o</div>
-                <span class="label">Support Request</span>
+                <span class="label">Create Service Request</span>
             </a>
 
         </div>

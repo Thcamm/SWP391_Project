@@ -29,8 +29,7 @@
         <h6>Support</h6>
         <ul class="list-unstyled">
           <li>
-            <a
-              href="${pageContext.request.contextPath}/Home"
+            <a href="${pageContext.request.contextPath}/admin/users"
               class="text-light text-decoration-none"
               >Home</a
             >

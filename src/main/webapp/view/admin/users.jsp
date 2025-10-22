@@ -72,7 +72,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
               <li>
                 <a
                   class="dropdown-item"
-                  href="${pageContext.request.contextPath}/Home"
+                  href="${pageContext.request.contextPath}/admin/users"
                 >
                   <i class="bi bi-house"></i> Home
                 </a>
@@ -599,11 +599,10 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
               <a
                 href="${pageContext.request.contextPath}/admin/users/choose-type"
                 class="text-decoration-none"
-                >Create User</a
-              >
+                >Create User</a>
               |
               <a
-                href="${pageContext.request.contextPath}/Home"
+                href="${pageContext.request.contextPath}/admin/users"
                 class="text-decoration-none"
                 >Home</a
               >

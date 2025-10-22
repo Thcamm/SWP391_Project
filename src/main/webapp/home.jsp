@@ -399,9 +399,9 @@
         <a href="${pageContext.request.contextPath}/customer/create-support-request" class="menu-item">
             <span>Create Support Request</span>
         </a>
-            <a href="${pageContext.request.contextPath}/customer/garage" class="menu-item">
-                <span>QUẢN LÝ XE (MY GARAGE)</span>
-            </a>
+        <a href="${pageContext.request.contextPath}/customer/garage" class="menu-item">
+            <span>My Garage</span>
+        </a>
     </nav>
 </div>
 

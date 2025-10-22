@@ -18,39 +18,24 @@
     <span class="navbar-brand">
       <i class="bi bi-wallet2"></i> Accountant Dashboard
     </span>
-
         <ul class="navbar-nav">
             <li class="nav-item dropdown">
-                <a
-                        class="nav-link dropdown-toggle"
-                        href="#"
-                        role="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                >
+                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-person-circle me-1"></i>
                     <span class="d-none d-lg-inline">${sessionScope.userName}</span>
+                    <span class="badge bg-secondary ms-1"
+                    >${sessionScope.roleName}</span
+                    >
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li>
-                        <h6 class="dropdown-header">
-                            Role: <span class="fw-normal">${sessionScope.roleName}</span>
-                        </h6>
-                    </li>
-                    <li>
-                        <a
-                                class="dropdown-item"
-                                href="${pageContext.request.contextPath}/user/profile"
-                        >
+                        <a class="dropdown-item" href="${pageContext.request.contextPath}/user/profile">
                             <i class="bi bi-person me-2"></i>My Profile
                         </a>
                     </li>
                     <li><hr class="dropdown-divider" /></li>
                     <li>
-                        <a
-                                class="dropdown-item text-danger"
-                                href="${pageContext.request.contextPath}/Home?action=logout"
-                        >
+                        <a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/Home?action=logout">
                             <i class="bi bi-box-arrow-right me-2"></i>Logout
                         </a>
                     </li>

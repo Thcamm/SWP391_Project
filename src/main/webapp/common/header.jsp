@@ -338,7 +338,29 @@
     </div>
     <nav class="main-navbar">
         <div class="container d-flex justify-content-between align-items-center">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/Home">
+            <c:set var="homeLink" value="${pageContext.request.contextPath}/Home" />
+
+            <c:choose>
+                <c:when test="${sessionScope.roleCode == 'ADMIN'}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/admin/users" />
+                </c:when>
+                <c:when test="${sessionScope.roleCode == 'TECHMANAGER'}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/techmanager/home" />
+                </c:when>
+                <c:when test="${sessionScope.roleCode == 'TECHNICAL'}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/technician/home" />
+                </c:when>
+                <c:when test="${sessionScope.roleCode == 'Store Keeper'}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/inventory/dashboard" />
+                </c:when>
+                <c:when test="${sessionScope.roleCode == 'ACCOUNTANT'}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/accountant/home" />
+                </c:when>
+                <c:when test="${sessionScope.roleCode == 'CUSTOMER_SERVICE'}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/customerservice/home" />
+                </c:when>
+            </c:choose>
+            <a class="navbar-brand" href="${homeLink}">
                 CS<span>CARSPA.VN</span>
             </a>
             <div class="nav-icons d-flex align-items-center">
@@ -362,23 +384,17 @@
         <a href="${pageContext.request.contextPath}/Home" class="menu-item">
             <span>TRANG CHỦ</span>
         </a>
-        <a href="${pageContext.request.contextPath}/customerservice/view-support-request" class="menu-item">
-            <span>DỊCH VỤ</span>
-        </a>
-        <a href="${pageContext.request.contextPath}/support-faq" class="menu-item">
-            <span>THƯ VIỆN DỰ ÁN</span>
-        </a>
-        <a href="${pageContext.request.contextPath}/customer/create-support-request" class="menu-item">
-            <span>SEARCH CUSTOMER</span>
-        </a>
-        <a href="${pageContext.request.contextPath}/customerservice/appointment-list" class="menu-item">
-            <span>TIN TỨC</span>
+        <a href="${pageContext.request.contextPath}/customer/appointment-history" class="menu-item">
+            <span>Appointment List</span>
         </a>
         <a href="${pageContext.request.contextPath}/customer/AppointmentService" class="menu-item">
-            <span>Lien he dat lich</span>
+            <span>Create Appointment</span>
+        </a>
+        <a href="${pageContext.request.contextPath}/customer/create-support-request" class="menu-item">
+            <span>Create Support Request</span>
         </a>
         <a href="${pageContext.request.contextPath}/customer/garage" class="menu-item">
-            <span>QUẢN LÝ XE (MY GARAGE)</span>
+            <span>My Garage</span>
         </a>
     </nav>
 </div>
