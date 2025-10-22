@@ -1,4 +1,4 @@
-package controller.employee;
+package controller.employee.techmanager;
 
 import model.employee.techmanager.TechManager;
 import service.employee.TechManagerService;
@@ -26,17 +26,16 @@ public class TechManagerController extends HttpServlet {
         String pathInfo = request.getPathInfo();
 
         if (pathInfo == null) {
-            response.sendRedirect(request.getContextPath() + "/techmanager/dashboard");
+            response.sendRedirect(request.getContextPath() + "/techmanager/home");
             return;
         }
 
         try {
             switch (pathInfo) {
-                case "/dashboard":
+                case "/home":
                     showDashboard(request, response);
                     break;
                 case "/workorders":
-                    // Forward to WorkOrderController for work order management
                     request.getRequestDispatcher("/techmanager/workorders/list").forward(request, response);
                     break;
                 default:
@@ -60,7 +59,7 @@ public class TechManagerController extends HttpServlet {
         TechManager currentUser = getCurrentTechManager(request);
         System.out.println("TechManagerController DEBUG: showDashboard - currentUser: "
                 + (currentUser != null ? currentUser.getUserName() + " (roleId=" + currentUser.getRoleId() + ")"
-                        : "null"));
+                : "null"));
 
         if (currentUser == null) {
             System.out.println("TechManagerController DEBUG: currentUser is null, redirecting to login");
@@ -79,7 +78,7 @@ public class TechManagerController extends HttpServlet {
             request.setAttribute("completedCount", dashboardData.getCompletedCount());
             request.setAttribute("isAdmin", dashboardData.isAdmin());
 
-            request.getRequestDispatcher("/view/techmanager/dashboard.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/techmanager/home.jsp").forward(request, response);
         } catch (Exception e) {
             throw new ServletException("Error loading dashboard", e);
         }

@@ -282,7 +282,7 @@ public class CustomerDAO extends DbContext {
             e.printStackTrace();
         }
 
-        return -1; // Không tìm thấy
+        return -1;
     }
     public Customer getCustomerByUserId(int userId) throws SQLException {
         String sql = "SELECT * FROM Customer WHERE UserID = ?";
@@ -295,13 +295,38 @@ public class CustomerDAO extends DbContext {
                     Customer customer = new Customer();
                     customer.setCustomerId(rs.getInt("CustomerID"));
                     customer.setUserId(rs.getInt("UserID"));
-                    // Set các thuộc tính khác nếu có...
                     return customer;
                 }
             }
         }
         return null;
     }
+public Customer getCustomerById(int customerId) throws SQLException {
+        Customer customer = null;
 
+        // ⚠️ Chú ý: Đảm bảo tên bảng và cột là chính xác
+        String sql = "SELECT c.CustomerID, u.UserID, u.FullName, u.Email, u.PhoneNumber " +
+                "FROM Customer c " +
+                "JOIN User u ON c.UserID = u.UserID " +
+                "WHERE c.CustomerID = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    customer = new Customer();
+                    // Lấy thông tin từ cả 2 bảng
+                    customer.setCustomerId(rs.getInt("CustomerID"));
+                    customer.setUserId(rs.getInt("UserID"));
+                    customer.setFullName(rs.getString("FullName"));
+                    customer.setEmail(rs.getString("Email"));
+                    customer.setPhoneNumber(rs.getString("PhoneNumber"));
+                }
+            }
+        }
+        return customer;
+    }
 
 }

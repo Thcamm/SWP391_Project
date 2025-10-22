@@ -6,7 +6,7 @@
     <!-- Logo/Brand -->
     <a
       class="navbar-brand fw-bold"
-      href="${pageContext.request.contextPath}/Home"
+      href="${pageContext.request.contextPath}/admin/users"
     >
       <i class="bi bi-gear-fill me-2"></i>
       CsCarSpa.vn
@@ -118,7 +118,7 @@
             <li>
               <a
                 class="dropdown-item text-danger"
-                href="${pageContext.request.contextPath}/Home/logout"
+                href="${pageContext.request.contextPath}/Home?action=logout"
               >
                 <i class="bi bi-box-arrow-right me-2"></i>Logout
               </a>
