@@ -538,132 +538,132 @@ ALTER TABLE RoleInfo
 CREATE UNIQUE INDEX ux_role_rolecode ON  RoleInfo(RoleCode);
 
 
-DELIMITER $$
+  DELIMITER $$
 
-CREATE TRIGGER trg_after_user_insert_create_customer
-AFTER INSERT ON User
-FOR EACH ROW
-BEGIN
-    -- Khai báo một biến để lưu RoleID của 'Customer'
-    DECLARE v_customer_role_id INT;
+  CREATE TRIGGER trg_after_user_insert_create_customer
+  AFTER INSERT ON User
+  FOR EACH ROW
+  BEGIN
+      -- Khai báo một biến để lưu RoleID của 'Customer'
+      DECLARE v_customer_role_id INT;
 
-    -- Lấy RoleID tương ứng với vai trò 'Customer' từ bảng RoleInfo
-    -- Điều này giúp trigger hoạt động đúng ngay cả khi ID của vai trò thay đổi
-    SELECT RoleID INTO v_customer_role_id 
-    FROM RoleInfo 
-    WHERE RoleName = 'Customer' 
-    LIMIT 1;
+      -- Lấy RoleID tương ứng với vai trò 'Customer' từ bảng RoleInfo
+      -- Điều này giúp trigger hoạt động đúng ngay cả khi ID của vai trò thay đổi
+      SELECT RoleID INTO v_customer_role_id 
+      FROM RoleInfo 
+      WHERE RoleName = 'Customer' 
+      LIMIT 1;
 
-    -- Kiểm tra xem RoleID của người dùng MỚI được chèn vào có phải là của Customer không
-    IF NEW.RoleID = v_customer_role_id THEN
-        -- Nếu đúng, tự động chèn một bản ghi mới vào bảng Customer
-        INSERT INTO Customer (UserID) VALUES (NEW.UserID);
-    END IF;
-END$$
+      -- Kiểm tra xem RoleID của người dùng MỚI được chèn vào có phải là của Customer không
+      IF NEW.RoleID = v_customer_role_id THEN
+          -- Nếu đúng, tự động chèn một bản ghi mới vào bảng Customer
+          INSERT INTO Customer (UserID) VALUES (NEW.UserID);
+      END IF;
+  END$$
 
-DELIMITER ;	
+  DELIMITER ;	
 
-CREATE TABLE CarBrands (
-    BrandID INT NOT NULL AUTO_INCREMENT,
-    BrandName VARCHAR(50) NOT NULL,
-    PRIMARY KEY (BrandID),
-    UNIQUE KEY ux_brand_name (BrandName)
-);
+  CREATE TABLE CarBrands (
+      BrandID INT NOT NULL AUTO_INCREMENT,
+      BrandName VARCHAR(50) NOT NULL,
+      PRIMARY KEY (BrandID),
+      UNIQUE KEY ux_brand_name (BrandName)
+  );
 
-CREATE TABLE CarModels (
-    ModelID INT NOT NULL AUTO_INCREMENT,
-    ModelName VARCHAR(50) NOT NULL,
-    BrandID INT NOT NULL,
-    PRIMARY KEY (ModelID),
-    CONSTRAINT fk_model_brand
-        FOREIGN KEY (BrandID) REFERENCES CarBrands(BrandID)
-        ON DELETE CASCADE
-);
+  CREATE TABLE CarModels (
+      ModelID INT NOT NULL AUTO_INCREMENT,
+      ModelName VARCHAR(50) NOT NULL,
+      BrandID INT NOT NULL,
+      PRIMARY KEY (ModelID),
+      CONSTRAINT fk_model_brand
+          FOREIGN KEY (BrandID) REFERENCES CarBrands(BrandID)
+          ON DELETE CASCADE
+  );
 
--- =========================================================
--- STORED PROCEDURES
--- =========================================================
+  -- =========================================================
+  -- STORED PROCEDURES
+  -- =========================================================
 
--- Promote Customer to Employee Stored Procedure
-DELIMITER $$
+  -- Promote Customer to Employee Stored Procedure
+  DELIMITER $$
 
-CREATE PROCEDURE SP_PromoteCustomerToEmployee(
-    IN p_user_id INT,
-    IN p_new_role_name VARCHAR(50),
-    IN p_employee_code VARCHAR(20),
-    IN p_salary DECIMAL(10,2),
-    IN p_managed_by_employee_id INT,
-    IN p_created_by_employee_id INT
-)
-BEGIN
-    DECLARE v_new_role_id INT;
-    DECLARE v_current_role_id INT;
-    DECLARE v_customer_role_id INT;
-    DECLARE v_existing_employee_count INT;
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        ROLLBACK;
-        RESIGNAL;
-    END;
+  CREATE PROCEDURE SP_PromoteCustomerToEmployee(
+      IN p_user_id INT,
+      IN p_new_role_name VARCHAR(50),
+      IN p_employee_code VARCHAR(20),
+      IN p_salary DECIMAL(10,2),
+      IN p_managed_by_employee_id INT,
+      IN p_created_by_employee_id INT
+  )
+  BEGIN
+      DECLARE v_new_role_id INT;
+      DECLARE v_current_role_id INT;
+      DECLARE v_customer_role_id INT;
+      DECLARE v_existing_employee_count INT;
+      DECLARE EXIT HANDLER FOR SQLEXCEPTION
+      BEGIN
+          ROLLBACK;
+          RESIGNAL;
+      END;
 
-    START TRANSACTION;
+      START TRANSACTION;
 
-    -- Get current role ID
-    SELECT RoleID INTO v_current_role_id 
-    FROM User 
-    WHERE UserID = p_user_id;
+      -- Get current role ID
+      SELECT RoleID INTO v_current_role_id 
+      FROM User 
+      WHERE UserID = p_user_id;
 
-    -- Get Customer role ID
-    SELECT RoleID INTO v_customer_role_id 
-    FROM RoleInfo 
-    WHERE RoleName = 'Customer' 
-    LIMIT 1;
+      -- Get Customer role ID
+      SELECT RoleID INTO v_customer_role_id 
+      FROM RoleInfo 
+      WHERE RoleName = 'Customer' 
+      LIMIT 1;
 
-    -- Get new role ID
-    SELECT RoleID INTO v_new_role_id 
-    FROM RoleInfo 
-    WHERE RoleName = p_new_role_name 
-    LIMIT 1;
+      -- Get new role ID
+      SELECT RoleID INTO v_new_role_id 
+      FROM RoleInfo 
+      WHERE RoleName = p_new_role_name 
+      LIMIT 1;
 
-    -- Validation checks
-    IF v_current_role_id IS NULL THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User not found';
-    END IF;
+      -- Validation checks
+      IF v_current_role_id IS NULL THEN
+          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User not found';
+      END IF;
 
-    IF v_new_role_id IS NULL THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Target role not found';
-    END IF;
+      IF v_new_role_id IS NULL THEN
+          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Target role not found';
+      END IF;
 
-    IF v_customer_role_id IS NULL THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Customer role not found in system';
-    END IF;
+      IF v_customer_role_id IS NULL THEN
+          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Customer role not found in system';
+      END IF;
 
-    IF v_current_role_id != v_customer_role_id THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User is not a Customer, cannot promote';
-    END IF;
+      IF v_current_role_id != v_customer_role_id THEN
+          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User is not a Customer, cannot promote';
+      END IF;
 
-    -- Check if user already has Employee record
-    SELECT COUNT(*) INTO v_existing_employee_count 
-    FROM Employee 
-    WHERE UserID = p_user_id;
+      -- Check if user already has Employee record
+      SELECT COUNT(*) INTO v_existing_employee_count 
+      FROM Employee 
+      WHERE UserID = p_user_id;
 
-    IF v_existing_employee_count > 0 THEN
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User already has Employee record';
-    END IF;
+      IF v_existing_employee_count > 0 THEN
+          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User already has Employee record';
+      END IF;
 
-    -- Update user role
-    UPDATE User 
-    SET RoleID = v_new_role_id, UpdatedAt = NOW() 
-    WHERE UserID = p_user_id;
+      -- Update user role
+      UPDATE User 
+      SET RoleID = v_new_role_id, UpdatedAt = NOW() 
+      WHERE UserID = p_user_id;
 
-    -- Create Employee record
-    INSERT INTO Employee (UserID, EmployeeCode, Salary, ManagedBy, CreatedBy, CreatedAt)
-    VALUES (p_user_id, p_employee_code, p_salary, p_managed_by_employee_id, p_created_by_employee_id, NOW());
+      -- Create Employee record
+      INSERT INTO Employee (UserID, EmployeeCode, Salary, ManagedBy, CreatedBy, CreatedAt)
+      VALUES (p_user_id, p_employee_code, p_salary, p_managed_by_employee_id, p_created_by_employee_id, NOW());
 
-    COMMIT;
-END$$
+      COMMIT;
+  END$$
 
-DELIMITER ;
+  DELIMITER ;
 
 -- =========================================================
 -- SAMPLE DATA
