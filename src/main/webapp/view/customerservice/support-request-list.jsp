@@ -154,9 +154,11 @@
 
                                     <c:choose>
                                         <c:when test="${sr.status == 'INPROGRESS'}">
-                                            <a href="mailto:${customerEmailMap[sr.customerId]}" class="btn btn-sm btn-outline-success ms-2">
+                                            <a href="${pageContext.request.contextPath}/customerservice/reply-request?id=${sr.requestId}&email=${customerEmailMap[sr.customerId]}"
+                                               class="btn btn-sm btn-outline-success ms-2">
                                                 ✉️ Reply
                                             </a>
+
                                         </c:when>
                                         <c:otherwise>
                                             <a class="btn btn-sm btn-outline-success ms-2 disabled"
