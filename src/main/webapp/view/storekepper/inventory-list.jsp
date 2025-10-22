@@ -7,168 +7,151 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kho Linh Kiện - Garage Inventory</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3a8a 0%, #312e81 100%);
-            min-height: 100vh;
-            padding: 20px;
+        /* Main Content Area */
+        .inventory-main {
+            min-height: calc(100vh - 200px);
+            background: #f8f9fa;
+            padding: 40px 0;
         }
 
         .container {
-            max-width: 1600px;
-            margin: 0 auto;
+            max-width: 1400px;
         }
 
-        /* Header */
-        .header {
+        /* Page Header */
+        .page-header {
             background: white;
-            border-radius: 20px;
+            border-radius: 15px;
             padding: 30px;
             margin-bottom: 30px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
+        .page-header h1 {
             color: #1e293b;
-            font-size: 36px;
+            font-size: 32px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
-        .header h1 i {
+        .page-header h1 i {
             color: #3b82f6;
-            font-size: 40px;
+        }
+
+        .page-header p {
+            color: #64748b;
+            margin: 0;
         }
 
         .header-actions {
             display: flex;
-            gap: 15px;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
         }
 
         /* Buttons */
         .btn {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 15px;
+            padding: 10px 20px;
+            border-radius: 8px;
             font-weight: 600;
-            text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-decoration: none;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         .btn-success {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            background: #10b981;
             color: white;
+            border: none;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            border: none;
         }
 
         .btn-warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            background: #f59e0b;
             color: white;
-        }
-
-        .btn-info {
-            background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
-            color: white;
+            border: none;
         }
 
         /* Stats Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
+        .stats-row {
             margin-bottom: 30px;
         }
 
         .stat-card {
             background: white;
-            border-radius: 16px;
+            border-radius: 12px;
             padding: 25px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            gap: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            height: 100%;
             transition: all 0.3s ease;
         }
 
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 50px rgba(0,0,0,0.25);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
         }
 
-        .stat-icon {
-            width: 70px;
-            height: 70px;
-            border-radius: 16px;
+        .stat-card .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 32px;
+            font-size: 28px;
             color: white;
+            margin-bottom: 15px;
         }
 
-        .stat-icon.blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
-        .stat-icon.orange { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
-        .stat-icon.green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-        .stat-icon.purple { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+        .stat-card .stat-icon.blue { background: #3b82f6; }
+        .stat-card .stat-icon.orange { background: #f59e0b; }
+        .stat-card .stat-icon.green { background: #10b981; }
+        .stat-card .stat-icon.purple { background: #8b5cf6; }
 
-        .stat-info h3 {
+        .stat-card h6 {
             color: #64748b;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            margin-bottom: 8px;
         }
 
-        .stat-info .stat-value {
+        .stat-card .stat-value {
             color: #1e293b;
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
         }
 
-        /* Search & Filter */
-        .search-section {
+        /* Search & Filter Section */
+        .search-filter-card {
             background: white;
-            border-radius: 16px;
+            border-radius: 12px;
             padding: 25px;
             margin-bottom: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
 
         .search-bar {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             margin-bottom: 20px;
         }
 
@@ -179,38 +162,38 @@
 
         .search-input-wrapper i {
             position: absolute;
-            left: 20px;
+            left: 15px;
             top: 50%;
             transform: translateY(-50%);
             color: #94a3b8;
-            font-size: 18px;
         }
 
         .search-input {
             width: 100%;
-            padding: 15px 20px 15px 55px;
+            padding: 12px 15px 12px 45px;
             border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 16px;
+            border-radius: 8px;
+            font-size: 15px;
             transition: all 0.3s ease;
         }
 
         .search-input:focus {
             outline: none;
             border-color: #3b82f6;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
         .filter-tabs {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
 
         .filter-tab {
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: 2px solid #e2e8f0;
             background: white;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
@@ -226,15 +209,15 @@
         }
 
         /* Inventory Table */
-        .inventory-card {
+        .table-card {
             background: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
             overflow: hidden;
         }
 
-        .table-wrapper {
+        .table-responsive {
             overflow-x: auto;
         }
 
@@ -244,21 +227,22 @@
         }
 
         thead {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
         }
 
         th {
-            padding: 18px 20px;
+            padding: 15px;
             text-align: left;
-            color: white;
-            font-weight: 600;
-            font-size: 14px;
+            color: #475569;
+            font-weight: 700;
+            font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         tbody tr {
-            border-bottom: 1px solid #e2e8f0;
+            border-bottom: 1px solid #f1f5f9;
             transition: all 0.2s ease;
         }
 
@@ -267,20 +251,20 @@
         }
 
         td {
-            padding: 20px;
+            padding: 18px 15px;
             color: #334155;
-            font-size: 15px;
+            font-size: 14px;
         }
 
         /* Badge Styles */
         .badge {
-            padding: 6px 14px;
+            padding: 5px 12px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
         }
 
         .badge-success {
@@ -298,7 +282,7 @@
             color: #991b1b;
         }
 
-        .badge-category {
+        .badge-info {
             background: #dbeafe;
             color: #1e40af;
         }
@@ -307,9 +291,9 @@
         .sku-code {
             font-family: 'Courier New', monospace;
             background: #f1f5f9;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 13px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
             font-weight: 600;
             color: #3b82f6;
         }
@@ -318,11 +302,11 @@
         .stock-info {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .stock-number {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
         }
 
@@ -335,13 +319,14 @@
         }
 
         .min-stock {
-            font-size: 12px;
+            font-size: 11px;
             color: #64748b;
+            margin-top: 2px;
         }
 
         /* Price */
         .price {
-            font-size: 17px;
+            font-size: 15px;
             font-weight: 700;
             color: #059669;
         }
@@ -350,35 +335,35 @@
         .characteristics {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 5px;
         }
 
         .char-tag {
             background: #f1f5f9;
             color: #475569;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
             font-weight: 500;
         }
 
         /* Action Buttons */
         .action-buttons {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
         .btn-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
             border: none;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         .btn-icon.btn-view {
@@ -398,7 +383,6 @@
 
         .btn-icon:hover {
             transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
         /* Empty State */
@@ -408,58 +392,38 @@
         }
 
         .empty-state i {
-            font-size: 80px;
-            color: #cbd5e0;
+            font-size: 60px;
+            color: #cbd5e1;
             margin-bottom: 20px;
         }
 
         .empty-state h3 {
             color: #475569;
-            font-size: 24px;
+            font-size: 20px;
             margin-bottom: 10px;
         }
 
         .empty-state p {
             color: #94a3b8;
-            font-size: 16px;
         }
 
         /* Alert Messages */
         .alert {
-            padding: 15px 20px;
-            border-radius: 12px;
+            border-radius: 10px;
             margin-bottom: 20px;
+            padding: 15px 20px;
             display: flex;
             align-items: center;
             gap: 12px;
-            font-weight: 500;
-        }
-
-        .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            border-left: 4px solid #10b981;
-        }
-
-        .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-            border-left: 4px solid #ef4444;
         }
 
         .alert i {
-            font-size: 20px;
+            font-size: 18px;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .header-top {
-                flex-direction: column;
-                gap: 20px;
-            }
-
             .header-actions {
-                width: 100%;
                 flex-direction: column;
             }
 
@@ -472,46 +436,47 @@
                 flex-direction: column;
             }
 
-            .filter-tabs {
-                overflow-x: auto;
-                padding-bottom: 10px;
-            }
-
             table {
-                font-size: 13px;
+                font-size: 12px;
             }
 
             th, td {
-                padding: 12px 10px;
+                padding: 10px 8px;
             }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <!-- Header -->
-    <div class="header">
-        <div class="header-top">
-            <h1>
-                <i class="fas fa-warehouse"></i>
-                Kho Linh Kiện
-            </h1>
-            <div class="header-actions">
-                <a href="${pageContext.request.contextPath}/inventory?action=add" class="btn btn-success">
-                    <i class="fas fa-plus"></i>
-                    Thêm Linh Kiện
-                </a>
-                <a href="${pageContext.request.contextPath}/stock?action=in" class="btn btn-primary">
-                    <i class="fas fa-arrow-down"></i>
-                    Nhập Kho
-                </a>
-                <a href="${pageContext.request.contextPath}/stock?action=out" class="btn btn-warning">
-                    <i class="fas fa-arrow-up"></i>
-                    Xuất Kho
-                </a>
+    <%@ include file="/common/header.jsp" %>
+
+    <div class="inventory-main">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="d-flex justify-content-between align-items-start flex-wrap">
+                    <div>
+                        <h1>
+                            <i class="fas fa-warehouse"></i>
+                            Quản Lý Kho Linh Kiện
+                        </h1>
+                        <p>Quản lý tồn kho, theo dõi và cập nhật thông tin linh kiện</p>
+                    </div>
+                    <div class="header-actions">
+                        <a href="${pageContext.request.contextPath}/inventory?action=add" class="btn btn-success">
+                            <i class="fas fa-plus"></i>
+                            Thêm Linh Kiện
+                        </a>
+                        <a href="${pageContext.request.contextPath}/stock?action=in" class="btn btn-primary">
+                            <i class="fas fa-arrow-down"></i>
+                            Nhập Kho
+                        </a>
+                        <a href="${pageContext.request.contextPath}/stock?action=out" class="btn btn-warning">
+                            <i class="fas fa-arrow-up"></i>
+                            Xuất Kho
+                        </a>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
     <!-- Alert Messages -->
     <c:if test="${not empty param.message}">
@@ -536,50 +501,63 @@
         </div>
     </c:if>
 
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon blue">
-                <i class="fas fa-boxes"></i>
-            </div>
-            <div class="stat-info">
-                <h3>Tổng Linh Kiện</h3>
-                <div class="stat-value">${totalItems != null ? totalItems : 0}</div>
-            </div>
-        </div>
+            <div class="row g-4 mb-4"> <%-- SỬA Ở ĐÂY --%>
 
-        <div class="stat-card">
-            <div class="stat-icon orange">
-                <i class="fas fa-exclamation-triangle"></i>
-            </div>
-            <div class="stat-info">
-                <h3>Cảnh Báo Tồn</h3>
-                <div class="stat-value">${lowStockCount != null ? lowStockCount : 0}</div>
-            </div>
-        </div>
+                <%-- Card 1 --%>
+                <div class="col-lg-3 col-md-6"> <%-- THÊM DÒNG NÀY --%>
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h6>Tổng Linh Kiện</h6> <%-- Dùng H6 cho đẹp hơn --%>
+                            <div class="stat-value">${totalItems != null ? totalItems : 0}</div>
+                        </div>
+                    </div>
+                </div> <%-- THÊM DÒNG NÀY --%>
 
-        <div class="stat-card">
-            <div class="stat-icon green">
-                <i class="fas fa-dollar-sign"></i>
-            </div>
-            <div class="stat-info">
-                <h3>Tổng Giá Trị</h3>
-                <div class="stat-value">
-                    <fmt:formatNumber value="${totalValue != null ? totalValue : 0}" type="number" maxFractionDigits="0"/>đ
-                </div>
-            </div>
-        </div>
+                <%-- Card 2 --%>
+                <div class="col-lg-3 col-md-6"> <%-- THÊM DÒNG NÀY --%>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h6>Cảnh Báo Tồn</h6>
+                            <div class="stat-value">${lowStockCount != null ? lowStockCount : 0}</div>
+                        </div>
+                    </div>
+                </div> <%-- THÊM DÒNG NÀY --%>
 
-        <div class="stat-card">
-            <div class="stat-icon purple">
-                <i class="fas fa-layer-group"></i>
+                <%-- Card 3 --%>
+                <div class="col-lg-3 col-md-6"> <%-- THÊM DÒNG NÀY --%>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h6>Tổng Giá Trị</h6>
+                            <div class="stat-value">
+                                <fmt:formatNumber value="${totalValue != null ? totalValue : 0}" type="number" maxFractionDigits="0"/>đ
+                            </div>
+                        </div>
+                    </div>
+                </div> <%-- THÊM DÒNG NÀY --%>
+
+                <%-- Card 4 --%>
+                <div class="col-lg-3 col-md-6"> <%-- THÊM DÒNG NÀY --%>
+                    <div class="stat-card">
+                        <div class="stat-icon purple">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h6>Tổng SKU</h6> <%-- Sửa H3 thành H6 và "SKU" thành "Tổng SKU" --%>
+                            <div class="stat-value">${totalItems != null ? totalItems : 0}</div>
+                        </div>
+                    </div>
+                </div> <%-- THÊM DÒNG NÀY --%>
+
             </div>
-            <div class="stat-info">
-                <h3>SKU</h3>
-                <div class="stat-value">${totalItems != null ? totalItems : 0}</div>
-            </div>
-        </div>
-    </div>
 
     <!-- Search & Filter -->
     <div class="search-section">
@@ -663,16 +641,21 @@
                                                 ${item.category}
                                             </span>
                                 </td>
+                                    <%-- ... các <td> khác ... --%>
                                 <td>
                                     <div class="characteristics">
-                                        <c:forEach var="c" items="${partDetail.characteristics}">
-                                            ${c.fullName}
+                                            <%-- SỬA LỖI Ở ĐÂY: Dùng "item" thay vì "partDetail" --%>
+                                        <c:forEach var="c" items="${item.characteristics}">
+                                            <span class="char-tag">${c.fullName}</span>
                                         </c:forEach>
+
+                                            <%-- Phần này đã đúng --%>
                                         <c:if test="${empty item.characteristics}">
                                             <span style="color: #94a3b8; font-size: 13px;">-</span>
                                         </c:if>
                                     </div>
                                 </td>
+                                    <%-- ... các <td> khác ... --%>
                                 <td>
                                     <div class="stock-info">
                                                 <span class="stock-number ${item.quantity <= item.minStock ? 'low' : 'normal'}">
@@ -741,41 +724,46 @@
         </c:choose>
     </div>
 </div>
+    </div>
 
-<script>
-    function confirmDelete(id, name) {
-        if (confirm('Bạn có chắc muốn xóa linh kiện "' + name + '" không?')) {
-            // Tạo form và submit
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '${pageContext.request.contextPath}/inventory';
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function confirmDelete(id, name) {
+            if (confirm('Bạn có chắc muốn xóa linh kiện "' + name + '" không?')) {
+                // Tạo form và submit
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '${pageContext.request.contextPath}/inventory';
 
-            const actionInput = document.createElement('input');
-            actionInput.type = 'hidden';
-            actionInput.name = 'action';
-            actionInput.value = 'delete';
+                const actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = 'action';
+                actionInput.value = 'delete';
 
-            const idInput = document.createElement('input');
-            idInput.type = 'hidden';
-            idInput.name = 'id';
-            idInput.value = id;
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'id';
+                idInput.value = id;
 
-            form.appendChild(actionInput);
-            form.appendChild(idInput);
-            document.body.appendChild(form);
-            form.submit();
+                form.appendChild(actionInput);
+                form.appendChild(idInput);
+                document.body.appendChild(form);
+                form.submit();
+            }
         }
-    }
 
-    // Tự động ẩn alert sau 5 giây
-    setTimeout(function() {
-        const alerts = document.querySelectorAll('.alert');
-        alerts.forEach(alert => {
-            alert.style.transition = 'opacity 0.5s ease';
-            alert.style.opacity = '0';
-            setTimeout(() => alert.remove(), 500);
-        });
-    }, 5000);
-</script>
+        // Tự động ẩn alert sau 5 giây
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+    </script>
+
+    <%@ include file="/common/footer.jsp" %>
 </body>
 </html>

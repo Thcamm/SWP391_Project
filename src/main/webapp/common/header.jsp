@@ -1,18 +1,8 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carspa | Dịch Vụ Chăm Sóc Xe Tốt Nhất</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-    <%@ page import="model.user.User" %>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-    <link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/assets/css/user/chatbot.css">
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="model.user.User" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-    <style>
+<style>
         :root {
             --primary-color: #ffffff;
             --secondary-color: #adb5bd;
@@ -380,9 +370,15 @@
         <a href="${pageContext.request.contextPath}/customer/garage" class="menu-item">
             <span>QUẢN LÝ XE (MY GARAGE)</span>
         </a>
+        <c:if test="${sessionScope.user != null && sessionScope.user.roleId == 5}">
+            <a href="${pageContext.request.contextPath}/inventory" class="menu-item">
+                <span>QUẢN LÝ KHO (INVENTORY)</span>
+            </a>
+        </c:if>
+
     </nav>
 </div>
-</body>
+
 <script>
     // Toggle Sidebar Menu
     const menuIcon = document.querySelector('.fa-bars');
