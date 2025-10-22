@@ -64,28 +64,28 @@ public class Login extends HttpServlet {
                 return;
             }
             //7 roles: ADMIN, TechManager, Technical, Accountant, Store Keeper, Customer Service,Customer
-            if("ADMIN".equals(roleCode)) {
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+            if(user.getRoleId() == 1) {
+                response.sendRedirect(request.getContextPath() + "/admin/users");
                 return;
-            } else if("TECHMANAGER".equals(roleCode)) {
+            } else if(user.getRoleId() == 2) {
                 response.sendRedirect(request.getContextPath() + "/techmanager/dashboard");
                 return;
-            } else if("TECHNICAL".equals(roleCode)) {
+            } else if(user.getRoleId() == 3) {
+                response.sendRedirect(request.getContextPath() + "/technician/home");
+                return;
+            } else if(user.getRoleId() == 4) {
                 response.sendRedirect(request.getContextPath() + "/admin/dashboard");
                 return;
-            } else if("ACCOUNTANT".equals(roleCode)) {
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+            } else if(user.getRoleId() == 5) {
+                response.sendRedirect(request.getContextPath() + "/inventory");
                 return;
-            } else if("STORE_KEEPER".equals(roleCode)) {
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
+            } else if(user.getRoleId() == 6) {
+                response.sendRedirect(request.getContextPath() + "/customerservice/home");
                 return;
-            } else if("CUSTOMER_SERVICE".equals(roleCode)) {
-                response.sendRedirect(request.getContextPath() + "/admin/dashboard");
-                return;
-            } else if("CUSTOMER".equals(roleCode)) {
+            } else if(user.getRoleId() == 7) {
                 response.sendRedirect(request.getContextPath() + "/Home");
                 return;
-            }
+                }
         } else {
             request.setAttribute("errorMessage", "Invalid username or password.");
             request.getRequestDispatcher("/login.jsp").forward(request, response);
