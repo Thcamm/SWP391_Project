@@ -101,10 +101,8 @@ public class PermissionFilter implements Filter {
         routePerm.put("GET:/view/technician/home.jsp", "technician_access");
 
         // Storekeeper (Inventory)
-        routePerm.put("GET:/inventory/items", "inventory_read");
-        routePerm.put("POST:/inventory/items", "inventory_create");
-        routePerm.put("POST:/inventory/import", "inventory_import");
-        routePerm.put("POST:/inventory/export", "inventory_export");
+        routePerm.put("GET:/view/storekepper/inventory-list.jsp", "inventory_access");
+        routePerm.put("GET:/view/storekepper/inventory-import.jsp", "inventory_access");
 
         // Accountant
         routePerm.put("GET:/view/accountant/home.jsp", "accountant_access");
