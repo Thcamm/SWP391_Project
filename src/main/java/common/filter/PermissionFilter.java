@@ -66,6 +66,9 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/view/customerservice/customer-detail.jsp", "cs_access");
         routePerm.put("GET:/view/customerservice/support-request-list.jsp", "cs_access");
         routePerm.put("POST:/view/customerservice/support-request-list.jsp", "cs_access");
+        routePerm.put("GET:/view/customerservice/reply-request.jsp", "cs_access");
+        routePerm.put("POST:/view/customerservice/reply-request.jsp", "cs_access");
+
         routePerm.put("GET:/view/customerservice/createRequest.jsp", "cs_access");
         routePerm.put("POST:/view/customerservice/createRequest.jsp", "cs_access");
         routePerm.put("GET:/view/customerservice/serviceRequest.jsp", "cs_access");
@@ -134,6 +137,9 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/view/user/editProfile.jsp", "user_access");
         routePerm.put("GET:/view/user/changePassword.jsp", "user_access");
         routePerm.put("POST:/view/user/changePassword.jsp", "user_access");
+        routePerm.put("GET:/view/user/supportFAQ-detail.jsp", "user_access");
+        routePerm.put("GET:/view/user/supportFAQ.jsp", "user_access");
+
 
         areaGate.put("/admin/", "role_permission_manage"); // Default admin permission for unspecified routes
         areaGate.put("/customerservice/", "cs_access");

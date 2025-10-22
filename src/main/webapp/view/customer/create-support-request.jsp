@@ -9,9 +9,9 @@
 
 </head>
 <body>
-<%@ include file="/common/header.jsp" %>
 
 <div class="container">
+    <%@ include file="/common/header.jsp" %>
     <h2>Support Request / Report a Bug</h2>
 
     <form action="${pageContext.request.contextPath}/customer/create-support-request" method="post" enctype="multipart/form-data">
@@ -47,8 +47,8 @@
     <c:if test="${not empty message}">
         <p class="message">${message}</p>
     </c:if>
+    <%@ include file="/common/footer.jsp" %>
 </div>
-<%@ include file="/common/footer.jsp" %>
 
 </body>
 </html>
