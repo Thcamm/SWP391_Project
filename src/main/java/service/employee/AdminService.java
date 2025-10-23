@@ -50,7 +50,7 @@ public class AdminService {
         }
     }
 
-    public boolean updateUserBasicInfo(int userId, String fullName, String email, int roleId, String currentUser) {
+    public boolean updateUserBasicInfo(int userId, String fullName, String email, int roleId, boolean activeStatus, String currentUser) {
         try {
             User user = userDAO.getUserById(userId);
 
@@ -60,6 +60,7 @@ public class AdminService {
             user.setFullName(fullName);
             user.setEmail(email);
             user.setRoleId(roleId);
+            user.setActiveStatus(activeStatus);
 
             return adminDAO.updateUserBasicInfo(user);
         } catch (SQLException e) {

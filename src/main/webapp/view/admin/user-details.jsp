@@ -179,28 +179,23 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   <i class="bi bi-pencil"></i> Edit User
                 </a>
 
-                <c:if test="${user.userName != currentUser}">
-                  <c:choose>
-                    <c:when test="${user.activeStatus}">
-                      <a
-                        href="${pageContext.request.contextPath}/admin/users/disable/${user.userId}"
-                        class="btn btn-outline-danger"
-                        onclick="return confirm('Are you sure you want to disable this user?')"
-                      >
-                        <i class="bi bi-lock"></i> Disable User
-                      </a>
-                    </c:when>
-                    <c:otherwise>
-                      <a
-                        href="${pageContext.request.contextPath}/admin/users/enable/${user.userId}"
-                        class="btn btn-outline-success"
-                        onclick="return confirm('Are you sure you want to enable this user?')"
-                      >
-                        <i class="bi bi-unlock"></i> Enable User
-                      </a>
-                    </c:otherwise>
-                  </c:choose>
-                </c:if>
+                  <c:if test="${user.userName != currentUser}">
+                      <%-- Form này POST đến UserToggleStatusServlet và giữ nguyên class "d-grid" --%>
+                      <form action="${pageContext.request.contextPath}/admin/users/toggle/${user.userId}" method="POST" class="d-grid">
+                          <c:choose>
+                              <c:when test="${user.activeStatus}">
+                                  <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to disable this user?')">
+                                      <i class="bi bi-lock"></i> Disable User
+                                  </button>
+                              </c:when>
+                              <c:otherwise>
+                                  <button type="submit" class="btn btn-outline-success" onclick="return confirm('Are you sure you want to enable this user?')">
+                                      <i class="bi bi-unlock"></i> Enable User
+                                  </button>
+                              </c:otherwise>
+                          </c:choose>
+                      </form>
+                  </c:if>
 
                 <hr />
 

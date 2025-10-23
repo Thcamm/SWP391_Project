@@ -248,9 +248,7 @@ public class AdminDAO extends DbContext {
                     } else {
                         empPs.setNull(3, java.sql.Types.DOUBLE);
                     }
-                    
-                    empPs.setNull(4, java.sql.Types.INTEGER); // ManagedBy - set later if needed
-                    
+                    empPs.setNull(4, java.sql.Types.INTEGER);
                     if (createdByEmployeeId != null) {
                         empPs.setInt(5, createdByEmployeeId);
                     } else {
@@ -520,8 +518,8 @@ public class AdminDAO extends DbContext {
     }
 
     public boolean updateUserBasicInfo(User user) throws SQLException {
-        // Chỉ cập nhật các trường được chỉnh sửa cơ bản
-        String sql = "UPDATE User SET RoleID=?, FullName=?, Email=?, UpdatedAt=NOW() WHERE UserID=?";
+        // Chỉ cập nhật các trường được chỉnh sửa cơ bản, gồm cả ActiveStatus
+        String sql = "UPDATE User SET RoleID=?, FullName=?, Email=?, ActiveStatus=?, UpdatedAt=NOW() WHERE UserID=?";
 
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -529,7 +527,8 @@ public class AdminDAO extends DbContext {
             ps.setInt(1, user.getRoleId());
             ps.setString(2, user.getFullName());
             ps.setString(3, user.getEmail());
-            ps.setInt(4, user.getUserId());
+            ps.setBoolean(4, user.isActiveStatus());
+            ps.setInt(5, user.getUserId());
 
             return ps.executeUpdate() > 0;
         }
