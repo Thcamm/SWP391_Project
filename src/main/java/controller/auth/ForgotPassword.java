@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.user.User;
 import service.user.ResetPasswordService;
 import util.MailService;
+import util.PasswordUtil;
 
 import java.io.IOException;
 
@@ -123,7 +124,9 @@ public class ForgotPassword extends HttpServlet {
                 }
 
                 try {
-                    // Thực hiện reset password
+                    // Thực hiện reset password\
+                    PasswordUtil hashUtil = new PasswordUtil();
+                    newPassword = hashUtil.hashPassword(newPassword);
                     boolean success = service.resetPasswordWithOTP(email, otp.trim(), newPassword);
 
                     if (success) {

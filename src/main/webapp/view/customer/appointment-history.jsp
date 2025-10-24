@@ -88,7 +88,7 @@
     <p class="error">${error}</p>
 </c:if>
 
-<table>
+<table class="table table-bordered table-hover align-middle">
     <thead>
     <tr>
         <th>ID</th>

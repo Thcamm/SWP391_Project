@@ -18,9 +18,9 @@
 
 <!-- Main content -->
 <div class="main-content container mt-4">
-    <h2 class="page-title mb-4">Create Customer</h2>
+    <xh2 class="page-title mb-4">Create Customer</x`h2>
 
-    <form id="createCustomerForm" action="${pageContext.request.contextPath}/customer/create" method="post" class="customer-form">
+    <form id="createCustomerForm" action="${pageContext.request.contextPath}/customerservice/create-customer" method="post" class="customer-form">
 
         <div class="row mb-3">
             <div class="col-md-6">

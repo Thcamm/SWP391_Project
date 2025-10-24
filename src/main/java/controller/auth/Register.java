@@ -102,10 +102,10 @@ public class Register extends HttpServlet {
             boolean success = userDAO.addUser(user);
 
             if (success) {
-                // Chuyển hướng về trang login với thông báo thành công
+                // Redirect to login page with success message
                 response.sendRedirect("login.jsp?success=true");
             } else {
-                request.setAttribute("error", "Đăng ký thất bại, vui lòng thử lại.");
+                request.setAttribute("error", "Registration failed, please try again.");
                 request.getRequestDispatcher("/register.jsp").forward(request, response);
             }
         } catch (Exception e) {

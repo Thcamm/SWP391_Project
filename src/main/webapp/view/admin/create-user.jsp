@@ -268,10 +268,10 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                 <div class="col-md-6">
                   <h6 class="text-danger">Tránh:</h6>
                   <ul class="text-danger">
-                    <li>Username có ký tự đặc biệt hoặc khoảng trắng</li>
-                    <li>Email không hợp lệ hoặc đã sử dụng</li>
-                    <li>Để trống các trường bắt buộc (*)</li>
-                    <li>Chọn role không phù hợp</li>
+                    <li>Username contains special characters or spaces</li>
+                    <li>Email is invalid or already in use</li>
+                    <li>Required fields (*) are left empty</li>
+                    <li>Inappropriate role selected</li>
                   </ul>
                 </div>
               </div>

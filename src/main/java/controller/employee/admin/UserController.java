@@ -367,17 +367,17 @@ public class UserController extends HttpServlet {
             // trigger here
             if (success) {
                 redirectWithMessage(response, request.getContextPath() + "/admin/users",
-                        "Cập nhật thông tin user thành công!", "success");
+                        "User information updated successfully!", "success");
             } else {
                 redirectWithMessage(response, request.getContextPath() + "/admin/users/edit/" + userId,
-                        "Cập nhật user thất bại!", "error");
+                        "Failed to update user!", "error");
             }
 
         } catch (Exception e) {
-            System.err.println("Lỗi xử lý Update User: " + e.getMessage());
+            System.err.println("Error handling Update User: " + e.getMessage());
             e.printStackTrace();
             redirectWithMessage(response, request.getContextPath() + "/admin/users",
-                    "Lỗi dữ liệu hoặc User ID không hợp lệ: " + e.getMessage(), "error");
+                    "Data error or invalid User ID: " + e.getMessage(), "error");
         }
     }
 
@@ -401,7 +401,7 @@ public class UserController extends HttpServlet {
             boolean newStatus = !user.isActiveStatus(); // Toggle current status
             boolean success = adminService.toggleUserStatus(userId, newStatus, currentUser);
 
-            String message = success ? "Đã thay đổi trạng thái user" : "Không thể thay đổi trạng thái user";
+            String message = success ? "User status changed successfully" : "Unable to change user status";
             String messageType = success ? "success" : "error";
 
             redirectWithMessage(response, request.getContextPath() + "/admin/users", message, messageType);
@@ -550,7 +550,7 @@ public class UserController extends HttpServlet {
             return;
         }
 
-        int customerRoleId = 6; // You might want to get this dynamically
+        int customerRoleId = 7; // You might want to get this dynamically
 
         // Create customer user (no Employee details needed)
         boolean success = adminService.createUser(fullName.trim(), userName.trim(),
@@ -561,14 +561,14 @@ public class UserController extends HttpServlet {
             System.out.println("UserController - Customer created successfully: " + userName +
                     " by " + getCurrentUser(request));
 
-            String message = "Đã tạo Customer thành công! Username: " + userName + ", Mật khẩu: 123456";
+            String message = "Customer created successfully! Username: " + userName + ", Password: 123456";
 
             redirectWithMessage(response, request.getContextPath() + "/admin/users",
                     message, "success");
         } else {
             System.out.println("UserController - Customer creation failed: " + userName);
             redirectWithMessage(response, request.getContextPath() + "/admin/users/create-customer",
-                    "Tạo Customer thất bại! Username có thể đã tồn tại.", "error");
+                    "Failed to create Customer! Username may already exist.", "error");
         }
     }
 
@@ -639,15 +639,15 @@ public class UserController extends HttpServlet {
             System.out.println("UserController - Employee created successfully: " + userName +
                     " by " + getCurrentUser(request));
 
-            String message = "Đã tạo Employee thành công! Username: " + userName +
-                    ", Mật khẩu: 123456. Employee record đã được tạo tự động.";
+            String message = "Employee created successfully! Username: " + userName +
+                    ", Password: 123456. Employee record has been created automatically.";
 
             redirectWithMessage(response, request.getContextPath() + "/admin/users",
                     message, "success");
         } else {
             System.out.println("UserController - Employee creation failed: " + userName);
             redirectWithMessage(response, request.getContextPath() + "/admin/users/create-employee",
-                    "Tạo Employee thất bại! Username có thể đã tồn tại.", "error");
+                    "Failed to create Employee! Username may already exist.", "error");
         }
     }
 

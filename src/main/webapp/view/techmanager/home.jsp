@@ -71,10 +71,10 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
           <i class="bi bi-check-circle"></i>
           <c:choose>
             <c:when test="${param.success == 'created'}"
-              >WorkOrder tạo thành công!</c:when
+              >WorkOrder created successfully!</c:when
             >
             <c:when test="${param.success == 'updated'}"
-              >WorkOrder cập nhật thành công!</c:when
+              >WorkOrder updated successfully!</c:when
             >
             <c:otherwise>Operation completed successfully!</c:otherwise>
           </c:choose>
@@ -91,12 +91,12 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
           <i class="bi bi-exclamation-triangle"></i>
           <c:choose>
             <c:when test="${param.error == 'create_failed'}"
-              >Tạo WorkOrder không thành công!</c:when
+              >Failed to create WorkOrder!</c:when
             >
             <c:when test="${param.error == 'update_failed'}"
-              >Cập nhật WorkOrder không thành công!</c:when
+              >Failed to update WorkOrder!</c:when
             >
-            <c:otherwise>Lỗi: ${param.error}</c:otherwise>
+            <c:otherwise>Error: ${param.error}</c:otherwise>
           </c:choose>
           <button
             type="button"
