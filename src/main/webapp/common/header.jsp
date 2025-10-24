@@ -381,8 +381,8 @@
         </button>
     </div>
     <nav class="sidebar-nav">
-        <a href="${pageContext.request.contextPath}/Home" class="menu-item">
-            <span>TRANG CHỦ</span>
+        <a href="${pageContext.request.contextPath}/customer/appointment-history" class="menu-item">
+            <span>Appointment List</span>
         </a>
         <a href="${pageContext.request.contextPath}/customer/appointment-history" class="menu-item">
             <span>Appointment List</span>

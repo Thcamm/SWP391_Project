@@ -14,19 +14,18 @@
 
 <body class="bg-light">
 <jsp:include page="/view/customerservice/sidebar.jsp" />
-
+<jsp:include page="/view/customerservice/result.jsp" />
 <div class="container py-4">
 
-    <!-- HEADER -->
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>Support Request List</h3>
     </div>
 
-    <!-- FILTER FORM -->
+
     <form action="${pageContext.request.contextPath}/customerservice/view-support-request" method="get" class="card p-4 mb-4">
         <div class="row g-3 align-items-end">
 
-            <!-- CATEGORY -->
             <div class="col-md-4">
                 <label for="categoryId" class="form-label">Category</label>
                 <select id="categoryId" name="categoryId" class="form-select">
@@ -39,19 +38,19 @@
                 </select>
             </div>
 
-            <!-- FROM DATE -->
+
             <div class="col-md-3">
                 <label for="fromDate" class="form-label">From Date</label>
                 <input type="date" id="fromDate" name="fromDate" value="${param.fromDate}" class="form-control" />
             </div>
 
-            <!-- TO DATE -->
+
             <div class="col-md-3">
                 <label for="toDate" class="form-label">To Date</label>
                 <input type="date" id="toDate" name="toDate" value="${param.toDate}" class="form-control" />
             </div>
 
-            <!-- SORT -->
+
             <div class="col-md-2">
                 <label for="sortOrder" class="form-label">Sort Order</label>
                 <select id="sortOrder" name="sortOrder" class="form-select">
@@ -61,7 +60,7 @@
             </div>
         </div>
 
-        <!-- STATUS & BUTTON -->
+
         <div class="row g-3 mt-3">
             <div class="col-md-8">
                 <label class="form-label">Status</label>
@@ -84,7 +83,6 @@
         </div>
     </form>
 
-    <!-- LIST SECTION -->
     <div class="card">
         <div class="card-header">
             <strong>List of Support Requests</strong>
@@ -116,7 +114,7 @@
                                 <td>${loop.index + 1}</td>
                                 <td>${categoryMap[sr.categoryId]}</td>
 
-                                <!-- STATUS -->
+
                                 <td>
                                     <c:choose>
 
@@ -146,17 +144,17 @@
                                 <td>${sr.createdAt}</td>
                                 <td>${sr.updatedAt}</td>
 
-                                <!-- ACTION -->
+
                                 <td>
-                                    <a href="support-request-detail?id=${sr.requestId}" class="btn btn-sm btn-outline-primary">
-                                        Detail
-                                    </a>
+                                    <a href="${pageContext.request.contextPath}/customerservice/view-support-request?id=${sr.requestId}"
+                                       class="btn btn-sm btn-outline-primary">Detail</a>
+
 
                                     <c:choose>
                                         <c:when test="${sr.status == 'INPROGRESS'}">
                                             <a href="${pageContext.request.contextPath}/customerservice/reply-request?id=${sr.requestId}&email=${customerEmailMap[sr.customerId]}"
                                                class="btn btn-sm btn-outline-success ms-2">
-                                                ✉️ Reply
+                                                Reply
                                             </a>
 
                                         </c:when>

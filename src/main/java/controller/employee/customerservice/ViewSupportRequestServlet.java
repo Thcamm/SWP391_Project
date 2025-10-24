@@ -24,8 +24,53 @@ public class ViewSupportRequestServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        HttpSession session = request.getSession();
+        if (session.getAttribute("message") != null) {
+            request.setAttribute("message", session.getAttribute("message"));
+            request.setAttribute("messageType", session.getAttribute("messageType"));
+            session.removeAttribute("message");
+            session.removeAttribute("messageType");
+        }
+
         SupportDAO dao = new SupportDAO();
 
+        // ======== Xử lý xem chi tiết ========
+        String idParam = request.getParameter("id");
+        if (idParam != null && !idParam.isEmpty()) {
+            try {
+                int requestId = Integer.parseInt(idParam);
+                SupportRequest supportRequest = dao.getSupportRequestById(requestId);
+
+                if (supportRequest == null) {
+                    response.sendError(404, "Support request not found.");
+                    return;
+                }
+
+                CustomerDAO customerDAO = new CustomerDAO();
+                Customer customer = customerDAO.getCustomerById(supportRequest.getCustomerId());
+
+                List<SupportCategory> categories = dao.getAllSupportCategories();
+                Map<Integer, String> categoryMap = new HashMap<>();
+                for (SupportCategory c : categories) {
+                    categoryMap.put(c.getCategoryId(), c.getCategoryName());
+                }
+
+                request.setAttribute("supportRequest", supportRequest);
+                request.setAttribute("customer", customer);
+                request.setAttribute("categoryMap", categoryMap);
+
+                request.getRequestDispatcher("/view/customerservice/support-detail.jsp")
+                        .forward(request, response);
+                return; // dừng doGet tại đây
+            } catch (Exception e) {
+                e.printStackTrace();
+                response.sendError(500, "Error loading support request detail.");
+                return;
+            }
+        }
+
+        // ======== Xử lý danh sách ========
         String categoryParam = request.getParameter("categoryId");
         Integer category = null;
         if (categoryParam != null && !categoryParam.isEmpty()) {
@@ -92,13 +137,16 @@ public class ViewSupportRequestServlet extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
+        HttpSession session = request.getSession();
 
         String requestIdParam = request.getParameter("requestId");
         String newStatus = request.getParameter("status");
         SupportService service = new SupportService();
 
         if (requestIdParam == null || newStatus == null) {
-            response.sendError(400, "Missing parameters: requestId or status.");
+            session.setAttribute("message", "Missing parameters: requestId or status.");
+            session.setAttribute("messageType", "error");
+            response.sendRedirect(request.getContextPath() + "/customerservice/view-support-request");
             return;
         }
 
@@ -110,18 +158,16 @@ public class ViewSupportRequestServlet extends HttpServlet {
 
             if (success) {
                 dao.updateSupportRequestStatus(requestId, newStatus);
-                response.sendRedirect(request.getContextPath() + "/customerservice/view-support-request");
-            } else {
-                request.setAttribute("errorMessage", "Failed to update support request status.");
-                request.getRequestDispatcher("/view/customerservice/support-request-list.jsp")
-                        .forward(request, response);
+                session.setAttribute("message", "Update support request status successfully.");
+                session.setAttribute("messageType", "success");
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            response.sendError(500, "Error updating support request status.");
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            session.setAttribute("message", e.getMessage());
+            session.setAttribute("messageType", "error");
         }
+
+        response.sendRedirect(request.getContextPath() + "/customerservice/view-support-request");
     }
+
 }

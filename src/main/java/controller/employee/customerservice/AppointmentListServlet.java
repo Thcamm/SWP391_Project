@@ -6,6 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import service.appointment.AppointmentService;
 
 import java.io.IOException;
@@ -18,7 +19,13 @@ public class AppointmentListServlet extends HttpServlet {
     @Override
     protected void doGet (HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
+        HttpSession session = request.getSession();
+        if (session.getAttribute("message") != null) {
+            request.setAttribute("message", session.getAttribute("message"));
+            request.setAttribute("messageType", session.getAttribute("messageType"));
+            session.removeAttribute("message");
+            session.removeAttribute("messageType");
+        }
         String name = request.getParameter("searchName");
         String fromDate = request.getParameter("fromDate");
         String toDate = request.getParameter("toDate");
@@ -50,19 +57,24 @@ public class AppointmentListServlet extends HttpServlet {
 
     }
     @Override
-    protected void doPost (HttpServletRequest request, HttpServletResponse response)
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        request.setCharacterEncoding("UTF-8");
+        HttpSession session = request.getSession();
+
         try {
             String appointmentIDStr = request.getParameter("appointmentID");
             String status = request.getParameter("status");
 
             if (appointmentIDStr == null || status == null || appointmentIDStr.isEmpty() || status.isEmpty()) {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameters");
+                session.setAttribute("message", "Missing parameters: appointmentID or status.");
+                session.setAttribute("messageType", "error");
+                response.sendRedirect(request.getContextPath() + "/customerservice/appointment-list");
                 return;
             }
 
             int appointmentID = Integer.parseInt(appointmentIDStr);
-
 
             AppointmentDAO dao = new AppointmentDAO();
             AppointmentService service = new AppointmentService();
@@ -71,18 +83,19 @@ public class AppointmentListServlet extends HttpServlet {
 
             if (success) {
                 dao.updateStatus(appointmentID, status);
-                response.sendRedirect(request.getContextPath() + "/customerservice/appointment-list");
-            } else {
-                request.setAttribute("errorMessage", "Failed to update appointment status.");
-                request.getRequestDispatcher("/view/customerservice/appointment-list.jsp")
-                        .forward(request, response);
+                session.setAttribute("message", "Update appointment status successfully.");
+                session.setAttribute("messageType", "success");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error updating status: " + e.getMessage());
+            session.setAttribute("message", e.getMessage());
+            session.setAttribute("messageType", "error");
         }
+
+        response.sendRedirect(request.getContextPath() + "/customerservice/appointment-list");
     }
-    }
+
+}
 
 

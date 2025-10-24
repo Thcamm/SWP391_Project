@@ -17,8 +17,9 @@
 <body class="bg-light">
 <jsp:include page="/view/customerservice/sidebar.jsp" />
 
+<div class="main-content">
 <div class="container py-4">
-
+    <jsp:include page="/view/customerservice/result.jsp" />
     <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>Appointment List</h3>
@@ -98,7 +99,6 @@
                 <tr>
                     <th>No</th>
                     <th>Customer</th>
-                    <th>Vehicle</th>
                     <th>Appointment Date</th>
                     <th>Status</th>
                     <th>Description</th>
@@ -113,12 +113,11 @@
                         </tr>
                     </c:when>
                     <c:otherwise>
-                        <c:forEach var="row" items="${appointments}">
+                        <c:forEach var="row" items="${appointments}" varStatus="loop">
                             <c:set var="apm" value="${row.appointment}" />
                             <tr>
-                                <td>${apm.appointmentID}</td>
+                                <td>${loop.index + 1}</td>
                                 <td>${row.customerName}</td>
-                                <td>${apm.vehicleID}</td>
                                 <td>${apm.appointmentDate}</td>
 
                                 <!-- STATUS -->
@@ -137,21 +136,26 @@
                                             <form action="${pageContext.request.contextPath}/customerservice/appointment-list"
                                                   method="post" class="d-inline">
                                                 <input type="hidden" name="appointmentID" value="${apm.appointmentID}">
-                                                ⏳
                                                 <select name="status" class="form-select form-select-sm d-inline-block w-auto ms-1"
                                                         onchange="this.form.submit()">
-                                                    <option value="PENDING" selected>Pending</option>
-                                                    <option value="ACCEPTED">Accepted</option>
-                                                    <option value="REJECTED">Rejected</option>
+                                                    <option value="PENDING" selected>PENDING</option>
+                                                    <option value="ACCEPTED">ACCEPTED</option>
+                                                    <option value="REJECTED">REJECTED</option>
                                                 </select>
                                             </form>
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
 
-                                <td>${empty apm.description ? '-' : apm.description}</td>
-
-                                <!-- ACTION -->
+                                <td>
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-primary"
+                                            data-bs-toggle="popover"
+                                            data-bs-html="true"
+                                            data-bs-content="${apm.description}">
+                                        ▶
+                                    </button>
+                                </td>
                                 <td>
                                     <a href="appointment-detail?id=${apm.appointmentID}" class="btn btn-sm btn-outline-primary">
                                         Detail
@@ -176,7 +180,18 @@
         </div>
     </div>
 </div>
+</div>
 <script src="${pageContext.request.contextPath}/assets/js/customerservice/appointment-list.js"></script>
-
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+        popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl, {
+                trigger: 'focus', // click sẽ hiển thị, click ra ngoài sẽ ẩn
+                placement: 'right'
+            })
+        })
+    });
+</script>
 </body>
 </html>
