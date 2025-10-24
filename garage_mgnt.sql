@@ -540,28 +540,65 @@ CREATE UNIQUE INDEX ux_role_rolecode ON  RoleInfo(RoleCode);
 
 DELIMITER $$
 
-CREATE TRIGGER trg_after_user_insert_create_customer
+-- 1A: Xóa trigger CŨ (nếu có) và TẠO trigger MỚI cho INSERT
+DROP TRIGGER IF EXISTS trg_after_user_insert_create_customer; $$
+DROP TRIGGER IF EXISTS trg_after_user_insert_create_profile; $$
+
+CREATE TRIGGER trg_after_user_insert_create_profile
 AFTER INSERT ON User
 FOR EACH ROW
 BEGIN
-    -- Khai báo một biến để lưu RoleID của 'Customer'
-    DECLARE v_customer_role_id INT;
+    DECLARE v_role_name VARCHAR(50);
 
-    -- Lấy RoleID tương ứng với vai trò 'Customer' từ bảng RoleInfo
-    -- Điều này giúp trigger hoạt động đúng ngay cả khi ID của vai trò thay đổi
-    SELECT RoleID INTO v_customer_role_id 
+    SELECT RoleName INTO v_role_name 
     FROM RoleInfo 
-    WHERE RoleName = 'Customer' 
-    LIMIT 1;
+    WHERE RoleID = NEW.RoleID;
 
-    -- Kiểm tra xem RoleID của người dùng MỚI được chèn vào có phải là của Customer không
-    IF NEW.RoleID = v_customer_role_id THEN
-        -- Nếu đúng, tự động chèn một bản ghi mới vào bảng Customer
+    IF v_role_name = 'Customer' THEN
         INSERT INTO Customer (UserID) VALUES (NEW.UserID);
+        
+    ELSEIF v_role_name IS NOT NULL AND v_role_name <> 'Customer' THEN
+        INSERT INTO Employee (UserID, EmployeeCode, Salary, CreatedAt)
+        VALUES (NEW.UserID, NULL, NULL, NOW());
     END IF;
 END$$
 
-DELIMITER ;	
+-- 1B: TẠO trigger cho UPDATE (để xử lý đổi vai trò)
+DROP TRIGGER IF EXISTS trg_after_user_update_manage_profiles; $$
+
+CREATE TRIGGER trg_after_user_update_manage_profiles
+AFTER UPDATE ON User
+FOR EACH ROW
+BEGIN
+    DECLARE v_old_role_name VARCHAR(50);
+    DECLARE v_new_role_name VARCHAR(50);
+    DECLARE v_employee_exists INT DEFAULT 0;
+    DECLARE v_customer_exists INT DEFAULT 0;
+    
+    IF OLD.RoleID <> NEW.RoleID THEN
+    
+        SELECT RoleName INTO v_old_role_name FROM RoleInfo WHERE RoleID = OLD.RoleID;
+        SELECT RoleName INTO v_new_role_name FROM RoleInfo WHERE RoleID = NEW.RoleID;
+
+        -- Tăng cấp: Customer -> Employee
+        IF v_old_role_name = 'Customer' AND v_new_role_name <> 'Customer' THEN
+            SELECT COUNT(*) INTO v_employee_exists FROM Employee WHERE UserID = NEW.UserID;
+            IF v_employee_exists = 0 THEN
+                INSERT INTO Employee (UserID, EmployeeCode, Salary, CreatedAt)
+                VALUES (NEW.UserID, NULL, NULL, NOW());
+            END IF;
+        
+        -- Giáng cấp: Employee -> Customer
+        ELSEIF v_old_role_name <> 'Customer' AND v_new_role_name = 'Customer' THEN
+            SELECT COUNT(*) INTO v_customer_exists FROM Customer WHERE UserID = NEW.UserID;
+            IF v_customer_exists = 0 THEN
+                INSERT INTO Customer (UserID) VALUES (NEW.UserID);
+            END IF;
+        END IF;
+    END IF;
+END$$
+
+DELIMITER ;
 
 CREATE TABLE CarBrands (
     BrandID INT NOT NULL AUTO_INCREMENT,
@@ -587,6 +624,10 @@ CREATE TABLE CarModels (
 -- Promote Customer to Employee Stored Procedure
 DELIMITER $$
 
+-- Xóa SP cũ
+DROP PROCEDURE IF EXISTS SP_PromoteCustomerToEmployee; $$
+
+-- TẠO LẠI SP với logic đã sửa
 CREATE PROCEDURE SP_PromoteCustomerToEmployee(
     IN p_user_id INT,
     IN p_new_role_name VARCHAR(50),
@@ -608,41 +649,34 @@ BEGIN
 
     START TRANSACTION;
 
-    -- Get current role ID
+    -- (Toàn bộ phần Validation giữ nguyên)
     SELECT RoleID INTO v_current_role_id 
     FROM User 
     WHERE UserID = p_user_id;
 
-    -- Get Customer role ID
     SELECT RoleID INTO v_customer_role_id 
     FROM RoleInfo 
     WHERE RoleName = 'Customer' 
     LIMIT 1;
 
-    -- Get new role ID
     SELECT RoleID INTO v_new_role_id 
     FROM RoleInfo 
     WHERE RoleName = p_new_role_name 
     LIMIT 1;
 
-    -- Validation checks
     IF v_current_role_id IS NULL THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User not found';
     END IF;
-
     IF v_new_role_id IS NULL THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Target role not found';
     END IF;
-
     IF v_customer_role_id IS NULL THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Customer role not found in system';
     END IF;
-
     IF v_current_role_id != v_customer_role_id THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User is not a Customer, cannot promote';
     END IF;
 
-    -- Check if user already has Employee record
     SELECT COUNT(*) INTO v_existing_employee_count 
     FROM Employee 
     WHERE UserID = p_user_id;
@@ -650,15 +684,18 @@ BEGIN
     IF v_existing_employee_count > 0 THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User already has Employee record';
     END IF;
+    
+    -- === LOGIC SỬA (ĐẢO NGƯỢC THỨ TỰ) ===
+    
+    -- 1. Create Employee record (CHẠY TRƯỚC)
+    INSERT INTO Employee (UserID, EmployeeCode, Salary, ManagedBy, CreatedBy, CreatedAt)
+    VALUES (p_user_id, p_employee_code, p_salary, p_managed_by_employee_id, p_created_by_employee_id, NOW());
 
-    -- Update user role
+    -- 2. Update user role (CHẠY SAU)
+    -- (Trigger sẽ được kích hoạt, nhưng thấy Employee đã tồn tại nên sẽ bỏ qua)
     UPDATE User 
     SET RoleID = v_new_role_id, UpdatedAt = NOW() 
     WHERE UserID = p_user_id;
-
-    -- Create Employee record
-    INSERT INTO Employee (UserID, EmployeeCode, Salary, ManagedBy, CreatedBy, CreatedAt)
-    VALUES (p_user_id, p_employee_code, p_salary, p_managed_by_employee_id, p_created_by_employee_id, NOW());
 
     COMMIT;
 END$$

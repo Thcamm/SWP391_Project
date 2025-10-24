@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib
 prefix="c" uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt"
 uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -27,6 +28,32 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
         <span class="navbar-brand">
           <i class="bi bi-tools"></i> TechManager Dashboard
         </span>
+              <!-- ================= THÊM CHUÔNG VÀO ĐÂY ================= -->
+              <div class="dropdown">
+                  <a href="#" class="notification-bell me-3" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                      <i class="bi bi-bell-fill"></i>
+                      <c:if test="${not empty userNotifications}">
+                          <span class="notification-count">${fn:length(userNotifications)}</span>
+                      </c:if>
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown">
+                      <c:choose>
+                          <c:when test="${not empty userNotifications}">
+                              <c:forEach var="notif" items="${userNotifications}" begin="0" end="4">
+                                  <li><a class="dropdown-item" href="#">
+                                      <strong>${notif.title}</strong><br>
+                                      <small>${notif.body}</small>
+                                  </a></li>
+                              </c:forEach>
+                              <li><hr class="dropdown-divider"></li>
+                              <li><a class="dropdown-item text-center" href="#">View All</a></li>
+                          </c:when>
+                          <c:otherwise>
+                              <li><a class="dropdown-item" href="#">No new notifications.</a></li>
+                          </c:otherwise>
+                      </c:choose>
+                  </ul>
+              </div>
         <span class="navbar-text">
           <i class="bi bi-person-circle"></i> ${techManager.fullName} |
           <fmt:formatDate
@@ -44,10 +71,10 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
           <i class="bi bi-check-circle"></i>
           <c:choose>
             <c:when test="${param.success == 'created'}"
-              >WorkOrder tạo thành công!</c:when
+              >WorkOrder created successfully!</c:when
             >
             <c:when test="${param.success == 'updated'}"
-              >WorkOrder cập nhật thành công!</c:when
+              >WorkOrder updated successfully!</c:when
             >
             <c:otherwise>Operation completed successfully!</c:otherwise>
           </c:choose>
@@ -64,12 +91,12 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
           <i class="bi bi-exclamation-triangle"></i>
           <c:choose>
             <c:when test="${param.error == 'create_failed'}"
-              >Tạo WorkOrder không thành công!</c:when
+              >Failed to create WorkOrder!</c:when
             >
             <c:when test="${param.error == 'update_failed'}"
-              >Cập nhật WorkOrder không thành công!</c:when
+              >Failed to update WorkOrder!</c:when
             >
-            <c:otherwise>Lỗi: ${param.error}</c:otherwise>
+            <c:otherwise>Error: ${param.error}</c:otherwise>
           </c:choose>
           <button
             type="button"
@@ -160,6 +187,43 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
           </div>
         </div>
       </div>
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-bell"></i> Recent Notifications</h5>
+                    </div>
+                    <div class="card-body">
+                        <c:choose>
+                            <c:when test="${not empty userNotifications}">
+                                <ul class="list-group list-group-flush">
+                                    <c:forEach var="notif" items="${userNotifications}" begin="0" end="4">
+                                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                                            <div class="ms-2 me-auto">
+                                                <div class="fw-bold">${notif.title}</div>
+                                                    ${notif.body}
+                                            </div>
+                                            <span class="badge bg-primary rounded-pill">
+                                            <fmt:formatDate value="${notif.createdAt}" pattern="dd/MM HH:mm" />
+                                        </span>
+                                            <a href="${pageContext.request.contextPath}/servicerequest/details?id=${notif.entityId}" class="stretched-link"></a>
+                                        </li>
+                                    </c:forEach>
+                                </ul>
+                            </c:when>
+                            <c:otherwise>
+                                <p class="text-muted text-center m-0">No new notifications.</p>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                    <c:if test="${fn:length(userNotifications) > 5}">
+                        <div class="card-footer text-center">
+                            <a href="#">View All Notifications</a>
+                        </div>
+                    </c:if>
+                </div>
+            </div>
+        </div>
 
       <!-- Recent WorkOrders -->
       <div class="row">

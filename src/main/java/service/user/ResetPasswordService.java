@@ -9,7 +9,6 @@ import util.MailService;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.Base64;
 
 public class ResetPasswordService {
     private PasswordResetDAO passwordResetDAO;
@@ -22,81 +21,187 @@ public class ResetPasswordService {
         this.mailService = mailService;
     }
 
-    // Tạo token ngẫu nhiên
-    private String generateToken() {
+    /**
+     * Tạo mã OTP ngẫu nhiên 6 chữ số
+     */
+    private String generateOTP() {
         SecureRandom random = new SecureRandom();
-        byte[] bytes = new byte[32];
-        random.nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+        int otp = 100000 + random.nextInt(900000);
+        return String.valueOf(otp);
     }
 
-    // Xử lý yêu cầu reset password
-    public boolean requestPasswordReset(String email, String baseUrl) {
+    /**
+     * Send OTP via email
+     * @param email User's email
+     * @return true if sent successfully
+     */
+    public boolean sendOTP(String email) {
         try {
-            // Tìm user theo email
+            // Check if email exists
             User user = userDAO.getUserByEmail(email);
             if (user == null) {
+                System.out.println("User not found with email: " + email);
                 return false;
             }
 
-            // Xóa token cũ của user (nếu có)
+            // Xóa các OTP cũ của user này
             passwordResetDAO.deleteOldTokensByUserId(user.getUserId());
 
-            // Tạo token mới
-            String token = generateToken();
-            LocalDateTime expiryDate = LocalDateTime.now().plusHours(24);
+            // Tạo OTP mới
+            String otp = generateOTP();
+            LocalDateTime expiryDate = LocalDateTime.now().plusMinutes(15); // Hết hạn sau 15 phút
 
-            PasswordResetToken resetToken = new PasswordResetToken(user.getUserId(), token, expiryDate);
+            System.out.println("Generated OTP: " + otp + " for user: " + user.getUserName());
 
-            // Lưu token vào database
-            if (!passwordResetDAO.saveToken(resetToken)) {
+            // Tạo đối tượng PasswordResetToken
+            PasswordResetToken resetToken = new PasswordResetToken(user.getUserId(), otp, expiryDate);
+
+            // Lưu OTP vào database
+            boolean saved = passwordResetDAO.saveToken(resetToken);
+            if (!saved) {
+                System.out.println("Failed to save OTP to database");
                 return false;
             }
 
-            // Tạo link reset
-            String resetLink = baseUrl + "/reset-password?token=" + token;
+            // Chuẩn bị nội dung email
+            String subject = "Mã OTP đặt lại mật khẩu - Garage System";
+            String content = buildOTPEmailContent(user.getUserName(), otp);
 
             // Gửi email
-            String subject = "Yêu cầu đặt lại mật khẩu";
-            String content = "Xin chào " + user.getUserName() + ",\n\n"
-                    + "Bạn đã yêu cầu đặt lại mật khẩu. Vui lòng click vào link sau để đặt lại mật khẩu:\n\n"
-                    + resetLink + "\n\n"
-                    + "Link này sẽ hết hạn sau 24 giờ.\n\n"
-                    + "Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.\n\n"
-                    + "Trân trọng!";
+            boolean emailSent = MailService.sendEmail(email, subject, content);
 
-            return MailService.sendEmail(email, subject, content);
+            if (emailSent) {
+                System.out.println("OTP email sent successfully to: " + email);
+            } else {
+                System.out.println("Failed to send OTP email to: " + email);
+            }
+
+            return emailSent;
+
         } catch (SQLException e) {
+            System.err.println("SQLException in sendOTP: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        } catch (Exception e) {
+            System.err.println("Exception in sendOTP: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
     }
 
-    // Kiểm tra token hợp lệ
-    public boolean validateToken(String token) {
-        PasswordResetToken resetToken = passwordResetDAO.findByToken(token);
-        return resetToken != null && !resetToken.isExpired() && !resetToken.isUsed();
+    /**
+     * Xây dựng nội dung email OTP
+     */
+    private String buildOTPEmailContent(String userName, String otp) {
+        return "Xin chào " + userName + ",\n\n"
+                + "Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản Garage System.\n\n"
+                + "Mã OTP của bạn là: " + otp + "\n\n"
+                + "Mã này có hiệu lực trong 15 phút.\n\n"
+                + "Vui lòng nhập mã OTP này vào trang đặt lại mật khẩu để tiếp tục.\n\n"
+                + "Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.\n\n"
+                + "Lưu ý: Không chia sẻ mã OTP này với bất kỳ ai!\n\n"
+                + "Trân trọng,\n"
+                + "Garage System Team";
     }
 
-    // Reset password
-    public boolean resetPassword(String token, String newPassword) {
+    /**
+     * Xác thực OTP và đặt lại mật khẩu
+     * @param email Email của user
+     * @param otp Mã OTP
+     * @param newPassword Mật khẩu mới
+     * @return true nếu thành công
+     */
+    public boolean resetPasswordWithOTP(String email, String otp, String newPassword) {
         try {
-            PasswordResetToken resetToken = passwordResetDAO.findByToken(token);
+            User user = userDAO.getUserByEmail(email);
+            if (user == null) {
+                return false;
+            }
 
-            if (resetToken == null || resetToken.isExpired() || resetToken.isUsed()) {
+            PasswordResetToken resetToken = passwordResetDAO.findByToken(otp);
+            if (resetToken == null) {
+                System.out.println("OTP not found: " + otp);
+                return false;
+            }
+
+            if (resetToken.getUserId() != user.getUserId()) {
+                System.out.println("OTP does not belong to this user");
+                return false;
+            }
+
+            if (resetToken.isExpired()) {
+                System.out.println("OTP has expired");
+                return false;
+            }
+
+            if (resetToken.isUsed()) {
+                System.out.println("OTP has already been used");
                 return false;
             }
 
             // Cập nhật mật khẩu mới
-            boolean success = userDAO.changeUserPassword(resetToken.getUserId(), newPassword);
+            boolean passwordUpdated = userDAO.changeUserPassword(user.getUserId(), newPassword);
 
-            if (success) {
-                // Đánh dấu token đã sử dụng
-                passwordResetDAO.markTokenAsUsed(token);
+            if (passwordUpdated) {
+                // Đánh dấu OTP đã được sử dụng
+                passwordResetDAO.markTokenAsUsed(otp);
+                System.out.println("Password reset successfully for user: " + user.getUserName());
+
+                // Gửi email thông báo đổi mật khẩu thành công
+                sendPasswordChangeNotification(email, user.getUserName());
+
                 return true;
+            } else {
+                System.out.println("Failed to update password");
+                return false;
             }
 
+        } catch (SQLException e) {
+            System.err.println("SQLException in resetPasswordWithOTP: " + e.getMessage());
+            e.printStackTrace();
             return false;
+        } catch (Exception e) {
+            System.err.println("Exception in resetPasswordWithOTP: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * Gửi email thông báo đổi mật khẩu thành công
+     */
+    private void sendPasswordChangeNotification(String email, String userName) {
+        try {
+            String subject = "Mật khẩu đã được thay đổi - Garage System";
+            String content = "Xin chào " + userName + ",\n\n"
+                    + "Mật khẩu của bạn đã được thay đổi thành công.\n\n"
+                    + "Nếu bạn không thực hiện thay đổi này, vui lòng liên hệ với chúng tôi ngay lập tức.\n\n"
+                    + "Trân trọng,\n"
+                    + "Garage System Team";
+
+            MailService.sendEmail(email, subject, content);
+        } catch (Exception e) {
+            System.err.println("Failed to send password change notification: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Kiểm tra OTP có hợp lệ không (không đổi mật khẩu)
+     */
+    public boolean validateOTP(String email, String otp) {
+        try {
+            User user = userDAO.getUserByEmail(email);
+            if (user == null) {
+                return false;
+            }
+
+            PasswordResetToken resetToken = passwordResetDAO.findByToken(otp);
+
+            return resetToken != null
+                    && resetToken.getUserId() == user.getUserId()
+                    && !resetToken.isExpired()
+                    && !resetToken.isUsed();
+
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
