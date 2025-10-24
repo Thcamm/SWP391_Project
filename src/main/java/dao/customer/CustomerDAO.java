@@ -112,10 +112,23 @@ public class CustomerDAO extends DbContext {
         }
     }
 
-    public boolean isCustomerDuplicate(String email) {
+    public boolean isEmailDuplicate(String email) {
         String sql = "SELECT COUNT(*) FROM user WHERE Email = ? ";
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
             st.setString(1, email);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean isPhoneNumberDuplicate(String phoneNumber) {
+        String sql = "SELECT COUNT(*) FROM user WHERE PhoneNumber = ? ";
+        try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
+            st.setString(1, phoneNumber);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1) > 0;
@@ -304,7 +317,7 @@ public class CustomerDAO extends DbContext {
 public Customer getCustomerById(int customerId) throws SQLException {
         Customer customer = null;
 
-        // ⚠️ Chú ý: Đảm bảo tên bảng và cột là chính xác
+
         String sql = "SELECT c.CustomerID, u.UserID, u.FullName, u.Email, u.PhoneNumber " +
                 "FROM Customer c " +
                 "JOIN User u ON c.UserID = u.UserID " +

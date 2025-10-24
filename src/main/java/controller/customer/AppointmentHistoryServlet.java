@@ -75,10 +75,13 @@ public class AppointmentHistoryServlet extends HttpServlet {
 
             if (success) {
                 dao.updateStatus(appointmentID, status);
+                request.setAttribute("message", "Update appointment status successfully.");
+                request.setAttribute("messageType", "success");
                 response.sendRedirect(request.getContextPath() + "/customer/appointment-history");
             } else {
 
-                request.setAttribute("errorMessage", "Failed to update appointment status.");
+                request.setAttribute("message", "Failed to update appointment status.");
+                request.setAttribute("messageType", "error");
                 request.getRequestDispatcher("/view/customer/appointment-list.jsp")
                         .forward(request, response);
             }

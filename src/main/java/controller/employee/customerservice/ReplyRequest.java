@@ -36,9 +36,11 @@ public class ReplyRequest extends HttpServlet {
         boolean sent = MailService.sendEmail(toEmail, subject, message);
 
         if (sent) {
-            request.setAttribute("messageSent", "Email sent successfully to " + toEmail);
+            request.setAttribute("message", "Email sent successfully to " + toEmail);
+            request.setAttribute("messageType", "success");
         } else {
-            request.setAttribute("error", " Failed to send email. Please check server logs.");
+            request.setAttribute("message", " Failed to send email. Please check server logs.");
+            request.setAttribute("messageType", "error");
         }
 
         request.setAttribute("requestId", requestId);

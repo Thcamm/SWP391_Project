@@ -18,6 +18,11 @@ import java.sql.SQLException;
 @MultipartConfig
 public class CreateSupportRequestServlet extends HttpServlet {
 
+    // Thư mục lưu file cố định ngoài webapp
+    private static final String UPLOAD_DIR = "C:/garage_support_uploads";
+    private static final long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    private static final String[] ALLOWED_TYPES = {"image/png", "image/jpeg", "application/pdf"};
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -36,12 +41,15 @@ public class CreateSupportRequestServlet extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
-
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
-        CustomerDAO customerDAO = new CustomerDAO();
-        Customer customer = null;
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
 
+        CustomerDAO customerDAO = new CustomerDAO();
+        Customer customer;
         try {
             customer = customerDAO.getCustomerByUserId(user.getUserId());
         } catch (SQLException e) {
@@ -49,35 +57,60 @@ public class CreateSupportRequestServlet extends HttpServlet {
         }
 
         int customerId = customer.getCustomerId();
-
         String description = request.getParameter("description");
         String categoryIdParam = request.getParameter("categoryId");
         String workOrderIdParam = request.getParameter("workOrderId");
         String appointmentIdParam = request.getParameter("appointmentId");
 
-        Integer appointmentId = appointmentIdParam != null && !appointmentIdParam.isEmpty()
-                ? Integer.parseInt(appointmentIdParam)
-                : null;
-        Integer categoryId = categoryIdParam != null && !categoryIdParam.isEmpty()
-                ? Integer.parseInt(categoryIdParam)
-                : null;
-        Integer workOrderId = workOrderIdParam != null && !workOrderIdParam.isEmpty()
-                ? Integer.parseInt(workOrderIdParam)
-                : null;
+        Integer appointmentId = (appointmentIdParam != null && !appointmentIdParam.isEmpty())
+                ? Integer.parseInt(appointmentIdParam) : null;
+        Integer categoryId = (categoryIdParam != null && !categoryIdParam.isEmpty())
+                ? Integer.parseInt(categoryIdParam) : null;
+        Integer workOrderId = (workOrderIdParam != null && !workOrderIdParam.isEmpty())
+                ? Integer.parseInt(workOrderIdParam) : null;
 
+        // Xử lý file upload
         Part filePart = request.getPart("attachment");
         String fileName = null;
 
         if (filePart != null && filePart.getSize() > 0) {
-            fileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
+            // Kiểm tra kích thước
+            if (filePart.getSize() > MAX_FILE_SIZE) {
+                request.setAttribute("message", "File quá lớn, tối đa 5MB!");
+                request.setAttribute("messageType", "error");
+                request.getRequestDispatcher("/view/customer/create-support-request.jsp").forward(request, response);
+                return;
+            }
 
-            String uploadPath = getServletContext().getRealPath("/support/upload");
-            File uploadDir = new File(uploadPath);
+            // Kiểm tra loại file
+            boolean allowed = false;
+            String contentType = filePart.getContentType();
+            for (String type : ALLOWED_TYPES) {
+                if (type.equals(contentType)) {
+                    allowed = true;
+                    break;
+                }
+            }
+            if (!allowed) {
+                request.setAttribute("message", "Chỉ cho phép file PNG, JPG hoặc PDF!");
+                request.setAttribute("messageType", "error");
+                request.getRequestDispatcher("/view/customer/create-support-request.jsp").forward(request, response);
+                return;
+            }
+
+            // Tạo tên file duy nhất
+            String originalFileName = filePart.getSubmittedFileName();
+            fileName = System.currentTimeMillis() + "_" + originalFileName.replaceAll("\\s+", "_");
+
+            // Tạo thư mục nếu chưa tồn tại
+            File uploadDir = new File(UPLOAD_DIR);
             if (!uploadDir.exists()) uploadDir.mkdirs();
 
-            filePart.write(uploadPath + File.separator + fileName);
+            // Lưu file
+            filePart.write(UPLOAD_DIR + File.separator + fileName);
         }
 
+        // Tạo SupportRequest và lưu DB
         SupportRequest sr = new SupportRequest();
         sr.setCustomerId(customerId);
         sr.setWorkOrderId(workOrderId);
@@ -90,9 +123,11 @@ public class CreateSupportRequestServlet extends HttpServlet {
         try {
             dao.insertSupportRequest(sr);
             request.setAttribute("message", "Support request submitted successfully!");
+            request.setAttribute("messageType", "success");
         } catch (SQLException e) {
             e.printStackTrace();
             request.setAttribute("message", "Error occurred while submitting the support request.");
+            request.setAttribute("messageType", "error");
         }
 
         request.getRequestDispatcher("/view/customer/create-support-request.jsp").forward(request, response);

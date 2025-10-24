@@ -21,7 +21,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>Search Customer</h3>
         <a href="${pageContext.request.contextPath}/view/customerservice/create-customer.jsp" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Create Customer
+            <i class="fa-solid fa-user-plus"></i> Create Customer
         </a>
     </div>
 
@@ -108,7 +108,7 @@
                             <tr>
                                 <td>${loop.index + 1}</td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/customerservice/customer-detail?id=${customer.customerId}">
+                                    <a href="${pageContext.request.contextPath}/user/profile?id=${c.userId}">
                                         ${c.fullName}
                                     </a>
                                 </td>
@@ -135,6 +135,7 @@
         </div>
     </div>
 </div>
+
 <script src="${pageContext.request.contextPath}/assets/js/customerservice/search-customer.js"></script>
 
 </body>

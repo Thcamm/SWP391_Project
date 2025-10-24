@@ -212,7 +212,7 @@ public class SupportDAO extends DbContext {
 
     public List<SupportRequest> getAllSupportRequests() throws SQLException {
         List<SupportRequest> list = new ArrayList<>();
-        String sql = "SELECT * FROM SupportRequest ";
+        String sql = "SELECT * FROM SupportRequest order by createdAt desc ";
         try (PreparedStatement ps = getConnection().prepareStatement(sql);
         ResultSet rs = ps.executeQuery()){
             while (rs.next()) {
