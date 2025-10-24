@@ -58,9 +58,6 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/view/customerservice/customerservice-home.jsp", "cs_access");
         routePerm.put("GET:/view/customerservice/appointment-list.jsp", "cs_access");
         routePerm.put("POST:/view/customerservice/appointment-list.jsp", "cs_access");
-<<<<<<< HEAD
-        routePerm.put("GET:/view/customerservice/customerservice-home.jsp", "cs_access");
-=======
         routePerm.put("GET:/view/customerservice/search-customer.jsp", "cs_access");
         routePerm.put("POST:/view/customerservice/search-customer.jsp", "cs_access");
         routePerm.put("GET:/view/customerservice/create-customer.jsp", "cs_access");
@@ -77,7 +74,6 @@ public class PermissionFilter implements Filter {
         routePerm.put("GET:/view/customerservice/serviceRequest.jsp", "cs_access");
         routePerm.put("POST:/view/customerservice/serviceRequest.jsp", "cs_access");
 
->>>>>>> 44c5be56c6cd2274f2d832bb4ba7937c71da1fcc
 
 
         // WorkOrder management - tất cả operations được xử lý bởi WorkOrderController
