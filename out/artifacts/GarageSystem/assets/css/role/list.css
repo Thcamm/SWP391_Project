@@ -1,0 +1,259 @@
+
+/* Page Container */
+.role-list-container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 25px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    font-family: system-ui, sans-serif;
+    color: #333;
+}
+
+/* Title */
+.page-title {
+    font-size: 1.6em;
+    margin-bottom: 20px;
+    font-weight: 600;
+    color: #222;
+    text-align: center;
+}
+
+/* ====== Messages ====== */
+.message-container {
+    margin-bottom: 15px;
+}
+
+.alert {
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 0.95em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.alert-success {
+    background: #f5fdf7;
+    border: 1px solid #cdeccd;
+    color: #27632a;
+}
+
+.alert-error {
+    background: #fdf6f6;
+    border: 1px solid #e0b4b4;
+    color: #a33;
+}
+
+/* ====== Action Buttons ====== */
+.action-buttons-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.btn {
+    text-decoration: none;
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-primary {
+    background: #f5f5f5;
+    color: #222;
+    border-color: #bbb;
+}
+
+.btn-primary:hover {
+    background: #eaeaea;
+}
+
+.btn-secondary {
+    background: #fff;
+    color: #333;
+    border-color: #ccc;
+}
+
+.btn-secondary:hover {
+    background: #f8f8f8;
+}
+
+/* ====== Search & Config ====== */
+.search-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-control {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.95em;
+    min-width: 160px;
+}
+
+.select-size {
+    padding: 6px 8px;
+}
+
+.btn-search {
+    background: #fafafa;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 14px;
+}
+
+.btn-search:hover {
+    background: #eee;
+}
+
+/* ====== Table ====== */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+    font-size: 0.95em;
+}
+
+.data-table th,
+.data-table td {
+    border: 1px solid #ddd;
+    padding: 10px 12px;
+    text-align: left;
+}
+
+.data-table thead th {
+    background: #f8f8f8;
+    font-weight: 600;
+    color: #333;
+}
+
+.data-table tbody tr:hover {
+    background: #fafafa;
+}
+
+/* Empty State */
+.no-data .empty-state {
+    text-align: center;
+    color: #777;
+    padding: 25px 0;
+}
+
+/* Badges */
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.85em;
+    background: #f0f0f0;
+    color: #333;
+}
+
+/* Actions in table */
+.action-column {
+    display: flex;
+    gap: 10px;
+}
+
+.action-link {
+    text-decoration: none;
+    font-size: 0.9em;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 3px 8px;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.action-link:hover {
+    background: #eee;
+    color: #000;
+}
+
+.delete-link {
+    color: #a33;
+}
+
+/* ====== Pagination ====== */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination {
+    list-style: none;
+    display: flex;
+    gap: 6px;
+    padding: 0;
+}
+
+.page-item {
+    display: inline-block;
+}
+
+.page-link {
+    text-decoration: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    color: #333;
+    font-size: 0.9em;
+}
+
+.page-item.active .page-link {
+    background: #eee;
+    font-weight: 600;
+}
+
+.page-item.disabled .page-link {
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+/* ====== Responsive ====== */
+@media (max-width: 768px) {
+    .role-list-container {
+        padding: 15px;
+    }
+
+    .action-buttons-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-form {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .data-table th, .data-table td {
+        padding: 8px;
+    }
+}
