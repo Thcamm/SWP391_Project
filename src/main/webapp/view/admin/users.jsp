@@ -200,30 +200,6 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
       <!-- Quick Filters -->
       <div class="mb-3">
         <div class="btn-group">
-          <c:choose>
-            <c:when test="${selectedStatus == 'active'}">
-              <a href="?status=active" class="btn btn-success btn-sm">
-                <i class="bi bi-check-circle"></i> Active
-              </a>
-            </c:when>
-            <c:otherwise>
-              <a href="?status=active" class="btn btn-outline-success btn-sm">
-                <i class="bi bi-check-circle"></i> Active
-              </a>
-            </c:otherwise>
-          </c:choose>
-          <c:choose>
-            <c:when test="${selectedStatus == 'inactive'}">
-              <a href="?status=inactive" class="btn btn-warning btn-sm">
-                <i class="bi bi-x-circle"></i> Inactive
-              </a>
-            </c:when>
-            <c:otherwise>
-              <a href="?status=inactive" class="btn btn-outline-warning btn-sm">
-                <i class="bi bi-x-circle"></i> Inactive
-              </a>
-            </c:otherwise>
-          </c:choose>
           <a href="?" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-arrow-clockwise"></i> Reset
           </a>
@@ -392,30 +368,22 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                             >
                               <i class="bi bi-pencil"></i>
                             </a>
-                            <c:if test="${user.userName != currentUser}">
-                              <c:choose>
-                                <c:when test="${user.activeStatus}">
-                                  <a
-                                    href="${pageContext.request.contextPath}/admin/users/disable/${user.userId}"
-                                    class="btn btn-outline-danger"
-                                    title="Disable User"
-                                    onclick="return confirm('Are you sure you want to disable this user?')"
-                                  >
-                                    <i class="bi bi-lock"></i>
-                                  </a>
-                                </c:when>
-                                <c:otherwise>
-                                  <a
-                                    href="${pageContext.request.contextPath}/admin/users/enable/${user.userId}"
-                                    class="btn btn-outline-success"
-                                    title="Enable User"
-                                    onclick="return confirm('Are you sure you want to enable this user?')"
-                                  >
-                                    <i class="bi bi-unlock"></i>
-                                  </a>
-                                </c:otherwise>
-                              </c:choose>
-                            </c:if>
+                              <c:if test="${user.userName != currentUser}">
+                                  <form action="${pageContext.request.contextPath}/admin/users/toggle/${user.userId}" method="POST" style="display: inline-block;">
+                                      <c:choose>
+                                          <c:when test="${user.activeStatus}">
+                                              <button type="submit" class="btn btn-outline-danger btn-sm" title="Disable User" onclick="return confirm('Are you sure you want to disable this user?')">
+                                                  <i class="bi bi-lock"></i>
+                                              </button>
+                                          </c:when>
+                                          <c:otherwise>
+                                              <button type="submit" class="btn btn-outline-success btn-sm" title="Enable User" onclick="return confirm('Are you sure you want to enable this user?')">
+                                                  <i class="bi bi-unlock"></i>
+                                              </button>
+                                          </c:otherwise>
+                                      </c:choose>
+                                  </form>
+                              </c:if>
                           </div>
                         </td>
                       </tr>
@@ -429,7 +397,6 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
       </div>
 
       <!-- Pagination -->
-      <c:if test="${totalPages > 1}">
         <div class="card mt-3">
           <div class="card-body">
             <div class="row align-items-center">
@@ -587,41 +554,6 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
             </div>
           </div>
         </div>
-      </c:if>
-
-      <!-- Footer Info -->
-      <div class="row mt-4">
-        <div class="col-12">
-          <div class="alert alert-light">
-            <small class="text-muted">
-              <i class="bi bi-info-circle"></i>
-              <strong>Quick Actions:</strong>
-              <a
-                href="${pageContext.request.contextPath}/admin/users/choose-type"
-                class="text-decoration-none"
-                >Create User</a>
-              |
-              <a
-                href="${pageContext.request.contextPath}/admin/users"
-                class="text-decoration-none"
-                >Home</a
-              >
-              |
-              <a
-                href="${pageContext.request.contextPath}/admin/rbac/roles"
-                class="text-decoration-none"
-                >Manage Roles</a
-              >
-              <a
-                href="${pageContext.request.contextPath}/techmanager/dashboard"
-                class="text-decoration-none"
-                >Dashboard</a
-              >
-            </small>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- Footer -->
     <%@ include file="footer.jsp" %>
