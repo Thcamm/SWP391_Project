@@ -1,100 +1,103 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%--
-  Created by IntelliJ IDEA.
-  User: ADMIN
-  Date: 10/6/2025
-  Time: 10:01 AM
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<html>
-<head>
-    <title>Role Management</title>
 
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/role/list.css">
-</head>
-<body class="role-list-page">
+<!-- Set page title and active menu -->
+<c:set var="pageTitle" value="Role Management" scope="request"/>
+<c:set var="pageCSS" value="role/list.css" scope="request"/>
+<c:set var="activeMenu" value="rbac" scope="request"/>
 
-<div class="container">
-    <h1 class="page-title">List role</h1>
+<!-- Include Header -->
+<jsp:include page="/view/role/header.jsp" />
 
+<!-- Page Content -->
+<div class="container role-list-container">
+    <h1 class="page-title">Role Management</h1>
 
+    <!-- Message Display -->
     <div class="message-container">
-        <c:if test = "${not empty sessionScope.flash}">
-            <div class="alert success-message">
-                    ${sessionScope.flash}
-                <c:remove var="flash" scope="session"/>
+        <c:if test="${not empty sessionScope.flash}">
+            <div class="alert alert-success">
+                <span class="alert-icon"></span>
+                <span class="alert-text">${sessionScope.flash}</span>
             </div>
+            <c:remove var="flash" scope="session"/>
         </c:if>
 
         <c:if test="${not empty sessionScope.error}">
-            <div class="alert error-message">
-                    ${sessionScope.error}
-                <c:remove var="error" scope="session"/>
+            <div class="alert alert-error">
+                <span class="alert-icon"></span>
+                <span class="alert-text">${sessionScope.error}</span>
             </div>
+            <c:remove var="error" scope="session"/>
         </c:if>
     </div>
 
-
+    <!-- Action Buttons -->
     <div class="action-buttons-container">
-        <a href ="${pageContext.request.contextPath}/admin/rbac/rolesList?action=new" class="btn btn-primary">
-            Add New Role
+        <a href="${pageContext.request.contextPath}/admin/rbac/rolesList?action=new" class="btn btn-primary">
+             Add New Role
         </a>
 
         <a href="${pageContext.request.contextPath}/admin/rbac/roles" class="btn btn-secondary">
-            Manage Role Permissions
+             Manage Role Permissions
         </a>
     </div>
 
-
+    <!-- Search Form -->
     <form action="${pageContext.request.contextPath}/admin/rbac/rolesList" method="get" class="search-form">
         <input type="hidden" name="action" value="list">
 
         <div class="form-group search-input-group">
-            <label for="keyword">Search </label>
-            <input type="text" id="keyword" name="keyword" value="${keyword}" placeholder="Enter name of role" class="form-control">
+            <label for="keyword">Search:</label>
+            <input type="text" id="keyword" name="keyword" value="${keyword}"
+                   placeholder="Enter role name" class="form-control">
             <button type="submit" class="btn btn-search">Search</button>
         </div>
 
         <div class="form-group page-config-group">
-            <label for="size">Number/Page: </label>
+            <label for="size">Items per Page:</label>
             <select name="size" id="size" onchange="this.form.submit()" class="form-control select-size">
                 <option value="2" ${pager.itemsPerPage == 2 ? 'selected' : ''}>2</option>
                 <option value="5" ${pager.itemsPerPage == 5 ? 'selected' : ''}>5</option>
                 <option value="10" ${pager.itemsPerPage == 10 ? 'selected' : ''}>10</option>
+                <option value="20" ${pager.itemsPerPage == 20 ? 'selected' : ''}>20</option>
             </select>
         </div>
 
-        <span class="total-items">Sum: ${pager.totalItems} role(s)</span>
+        <span class="total-items">Total: <strong>${pager.totalItems}</strong> role(s)</span>
     </form>
 
-
+    <!-- Data Table -->
     <div class="table-responsive">
         <table class="data-table">
             <thead>
             <tr>
                 <th>ID</th>
-                <th>Name of Role</th>
-                <th>NO User(s)</th>
+                <th>Role Name</th>
+                <th>Users Count</th>
                 <th>Description</th>
-                <th>Action</th>
+                <th>Actions</th>
             </tr>
             </thead>
             <tbody>
             <c:forEach var="role" items="${pager.data}">
                 <tr>
                     <td>${role.roleId}</td>
-                    <td>${role.roleName}</td>
-                    <td>${role.userCount}</td>
+                    <td><strong>${role.roleName}</strong></td>
+                    <td>
+                        <span class="badge badge-info">${role.userCount}</span>
+                    </td>
                     <td>
                         <c:out value="${not empty role.description ? role.description : 'N/A'}"/>
                     </td>
                     <td class="action-column">
-                        <a href="${pageContext.request.contextPath}/admin/rbac/rolesList?action=edit&id=${role.roleId}" class="action-link edit-link">
-                            Edit
+                        <a href="${pageContext.request.contextPath}/admin/rbac/rolesList?action=edit&id=${role.roleId}"
+                           class="action-link edit-link" title="Edit">
+                            ✏Edit
                         </a>
                         <a href="${pageContext.request.contextPath}/admin/rbac/rolesList?action=delete&id=${role.roleId}"
-                           onclick="return confirm('Are you sure to delete this role');" class="action-link delete-link">
+                           onclick="return confirm('Are you sure you want to delete this role?');"
+                           class="action-link delete-link" title="Delete">
                             Delete
                         </a>
                     </td>
@@ -103,15 +106,19 @@
 
             <c:if test="${empty pager.data}">
                 <tr>
-                    <td colspan = "5" class="no-data">Not found any role</td>
+                    <td colspan="5" class="no-data">
+                        <div class="empty-state">
+                            <p>No roles found</p>
+                        </div>
+                    </td>
                 </tr>
             </c:if>
             </tbody>
         </table>
     </div>
 
-
-
+    <!-- Pagination -->
+    <c:if test="${pager.totalPages > 1}">
         <div class="pagination-container">
             <ul class="pagination">
                 <c:set var="currentPage" value="${pager.currentPage}" />
@@ -120,20 +127,21 @@
                 <c:set var="keywordParam" value="${not empty keyword ? '&keyword=' : ''}"/>
                 <c:set var="baseUrl" value="${pageContext.request.contextPath}/admin/rbac/rolesList?action=list&size=${pageSize}${keywordParam}${keyword}"/>
 
-
-                <li class="page-item <c:if test="${currentPage == 1}">disabled</c:if>">
+                <!-- Previous Button -->
+                <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
                     <c:choose>
                         <c:when test="${currentPage == 1}">
-                            <span class="page-link">&laquo; Before</span>
+                            <span class="page-link">&laquo; Previous</span>
                         </c:when>
                         <c:otherwise>
-                            <a href="${baseUrl}&page=${currentPage - 1}" class="page-link">&laquo; Before</a>
+                            <a href="${baseUrl}&page=${currentPage - 1}" class="page-link">&laquo; Previous</a>
                         </c:otherwise>
                     </c:choose>
                 </li>
 
+                <!-- Page Numbers -->
                 <c:forEach begin="1" end="${totalPages}" var="i">
-                    <li class="page-item <c:if test="${i == currentPage}">active</c:if>">
+                    <li class="page-item ${i == currentPage ? 'active' : ''}">
                         <c:choose>
                             <c:when test="${i == currentPage}">
                                 <span class="page-link">${i}</span>
@@ -145,19 +153,21 @@
                     </li>
                 </c:forEach>
 
-                <li class="page-item <c:if test="${currentPage == totalPages}">disabled</c:if>">
+                <!-- Next Button -->
+                <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
                     <c:choose>
                         <c:when test="${currentPage == totalPages}">
-                            <span class="page-link">After &raquo;</span>
+                            <span class="page-link">Next &raquo;</span>
                         </c:when>
                         <c:otherwise>
-                            <a href="${baseUrl}&page=${currentPage + 1}" class="page-link">After &raquo;</a>
+                            <a href="${baseUrl}&page=${currentPage + 1}" class="page-link">Next &raquo;</a>
                         </c:otherwise>
                     </c:choose>
                 </li>
             </ul>
         </div>
-
+    </c:if>
 </div>
-</body>
-</html>
+
+<!-- Include Footer -->
+<jsp:include page="/view/role/footer.jsp" />

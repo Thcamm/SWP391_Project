@@ -13,13 +13,15 @@
 </head>
 
 <body class="bg-light">
+<jsp:include page="/view/customerservice/sidebar.jsp" />
+
 <div class="container py-4">
 
     <!-- HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h3>Search Customer</h3>
         <a href="${pageContext.request.contextPath}/view/customerservice/create-customer.jsp" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Create Customer
+            <i class="fa-solid fa-user-plus"></i> Create Customer
         </a>
     </div>
 
@@ -28,17 +30,17 @@
         <div class="row g-3">
             <div class="col-md-4">
                 <label for="searchName" class="form-label">Customer Name</label>
-                <input type="text" id="searchName" name="searchName" value="${param.searchName}" class="form-control" placeholder="Nhập tên khách hàng" />
+                <input type="text" id="searchName" name="searchName" value="${param.searchName}" class="form-control" placeholder="Enter customer name" />
             </div>
 
             <div class="col-md-4">
                 <label for="searchLicensePlate" class="form-label">License Plate</label>
-                <input type="text" id="searchLicensePlate" name="searchLicensePlate" value="${param.searchLicensePlate}" class="form-control" placeholder="Nhập biển số xe" />
+                <input type="text" id="searchLicensePlate" name="searchLicensePlate" value="${param.searchLicensePlate}" class="form-control" placeholder="Enter license plate" />
             </div>
 
             <div class="col-md-4">
                 <label for="searchEmail" class="form-label">Email / Phone Number</label>
-                <input type="text" id="searchEmail" name="searchEmail" value="${param.searchEmail}" class="form-control" placeholder="Nhập email hoặc SĐT" />
+                <input type="text" id="searchEmail" name="searchEmail" value="${param.searchEmail}" class="form-control" placeholder="Enter email or phone number" />
             </div>
         </div>
 
@@ -90,6 +92,7 @@
                     <th>Lience Plate</th>
                     <th>Email</th>
                     <th>Phone Number</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
 
@@ -97,7 +100,7 @@
                 <c:choose>
                     <c:when test="${empty customerList}">
                         <tr class="text-center text-muted">
-                            <td colspan="5">Nothing</td>
+                            <td colspan="6">Nothing</td>
                         </tr>
                     </c:when>
                     <c:otherwise>
@@ -105,7 +108,7 @@
                             <tr>
                                 <td>${loop.index + 1}</td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/customerservice/customer-detail?id=${customer.customerId}">
+                                    <a href="${pageContext.request.contextPath}/user/profile?id=${c.userId}">
                                         ${c.fullName}
                                     </a>
                                 </td>
@@ -117,6 +120,12 @@
                                 </td>
                                 <td>${c.email}</td>
                                 <td>${c.phoneNumber}</td>
+                                <td>
+                                    <a href="${pageContext.request.contextPath}/customerservice/createRequest?customerId=${c.customerId}"
+                                       class="btn btn-sm btn-success">
+                                        Create Request
+                                    </a>
+                                </td>
                             </tr>
                         </c:forEach>
                     </c:otherwise>
@@ -126,6 +135,7 @@
         </div>
     </div>
 </div>
+
 <script src="${pageContext.request.contextPath}/assets/js/customerservice/search-customer.js"></script>
 
 </body>

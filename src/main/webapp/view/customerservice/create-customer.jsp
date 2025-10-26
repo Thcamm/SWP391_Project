@@ -1,116 +1,97 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tạo mới khách hàng</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customerservice/create-customer.css">
-
+    <title>Create Customer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customer/create-customer.css">
 </head>
 <body>
+<jsp:include page="/view/customerservice/sidebar.jsp" />
+<jsp:include page="/view/customerservice/result.jsp" />
+<div class="main-content container mt-4">
+    <xh2 class="page-title mb-4">Create Customer</x`h2>
 
-<div class="container">
-    <div class="header">
-        <h1>
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            Create A New Customer
-        </h1>
-        <p>Enter Customer Information</p>
-    </div>
-    <c:if test="${not empty message}">
-        <div class="alert
-                ${messageType == 'success' ? 'alert-success' :
-                messageType == 'warning' ? 'alert-warning' :
-                'alert-danger'}" role="alert">
-                ${message}
-        </div>
-    </c:if>
-    <form action="${pageContext.request.contextPath}/customerservice/create-customer" method="post" id="customerForm">
+    <form id="createCustomerForm" action="${pageContext.request.contextPath}/customerservice/create-customer" method="post" class="customer-form">
 
-        <div class="section">
-            <div class="section-title">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                Customer Details
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="fullName" name="fullName" required>
+            </div>
+            <div class="col-md-6">
+                <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+                <input type="email" class="form-control" id="email" name="email" required>
             </div>
 
-            <div class="form-group full-width">
-                <label>
-                    Full Name
-                    <span class="required">*</span>
-                </label>
-                <input type="text" name="fullName" placeholder="Enter full name" required>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label>
-                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="4" width="18" height="16" rx="2"></rect>
-                            <polyline points="3 10 12 15 21 10"></polyline>
-                        </svg>
-                        Email
-                        <span class="required">*</span>
-                    </label>
-                    <input type="email" name="email" placeholder="example@email.com">
+            <div class="card-body">
+                <!-- Full Name -->
+                <div class="mb-3">
+                    <label for="fullName" class="form-label"><b>Full Name</b> <span class="text-danger">*</span></label>
+                    <input type="text" id="fullName" name="fullName" class="form-control" placeholder="Enter full name" required>
                 </div>
 
-                <div class="form-group">
-                    <label>
-                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                        </svg>
-                        Phone Number
-                    </label>
-                    <input type="tel" name="phone" placeholder="0123456789">
-                </div>
-            </div>
+                <!-- Email & Phone -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="email" class="form-label d-flex align-items-center gap-2">
+                            <i class="bi bi-envelope"></i> <b>Email</b>
+                        </label>
+                        <input type="email" id="email" name="email" class="form-control" placeholder="example@email.com" required>
+                    </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Gender</label>
-                    <select name="gender">
-                        <option value="">Select gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                    </select>
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label d-flex align-items-center gap-2">
+                            <i class="bi bi-telephone"></i> <b>Phone Number</b>
+                        </label>
+                        <input type="text" id="phone" name="phone" class="form-control" placeholder="0123456789" pattern="[0-9]{10,11}" required>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>
-                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                        </svg>
-                        Birth Date
-                    </label>
-                    <input type="date" name="birthDate" placeholder="dd/mm/yyyy">
+                <!-- Gender & Date of Birth -->
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="gender" class="form-label">
+                            <i class="fa-regular fa-venus-mars"></i> <b>Gender</b> </label>
+                        <select id="gender" name="gender" class="form-select">
+                            <option value="">Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="birthDate" class="form-label d-flex align-items-center gap-2">
+                            <i class="bi bi-calendar3"></i><b>Date of Birth</b>
+                        </label>
+                        <input type="date" id="birthDate" name="birthDate" class="form-control">
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group full-width">
-                <label>Address</label>
-                <textarea name="address" placeholder="Enter full address"></textarea>
-            </div>
+                <!-- Address -->
+                <div class="mt-3">
+                    <label for="address" class="form-label"><i class="fa-regular fa-map-location-dot"></i><b>Address</b></label>
+                    <textarea id="address" name="address" rows="2" class="form-control" placeholder="Enter full address"></textarea>
+                </div>
 
+            </div>
         </div>
 
-        <div class="form-actions">
-            <button type="button" class="btn btn-cancel" onclick="window.history.back()">Cancel</button>
-            <button type="submit" class="btn btn-submit">Create</button>
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-end gap-3">
+            <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create</button>
         </div>
     </form>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/customerservice/create-customer.js"></script>
 </body>
 </html>
+
+
+

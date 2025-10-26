@@ -64,6 +64,6 @@
         </form>
     </c:if>
 </div>
-<%--<%@ include file="/common/footer.jsp" %>--%>
+<%--<%@ include file="/common/sidebar.jsp" %>--%>
 </body>
 </html>

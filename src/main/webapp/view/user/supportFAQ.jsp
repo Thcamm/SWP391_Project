@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> Frequently asked questions</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/supportFAQ.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/user/supportFAQ.css">
 
 </head>
 <body>

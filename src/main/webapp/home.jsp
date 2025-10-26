@@ -346,8 +346,7 @@
             <div class="d-flex align-items-center gap-3">
                 <c:choose>
                     <c:when test="${not empty sessionScope.user}">
-                        <a href="${pageContext.request.contextPath}/user/profile" class="welcome-user"
-                           style="text-decoration: none; color: white;">        <span>
+                        <a href="${pageContext.request.contextPath}/user/profile" class="welcome-user" style="text-decoration: none; color: white;">        <span>
             <i class="fas fa-user-circle"></i>
             Xin chào, ${sessionScope.user.fullName}
         </span>
@@ -392,28 +391,17 @@
     </div>
     <nav class="sidebar-nav">
         <a href="${pageContext.request.contextPath}/customer/appointment-history" class="menu-item">
-            <span>DỊCH VỤ</span>
-        </a>
-        <a href="${pageContext.request.contextPath}/customer/" class="menu-item">
-            <span>THƯ VIỆN DỰ ÁN</span>
-        </a>
-        <a href="${pageContext.request.contextPath}/customerservice/view-support-request" class="menu-item">
-            <span>SEARCH CUSTOMER</span>
-        </a>
-        <a href="${pageContext.request.contextPath}/customerservice/appointment-list" class="menu-item">
-            <span>TIN TỨC</span>
+            <span>Appointment List</span>
         </a>
         <a href="${pageContext.request.contextPath}/customer/AppointmentService" class="menu-item">
-            <span>Lien he dat lich</span>
+            <span>Create Appointment</span>
+        </a>
+        <a href="${pageContext.request.contextPath}/customer/create-support-request" class="menu-item">
+            <span>Create Support Request</span>
         </a>
         <a href="${pageContext.request.contextPath}/customer/garage" class="menu-item">
-            <span>QUẢN LÝ XE (MY GARAGE)</span>
+            <span>My Garage</span>
         </a>
-        <c:if test="${sessionScope.user != null && sessionScope.user.roleId == 5}">
-            <a href="${pageContext.request.contextPath}/inventory" class="menu-item">
-                <span>QUẢN LÝ KHO (INVENTORY)</span>
-            </a>
-        </c:if>
     </nav>
 </div>
 

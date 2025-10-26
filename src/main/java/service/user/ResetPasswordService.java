@@ -34,13 +34,13 @@ public class ResetPasswordService {
     }
 
     /**
-     * Gửi OTP qua email
-     * @param email Email của user
-     * @return true nếu gửi thành công
+     * Send OTP via email
+     * @param email User's email
+     * @return true if sent successfully
      */
     public boolean sendOTP(String email) {
         try {
-            // Kiểm tra email có tồn tại không
+            // Check if email exists
             User user = userDAO.getUserByEmail(email);
             if (user == null) {
                 System.out.println("User not found with email: " + email);

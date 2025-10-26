@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet(name = "InventoryController", urlPatterns = {"/inventory"})
+@WebServlet(name = "InventoryController", urlPatterns = {"/inventory/dashboard"})
 public class InventoryController extends HttpServlet {
     private PartDAO partDetailDAO = new PartDAO();
 

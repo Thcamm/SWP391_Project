@@ -1,7 +1,7 @@
 
 # Build output
 target/
-src/main/java/common/DbContext.java
+
 
 # Log files
 *.log
@@ -16,7 +16,6 @@ dependency-reduced-pom.xml
 
 # Google OAuth credentials
 src/main/resources/google.properties
-
 
 ### IntelliJ IDEA ###
 .idea/

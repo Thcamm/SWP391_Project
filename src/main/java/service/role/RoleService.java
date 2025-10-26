@@ -19,7 +19,7 @@ public class RoleService {
 //        this.actorUserId = actorUserId;
     }
 
-    private static final Set<String> SYSTEM_ROLES = Set.of("ADMINISTRATOR", "SUPER_ADMIN");
+    private static final Set<String> SYSTEM_ROLES = Set.of("ADMINISTRATOR", "SUPER_ADMIN", "ADMIN");
 
     public Role createRole(String rawName, String description) throws SQLException {
         String name = NameValidator.normalizeDisplayName(rawName);

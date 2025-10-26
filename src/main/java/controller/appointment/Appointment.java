@@ -15,15 +15,15 @@ import service.vehicle.VehicleService;
 
 import java.io.IOException;
 
-@WebServlet(name = "AppointmentService", urlPatterns = {"/customer/AppointmentService"})
+@WebServlet(name = "AppointmentService", urlPatterns = { "/customer/AppointmentService" })
 public class Appointment extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //response.setContentType("text/plain;charset=UTF-8");
-        //response.getWriter().write("AppointmentService GET OK");
+        // response.setContentType("text/plain;charset=UTF-8");
+        // response.getWriter().write("AppointmentService GET OK");
         request.getRequestDispatcher("/view/customer/appointment-scheduling.jsp").forward(request, response);
     }
 
@@ -38,14 +38,13 @@ public class Appointment extends HttpServlet {
         request.setAttribute("fullName", user.getUserName());
         request.setAttribute("phoneNumber", user.getPhoneNumber());
 
-
-        // 1. Kiểm tra người dùng đã đăng nhập chưa
+        // 1. Check if user is logged in
         if (user == null) {
-            response.sendRedirect("login.jsp"); // Chuyển đến trang đăng nhập
-            return; // Dừng thực thi ngay lập tức
+            response.sendRedirect("login.jsp"); // Redirect to login page
+            return; // Stop execution immediately
         }
 
-        // 2. Lấy các tham số cần thiết
+        // 2. Get necessary parameters
         String carBrand = request.getParameter("carBrand");
         String licensePlate = request.getParameter("licensePlate");
         String dateStr = request.getParameter("appointmentDate");
@@ -56,7 +55,7 @@ public class Appointment extends HttpServlet {
         AppointmentDAO appointmentDAO = new AppointmentDAO(); // Hoặc dùng Service
         VehicleService vehicleService = new VehicleService(vehicleDAO);
 
-        // (Tùy chọn) Validation: Kiểm tra các trường bắt buộc không bị trống
+        // (Optional) Validation: Check required fields are not empty
         if (licensePlate == null || licensePlate.trim().isEmpty() || dateStr == null || dateStr.trim().isEmpty()) {
             request.setAttribute("errorMessage", "License plate and date are required.");
             request.getRequestDispatcher("/view/customer/appointment-scheduling.jsp").forward(request, response);
@@ -69,55 +68,55 @@ public class Appointment extends HttpServlet {
         }
 
         try {
-            // 4. Lấy CustomerID từ UserID
+            // 4. Get CustomerID from UserID
             int customerID = customerDAO.getCustomerIdByUserId(user.getUserId());
             if (customerID == -1) {
-                // Có thể xử lý trường hợp user có tồn tại nhưng chưa có record trong bảng Customer
-                // Ví dụ: Tạo mới customer record rồi lấy ID
+                // Handle case where user exists but has no record in Customer table
+                // Example: Create new customer record then get ID
                 throw new ServletException("Customer profile not found for the logged-in user.");
             }
 
-// 5. Xử lý Vehicle: Tìm hoặc Tạo mới
+            // 5. Handle Vehicle: Find or Create new
             int vehicleID = vehicleDAO.getVehicleIdByLicensePlate(licensePlate);
             if (vehicleID == -1) {
-                // Nếu xe chưa tồn tại, tạo xe mới
+                // If vehicle doesn't exist, create new vehicle
                 Vehicle newVehicle = new Vehicle();
                 newVehicle.setCustomerID(customerID);
                 newVehicle.setLicensePlate(licensePlate);
                 newVehicle.setBrand(carBrand);
-                // Không cần set vehicleID thủ công
+                // No need to manually set vehicleID
 
-                vehicleID = vehicleDAO.insertVehicle(newVehicle); // ← Lấy ID từ return
+                vehicleID = vehicleDAO.insertVehicle(newVehicle); // Get ID from return
 
                 if (vehicleID == -1) {
                     throw new ServletException("Failed to insert vehicle");
                 }
             }
 
-            // 6. Xử lý AppointmentService
+            // 6. Handle Appointment
             model.appointment.Appointment appointment = new model.appointment.Appointment();
             appointment.setCustomerID(customerID);
             appointment.setVehicleID(vehicleID);
             java.time.LocalDateTime dateTime = java.time.LocalDateTime.parse(dateStr);
             appointment.setAppointmentDate(dateTime);
             appointment.setDescription(description);
-            appointment.setStatus("PENDING"); // Gán trạng thái ban đầu
+            appointment.setStatus("PENDING"); // Set initial status
 
-            // 7. Lưu vào cơ sở dữ liệu
+            // 7. Save to database
             appointmentDAO.insertAppointment(appointment);
 
-            // 8. Chuyển hướng sau khi thành công (PRG Pattern)
+            // 8. Redirect after success (PRG Pattern)
             request.setAttribute("successMessage", "AppointmentService scheduled successfully!");
             request.getRequestDispatcher("/view/customer/appointment-scheduling.jsp").forward(request, response);
 
         } catch (IllegalArgumentException e) {
-            // Bắt lỗi nếu định dạng ngày sai
+            // Catch error if date format is incorrect
             request.setAttribute("errorMessage", "Invalid date format. Please use YYYY-MM-DD.");
             request.getRequestDispatcher("/view/customer/appointment-scheduling.jsp").forward(request, response);
         } catch (Exception e) {
-            // Bắt các lỗi khác (lỗi DB, etc.)
-            e.printStackTrace(); // Ghi log lỗi ra console
-            // Hiển thị lỗi chi tiết trên màn hình
+            // Catch other errors (DB errors, etc.)
+            e.printStackTrace(); // Log error to console
+            // Display detailed error on screen
             String detailError = "An error occurred: " + e.getMessage() + " | Type: " + e.getClass().getSimpleName();
             request.setAttribute("errorMessage", detailError);
             request.getRequestDispatcher("/view/customer/appointment-scheduling.jsp").forward(request, response);
