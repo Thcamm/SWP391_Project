@@ -27,9 +27,6 @@ public class ForgotPassword extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
-
         String action = request.getParameter("action");
         String email = request.getParameter("email");
 
@@ -45,7 +42,7 @@ public class ForgotPassword extends HttpServlet {
             UserDAO userDAO = new UserDAO();
             MailService mailService = new MailService();
 
-            ResetPasswordService service = new ResetPasswordService(resetDAO, userDAO, mailService);
+            ResetPasswordService service = new ResetPasswordService();
 
             // Xử lý gửi OTP
             if ("send".equals(action)) {
@@ -61,6 +58,7 @@ public class ForgotPassword extends HttpServlet {
                     boolean otpSent = service.sendOTP(email);
 
                     if (otpSent) {
+
                         request.setAttribute("successMessage", "Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra hộp thư.");
                         request.setAttribute("email", email);
                         request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
@@ -124,11 +122,12 @@ public class ForgotPassword extends HttpServlet {
 
                 try {
                     // Thực hiện reset password
+
                     boolean success = service.resetPasswordWithOTP(email, otp.trim(), newPassword);
 
                     if (success) {
-                        //request.getSession().setAttribute("successMessage", "Đặt lại mật khẩu thành công! Vui lòng đăng nhập với mật khẩu mới.");
-                        response.sendRedirect("login.jsp");
+                        request.setAttribute("successMessage", "Đặt lại mật khẩu thành công! Vui lòng đăng nhập với mật khẩu mới.");
+                        request.getRequestDispatcher("forgotpassword.jsp").forward(request, response);
                     } else {
                         request.setAttribute("errorMessage", "Mã OTP không hợp lệ hoặc đã hết hạn. Vui lòng thử lại.");
                         request.setAttribute("email", email);

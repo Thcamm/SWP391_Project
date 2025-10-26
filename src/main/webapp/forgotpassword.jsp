@@ -9,7 +9,7 @@
     <%-- Sử dụng lại file CSS của trang login để giao diện đồng bộ --%>
     <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link href="../../assets/css/user/login.css" rel="stylesheet">
+    <link href="assets/css/user/login.css" rel="stylesheet">
 </head>
 <body>
 <div class="login-container">
@@ -52,10 +52,11 @@
                     </div>
                 </div>
             </form>
-
             <%-- Form 2: Reset Password --%>
             <form action="forgotpassword" method="post" id="resetPasswordForm">
                 <input type="hidden" name="action" value="reset">
+                <!-- THÊM DÒNG NÀY -->
+                <input type="hidden" name="email" id="hiddenEmail" value="${email != null ? email : param.email}">
 
                 <div class="mb-3">
                     <label for="otp" class="form-label">OTP Code <span class="text-danger">*</span></label>
