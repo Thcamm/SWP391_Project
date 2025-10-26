@@ -151,6 +151,20 @@ public class MessageConstants {
             "Please provide notes for this action."
     );
 
+    public static final SystemMessage TASK009 = new SystemMessage(
+            "TASK009",
+            MessageType.VALIDATION,
+            "Task permission required",
+            "You do not have permission to modify this task."
+    );
+
+    public static final SystemMessage TASK010 = new SystemMessage(
+            "TASK010",
+            MessageType.VALIDATION,
+            "Task update",
+            "Can only update tasks that are in progress."
+    );
+
     public static final SystemMessage PART001 = new SystemMessage(
             "PART001",
             MessageType.SUCCESS,

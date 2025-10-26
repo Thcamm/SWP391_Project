@@ -114,7 +114,7 @@
                         <fmt:formatDate value="${task.assignedDate}" pattern="dd/MM HH:mm" />
                     </td>
                     <td class="action-buttons">
-                        <form action="${pageContext.request.contextPath}/technician/task-action"
+                        <form action="${pageContext.request.contextPath}/technician/tasks-action"
                               method="post" style="display:inline;">
                             <input type="hidden" name="assignmentId" value="${task.assignmentID}">
                             <input type="hidden" name="action" value="accept">
@@ -123,7 +123,7 @@
                                 Accept
                             </button>
                         </form>
-                        <form action="${pageContext.request.contextPath}/technician/task-action"
+                        <form action="${pageContext.request.contextPath}/technician/tasks-action"
                               method="post" style="display:inline;">
                             <input type="hidden" name="assignmentId" value="${task.assignmentID}">
                             <input type="hidden" name="action" value="reject">
@@ -196,14 +196,20 @@
                                 <c:if test="${fn:length(task.notes) > 30}">...</c:if>
                             </td>
                             <td class="action-buttons">
-                                <button type="button" class="btn btn-update"
-                                        onclick="openProgressModal(${task.assignmentID}, ${task.progressPercentage}, '${fn:escapeXml(task.notes)}')">
+                                <a href="${pageContext.request.contextPath}/technician/update-progress-form?assignmentId=${task.assignmentID}"
+                                   class="btn btn-update">
                                     Update
-                                </button>
-                                <button type="button" class="btn btn-complete"
-                                        onclick="completeTask(${task.assignmentID})">
-                                    Complete
-                                </button>
+                                </a>
+
+                                <form action="${pageContext.request.contextPath}/technician/update-progress"
+                                      method="post" style="display:inline;">
+                                    <input type="hidden" name="assignmentId" value="${task.assignmentID}">
+                                    <input type="hidden" name="action" value="complete">
+                                    <button type="submit" class="btn btn-complete">
+                                        Complete
+                                    </button>
+                                </form>
+
                             </td>
                         </tr>
                     </c:forEach>
@@ -301,33 +307,6 @@
     </div>
 </section>
 
-<div id="progressModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeProgressModal()">&times;</span>
-        <h2>Update Task Progress</h2>
-        <form action="${pageContext.request.contextPath}/technician/update-progress" method="post">
-            <input type="hidden" id="modalAssignmentId" name="assignmentId">
-            <input type="hidden" name="action" value="update">
 
-            <div class="form-group">
-                <label for="progressPercentage">Progress (%)</label>
-                <input type="range" id="progressPercentage" name="progressPercentage"
-                       min="0" max="100" value="0" oninput="updateProgressValue(this.value)">
-                <span id="progressValue">0%</span>
-            </div>
-
-            <div class="form-group">
-                <label for="notes">Notes</label>
-                <textarea id="notes" name="notes" rows="4"
-                          placeholder="Enter any notes about the progress..."></textarea>
-            </div>
-
-            <div class="modal-actions">
-                <button type="submit" class="btn btn-primary">Update Progress</button>
-                <button type="button" class="btn btn-secondary" onclick="closeProgressModal()">Cancel</button>
-            </div>
-        </form>
-    </div>
-</div>
 
 <jsp:include page="footer.jsp" />
