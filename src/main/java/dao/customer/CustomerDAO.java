@@ -112,10 +112,23 @@ public class CustomerDAO extends DbContext {
         }
     }
 
-    public boolean isCustomerDuplicate(String email) {
+    public boolean isEmailDuplicate(String email) {
         String sql = "SELECT COUNT(*) FROM user WHERE Email = ? ";
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
             st.setString(1, email);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean isPhoneNumberDuplicate(String phoneNumber) {
+        String sql = "SELECT COUNT(*) FROM user WHERE PhoneNumber = ? ";
+        try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
+            st.setString(1, phoneNumber);
             ResultSet rs = st.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1) > 0;
@@ -282,7 +295,7 @@ public class CustomerDAO extends DbContext {
             e.printStackTrace();
         }
 
-        return -1; // Không tìm thấy
+        return -1;
     }
     public Customer getCustomerByUserId(int userId) throws SQLException {
         String sql = "SELECT * FROM Customer WHERE UserID = ?";
@@ -295,13 +308,38 @@ public class CustomerDAO extends DbContext {
                     Customer customer = new Customer();
                     customer.setCustomerId(rs.getInt("CustomerID"));
                     customer.setUserId(rs.getInt("UserID"));
-                    // Set các thuộc tính khác nếu có...
                     return customer;
                 }
             }
         }
         return null;
     }
+public Customer getCustomerById(int customerId) throws SQLException {
+        Customer customer = null;
 
+
+        String sql = "SELECT c.CustomerID, u.UserID, u.FullName, u.Email, u.PhoneNumber " +
+                "FROM Customer c " +
+                "JOIN User u ON c.UserID = u.UserID " +
+                "WHERE c.CustomerID = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    customer = new Customer();
+                    // Lấy thông tin từ cả 2 bảng
+                    customer.setCustomerId(rs.getInt("CustomerID"));
+                    customer.setUserId(rs.getInt("UserID"));
+                    customer.setFullName(rs.getString("FullName"));
+                    customer.setEmail(rs.getString("Email"));
+                    customer.setPhoneNumber(rs.getString("PhoneNumber"));
+                }
+            }
+        }
+        return customer;
+    }
 
 }

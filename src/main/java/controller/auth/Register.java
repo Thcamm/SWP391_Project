@@ -78,7 +78,7 @@ public class Register extends HttpServlet {
         user.setPasswordHash(hashedPassword);
         user.setGender(gender.trim());
         user.setBirthDate(sqlDateOfBirth);
-        user.setRoleId(6); // Role mặc định là Customer
+        user.setRoleId(7); // Role mặc định là Customer
         user.setActiveStatus(true);
         user.setAddress(address.trim());
 
@@ -102,10 +102,10 @@ public class Register extends HttpServlet {
             boolean success = userDAO.addUser(user);
 
             if (success) {
-                // Chuyển hướng về trang login với thông báo thành công
+                // Redirect to login page with success message
                 response.sendRedirect("login.jsp?success=true");
             } else {
-                request.setAttribute("error", "Đăng ký thất bại, vui lòng thử lại.");
+                request.setAttribute("error", "Registration failed, please try again.");
                 request.getRequestDispatcher("/register.jsp").forward(request, response);
             }
         } catch (Exception e) {

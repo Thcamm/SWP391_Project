@@ -5,11 +5,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Support Request</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customer/appointment-history.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customer/create-support-request.css">
 
 </head>
 <body>
+<%@ include file="/common/header.jsp" %>
+
+<jsp:include page="/view/customerservice/result.jsp" />
 <div class="container">
+
     <h2>Support Request / Report a Bug</h2>
 
     <form action="${pageContext.request.contextPath}/customer/create-support-request" method="post" enctype="multipart/form-data">
@@ -32,12 +36,15 @@
         <label>Appointment code (if any)</label>
         <input type="text" name="appointmentId" placeholder="Enter Appointment Code">
 
+
         <label>Detail</label>
         <textarea name="description" rows="5" placeholder="Enter the content of your support request..." required></textarea>
 
-        <label>
-            Attached photo (if any)</label>
-        <input type="file" name="attachment">
+        <label>Attached photo (if any)</label>
+        <input type="file" name="attachment" id="attachment">
+        <div id="fileError" style="color:red; margin-top:5px;"></div>
+        <img id="previewImage" style="max-width:200px; display:none; margin-top:10px;" />
+
 
         <button type="submit">Send request</button>
     </form>
@@ -45,6 +52,8 @@
     <c:if test="${not empty message}">
         <p class="message">${message}</p>
     </c:if>
+    <%@ include file="/common/footer.jsp" %>
 </div>
+
 </body>
 </html>

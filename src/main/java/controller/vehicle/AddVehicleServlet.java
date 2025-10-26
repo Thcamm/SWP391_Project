@@ -24,7 +24,7 @@ public class AddVehicleServlet extends HttpServlet {
 
     private final CarDataDAO carDAO = new CarDataDAO();
     private final VehicleDAO vehicleDAO = new VehicleDAO();
-    private final VehicleService vehicleService = new VehicleService();
+    private final VehicleService vehicleService = new VehicleService(vehicleDAO);
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

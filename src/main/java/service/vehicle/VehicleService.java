@@ -1,6 +1,7 @@
 package service.vehicle;
 
 import dao.vehicle.VehicleDAO;
+
 import java.sql.SQLException;
 import java.util.regex.Pattern;
 
@@ -8,8 +9,8 @@ public class VehicleService {
 
     private final VehicleDAO vehicleDAO;
 
-    public VehicleService() {
-        this.vehicleDAO = new VehicleDAO();
+    public VehicleService(VehicleDAO vehicleDAO) {
+        this.vehicleDAO = vehicleDAO;
     }
 
     public boolean validateLicensePlateFormat(String licensePlate) {

@@ -81,7 +81,7 @@
                 <a href="Register">
                     Create new account
                 </a>
-                <a href="forgotpassword">
+                <a href="${pageContext.request.contextPath}/forgotpassword">
                     Forgot password?
                 </a>
             </div>

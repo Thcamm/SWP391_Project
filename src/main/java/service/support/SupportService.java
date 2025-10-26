@@ -18,7 +18,7 @@ public class SupportService {
 
         String currentStatus = req.getStatus();
 
-        if ("RESOLVED".equalsIgnoreCase(currentStatus) || "CLOSED".equalsIgnoreCase(currentStatus)) {
+        if ( "CLOSED".equalsIgnoreCase(currentStatus)) {
             throw new Exception("Cannot change the status of a request that is already " + currentStatus.toLowerCase());
         }
 
@@ -31,14 +31,9 @@ public class SupportService {
     private boolean isValidTransition(String current, String next) {
         switch (current.toUpperCase()) {
             case "PENDING":
-                return next.equalsIgnoreCase("INPROGRESS")
-                        || next.equalsIgnoreCase("RESOLVED")
-                        || next.equalsIgnoreCase("CLOSED");
+                return next.equalsIgnoreCase("INPROGRESS");
             case "INPROGRESS":
-                return next.equalsIgnoreCase("RESOLVED")
-                        || next.equalsIgnoreCase("CLOSED");
-            case "RESOLVED":
-                return next.equalsIgnoreCase("CLOSED");
+                return next.equalsIgnoreCase("RESOLVED");
             default:
                 return false;
         }
