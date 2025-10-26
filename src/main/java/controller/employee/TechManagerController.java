@@ -26,13 +26,13 @@ public class TechManagerController extends HttpServlet {
         String pathInfo = request.getPathInfo();
 
         if (pathInfo == null) {
-            response.sendRedirect(request.getContextPath() + "/techmanager/dashboard");
+            response.sendRedirect(request.getContextPath() + "/techmanager/home");
             return;
         }
 
         try {
             switch (pathInfo) {
-                case "/dashboard":
+                case "/home":
                     showDashboard(request, response);
                     break;
                 case "/workorders":
@@ -79,7 +79,7 @@ public class TechManagerController extends HttpServlet {
             request.setAttribute("completedCount", dashboardData.getCompletedCount());
             request.setAttribute("isAdmin", dashboardData.isAdmin());
 
-            request.getRequestDispatcher("/view/techmanager/dashboard.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/techmanager/home.jsp").forward(request, response);
         } catch (Exception e) {
             throw new ServletException("Error loading dashboard", e);
         }

@@ -103,7 +103,7 @@
                     <td>${task.customerName}</td>
                     <td>${task.serviceInfo}</td>
                     <td>
-                        <span class="task-type-badge">${task.taskType}</span>
+                        <span class="task-type-badge">${task.taskType}🏠</span>
                     </td>
                     <td class="task-description">
                             ${fn:substring(task.taskDescription, 0, 50)}
