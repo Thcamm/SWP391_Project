@@ -17,7 +17,7 @@ public class ServiceRequestDAO extends DbContext {
                 "VALUES (?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, request.getCustomerID());
             ps.setInt(2, request.getVehicleID());
@@ -41,6 +41,7 @@ public class ServiceRequestDAO extends DbContext {
         }
         return -1;
     }
+
     public List<ServiceHistoryDTO> getServiceHistoryByCustomerId(int customerId) throws SQLException {
         List<ServiceHistoryDTO> history = new ArrayList<>();
         String sql = "SELECT sr.RequestID, st.ServiceName, sr.RequestDate, sr.Status, st.UnitPrice " +
@@ -50,7 +51,7 @@ public class ServiceRequestDAO extends DbContext {
                 "ORDER BY sr.RequestDate DESC";
 
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, customerId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -67,6 +68,7 @@ public class ServiceRequestDAO extends DbContext {
         }
         return history;
     }
+
     public List<ServiceRequestViewDTO> getAllServiceRequestsForView() throws SQLException {
         List<ServiceRequestViewDTO> requestList = new ArrayList<>();
         String sql = "SELECT sr.RequestID, sr.RequestDate, sr.Status, " +
@@ -81,8 +83,8 @@ public class ServiceRequestDAO extends DbContext {
                 "ORDER BY sr.RequestDate DESC";
 
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 ServiceRequestViewDTO dto = new ServiceRequestViewDTO();
@@ -98,10 +100,11 @@ public class ServiceRequestDAO extends DbContext {
         }
         return requestList;
     }
+
     public boolean updateServiceRequestStatus(int requestId, String newStatus) throws SQLException {
         String sql = "UPDATE ServiceRequest SET Status = ? WHERE RequestID = ?";
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, newStatus);
             ps.setInt(2, requestId);
             return ps.executeUpdate() > 0;
