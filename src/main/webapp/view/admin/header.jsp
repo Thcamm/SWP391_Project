@@ -72,7 +72,7 @@
         <li class="nav-item">
           <a
             class="nav-link ${activeMenu == 'employees' ? 'active fw-bold' : ''}"
-            href="${pageContext.request.contextPath}/techmanager/dashboard"
+            href="${pageContext.request.contextPath}/techmanager/service-requests"
           >
             <i class="bi bi-person-badge me-1"></i>Tech Manager
           </a>

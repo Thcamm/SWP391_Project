@@ -79,6 +79,8 @@ public class PermissionFilter implements Filter {
         // WorkOrder management - tất cả operations được xử lý bởi WorkOrderController
         routePerm.put("GET:/view/techmanager/home.jsp", "tech_manager_access");
         routePerm.put("POST:/view/techmanager/home.jsp", "tech_manager_access");
+        routePerm.put("GET:/view/techmanager/service-requests.jsp", "tech_manager_access");
+        routePerm.put("POST:/view/techmanager/service-requests.jsp", "tech_manager_access");
         routePerm.put("GET:/view/techmanager/workorders/list", "tech_manager_access");
         routePerm.put("GET:/view/workorders/create.jsp", "tech_manager_access");
         routePerm.put("POST:/view/workorders/create.jsp", "tech_manager_access");
