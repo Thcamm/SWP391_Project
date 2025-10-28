@@ -34,6 +34,28 @@ public class WorkOrderDAO extends DbContext {
         }
     }
 
+    /**
+     * Create WorkOrder using provided connection (for transactions)
+     */
+    public int createWorkOrder(Connection conn, WorkOrder workOrder) throws SQLException {
+        String sql = "INSERT INTO WorkOrder (TechManagerID, RequestID, EstimateAmount, Status) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, workOrder.getTechManagerId());
+            ps.setInt(2, workOrder.getRequestId());
+            ps.setBigDecimal(3, workOrder.getEstimateAmount());
+            ps.setString(4, workOrder.getStatus().name());
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
+                }
+            }
+            return -1;
+        }
+    }
+
     public WorkOrder getWorkOrderById(int workOrderId) throws SQLException {
         String sql = "SELECT * FROM WorkOrder WHERE WorkOrderID = ?";
         try (Connection conn = DbContext.getConnection();
@@ -102,6 +124,40 @@ public class WorkOrderDAO extends DbContext {
             ps.setBigDecimal(6, detail.getEstimateHours());
             ps.setBigDecimal(7, detail.getEstimateAmount());
             return ps.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * Add WorkOrderDetail using provided connection (for transactions)
+     */
+    public int addWorkOrderDetail(Connection conn, WorkOrderDetail detail) throws SQLException {
+        String sql = "INSERT INTO WorkOrderDetail (WorkOrderID, Source, DiagnosticID, ApprovalStatus, TaskDescription, EstimateHours, EstimateAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, detail.getWorkOrderId());
+            ps.setString(2, detail.getSource().name());
+            if (detail.getDiagnosticId() != null) {
+                ps.setInt(3, detail.getDiagnosticId());
+            } else {
+                ps.setNull(3, java.sql.Types.INTEGER);
+            }
+            if (detail.getApprovalStatus() != null) {
+                ps.setString(4, detail.getApprovalStatus().name());
+            } else {
+                ps.setNull(4, java.sql.Types.VARCHAR);
+            }
+            ps.setString(5, detail.getTaskDescription());
+            ps.setBigDecimal(6, detail.getEstimateHours());
+            ps.setBigDecimal(7, detail.getEstimateAmount());
+            
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
+                }
+            }
+            return -1;
         }
     }
 
