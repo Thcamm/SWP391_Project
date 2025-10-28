@@ -14,7 +14,7 @@ public class CSHome extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/view/customerservice/customerservice-home.jsp")
+        request.getRequestDispatcher("/view/customerservice/home.jsp")
                 .forward(request, response);
 
 

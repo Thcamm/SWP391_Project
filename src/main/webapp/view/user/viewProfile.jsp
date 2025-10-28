@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/user/viewProfile.css">
 </head>
 <body>
-<jsp:include page="/common/header.jsp" />
+<jsp:include page="/common/customer/header.jsp" />
 <div class="container profile-content">
     <h2>User Profile</h2>
 
@@ -110,7 +110,7 @@
         </div>
     </div>
 </div>
-<jsp:include page="/common/footer.jsp" />
+<jsp:include page="/common/customer/footer.jsp" />
 <script src="${pageContext.request.contextPath}/assets/js/user/viewProfile.js"></script>
 </body>
 </html>
