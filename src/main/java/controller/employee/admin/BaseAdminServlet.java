@@ -10,7 +10,6 @@ import java.io.IOException;
 
 public abstract class BaseAdminServlet extends HttpServlet {
 
-
     protected String getCurrentUser(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         if (session != null) {
@@ -19,16 +18,14 @@ public abstract class BaseAdminServlet extends HttpServlet {
                 return userName;
             }
         }
-        return null; // Hoặc trả về một user mặc định "Guest" nếu cần
+        return null;
     }
-
 
     protected void handleError(HttpServletRequest request, HttpServletResponse response, String errorMessage)
             throws ServletException, IOException {
         request.setAttribute("errorMessage", errorMessage);
         request.getRequestDispatcher("/error.jsp").forward(request, response);
     }
-
 
     protected Integer parseIntParameter(String param) {
         if (param == null || param.trim().isEmpty()) {
@@ -48,7 +45,6 @@ public abstract class BaseAdminServlet extends HttpServlet {
         return "active".equalsIgnoreCase(param);
     }
 
-
     protected void handleMessages(HttpServletRequest request) {
         String message = request.getParameter("message");
         String messageType = request.getParameter("messageType");
@@ -59,13 +55,12 @@ public abstract class BaseAdminServlet extends HttpServlet {
         }
     }
 
-
     protected boolean isNullOrEmpty(String str) {
         return str == null || str.trim().isEmpty();
     }
 
     protected void redirectWithMessage(HttpServletResponse response, String url,
-                                       String message, String messageType) throws IOException {
+            String message, String messageType) throws IOException {
         // Đảm bảo URL chưa có dấu ?
         String separator = url.contains("?") ? "&" : "?";
 
