@@ -39,12 +39,10 @@
         }
     </style>
 </head>
-<body class="bg-light">
-
-<div class="container py-5">
-    <div class="card shadow-lg">
-        <div class="card-body">
-            <h3 class="card-title mb-4 text-center">Edit Vehicle</h3>
+<body>
+<jsp:include page="/common/customer/header.jsp" />
+<div class="form-container">
+    <h2>Edit Vehicle Information</h2>
 
             <c:if test="${not empty error}">
                 <div class="alert alert-danger">${error}</div>
@@ -129,5 +127,6 @@
 
 <script src="${pageContext.request.contextPath}/assets/js/customer/vehicleApi.js"></script>
 
+<jsp:include page="/common/customer/footer.jsp" />
 </body>
 </html>

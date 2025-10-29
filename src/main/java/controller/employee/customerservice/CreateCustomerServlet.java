@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.customer.Customer;
+import util.MailService;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -32,7 +33,10 @@ public class CreateCustomerServlet extends HttpServlet {
         String email = request.getParameter("email");
         String phoneNumber = request.getParameter("phone");
         String gender = request.getParameter("gender");
-        String address = request.getParameter("address");
+        String province = request.getParameter("province");
+        String district = request.getParameter("district");
+        String detailAddress = request.getParameter("addressDetail");
+        String address = detailAddress + ", " + district + ", " + province;
         String birthDateStr = request.getParameter("birthDate");
         String password = RandomString.generateRandomString(12);
         Date birthDate = null;
@@ -55,14 +59,25 @@ public class CreateCustomerServlet extends HttpServlet {
         customer.setAddress(address);
         customer.setActiveStatus(true);
         customer.setUserName(email);
-        customer.setPasswordHash(util.PasswordUtil.hashPassword(email));
+        customer.setPasswordHash(util.PasswordUtil.hashPassword(password));
         customer.setPointLoyalty(0);
 
         CustomerDAO dao = new CustomerDAO();
 
-        boolean isDuplicate = dao.isCustomerDuplicate(email);
-        if (isDuplicate) {
+        boolean isEmailDuplicate = dao.isEmailDuplicate(email);
+        boolean isPhoneDuplicate = dao.isPhoneNumberDuplicate(phoneNumber);
+        if (isEmailDuplicate && isPhoneDuplicate ) {
+            request.setAttribute("message", "Email and phone already exists!");
+            request.setAttribute("messageType", "warning");
+            request.getRequestDispatcher("/view/customerservice/create-customer.jsp").forward(request, response);
+            return;
+        } else if (isEmailDuplicate) {
             request.setAttribute("message", "Email already exists!");
+            request.setAttribute("messageType", "warning");
+            request.getRequestDispatcher("/view/customerservice/create-customer.jsp").forward(request, response);
+            return;
+        } else if (isPhoneDuplicate) {
+            request.setAttribute("message", "Phone already exists!");
             request.setAttribute("messageType", "warning");
             request.getRequestDispatcher("/view/customerservice/create-customer.jsp").forward(request, response);
             return;
@@ -70,7 +85,8 @@ public class CreateCustomerServlet extends HttpServlet {
 
         boolean success = dao.insertCustomer(customer);
         if (success) {
-            request.setAttribute("message", "Customer added successfully!");
+            MailService.sendEmail(email,"You have been successfully created!","This is your temporary password " + password );
+            request.setAttribute("message", "Customer added successfully! Password: " + password);
             request.setAttribute("messageType", "success");
         } else {
             request.setAttribute("message", "Unable to add customer. Please try again.");

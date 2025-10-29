@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Objects;
 
 public class Customer extends User {
-    private int customerId;
-    private int userId;
+    private Integer customerId;
+    private Integer userId;
     private int pointLoyalty;
     private List<Vehicle> vehicles;
 
@@ -19,23 +19,22 @@ public class Customer extends User {
         super();
     }
 
-    public Customer(int customerId, int userId, int pointLoyalty) {
+    public Customer(Integer customerId, Integer userId, int pointLoyalty) {
         super();
         this.customerId = customerId;
         this.userId = userId;
         this.pointLoyalty = pointLoyalty;
     }
 
-    // Constructor đầy đủ
     public Customer(String address, boolean activeStatus, Date birthDate, Timestamp createdAt, String email,
             String fullName, String gender, String passwordHash, String phoneNumber, int roleId, Timestamp updatedAt,
-            Integer userId, String userName, int customerId, int pointLoyalty) {
+            Integer userId, String userName, Integer customerId, int pointLoyalty) {
         super();
         this.customerId = customerId;
         this.pointLoyalty = pointLoyalty;
     }
 
-    public int getCustomerId() {
+    public Integer getCustomerId() {
         return customerId;
     }
 

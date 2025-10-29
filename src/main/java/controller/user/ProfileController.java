@@ -38,13 +38,20 @@ public class ProfileController extends HttpServlet {
             response.sendRedirect(contextPath + "/login");
             return;
         }
+        String idParam = request.getParameter("id");
+        int userIdToView = sessionUser.getUserId(); // mặc định là chính mình
+
+        if (idParam != null && !idParam.isEmpty()) {
+            userIdToView = Integer.parseInt(idParam); // nếu có id khác thì lấy id đó
+        }
+        showViewProfilePage(request, response, userIdToView);
 
         String action = request.getParameter("action");
 
         if ("edit".equals(action)) {
             showEditProfilePage(request, response, sessionUser.getUserId());
         } else {
-            showViewProfilePage(request, response, sessionUser.getUserId());
+            showViewProfilePage(request, response, userIdToView);
         }
     }
 

@@ -10,7 +10,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<%@ include file="/common/header.jsp" %>
+<jsp:include page="/common/customer/header.jsp" />
+
+<jsp:include page="/view/customerservice/result.jsp" />
 <form action="${pageContext.request.contextPath}/customer/appointment-history" method="get" class="card p-4 mb-4">
     <div class="mt-4 d-flex justify-content-between align-items-center">
         <label>
@@ -96,7 +98,6 @@
         <th>Appointment Date</th>
         <th>Status</th>
         <th>Description</th>
-        <th>Action</th>
     </tr>
     </thead>
     <tbody>
@@ -131,38 +132,39 @@
                 </c:choose>
 
             </td>
-            <td>${empty apm.description ? '-' : apm.description}</td>
-
             <td>
-                <a href="appointment-detail?id=${apm.appointmentID}" class="btn btn-sm btn-outline-primary">
-                    Detail
-                </a>
-
-
-<%--                    <c:when test="${apm.status == 'ACCEPTED'}">--%>
-<%--                        <a href="/customer/appointment-history?appointmentID=${apm.appointmentID}"--%>
-<%--                           class="btn btn-sm btn-success ms-2">＋ SO</a>--%>
-<%--                    </c:when>--%>
-<%--                    <c:otherwise>--%>
-<%--                        <a class="btn btn-sm btn-success ms-2 disabled" tabindex="-1" aria-disabled="true"--%>
-<%--                           style="opacity: 0.5; pointer-events: none;">＋ SO</a>--%>
-<%--                    </c:otherwise>--%>
-<%--                </c:choose>--%>
-
+                <button type="button"
+                        class="btn btn-sm btn-outline-primary"
+                        data-bs-toggle="popover"
+                        data-bs-html="true"
+                        data-bs-content="${apm.description}">
+                    ▶
+                </button>
             </td>
+
         </tr>
     </c:forEach>
 
     <c:if test="${empty appointments}">
         <tr>
-            <td colspan="7" class="text-center">No appointments found.</td>
+            <td colspan="6" class="text-center">No appointments found.</td>
         </tr>
     </c:if>
     </tbody>
 </table>
-<%@ include file="/common/footer.jsp" %>
+<jsp:include page="/common/customer/footer.jsp" />
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+        popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl, {
+                trigger: 'focus', // click sẽ hiển thị, click ra ngoài sẽ ẩn
+                placement: 'right'
+            })
+        })
+    });
+</script>
 <script src="${pageContext.request.contextPath}/assets/js/customer/appointment-history.js"></script>
 </body>
 </html>

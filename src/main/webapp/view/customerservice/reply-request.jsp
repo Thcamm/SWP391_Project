@@ -10,6 +10,8 @@
 </head>
 
 <body class="bg-light">
+<jsp:include page="/view/customerservice/sidebar.jsp" />
+<jsp:include page="/view/customerservice/result.jsp" />
 <div class="container mt-5">
 
     <div class="card shadow-sm">
@@ -50,13 +52,6 @@
                 </div>
             </form>
 
-            <c:if test="${not empty messageSent}">
-                <div class="alert alert-success mt-3">${messageSent}</div>
-            </c:if>
-
-            <c:if test="${not empty error}">
-                <div class="alert alert-danger mt-3">${error}</div>
-            </c:if>
         </div>
     </div>
 

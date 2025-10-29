@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #ededed 0%, #ededed 100%);
     min-height: 100vh;
     padding: 20px;
     color: #333;
@@ -14,7 +14,7 @@ body {
 
 h2 {
     text-align: center;
-    color: #fff;
+    color: #3a3a3c;
     font-size: 2.5rem;
     margin-bottom: 30px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
@@ -44,13 +44,13 @@ input[type="text"] {
 
 input[type="text"]:focus {
     background: #fff;
-    border-color: #667eea;
+    border-color: #d9d9d9;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 button[type="submit"] {
     padding: 12px 30px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #dfdfdf 0%, #c1c1c1 100%);
     color: white;
     border: none;
     border-radius: 25px;
@@ -58,12 +58,12 @@ button[type="submit"] {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 15px rgba(154, 154, 154, 0.4);
 }
 
 button[type="submit"]:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 6px 20px rgb(193, 193, 193);
 }
 
 button[type="submit"]:active {
@@ -128,7 +128,7 @@ li a::before {
 }
 
 li:hover a {
-    color: #667eea;
+    color: #3a3a3c;
 }
 
 li a::after {
@@ -156,7 +156,7 @@ li:hover a::after {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #bbb9bd 0%, #bbb9bd 100%);
     color: #fff;
     font-size: 28px;
     border: none;
@@ -167,7 +167,7 @@ li:hover a::after {
 
 .help-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 6px 25px rgb(193, 193, 193);
 }
 
 .help-options {

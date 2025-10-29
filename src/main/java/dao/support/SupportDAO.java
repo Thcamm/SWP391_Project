@@ -201,8 +201,8 @@ public class SupportDAO extends DbContext {
                     sr.setCustomerId(rs.getInt("CustomerID"));
                     sr.setCategoryId(rs.getInt("CategoryID"));
                     sr.setStatus(rs.getString("Status"));
-                    sr.setCreatedAt(rs.getDate("CreatedAt"));
-                    sr.setUpdatedAt(rs.getDate("UpdatedAt"));
+                    sr.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
+                    sr.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
                     list.add(sr);
                 }
             }
@@ -212,7 +212,7 @@ public class SupportDAO extends DbContext {
 
     public List<SupportRequest> getAllSupportRequests() throws SQLException {
         List<SupportRequest> list = new ArrayList<>();
-        String sql = "SELECT * FROM SupportRequest ";
+        String sql = "SELECT * FROM SupportRequest order by createdAt desc ";
         try (PreparedStatement ps = getConnection().prepareStatement(sql);
         ResultSet rs = ps.executeQuery()){
             while (rs.next()) {
@@ -221,8 +221,9 @@ public class SupportDAO extends DbContext {
                 sr.setCustomerId(rs.getInt("CustomerID"));
                 sr.setCategoryId(rs.getInt("CategoryID"));
                 sr.setStatus(rs.getString("Status"));
-                sr.setCreatedAt(rs.getDate("CreatedAt"));
-                sr.setUpdatedAt(rs.getDate("UpdatedAt"));
+                sr.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
+                sr.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
+
                 list.add(sr);
             }
         } catch (SQLException e) {
@@ -264,7 +265,7 @@ public class SupportDAO extends DbContext {
                     sr.setRequestId(rs.getInt("RequestID"));
                     sr.setCustomerId(rs.getInt("CustomerID"));
 
-                    // Có thể null → dùng getObject()
+
                     sr.setWorkOrderId((Integer) rs.getObject("WorkOrderID"));
                     sr.setAppointmentId((Integer) rs.getObject("AppointmentID"));
 
@@ -272,8 +273,9 @@ public class SupportDAO extends DbContext {
                     sr.setDescription(rs.getString("Description"));
                     sr.setAttachmentPath(rs.getString("AttachmentPath"));
                     sr.setStatus(rs.getString("Status"));
-                    sr.setCreatedAt(rs.getDate("CreatedAt"));
-                    sr.setUpdatedAt(rs.getDate("UpdatedAt"));
+                    sr.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
+                    sr.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
+
                     return sr;
                 }
             }
