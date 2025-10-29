@@ -33,7 +33,10 @@ public class CreateCustomerServlet extends HttpServlet {
         String email = request.getParameter("email");
         String phoneNumber = request.getParameter("phone");
         String gender = request.getParameter("gender");
-        String address = request.getParameter("address");
+        String province = request.getParameter("province");
+        String district = request.getParameter("district");
+        String detailAddress = request.getParameter("addressDetail");
+        String address = detailAddress + ", " + district + ", " + province;
         String birthDateStr = request.getParameter("birthDate");
         String password = RandomString.generateRandomString(12);
         Date birthDate = null;

@@ -1,4 +1,6 @@
 package controller.employee.customerservice;
+
+import common.utils.PaginationUtils;
 import dao.customer.CustomerDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -9,7 +11,6 @@ import model.customer.Customer;
 
 import java.io.IOException;
 import java.util.List;
-
 
 @WebServlet("/customerservice/search-customer")
 public class SearchCustomerServlet extends HttpServlet {
@@ -25,21 +26,55 @@ public class SearchCustomerServlet extends HttpServlet {
         String fromDate = request.getParameter("fromDate");
         String toDate = request.getParameter("toDate");
 
-        CustomerDAO dao = new CustomerDAO();
-        List<Customer> customers ;
-        if ((name == null || name.isEmpty()) &&
-                (licensePlate == null || licensePlate.isEmpty()) &&
-                (emailOrPhone == null || emailOrPhone.isEmpty()) &&
-                (fromDate == null || fromDate.isEmpty()) &&
-                (toDate == null || toDate.isEmpty())) {
+        int currentPage = 1;
+        int itemsPerPage = 10;
 
-            customers = dao.getAllCustomers();
-        } else {
-            customers = dao.searchCustomers(name, emailOrPhone, licensePlate, sortOrder, fromDate, toDate);
+        if (request.getParameter("page") != null) {
+            try {
+                currentPage = Integer.parseInt(request.getParameter("page"));
+            } catch (NumberFormatException ignored) {
+            }
         }
 
-        request.setAttribute("customerList", customers);
+        CustomerDAO dao = new CustomerDAO();
+        List<Customer> customers;
+        PaginationUtils.PaginationResult<Customer> result;
 
-        request.getRequestDispatcher("/view/customerservice/search-customer.jsp").forward(request, response);
+        boolean isFilterEmpty =
+                (name == null || name.isEmpty()) &&
+                        (licensePlate == null || licensePlate.isEmpty()) &&
+                        (emailOrPhone == null || emailOrPhone.isEmpty()) &&
+                        (fromDate == null || fromDate.isEmpty()) &&
+                        (toDate == null || toDate.isEmpty());
+
+        if (isFilterEmpty) {
+            int totalItems = dao.countCustomers();
+            PaginationUtils.PaginationCalculation calc =
+                    PaginationUtils.calculateParams(totalItems, currentPage, itemsPerPage);
+
+            customers = dao.getCustomersWithLimit(itemsPerPage, calc.getOffset());
+            result = new PaginationUtils.PaginationResult<>(
+                    customers, totalItems, calc.getTotalPages(),
+                    calc.getSafePage(), itemsPerPage);
+        } else {
+            int totalItems = dao.countSearchCustomers(name, emailOrPhone, licensePlate, fromDate, toDate);
+            PaginationUtils.PaginationCalculation calc =
+                    PaginationUtils.calculateParams(totalItems, currentPage, itemsPerPage);
+
+            customers = dao.searchCustomersWithLimit(
+                    name, emailOrPhone, licensePlate, sortOrder,
+                    fromDate, toDate, itemsPerPage, calc.getOffset());
+
+            result = new PaginationUtils.PaginationResult<>(
+                    customers, totalItems, calc.getTotalPages(),
+                    calc.getSafePage(), itemsPerPage);
+        }
+
+        request.setAttribute("customerList", result);
+        request.setAttribute("currentPage", result.getCurrentPage());
+        request.setAttribute("totalPages", result.getTotalPages());
+
+        request.getRequestDispatcher("/view/customerservice/search-customer.jsp")
+                .forward(request, response);
     }
 }

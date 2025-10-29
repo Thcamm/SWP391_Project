@@ -14,7 +14,7 @@
 
 </head>
 <body>
-<%@ include file="/common/header.jsp" %>
+<jsp:include page="/common/customer/header.jsp" />
 <main class="garage-container">
     <div class="garage-header">
         <h2>My Vehicles</h2>
@@ -60,7 +60,7 @@
         </c:otherwise>
     </c:choose>
 </main>
-<%@ include file="/common/footer.jsp" %>
+<jsp:include page="/common/customer/footer.jsp" />
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
