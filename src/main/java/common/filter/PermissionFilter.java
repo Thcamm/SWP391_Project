@@ -76,6 +76,7 @@ public class PermissionFilter implements Filter {
         // Tech manager - chỉ dashboard, workorders được forward đến WorkOrderController
         routePerm.put("GET:/techmanager/home", "tech_manager_access");
 
+
         // WorkOrder management - tất cả operations được xử lý bởi WorkOrderController
         routePerm.put("GET:/view/techmanager/home.jsp", "tech_manager_access");
         routePerm.put("GET:/view/techmanager/home.jsp", "tech_manager_access");
@@ -103,6 +104,7 @@ public class PermissionFilter implements Filter {
         routePerm.put("GET:/view/error.jsp", "tech_manager_access");
         // Technician
         routePerm.put("GET:/view/technician/home.jsp", "technician_access");
+        routePerm.put("GET:/view/technician/tasks.jsp", "technician_access");
 
         // Storekeeper (Inventory)
         routePerm.put("GET:/view/storekepper/inventory-list.jsp", "inventory_access");

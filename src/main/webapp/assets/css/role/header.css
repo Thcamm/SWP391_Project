@@ -1,16 +1,21 @@
-
+/* =====================================================
+   ADMIN HEADER - SMART GREEN PASTEL DESIGN
+   ===================================================== */
 
 .admin-header {
-    background: #fff;
-    border-bottom: 1px solid #ddd;
-    padding: 12px 24px;
+    background: linear-gradient(135deg, #f6fff8 0%, #ecfdf3 100%);
+    border-bottom: 3px solid #a8e6ae;
+    padding: 1rem 2rem;
     display: flex;
     justify-content: center;
     align-items: center;
     position: sticky;
     top: 0;
     z-index: 1000;
-    font-family: system-ui, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    box-shadow: 0 4px 16px rgba(60, 120, 80, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
 }
 
 .header-container {
@@ -18,27 +23,59 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    max-width: 1300px;
+    max-width: 1400px;
+    gap: 2rem;
 }
 
-/* --- Logo --- */
+/* === LOGO === */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
 .logo h1 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #333;
+    font-size: 1.4rem;
+    font-weight: 700;
     margin: 0;
+    background: linear-gradient(135deg, #57c77b 0%, #89e6a5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
 }
 
 .logo a {
     text-decoration: none;
     color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: transform 0.3s ease;
 }
 
-/* --- Navigation --- */
-.main-nav .nav-menu {
+.logo a:hover {
+    transform: scale(1.05);
+}
+
+/* Optional Logo Icon */
+.logo::before {
+    content: "🌿";
+    font-size: 1.8rem;
+    filter: drop-shadow(0 2px 4px rgba(121, 199, 132, 0.25));
+}
+
+/* === NAVIGATION === */
+.main-nav {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.nav-menu {
     display: flex;
     list-style: none;
-    gap: 25px;
+    gap: 0.5rem;
     margin: 0;
     padding: 0;
 }
@@ -49,37 +86,55 @@
 
 .nav-link {
     text-decoration: none;
-    color: #555;
+    color: #56715d;
     font-weight: 500;
-    padding: 6px 0;
-    transition: color 0.2s ease, border-color 0.2s ease;
-    border-bottom: 2px solid transparent;
+    padding: 0.65rem 1.25rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: inline-block;
+    font-size: 0.95rem;
+    border: 2px solid transparent;
 }
 
 .nav-link:hover {
-    color: #000;
-    border-bottom-color: #aaa;
+    color: #2e5d34;
+    background: linear-gradient(135deg, #d8f9e0 0%, #c1f1ce 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(121, 199, 132, 0.15);
 }
 
 .nav-item.active > .nav-link {
-    color: #000;
-    border-bottom-color: #222;
+    color: white;
+    background: linear-gradient(135deg, #79c784 0%, #a4e8b3 100%);
     font-weight: 600;
+    box-shadow: 0 4px 14px rgba(100, 180, 120, 0.25);
 }
 
-/* --- Dropdown Menu --- */
+/* === DROPDOWN MENU === */
 .dropdown-menu {
     position: absolute;
-    top: 110%;
+    top: calc(100% + 0.5rem);
     left: 0;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 8px 0;
+    background: #ffffff;
+    border: 2px solid #d6edd8;
+    border-radius: 10px;
+    padding: 0.5rem;
     list-style: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 8px 20px rgba(60, 120, 80, 0.1);
     display: none;
-    min-width: 180px;
+    min-width: 220px;
+    animation: dropdownSlide 0.3s ease-out;
+}
+
+@keyframes dropdownSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .nav-item.dropdown:hover .dropdown-menu {
@@ -91,69 +146,216 @@
 }
 
 .dropdown-menu a {
-    display: block;
-    padding: 8px 15px;
-    color: #444;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+    color: #5d725d;
     text-decoration: none;
-    transition: background 0.2s ease;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
 }
 
 .dropdown-menu a:hover {
-    background: #f4f4f4;
+    background: linear-gradient(135deg, #e7f8ea 0%, #d8f4de 100%);
+    color: #2e5d34;
+    transform: translateX(5px);
 }
 
-/* --- Right Side (User Info) --- */
+/* Dropdown Icon */
+.dropdown-menu a::before {
+    content: "▸";
+    font-size: 0.8rem;
+    color: #79c784;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.dropdown-menu a:hover::before {
+    opacity: 1;
+}
+
+/* === RIGHT SIDE (USER INFO) === */
 .header-right {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 1.25rem;
 }
 
 .user-info {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    font-size: 0.9em;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #d8f9e0 0%, #c1f1ce 100%);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(60, 120, 80, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.user-info:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(80, 160, 100, 0.2);
 }
 
 .user-name {
-    font-weight: 500;
-    color: #333;
+    font-weight: 600;
+    color: #2f4f35;
+    font-size: 0.95rem;
 }
 
 .user-role {
-    color: #777;
-    font-size: 0.8em;
+    color: #6a8b6c;
+    font-size: 0.8rem;
+    margin-top: 0.15rem;
 }
 
+/* User Avatar */
+.user-info::before {
+    content: "👤";
+    position: absolute;
+    left: -2rem;
+    font-size: 1.5rem;
+    filter: drop-shadow(0 2px 4px rgba(121, 199, 132, 0.3));
+}
+
+/* === LOGOUT BUTTON === */
 .logout-btn {
-    background: none;
-    border: 1px solid #ccc;
-    padding: 6px 12px;
-    border-radius: 4px;
-    color: #333;
+    background: linear-gradient(135deg, #e8f8e9 0%, #d6f3d8 100%);
+    border: none;
+    padding: 0.65rem 1.25rem;
+    border-radius: 8px;
+    color: #2f4f35;
     text-decoration: none;
-    font-size: 0.9em;
-    transition: background 0.2s ease, color 0.2s ease;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 8px rgba(60, 120, 80, 0.1);
 }
 
 .logout-btn:hover {
-    background: #f0f0f0;
-    color: #000;
+    background: linear-gradient(135deg, #c8f7d4 0%, #b2f2c2 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(100, 180, 120, 0.25);
 }
 
-/* --- Responsive --- */
+.logout-btn::before {
+    content: "🚪";
+    font-size: 1rem;
+}
+
+/* === MOBILE MENU TOGGLE === */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: 2px solid #cde8cf;
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mobile-menu-toggle:hover {
+    background: #f6fff8;
+    border-color: #79c784;
+}
+
+.mobile-menu-toggle span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: #2f4f35;
+    margin: 5px 0;
+    transition: all 0.3s ease;
+}
+
+/* === RESPONSIVE DESIGN === */
 @media (max-width: 900px) {
-    .main-nav .nav-menu {
+    .mobile-menu-toggle {
+        display: block;
+    }
+
+    .main-nav {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #ffffff;
+        border-top: 2px solid #d6edd8;
+        box-shadow: 0 6px 16px rgba(60, 120, 80, 0.1);
         display: none;
+    }
+
+    .main-nav.active {
+        display: block;
+    }
+
+    .nav-menu {
+        flex-direction: column;
+        padding: 1rem;
+        gap: 0.5rem;
+    }
+
+    .nav-link {
+        width: 100%;
+        display: block;
+    }
+
+    .dropdown-menu {
+        position: static;
+        box-shadow: none;
+        border: none;
+        border-left: 3px solid #79c784;
+        margin-left: 1rem;
+        margin-top: 0.5rem;
     }
 
     .header-container {
         flex-wrap: wrap;
-        gap: 10px;
     }
 
     .user-info {
-        align-items: flex-start;
+        order: 3;
+        width: 100%;
+        margin-top: 0.5rem;
     }
+}
+
+@media (max-width: 768px) {
+    .admin-header {
+        padding: 0.75rem 1rem;
+    }
+
+    .logo h1 {
+        font-size: 1.1rem;
+    }
+
+    .logout-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* === ACTIVE STATE ANIMATIONS === */
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.nav-item.active > .nav-link {
+    animation: pulse 2s infinite;
+}
+
+/* === SCROLL EFFECT === */
+.admin-header.scrolled {
+    box-shadow: 0 6px 20px rgba(60, 120, 80, 0.15);
 }

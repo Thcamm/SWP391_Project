@@ -26,13 +26,13 @@
 
     <div class="task-stats">
         <div class="stat-box all">
-            <div class="stat-number">${taskStats.totalTasks}</div>
+            <div class="stat-number">${taskStats.totalTasksCount}</div>
             <div class="stat-label">Total tasks</div>
 
         </div>
 
         <div class="stat-box assigned">
-            <div class="stat-number">${taskStats.assignedCount}</div>
+            <div class="stat-number">${taskStats.newTasksCount}</div>
             <div class="stat-label">Assigned</div>
 
         </div>
@@ -44,7 +44,7 @@
         </div>
 
         <div class="stat-box completed">
-            <div class="stat-number">${taskStats.completedCount}</div>
+            <div class="stat-number">${taskStats.completedTodayCount}</div>
             <div class="stat-label">Completed</div>
 
         </div>
