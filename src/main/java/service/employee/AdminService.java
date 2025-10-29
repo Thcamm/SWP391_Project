@@ -127,8 +127,7 @@ public class AdminService {
                         roleName.contains("manager") ||
                         roleName.contains("supervisor") ||
                         roleName.equals("tech manager") ||
-                        roleName.contains("quản lý") || // Vietnamese
-                        roleName.contains("admin"); // Any admin variant
+                        roleName.contains("quản lý");
                 return isAdminRole;
 
             } else {
@@ -202,10 +201,6 @@ public class AdminService {
     // }
     // }
 
-    public boolean createUser(String fullName, String userName, String email, int roleId, String gender,
-            String currentUser) {
-        return createUser(fullName, userName, email, roleId, gender, currentUser, null, null);
-    }
 
     /**
      * Create user with optional employee details for non-customer roles
@@ -387,6 +382,7 @@ public class AdminService {
             System.out.println("    User ID: " + userId);
             System.out.println("    New Status: " + (newStatus ? "ACTIVE" : "INACTIVE"));
             System.out.println("    Actor: " + currentUser);
+
 
             boolean success = adminDAO.updateUserStatus(userId, newStatus, currentUser);
 

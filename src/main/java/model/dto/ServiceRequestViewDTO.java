@@ -1,4 +1,4 @@
-package model.servicetype;
+package model.dto;
 
 import java.sql.Timestamp;
 

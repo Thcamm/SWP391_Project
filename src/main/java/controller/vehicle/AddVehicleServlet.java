@@ -1,154 +1,154 @@
 package controller.vehicle;
 
-import dao.vehicle.CarDataDAO;
 import dao.vehicle.VehicleDAO;
 import model.customer.Customer;
-import model.vehicle.CarBrand;
-import model.vehicle.CarModel;
 import model.vehicle.Vehicle;
 import service.vehicle.VehicleService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-
+import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
 
 @WebServlet(name = "AddVehicleServlet", urlPatterns = {"/customer/addVehicle"})
 public class AddVehicleServlet extends HttpServlet {
 
-    private final CarDataDAO carDAO = new CarDataDAO();
     private final VehicleDAO vehicleDAO = new VehicleDAO();
     private final VehicleService vehicleService = new VehicleService(vehicleDAO);
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            List<CarBrand> brands = carDAO.getAllBrands();
-            request.setAttribute("brands", brands);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Could not load car brands data.");
-        }
+        // JSP sẽ tự fetch brand/model qua API
         request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        String action = request.getParameter("action");
-        if (action == null) action = "";
-
-        try {
-            if ("selectModel".equals(action)) {
-                handleSelectModel(request, response);
-            } else {
-                handleSaveVehicle(request, response);
-            }
-        } catch (SQLException | NumberFormatException e) {
-            e.printStackTrace();
-            request.setAttribute("error", "An error occurred. Please try again.");
-            request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
-        }
-    }
-
-    private void handleSelectModel(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        int brandId = Integer.parseInt(request.getParameter("brandId"));
-        List<CarBrand> brands = carDAO.getAllBrands();
-        List<CarModel> models = carDAO.getModelsByBrandId(brandId);
-
-        request.setAttribute("brands", brands);
-        request.setAttribute("models", models);
-        request.setAttribute("selectedBrandId", brandId);
-        brands.stream()
-                .filter(b -> b.getBrandId() == brandId)
-                .findFirst()
-                .ifPresent(b -> request.setAttribute("selectedBrandName", b.getBrandName()));
-
-        request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
-    }
-
-    private void handleSaveVehicle(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
         HttpSession session = request.getSession();
-        String contextPath = request.getContextPath();
         Customer customer = (Customer) session.getAttribute("customer");
+        String contextPath = request.getContextPath();
+
         if (customer == null) {
             response.sendRedirect(contextPath + "/login");
             return;
         }
 
-        String brandName = request.getParameter("brandName");
-        String modelName = request.getParameter("modelName");
-        String yearStr = request.getParameter("yearManufacture");
+        // ====== FIX: Lấy đúng tên parameter từ form ======
+        String brand = request.getParameter("brand");           // ✅ ĐÚNG
+        String model = request.getParameter("model");           // ✅ ĐÚNG
+        String yearStr = request.getParameter("year");          // ✅ ĐÚNG
         String licensePlate = request.getParameter("licensePlate");
 
+        // ====== DEBUG: In ra console để kiểm tra ======
+        System.out.println("=== DEBUG AddVehicle ===");
+        System.out.println("Brand: " + brand);
+        System.out.println("Model: " + model);
+        System.out.println("Year: " + yearStr);
+        System.out.println("License Plate: " + licensePlate);
+        System.out.println("========================");
+
+        // ====== Validate: Kiểm tra null/empty ======
+        if (brand == null || brand.trim().isEmpty()) {
+            request.setAttribute("error", "Brand is required.");
+            request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
+            return;
+        }
+
+        if (model == null || model.trim().isEmpty()) {
+            request.setAttribute("error", "Model is required.");
+            request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
+            return;
+        }
+
+        if (yearStr == null || yearStr.trim().isEmpty()) {
+            request.setAttribute("error", "Year is required.");
+            request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
+            return;
+        }
+
+        if (licensePlate == null || licensePlate.trim().isEmpty()) {
+            request.setAttribute("error", "License plate is required.");
+            request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
+            return;
+        }
+
+        // ====== BƯỚC 1: Chuẩn hóa biển số để so sánh và lưu nhất quán ======
+        String normalizedPlate = normalizePlate(licensePlate);
+
+        // ====== BƯỚC 2: Validate format cơ bản ======
         if (!vehicleService.validateLicensePlateFormat(licensePlate)) {
             request.setAttribute("error", "Invalid license plate format.");
-            repopulateFormOnError(request, response, brandName);
+            request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
             return;
         }
 
-        if (vehicleService.isLicensePlateTaken(licensePlate, 0)) {
-            request.setAttribute("error", "This license plate already exists.");
-            repopulateFormOnError(request, response, brandName);
+        // ====== BƯỚC 3: Kiểm tra trùng biển số (kể cả dạng khác nhau) ======
+        try {
+            if (vehicleService.isLicensePlateTaken(normalizedPlate, -1)) {
+                request.setAttribute("error", "This license plate already exists in the system.");
+                request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
+                return;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Database error while checking license plate.");
+            request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
             return;
         }
 
-        int year = 0;
+        // ====== BƯỚC 4: Kiểm tra năm sản xuất ======
+        int year;
         try {
             year = Integer.parseInt(yearStr);
         } catch (NumberFormatException e) {
             request.setAttribute("error", "Year must be a valid number.");
-            repopulateFormOnError(request, response, brandName);
+            request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
             return;
         }
 
         int currentYear = java.time.Year.now().getValue();
-        if (year < 2000 || year > currentYear) {
-            request.setAttribute("error", "Year of manufacture must be between 2000 and " + currentYear + ".");
-            repopulateFormOnError(request, response, brandName);
+        if (year < 1900 || year > currentYear + 1) {
+            request.setAttribute("error", "Invalid year of manufacture.");
+            request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
             return;
         }
 
-        Vehicle newVehicle = new Vehicle();
-        newVehicle.setCustomerID(customer.getCustomerId());
-        newVehicle.setBrand(brandName);
-        newVehicle.setModel(modelName);
-        newVehicle.setYearManufacture(year);
-        newVehicle.setLicensePlate(licensePlate);
+        // ====== BƯỚC 5: Lưu vào database ======
+        Vehicle v = new Vehicle();
+        v.setCustomerID(customer.getCustomerId());
+        v.setBrand(brand.trim());
+        v.setModel(model.trim());
+        v.setYearManufacture(year);
+        v.setLicensePlate(normalizedPlate); // Lưu bản chuẩn hóa
 
-        vehicleDAO.insertVehicle(newVehicle);
-        session.setAttribute("success", "New vehicle added successfully!");
-        response.sendRedirect(contextPath + "/customer/garage");
+        try {
+            // insertVehicle() trả về vehicleId (int), không phải boolean
+            int newVehicleId = vehicleDAO.insertVehicle(v);
+
+            if (newVehicleId > 0) {
+                System.out.println("✅ Vehicle saved successfully with ID: " + newVehicleId);
+                session.setAttribute("success", "New vehicle added successfully!");
+                response.sendRedirect(contextPath + "/customer/garage");
+            } else {
+                System.out.println("❌ Failed to save vehicle! (returned ID: " + newVehicleId + ")");
+                request.setAttribute("error", "Failed to save vehicle. Please try again.");
+                request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("❌ SQL Exception: " + e.getMessage());
+            request.setAttribute("error", "Database error while saving vehicle: " + e.getMessage());
+            request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
+        }
     }
 
-    private void repopulateFormOnError(HttpServletRequest request, HttpServletResponse response, String brandName) throws SQLException, ServletException, IOException {
-        List<CarBrand> brands = carDAO.getAllBrands();
-        request.setAttribute("brands", brands);
-
-        if (brandName != null && !brandName.isEmpty()) {
-            int brandId = brands.stream()
-                    .filter(b -> b.getBrandName().equals(brandName))
-                    .findFirst().map(CarBrand::getBrandId).orElse(0);
-            if (brandId > 0) {
-                List<CarModel> models = carDAO.getModelsByBrandId(brandId);
-                request.setAttribute("models", models);
-                request.setAttribute("selectedBrandId", brandId);
-                request.setAttribute("selectedBrandName", brandName);
-            }
-        }
-
-        request.setAttribute("prevModel", request.getParameter("modelName"));
-        request.setAttribute("prevYear", request.getParameter("yearManufacture"));
-        request.setAttribute("prevLicensePlate", request.getParameter("licensePlate"));
-
-        request.getRequestDispatcher("/view/customer/addVehicle.jsp").forward(request, response);
+    // ====== HÀM CHUẨN HÓA BIỂN SỐ ======
+    private String normalizePlate(String plate) {
+        if (plate == null) return "";
+        return plate.replaceAll("[^A-Za-z0-9]", "").toUpperCase();
+        // Xóa mọi ký tự không phải chữ/số, viết hoa hết => 36A.36363 -> 36A36363
     }
 }

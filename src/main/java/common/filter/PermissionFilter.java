@@ -108,7 +108,13 @@ public class PermissionFilter implements Filter {
         routePerm.put("GET:/view/storekepper/inventory-import.jsp", "inventory_access");
 
         // Accountant
-        routePerm.put("GET:/view/accountant/home.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/dashboard.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/dashboard.jsp", "accountant_access");
+        routePerm.put("GET:/view/invoice/invoiceDetails.jsp", "accountant_access");
+        routePerm.put("POST:/view/invoice/invoiceDetails.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/recordPayment.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/recordPayment.jsp", "accountant_access");
+
 
         // Customer
         routePerm.put("GET:/view/customer/appointment-scheduling.jsp", "customer_access");
@@ -148,7 +154,8 @@ public class PermissionFilter implements Filter {
         areaGate.put("/inventory/", "inventory_access"); // Store Keeper
         areaGate.put("/accountant/", "accountant_access"); // Accountant
         areaGate.put("/customer/", "customer_access"); // Customer
-        areaGate.put("/user/", "user_access"); // User
+        areaGate.put("/user/", "user_access");
+        areaGate.put("/invoices/", "accountant_access");// User
     }
 
     @Override

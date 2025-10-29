@@ -1,8 +1,8 @@
 package dao.carservice;
 
 import common.DbContext;
-import model.servicetype.ServiceHistoryDTO;
-import model.servicetype.ServiceRequestViewDTO;
+import model.dto.ServiceHistoryDTO;
+import model.dto.ServiceRequestViewDTO;
 import model.workorder.ServiceRequest;
 
 import java.sql.*;

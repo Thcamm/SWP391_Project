@@ -76,7 +76,7 @@ public class Login extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/inventory/dashboard");
                 return;
             } else if(user.getRoleId() == 5) {
-                response.sendRedirect(request.getContextPath() + "/accountant/home");
+                response.sendRedirect(request.getContextPath() + "/accountant/dashboard");
                 return;
             } else if(user.getRoleId() == 6) {
                 response.sendRedirect(request.getContextPath() + "/customerservice/home");

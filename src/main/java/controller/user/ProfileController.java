@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.customer.Customer;
-import model.servicetype.ServiceHistoryDTO;
+import model.dto.ServiceHistoryDTO;
 import model.user.User;
 import service.user.UserProfileService;
 import service.user.UserProfileService.ValidationResult;
@@ -50,6 +50,10 @@ public class ProfileController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Set encoding để xử lý tiếng Việt (Giống Register.java)
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
         HttpSession session = request.getSession();
         User sessionUser = (User) session.getAttribute("user");
         String contextPath = request.getContextPath();
@@ -59,36 +63,54 @@ public class ProfileController extends HttpServlet {
             return;
         }
 
+        // Lấy các tham số
         String fullName = request.getParameter("fullName");
         String email = request.getParameter("email");
         String phoneNumber = request.getParameter("phoneNumber");
-        String address = request.getParameter("address");
         String gender = request.getParameter("gender");
         String birthDateStr = request.getParameter("birthDate");
 
+        // --- BẮT ĐẦU THAY ĐỔI: Lấy thông tin địa chỉ giống Register.java ---
+        String province = request.getParameter("province");
+        String district = request.getParameter("district");
+        String detailAddress = request.getParameter("addressDetail");
+
+        // Kết hợp 3 trường địa chỉ lại
+        String address = detailAddress + ", " + district + ", " + province;
+        // --- KẾT THÚC THAY ĐỔI ---
+
+        // Tạo đối tượng User để cập nhật
         User updatedUser = new User();
-        updatedUser.setUserId(sessionUser.getUserId());
+        updatedUser.setUserId(sessionUser.getUserId()); // Rất quan trọng: Phải có ID của user
         updatedUser.setFullName(fullName);
         updatedUser.setEmail(email);
         updatedUser.setPhoneNumber(phoneNumber);
-        updatedUser.setAddress(address);
+        updatedUser.setAddress(address); // Gán địa chỉ đã được kết hợp
         updatedUser.setGender(gender);
+
         try {
             if (birthDateStr != null && !birthDateStr.isEmpty()) {
+                // Giữ logic parse ngày sinh
                 updatedUser.setBirthDate(Date.valueOf(birthDateStr));
             }
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
+            // Cân nhắc thêm xử lý lỗi nếu ngày sinh không hợp lệ
         }
 
+        // Gọi service để validate và cập nhật
         ValidationResult result = userProfileService.updateUserProfile(updatedUser);
 
         if (result.isValid()) {
             session.setAttribute("success", result.getMessage());
+            // Cập nhật lại thông tin user trong session
             session.setAttribute("user", userProfileService.getUserProfile(sessionUser.getUserId()));
-            // Redirect to the new URL
             response.sendRedirect(contextPath + "/user/profile");
         } else {
+            // Nếu thất bại, gửi lại object 'updatedUser' để điền lại form
+            // Lưu ý: Form editProfile.jsp của ông bạn phải có logic
+            // để xử lý lại ${user.address} (địa chỉ tổng) ra 3 trường
+            // province, district, addressDetail (thường là bằng JavaScript)
             request.setAttribute("error", result.getMessage());
             request.setAttribute("user", updatedUser);
             request.getRequestDispatcher("/view/user/editProfile.jsp").forward(request, response);

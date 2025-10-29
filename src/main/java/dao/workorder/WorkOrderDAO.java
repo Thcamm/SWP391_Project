@@ -1,9 +1,12 @@
 package dao.workorder;
 
 import common.DbContext;
+import model.customer.Customer;
+import model.dto.InvoiceItemDTO;
 import model.workorder.WorkOrder;
 import model.workorder.WorkOrderDetail;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -103,6 +106,112 @@ public class WorkOrderDAO extends DbContext {
             ps.setBigDecimal(7, detail.getEstimateAmount());
             return ps.executeUpdate() > 0;
         }
+    }
+    /**
+     * Get customer ID from request ID
+     */
+    public int getCustomerIdByRequestId(int requestId) throws SQLException {
+        String query = "SELECT CustomerID FROM Request WHERE RequestID = ?";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, requestId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("CustomerID");
+                }
+            }
+        }
+        return -1; // Not found
+    }
+    public Customer getCustomerForWorkOrder(int workOrderId) throws SQLException {
+        // This assumes CustomerDAO has getCustomerById method joining User table
+        String sql = "SELECT c.*, u.FullName, u.Email, u.PhoneNumber " + // Select details from User
+                "FROM WorkOrder wo " +
+                "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
+                "JOIN Customer c ON sr.CustomerID = c.CustomerID " +
+                "JOIN User u ON c.UserID = u.UserID " + // Join User table
+                "WHERE wo.WorkOrderID = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, workOrderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Customer customer = new Customer();
+                    // Map data from both Customer and User tables
+                    customer.setCustomerId(rs.getInt("CustomerID"));
+                    customer.setUserId(rs.getInt("UserID"));
+                    customer.setFullName(rs.getString("FullName"));
+                    customer.setEmail(rs.getString("Email"));
+                    customer.setPhoneNumber(rs.getString("PhoneNumber"));
+                    return customer;
+                }
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Retrieves all service/task details for a specific WorkOrder.
+     * @param workOrderId The ID of the WorkOrder.
+     * @return A list of InvoiceItemDTO representing services/tasks.
+     */
+    public List<InvoiceItemDTO> getWorkOrderDetailsForInvoice(int workOrderId) throws SQLException {
+        List<InvoiceItemDTO> items = new ArrayList<>();
+        // Assuming WorkOrderDetail has TaskDescription and EstimateAmount (used as final price here)
+        String sql = "SELECT TaskDescription, 1 AS Quantity, EstimateAmount AS UnitPrice " +
+                "WHERE WorkOrderID = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, workOrderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    InvoiceItemDTO item = new InvoiceItemDTO();
+                    item.setDescription(rs.getString("TaskDescription"));
+                    item.setQuantity(rs.getInt("Quantity")); // Hardcoded to 1 for now
+                    BigDecimal price = rs.getBigDecimal("UnitPrice");
+                    item.setUnitPrice(price);
+                    item.setAmount(price); // Since Quantity is 1
+                    items.add(item);
+                }
+            }
+        }
+        return items;
+    }
+
+    /**
+     * Retrieves all parts used for a specific WorkOrder.
+     * @param workOrderId The ID of the WorkOrder.
+     * @return A list of InvoiceItemDTO representing parts.
+     */
+    public List<InvoiceItemDTO> getWorkOrderPartsForInvoice(int workOrderId) throws SQLException {
+        List<InvoiceItemDTO> items = new ArrayList<>();
+        // Joins WorkOrderPart with PartDetail and Part to get name and price
+        String sql = "SELECT p.PartName, wop.QuantityUsed, wop.UnitPrice " +
+                "FROM WorkOrderPart wop " +
+                "JOIN WorkOrderDetail wod ON wop.DetailID = wod.DetailID " + // Join needed if WorkOrderPart relates to DetailID
+                "JOIN PartDetail pd ON wop.PartDetailID = pd.PartDetailID " + // Optional: If UnitPrice is NOT in WorkOrderPart
+                "JOIN Part p ON pd.PartID = p.PartID " + // To get PartName
+                "WHERE wod.WorkOrderID = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, workOrderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    InvoiceItemDTO item = new InvoiceItemDTO();
+                    item.setDescription(rs.getString("PartName"));
+                    int quantity = rs.getInt("QuantityUsed");
+                    BigDecimal unitPrice = rs.getBigDecimal("UnitPrice"); // Get price recorded at time of use
+                    item.setQuantity(quantity);
+                    item.setUnitPrice(unitPrice);
+                    // Calculate amount
+                    item.setAmount(unitPrice.multiply(BigDecimal.valueOf(quantity)));
+                    items.add(item);
+                }
+            }
+        }
+        return items;
     }
 
     // Helper method to map ResultSet to WorkOrder

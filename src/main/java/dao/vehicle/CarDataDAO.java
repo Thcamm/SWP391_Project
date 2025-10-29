@@ -43,4 +43,51 @@ public class CarDataDAO extends DbContext {
         }
         return list;
     }
+    public int getBrandIdByName(String brandName) throws SQLException {
+        String sql = "SELECT BrandID FROM CarBrands WHERE BrandName = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setString(1, brandName);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) return rs.getInt("BrandID");
+        }
+        return -1;
+    }
+
+    public int insertBrandIfNotExist(String brandName) throws SQLException {
+        String sql = "INSERT INTO CarBrands (BrandName) VALUES (?)";
+        try (Connection conn = getConnection();
+             PreparedStatement st = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            st.setString(1, brandName);
+            st.executeUpdate();
+            ResultSet rs = st.getGeneratedKeys();
+            if (rs.next()) return rs.getInt(1);
+        }
+        return getBrandIdByName(brandName); // fallback
+    }
+
+    public int getModelIdByNameAndBrand(String modelName, int brandId) throws SQLException {
+        String sql = "SELECT ModelID FROM CarModels WHERE ModelName = ? AND BrandID = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setString(1, modelName);
+            st.setInt(2, brandId);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) return rs.getInt("ModelID");
+        }
+        return -1;
+    }
+
+    public int insertModelIfNotExist(String modelName, int brandId) throws SQLException {
+        String sql = "INSERT INTO CarModels (ModelName, BrandID) VALUES (?, ?)";
+        try (Connection conn = getConnection();
+             PreparedStatement st = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            st.setString(1, modelName);
+            st.setInt(2, brandId);
+            st.executeUpdate();
+            ResultSet rs = st.getGeneratedKeys();
+            if (rs.next()) return rs.getInt(1);
+        }
+        return getModelIdByNameAndBrand(modelName, brandId);
+    }
 }

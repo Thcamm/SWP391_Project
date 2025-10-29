@@ -218,11 +218,11 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                               </li>
                               <li>
                                 <i class="bi bi-check-circle text-success"></i>
-                                View service history
+                                Xem lịch sử dịch vụ
                               </li>
                               <li>
                                 <i class="bi bi-check-circle text-success"></i>
-                                Track vehicle status
+                                Theo dõi trạng thái xe
                               </li>
                             </ul>
                           </div>

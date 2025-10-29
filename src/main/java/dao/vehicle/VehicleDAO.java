@@ -77,20 +77,20 @@ public class VehicleDAO extends DbContext {
         }
     }
 
-    public int getVehicleIdByLicensePlate(String licensePlate) {
-        String sql = "SELECT VehicleID FROM vehicle WHERE LicensePlate = ?";
-        try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
-            st.setString(1, licensePlate);
-            ResultSet rs = st.executeQuery();
-            if (rs.next()) {
-                int vehicleID = rs.getInt("VehicleID");
-                return vehicleID;
-            }
-            return -1;
-        } catch (SQLException e) {
-            throw new RuntimeException("Lỗi khi lấy VehicleID theo biển số xe", e);
-        }
-    }
+//    public int getVehicleIdByLicensePlate(String licensePlate) {
+//        String sql = "SELECT VehicleID FROM vehicle WHERE LicensePlate = ?";
+//        try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
+//            st.setString(1, licensePlate);
+//            ResultSet rs = st.executeQuery();
+//            if (rs.next()) {
+//                int vehicleID = rs.getInt("VehicleID");
+//                return vehicleID;
+//            }
+//            return -1;
+//        } catch (SQLException e) {
+//            throw new RuntimeException("Lỗi khi lấy VehicleID theo biển số xe", e);
+//        }
+//    }
     private Vehicle extractVehicleFromResultSet(ResultSet rs) throws SQLException {
         Vehicle v = new Vehicle();
         v.setVehicleID(rs.getInt("VehicleID"));
@@ -141,5 +141,40 @@ public class VehicleDAO extends DbContext {
 
             return st.executeUpdate() > 0;
         }
+    }
+//    public List<String> getAllLicensePlates() throws SQLException {
+//        List<String> plates = new ArrayList<>();
+//        String sql = "SELECT LicensePlate FROM Vehicle";
+//        try (Connection conn = DbContext.getConnection();
+//             PreparedStatement st = conn.prepareStatement(sql);
+//             ResultSet rs = st.executeQuery()) {
+//            while (rs.next()) {
+//                plates.add(rs.getString("LicensePlate"));
+//            }
+//        }
+//        return plates;
+//    }
+    public List<String> getAllLicensePlates() throws SQLException {
+        List<String> plates = new ArrayList<>();
+        String sql = "SELECT LicensePlate FROM Vehicle";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            while (rs.next()) {
+                plates.add(rs.getString("LicensePlate"));
+            }
+        }
+        return plates;
+    }
+    public int getVehicleIdByLicensePlate(String licensePlate) throws SQLException {
+        String sql = "SELECT VehicleID FROM vehicle WHERE LicensePlate = ?";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setString(1, licensePlate);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) return rs.getInt("VehicleID");
+            }
+        }
+        return -1;
     }
 }
