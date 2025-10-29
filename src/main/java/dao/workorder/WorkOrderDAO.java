@@ -148,7 +148,7 @@ public class WorkOrderDAO extends DbContext {
             ps.setString(5, detail.getTaskDescription());
             ps.setBigDecimal(6, detail.getEstimateHours());
             ps.setBigDecimal(7, detail.getEstimateAmount());
-            
+
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {
                 try (ResultSet rs = ps.getGeneratedKeys()) {
