@@ -1,4 +1,6 @@
 package controller.employee.admin;
+import util.Validate;
+import common.constant.IConstant;
 
 // Required imports from Jakarta Servlet API
 
@@ -52,16 +54,45 @@ public class UserCreateCustomerServlet extends BaseAdminServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-
         String fullName = request.getParameter("fullName");
         String userName = request.getParameter("userName");
         String email = request.getParameter("email");
         String gender = request.getParameter("gender");
+        String phoneNumber = request.getParameter("phoneNumber");
+        String dobStr = request.getParameter("dob");
 
-        // Validate required fields
-        if (isNullOrEmpty(fullName) || isNullOrEmpty(userName) || isNullOrEmpty(email)) {
-            redirectWithMessage(response, request.getContextPath() + "/admin/users/create-customer",
-                    "Vui lòng điền đầy đủ thông tin bắt buộc!", "error");
+        String redirectUrl = request.getContextPath() + "/admin/users/create-customer";
+
+        if (Validate.isNullOrEmpty(fullName) || Validate.isNullOrEmpty(userName) || Validate.isNullOrEmpty(email)) {
+            redirectWithMessage(response, redirectUrl, "Vui lòng điền đầy đủ Tên, Username và Email!", "error");
+            return;
+        }
+        if (!Validate.isValidUsername(userName)) {
+            redirectWithMessage(response, redirectUrl, "Username phải từ 3-20 ký tự, không chứa ký tự đặc biệt hoặc khoảng trắng!", "error");
+            return;
+        }
+
+        if (!Validate.isValidEmail(email)) {
+            redirectWithMessage(response, redirectUrl, "Định dạng email không hợp lệ!", "error");
+            return;
+        }
+        if (!Validate.isValidPhoneNumber(phoneNumber)) {
+            redirectWithMessage(response, redirectUrl, "Định dạng số điện thoại không hợp lệ!", "error");
+            return;
+        }
+
+        if (!Validate.isValidGender(gender)) {
+            redirectWithMessage(response, redirectUrl, "Giá trị giới tính không hợp lệ!", "error");
+            return;
+        }
+
+        if (!Validate.isValidDateOfBirth(dobStr)) {
+            redirectWithMessage(response, redirectUrl, "Ngày sinh không hợp lệ (không được ở tương lai và phải đúng định dạng " + IConstant.DATE_FORMAT + ")!", "error");
+            return;
+        }
+
+        if (!Validate.isLengthValid(fullName, IConstant.MAX_FULLNAME_LENGTH)) {
+            redirectWithMessage(response, redirectUrl, "Tên đầy đủ không được vượt quá " + IConstant.MAX_FULLNAME_LENGTH + " ký tự!", "error");
             return;
         }
 
@@ -69,21 +100,29 @@ public class UserCreateCustomerServlet extends BaseAdminServlet {
             int customerRoleId = 7;
             String currentUser = getCurrentUser(request);
 
-            boolean success = adminService.createUser(fullName.trim(), userName.trim(),
-                    email.trim(), customerRoleId, gender, currentUser,
-                    null, null); // No employee code or salary
 
-            if (success) {
-                String message = "Đã tạo Customer thành công! Username: " + userName + ", Mật khẩu: 123456";
+            String generatedPassword = adminService.createUser(
+                    fullName.trim(),
+                    userName.trim(),
+                    email.trim(),
+                    customerRoleId,
+                    gender,
+                    currentUser,
+                    null,
+                    null
+                    // dobStr,
+                    // phoneNumber
+            );
+
+            if (generatedPassword != null) {
+                String message = "Đã tạo Customer thành công! Username: " + userName + ", Mật khẩu: " + generatedPassword;
                 redirectWithMessage(response, request.getContextPath() + "/admin/users", message, "success");
             } else {
-                redirectWithMessage(response, request.getContextPath() + "/admin/users/create-customer",
-                        "Tạo Customer thất bại! Username có thể đã tồn tại.", "error");
+                redirectWithMessage(response, redirectUrl, "Tạo Customer thất bại! Username hoặc Email có thể đã tồn tại.", "error");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            redirectWithMessage(response, request.getContextPath() + "/admin/users/create-customer",
-                    "Lỗi hệ thống: " + e.getMessage(), "error");
+            redirectWithMessage(response, redirectUrl, "Lỗi hệ thống: " + e.getMessage(), "error");
         }
     }
 }
