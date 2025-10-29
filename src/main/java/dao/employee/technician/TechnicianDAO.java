@@ -70,10 +70,12 @@ public class TechnicianDAO {
         TaskStatistics stats = new TaskStatistics();
 
         String sql = "SELECT " +
+                "COUNT(*) as total_tasks, " +
                 "SUM(CASE WHEN ta.Status = 'ASSIGNED' THEN 1 ELSE 0 END) as new_tasks, " +
                 "SUM(CASE WHEN ta.Status = 'IN_PROGRESS' THEN 1 ELSE 0 END) as in_progress, " +
                 "SUM(CASE WHEN ta.Status = 'COMPLETE' AND DATE(ta.CompleteAt) = CURDATE() THEN 1 ELSE 0 END) as completed_today "
                 +
+
                 "FROM TaskAssignment ta " +
                 "WHERE ta.AssignToTechID = ?";
 

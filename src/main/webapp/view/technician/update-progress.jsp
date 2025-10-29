@@ -11,6 +11,7 @@
 
 <jsp:include page="header.jsp"/>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/update-progress.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/base.css">
 
 <section class="update-progress-section">
     <div class="page-header">
