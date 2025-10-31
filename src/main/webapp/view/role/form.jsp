@@ -1,59 +1,84 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%
-    String mode = (String) request.getAttribute("mode");
-%>
-<c:set var="isEdit" value="${mode == 'edit'}" />
-<c:set var="actionUrl" value="${pageContext.request.contextPath}/admin/rbac/rolesList" />
-<c:set var="formAction" value="${isEdit ? 'update' : 'create'}" />
-<c:set var="formTitle" value="${isEdit ? 'Update Role' : 'Create New Role'}" />
-<c:set var="pageTitle" value="${formTitle}" />
-<c:set var="activeMenu" value="rbac" />
-<c:set var="pageCSS" value="role/form.css" scope="request"/>
 
-<jsp:include page="/view/role/header.jsp" />
+<c:set var="pageTitle"  value="${mode eq 'edit' ? 'Update Role' : 'Create New Role'}" scope="request"/>
+<c:set var="activeMenu" value="rbac" scope="request"/>
 
-<main class="admin-content role-form-page">
-    <div class="container form-container">
-        <h1 class="page-title">${formTitle}</h1>
+<c:set var="isEdit"     value="${mode eq 'edit'}"/>
+<c:set var="actionUrl"  value="${pageContext.request.contextPath}/admin/rbac/rolesList"/>
+<c:set var="formAction" value="${isEdit ? 'update' : 'create'}"/>
 
-        <c:if test="${not empty error}">
-            <div class="alert error-message">
-                Error: ${error}
+<jsp:include page="/view/admin/header.jsp"/>
+
+<!-- CSS riêng cho trang form role -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/role/form.css"/>
+
+<div class="layout">
+    <jsp:include page="/view/admin/sidebar.jsp"/>
+
+    <main class="main">
+        <div class="page-wrap">
+
+            <div class="form-container card">
+                <h1 class="page-title">${pageTitle}</h1>
+
+                <c:if test="${not empty error}">
+                    <div class="alert err">Error: ${error}</div>
+                </c:if>
+
+                <form action="${actionUrl}" method="post" class="main-form" autocomplete="off" novalidate>
+                    <input type="hidden" name="action" value="${formAction}"/>
+
+                    <c:if test="${isEdit}">
+                        <input type="hidden" name="id" value="${role.roleId}"/>
+                        <div class="meta">
+                            <span class="muted">Role ID:</span>
+                            <strong>${role.roleId}</strong>
+                        </div>
+                    </c:if>
+
+                    <!-- Name -->
+                    <div class="form-group">
+                        <label for="name" class="form-label">Name of role <span class="req">*</span></label>
+                        <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                required
+                                maxlength="50"
+                                class="inp"
+                                placeholder="Enter name of role"
+                                value="<c:out value='${isEdit ? role.roleName : (not empty name ? name : "")}'/>"
+                        />
+                        <small class="hint">Max 50 chars.</small>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea
+                                id="description"
+                                name="description"
+                                rows="5"
+                                maxlength="255"
+                                class="inp ta"
+                                placeholder="Enter description (optional)"><c:out value='${isEdit ? role.description : (not empty description ? description : "")}'/></textarea>
+                        <small class="hint">Optional — max 255 chars.</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn primary">
+                            ${isEdit ? 'Update' : 'Create'}
+                        </button>
+                        <a href="${pageContext.request.contextPath}/admin/rbac/rolesList?action=list" class="btn ghost">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
             </div>
-        </c:if>
 
-        <form action="${actionUrl}" method="post" class="main-form">
-            <input type="hidden" name="action" value="${formAction}" />
+        </div>
+    </main>
+</div>
 
-            <c:if test="${isEdit}">
-                <input type="hidden" name="id" value="${role.roleId}" />
-                <div class="form-group">
-                    <p class="role-id">Role ID: <strong>${role.roleId}</strong></p>
-                </div>
-            </c:if>
-
-            <div class="form-group">
-                <label for="name" class="form-label">Name of role:</label>
-                <input type="text" id="name" name="name" required maxlength="50" class="form-control"
-                       value="<c:out value='${isEdit ? role.roleName : (not empty name ? name : "")}'/>"
-                       placeholder="Enter name of role" />
-            </div>
-
-            <div class="form-group">
-                <label for="description" class="form-label">Description:</label>
-                <textarea id="description" name="description" rows="4" maxlength="255" class="form-control"
-                          placeholder="Enter description (optional)">
-                    <c:out value='${isEdit ? role.description : (not empty description ? description : "")}'/>
-                </textarea>
-            </div>
-
-            <div class="form-actions">
-                <input type="submit" value="${isEdit ? 'Update' : 'Create'}" class="btn btn-primary form-submit-btn" />
-                <a href="${pageContext.request.contextPath}/admin/rbac/rolesList?action=list" class="btn btn-secondary">Cancel</a>
-            </div>
-        </form>
-    </div>
-</main>
-
-<jsp:include page="/view/role/footer.jsp" />
+<jsp:include page="/view/admin/footer.jsp"/>

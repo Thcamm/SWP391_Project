@@ -7,3 +7,14 @@ body{background:var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,Segoe 
 .nav-link.active{background:var(--brand);color:#fff;border-color:var(--brand)}
 .footer{border-top:1px solid var(--border);background:var(--card)}
 .footer .footer-content{max-width:1200px;margin:0 auto;padding:14px 20px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.layout {
+    display: flex;              /* cho phép sidebar và main nằm ngang */
+    min-height: calc(100vh - 64px);  /* trừ chiều cao header */
+    background: #f9fafb;
+}
+
+.main {
+    flex: 1;                    /* chiếm toàn bộ phần còn lại */
+    padding: 20px;
+    overflow-y: auto;
+}
