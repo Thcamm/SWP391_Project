@@ -39,7 +39,7 @@ public class PasswordHashUtil {
      */
     public static void main(String[] args) {
         // Password để test
-        String password = "123456";
+        String password = "666666";
 
         // Generate 3 hash khác nhau (BCrypt mỗi lần hash sẽ khác vì có salt)
         System.out.println("========================================");

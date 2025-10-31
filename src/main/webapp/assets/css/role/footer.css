@@ -1,61 +1,206 @@
+/* =====================================================
+   FOOTER STYLES - SMART WEBSITE (PASTEL GREEN THEME)
+   ===================================================== */
 
+/* === MAIN CONTAINER === */
+main {
+    min-height: calc(100vh - 220px);
+    padding-bottom: 2rem;
+}
+
+/* === FOOTER === */
 .admin-footer {
-    background: #fff;
-    border-top: 1px solid #ddd;
-    margin-top: 30px;
-    padding: 15px 25px;
-    font-size: 0.9em;
-    color: #555;
+    background: linear-gradient(135deg, #f6fff8 0%, #e9f9ee 100%);
+    border-top: 3px solid #a3d9a5;
+    margin-top: 3rem;
+    padding: 2rem 0 1rem;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
+    animation: footerFadeIn 0.6s ease-out;
 }
 
 .footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.footer-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #cde8cf;
 }
 
-.footer-left p {
+/* === FOOTER LEFT === */
+.footer-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2e5d34;
+}
+
+.logo-icon {
+    font-size: 1.75rem;
+    color: #79c784;
+    filter: drop-shadow(0 2px 4px rgba(121, 199, 132, 0.25));
+}
+
+.logo-text {
+    background: linear-gradient(135deg, #79c784 0%, #a4e8b3 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.footer-copyright {
+    color: #6a8b6c;
+    font-size: 0.9rem;
     margin: 0;
-    color: #666;
 }
 
+/* === FOOTER RIGHT === */
 .footer-right {
     display: flex;
     align-items: center;
 }
 
 .footer-links {
-    list-style: none;
     display: flex;
-    gap: 15px;
+    list-style: none;
+    gap: 0.5rem;
+    margin: 0;
     padding: 0;
-    margin: 0;
 }
 
-.footer-links li {
-    margin: 0;
-}
-
-.footer-links a {
+.footer-links li a {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
     text-decoration: none;
-    color: #555;
-    transition: color 0.2s ease;
+    color: #5d6b5f;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    background: #f0f9f2;
 }
 
-.footer-links a:hover {
-    color: #000;
+.footer-links li a:hover {
+    color: #2e5d34;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(100, 180, 120, 0.2);
 }
 
-/* Subtle responsiveness */
+/* === HOVER COLOR VARIANTS (GREEN PALETTE) === */
+.footer-links li:nth-child(1) a:hover {
+    background: linear-gradient(135deg, #d4fcd6 0%, #bdf4c2 100%);
+}
+
+.footer-links li:nth-child(2) a:hover {
+    background: linear-gradient(135deg, #b8f3c0 0%, #a5e6ae 100%);
+}
+
+.footer-links li:nth-child(3) a:hover {
+    background: linear-gradient(135deg, #c6f7d2 0%, #adf0be 100%);
+}
+
+.footer-links li:nth-child(4) a:hover {
+    background: linear-gradient(135deg, #d8f9e0 0%, #c1f1ce 100%);
+}
+
+.link-icon {
+    font-size: 1rem;
+    color: #69b97b;
+}
+
+/* === FOOTER BOTTOM === */
+.footer-bottom {
+    padding-top: 1rem;
+    text-align: center;
+}
+
+.footer-version {
+    color: #9bb99c;
+    font-size: 0.85rem;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* === RESPONSIVE DESIGN === */
 @media (max-width: 768px) {
-    .footer-container {
-        flex-direction: column;
-        text-align: center;
+    .admin-footer {
+        padding: 1.5rem 0 1rem;
     }
 
-    .footer-right {
+    .footer-container {
+        padding: 0 1rem;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 1.5rem;
+    }
+
+    .footer-left {
+        align-items: center;
+    }
+
+    .footer-links {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.5rem;
+    }
+
+    .footer-links li {
+        width: 100%;
+    }
+
+    .footer-links li a {
         justify-content: center;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-logo {
+        font-size: 1.1rem;
+    }
+
+    .logo-icon {
+        font-size: 1.5rem;
+    }
+
+    .footer-copyright {
+        font-size: 0.85rem;
+    }
+
+    .footer-links li a {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* === ANIMATION === */
+@keyframes footerFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
