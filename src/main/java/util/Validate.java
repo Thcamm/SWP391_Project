@@ -10,10 +10,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 /**
- * Lớp tiện ích (utility class) chứa các phương thức static để validate.
- * Class này implement IConstant để có thể sử dụng trực tiếp các hằng số.
- * Nó biên dịch các hằng số String Regex thành các đối tượng Pattern
- * để tối ưu hiệu suất.
+ * Utility class that contains static validation methods.
+ * This class implements IConstant to allow direct use of constant values.
+ * Regular expression string constants are compiled into Pattern instances
+ * to improve performance.
  */
 public final class Validate implements IConstant {
     private static final Pattern EMAIL_REGEX = Pattern.compile(EMAIL_PATTERN);
@@ -24,7 +24,7 @@ public final class Validate implements IConstant {
     private static final List<String> VALID_GENDERS = Arrays.asList("Nam", "Nữ", "Khác");
 
     /**
-     * Private constructor để ngăn chặn việc khởi tạo class này.
+     * Private constructor to prevent instantiation of this utility class.
      */
     private Validate() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
@@ -32,25 +32,25 @@ public final class Validate implements IConstant {
 
 
     /**
-     * Kiểm tra xem một chuỗi có rỗng (null hoặc chỉ chứa khoảng trắng) hay không.
-     * (Đây là phương thức bị thiếu gây ra lỗi của bạn)
+     * Check whether a string is null or empty (only whitespace).
+     * (This helper was missing and caused errors in your code previously)
      */
     public static boolean isNullOrEmpty(String str) {
         return str == null || str.trim().isEmpty();
     }
 
     /**
-     * Kiểm tra độ dài tối đa của một chuỗi.
+     * Validate maximum length of a string.
      */
     public static boolean isLengthValid(String str, int maxLength) {
         if (isNullOrEmpty(str)) {
-            return true; // Chuỗi rỗng luôn hợp lệ về độ dài
+            return true; // An empty string is considered valid in terms of length
         }
         return str.length() <= maxLength;
     }
 
     /**
-     * Chuyển đổi một chuỗi sang Integer một cách an toàn.
+     * Safely parse a string to Integer.
      */
     public static Integer parseInteger(String param) {
         if (isNullOrEmpty(param)) {
@@ -64,8 +64,8 @@ public final class Validate implements IConstant {
     }
 
     /**
-     * Chuyển đổi một chuỗi sang Double một cách an toàn.
-     * Tự động xử lý cả dấu ',' (kiểu VN) và '.' (kiểu US).
+     * Safely parse a string to Double.
+     * Handles both ',' (Vietnamese style) and '.' (US style) decimal separators.
      */
     public static Double parseDouble(String param) {
         if (isNullOrEmpty(param)) {
@@ -79,83 +79,84 @@ public final class Validate implements IConstant {
         }
     }
     /**
-     * Kiểm tra xem một số Integer có là số dương (> 0).
+     * Check whether an Integer is positive (> 0).
      */
     public static boolean isPositive(Integer number) {
         return number != null && number > 0;
     }
 
     /**
-     * Kiểm tra xem một số Double có là số không âm (>= 0).
+     * Check whether a Double is non-negative (>= 0).
      */
     public static boolean isNonNegative(Double number) {
         return number != null && number >= 0;
     }
 
     /**
-     * Kiểm tra định dạng email (bắt buộc).
-     * @return false nếu rỗng hoặc sai định dạng.
+     * Validate email format (required).
+     * @return false if empty or not matching the pattern.
      */
     public static boolean isValidEmail(String email) {
         if (isNullOrEmpty(email)) {
-            return false; // Email là bắt buộc
+            return false; // Email is required
         }
         return EMAIL_REGEX.matcher(email).matches();
     }
 
     /**
-     * Kiểm tra định dạng username (bắt buộc).
-     * @return false nếu rỗng hoặc sai định dạng (không khớp regex).
+     * Validate username format (required).
+     * @return false if empty or does not match the regex.
      */
     public static boolean isValidUsername(String username) {
         if (isNullOrEmpty(username)) {
-            return false; // Username là bắt buộc
+            return false; // Username is required
         }
         return USERNAME_REGEX.matcher(username).matches();
     }
 
     /**
-     * Kiểm tra số điện thoại (tùy chọn).
-     * @return true nếu rỗng HOẶC đúng định dạng.
+     * Validate phone number (optional).
+     * @return true if empty OR matches the phone pattern.
      */
     public static boolean isValidPhoneNumber(String phoneNumber) {
         if (isNullOrEmpty(phoneNumber)) {
-            return true; // SĐT là tùy chọn
+            return true; // Phone number is optional
         }
         return PHONE_REGEX.matcher(phoneNumber).matches();
     }
 
     /**
-     * Kiểm tra mã nhân viên (tùy chọn).
-     * @return true nếu rỗng HOẶC đúng định dạng.
+     * Validate employee code (optional).
+     * @return true if empty OR matches the employee code pattern.
      */
     public static boolean isValidEmployeeCode(String code) {
         if (isNullOrEmpty(code)) {
-            return true; // Mã NV là tùy chọn
+            return true; // Employee code is optional
         }
         return EMPLOYEE_CODE_REGEX.matcher(code).matches();
     }
 
     /**
-     * Kiểm tra giá trị gender (cho phép rỗng/tùy chọn).
-     * @return true nếu rỗng HOẶC nằm trong danh sách VALID_GENDERS.
+     * Validate gender value (allows empty/optional).
+     * @return true if empty OR contained in VALID_GENDERS list.
      */
     public static boolean isValidGender(String gender) {
         if (isNullOrEmpty(gender)) {
-            return true; // Giới tính là tùy chọn
+            return true; // Gender is optional
         }
         return VALID_GENDERS.contains(gender);
     }
 
     /**
-     * Kiểm tra Ngày tháng năm sinh (DOB).
-     * (Phương thức bạn đã cung cấp)
-     * @param dateStr Chuỗi ngày tháng (ví dụ: "1990-10-30").
-     * @return true nếu rỗng (coi là tùy chọn) HOẶC là ngày hợp lệ VÀ không ở tương lai.
-     * false nếu sai định dạng HOẶC là ngày trong tương lai.
+     * Validate date of birth (DOB).
+     * If empty -> considered valid (optional). Otherwise the date must parse
+     * according to the configured DATE_FORMAT and must not be in the future.
+     *
+     * @param dateStr Date string (e.g. "1990-10-30").
+     * @return true if empty OR a valid date not in the future; false if parsing fails or the date is in the future.
      */
     public static boolean isValidDateOfBirth(String dateStr) {
-        // 1. Coi ngày sinh là tùy chọn. Nếu rỗng -> hợp lệ.
+        // Treat DOB as optional. If empty -> valid.
         if (isNullOrEmpty(dateStr)) {
             return true;
         }
