@@ -70,10 +70,12 @@ public class TechnicianDAO {
         TaskStatistics stats = new TaskStatistics();
 
         String sql = "SELECT " +
+                "COUNT(*) as total_tasks, " +
                 "SUM(CASE WHEN ta.Status = 'ASSIGNED' THEN 1 ELSE 0 END) as new_tasks, " +
                 "SUM(CASE WHEN ta.Status = 'IN_PROGRESS' THEN 1 ELSE 0 END) as in_progress, " +
                 "SUM(CASE WHEN ta.Status = 'COMPLETE' AND DATE(ta.CompleteAt) = CURDATE() THEN 1 ELSE 0 END) as completed_today "
                 +
+
                 "FROM TaskAssignment ta " +
                 "WHERE ta.AssignToTechID = ?";
 
@@ -161,6 +163,136 @@ public class TechnicianDAO {
         }
 
         return tasks;
+    }
+
+    public TaskAssignment getTaskById(int assignmentId) {
+        String sql = "SELECT ta.*, " +
+                "wd.TaskDescription AS WorkOrderDetailDesc, " +
+                "wd.EstimateHours, " +
+                "CONCAT(v.LicensePlate, ' - ', v.Brand, ' ', v.Model) AS VehicleInfo, " +
+                "st.ServiceName, " +
+                "u.FullName as CustomerName " +
+                "FROM TaskAssignment ta " +
+                "JOIN WorkOrderDetail wd ON ta.DetailID = wd.DetailID " +
+                "JOIN WorkOrder wo ON wd.WorkOrderID = wo.WorkOrderID " +
+                "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
+                "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
+                "JOIN Service_Type st ON sr.ServiceID = st.ServiceID " +
+                "JOIN Customer c ON v.CustomerID = c.CustomerID " +
+                "JOIN User u ON c.UserID = u.UserID " +
+                "WHERE ta.AssignmentID = ?";
+
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, assignmentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToTask(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+
+        return null;
+    }
+
+    public List<TaskAssignment> getAllTasksWithFilter(
+            int technicianId,
+            String status,
+            String priority,
+            String search
+    ) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT ta.*, " +
+                        "wd.TaskDescription AS WorkOrderDetailDesc,  " +
+                        "wd.EstimateHours, " +
+                        "CONCAT(v.LicensePlate, ' - ', v.Brand, ' ', v.Model) AS VehicleInfo, " +
+                        "st.ServiceName, " +
+                        "u.FullName as CustomerName " +
+                        "FROM TaskAssignment ta " +
+                        "JOIN WorkOrderDetail wd ON ta.DetailID = wd.DetailID " +
+                        "JOIN WorkOrder wo ON wd.WorkOrderID = wo.WorkOrderID " +
+                        "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
+                        "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
+                        "JOIN Service_Type st ON sr.ServiceID = st.ServiceID " +
+                        "JOIN Customer c ON v.CustomerID = c.CustomerID " +
+                        "JOIN User u ON c.UserID = u.UserID " +
+                        "WHERE ta.AssignToTechID = ? "
+        );
+
+        List<Object> params = new ArrayList<>();
+        params.add(technicianId);
+        if(status != null && !status.trim().isEmpty()) {
+            sql.append("AND ta.Status = ? ");
+            params.add(status);
+        }
+
+        if(priority != null && !priority.trim().isEmpty()) {
+            sql.append("AND ta.priority = ? ");
+            params.add(priority);
+        }
+
+        if(search != null && !search.trim().isEmpty()) {
+            sql.append("AND (v.LicensePlate LIKE ? OR v.Brand LIKE ? OR v.Model LIKE ? OR u.FullName LIKE ? OR st.ServiceName LIKE ?) ");
+            String searchPattern = "%" + search + "%";
+            params.add(searchPattern);
+            params.add(searchPattern);
+            params.add(searchPattern);
+            params.add(searchPattern);
+            params.add(searchPattern);
+        }
+
+        sql.append("ORDER BY ta.priority DESC, ta.AssignedDate DESC");
+
+        List<TaskAssignment> tasks = new ArrayList<>();
+        try(Connection conn = DbContext.getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql.toString())){
+            for(int i = 0; i < params.size(); i++){
+                ps.setObject(i+1, params.get(i));
+            }
+
+            try(ResultSet rs = ps.executeQuery()){
+                while(rs.next()) {
+                    TaskAssignment task = mapResultSetToTask(rs);
+                    tasks.add(task);
+                }
+            }
+        }catch(SQLException e){
+            e.printStackTrace();
+
+        }
+        return tasks;
+
+    }
+
+    public TaskStatistics getAllTasksStatistics(int technicianId) {
+        TaskStatistics stats = new TaskStatistics();
+        String sql = "SELECT " +
+                "COUNT(*) as total_tasks, " +
+                "SUM(CASE WHEN ta.Status = 'ASSIGNED' THEN 1 ELSE 0 END) as assigned_count, " +
+                "SUM(CASE WHEN ta.Status = 'IN_PROGRESS' THEN 1 ELSE 0 END) as in_progress_count, " +
+                "SUM(CASE WHEN ta.Status = 'COMPLETE' THEN 1 ELSE 0 END) as completed_count " +
+                "FROM TaskAssignment ta " +
+                "WHERE ta.AssignToTechID = ?";
+        try(Connection conn = DbContext.getConnection();
+        PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setInt(1, technicianId);
+            try (ResultSet rs = ps.executeQuery()){
+                if(rs.next()){
+                    stats.setTotalTasksCount(rs.getInt("total_tasks"));
+                    stats.setNewTasksCount(rs.getInt("assigned_count"));
+                    stats.setInProgressCount(rs.getInt("in_progress_count"));
+                    stats.setCompletedTodayCount(rs.getInt("completed_count"));
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return stats;
     }
 
     public List<TaskAssignment> getInProgressTasks(int technicianId) {

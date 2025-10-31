@@ -6,6 +6,7 @@ import model.user.User;
 import model.employee.admin.UserDisplay;
 import model.employee.admin.rbac.Role;
 import dao.employee.admin.rbac.RoleDao;
+import util.PasswordUtil;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -29,7 +30,6 @@ public class AdminService {
 
     private int getCreatedByEmployeeId(String userName) throws SQLException {
         Integer employeeId = adminDAO.getEmployeeIdByUsername(userName);
-        // Dùng ID 1 làm ID mặc định nếu Admin không có hồ sơ trong bảng Employee
         return employeeId != null ? employeeId : 1;
     }
 
@@ -50,7 +50,7 @@ public class AdminService {
         }
     }
 
-    public boolean updateUserBasicInfo(int userId, String fullName, String email, int roleId, String currentUser) {
+    public boolean updateUserBasicInfo(int userId, String fullName, String email, int roleId, boolean activeStatus, String currentUser) {
         try {
             User user = userDAO.getUserById(userId);
 
@@ -60,6 +60,7 @@ public class AdminService {
             user.setFullName(fullName);
             user.setEmail(email);
             user.setRoleId(roleId);
+            user.setActiveStatus(activeStatus);
 
             return adminDAO.updateUserBasicInfo(user);
         } catch (SQLException e) {
@@ -116,18 +117,16 @@ public class AdminService {
         try {
             System.out.println("Checking role permissions for roleId: " + roleId);
 
-            // Use your existing findById() method
             Role role = roleDao.findById(roleId);
 
             if (role != null) {
                 String roleName = role.getRoleName().toLowerCase();
-
-                // FLEXIBLE: Check by role name patterns
                 boolean isAdminRole = roleName.contains("admin") ||
                         roleName.contains("manager") ||
                         roleName.contains("supervisor") ||
                         roleName.equals("tech manager") ||
-                        roleName.contains("quản lý");
+                        roleName.contains("quản lý") || // Vietnamese
+                        roleName.contains("admin"); // Any admin variant
                 return isAdminRole;
 
             } else {
@@ -164,59 +163,27 @@ public class AdminService {
         }
     }
 
-    // public List<User> getAllUsers() {
-    // try {
-    // return userDAO.getAllActiveUsers();
-    // } catch (SQLException e) {
-    // System.out.println("Lỗi khi lấy danh sách users: " + e.getMessage());
-    // return new ArrayList<>();
-    // }
-    // }
-    //
-    // public List<User> searchUsers(String keyword) {
-    // try {
-    // List<User> allUsers = userDAO.getAllActiveUsers();
-    // List<User> result = new ArrayList<>();
-    //
-    // if (keyword == null || keyword.trim().isEmpty()) {
-    // return allUsers;
-    // }
-    //
-    // String searchKeyword = keyword.toLowerCase();
-    // for (User user : allUsers) {
-    // if (user.getUserName().toLowerCase().contains(searchKeyword) ||
-    // user.getEmail().toLowerCase().contains(searchKeyword) ||
-    // user.getFullName().toLowerCase().contains(searchKeyword)) {
-    // result.add(user);
-    // }
-    // }
-    //
-    // System.out.println("Tìm thấy " + result.size() + " users với từ khóa: " +
-    // keyword);
-    // return result;
-    //
-    // } catch (SQLException e) {
-    // System.out.println("Lỗi khi tìm kiếm: " + e.getMessage());
-    // return new ArrayList<>();
-    // }
-    // }
-
 
     /**
      * Create user with optional employee details for non-customer roles
      */
-    public boolean createUser(String fullName, String userName, String email, int roleId, String gender,
-            String currentUser, String employeeCode, Double salary) {
+    // THAY ĐỔI: Kiểu trả về là String
+    public String createUser(String fullName, String userName, String email, int roleId, String gender,
+                             String currentUser, String employeeCode, Double salary) {
+
+        // 1. Tạo mật khẩu ngẫu nhiên ngay từ đầu
+        String randomPassword = PasswordUtil.generateRandomPassword(6);
+
         try {
             if (currentUser == null || currentUser.trim().isEmpty()) {
                 System.out.println("Lỗi: Không có thông tin user hiện tại!");
-                return false;
+                return null;
             }
 
             User existingUser = userDAO.getUserByUserName(userName);
             if (existingUser != null) {
                 System.out.println("Username đã tồn tại: " + userName);
-                return false;
+                return null;
             }
 
             User newUser = new User();
@@ -225,30 +192,27 @@ public class AdminService {
             newUser.setEmail(email);
             newUser.setGender(gender);
             newUser.setRoleId(roleId);
-            // Hash password mặc định bằng PasswordUtil
-            newUser.setPasswordHash(util.PasswordUtil.hashPassword("123456"));
+            newUser.setPasswordHash(util.PasswordUtil.hashPassword(randomPassword));
             newUser.setActiveStatus(true);
             Integer createdByEmployeeId = null;
             createdByEmployeeId = adminDAO.getEmployeeIdByUsername(currentUser);
 
-
-            // Use AdminDAO's enhanced createUser method that handles Employee creation
+            // Use AdminDAO's enhanced createUser method
             boolean success = adminDAO.createUser(newUser, employeeCode, salary, createdByEmployeeId);
 
             if (success) {
                 System.out.println("User " + currentUser + " đã tạo user mới: " + userName);
 
-                // Log if Employee record was created
                 if (isEmployeeRole(roleId)) {
                     System.out.println("Employee record also created for non-customer user: " + userName);
                 }
+                return randomPassword;
             }
-
-            return success;
+            return null;
 
         } catch (SQLException e) {
             System.out.println("Lỗi khi tạo user: " + e.getMessage());
-            return false;
+            return null;
         }
     }
 
@@ -382,7 +346,6 @@ public class AdminService {
             System.out.println("    User ID: " + userId);
             System.out.println("    New Status: " + (newStatus ? "ACTIVE" : "INACTIVE"));
             System.out.println("    Actor: " + currentUser);
-
 
             boolean success = adminDAO.updateUserStatus(userId, newStatus, currentUser);
 
