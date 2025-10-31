@@ -55,6 +55,7 @@ public class RolePageServlet extends HttpServlet {
                     ? (roles.isEmpty() ? -1 : roles.get(0).getRoleId())
                     : Integer.parseInt(req.getParameter("roleId"));
 
+
             var pager = rbacService.getPermissionsPaged(page, size, keyword, category);
 
             var checkedPermIds = (roleId == null) ? java.util.Collections.<Integer>emptySet()
