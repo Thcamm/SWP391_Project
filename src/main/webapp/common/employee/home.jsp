@@ -16,7 +16,17 @@
             content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Customer Service - Home</title>
+    <title>
+        <c:choose>
+            <c:when test="${not empty sessionScope.roleName}">
+                ${sessionScope.roleName} - Home
+            </c:when>
+            <c:otherwise>
+                Home
+            </c:otherwise>
+        </c:choose>
+    </title>
+
 
 
 </head>
@@ -48,3 +58,4 @@
 
 </body>
 </html>
+

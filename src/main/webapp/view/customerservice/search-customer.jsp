@@ -19,17 +19,17 @@
     />
 
     <title>Customer Service - Home</title>
-    <jsp:include page="/common/employee/header.jsp" />
+    <jsp:include page="/common/employee/component/header.jsp" />
 
 </head>
 
 <body>
 <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
-        <jsp:include page="/common/employee/sidebar.jsp" />
+        <jsp:include page="/common/employee/component/sidebar.jsp" />
 
         <div class="layout-page">
-            <jsp:include page="/common/employee/navbar.jsp" />
+            <jsp:include page="/common/employee/component/navbar.jsp" />
 
             <div class="content-wrapper">
                 <div class="container-fluid flex-grow-1 container-p-y">
@@ -154,7 +154,7 @@
                     </div>
 
                 </div>
-                <jsp:include page="/common/employee/footer.jsp" />
+                <jsp:include page="/common/employee/component/footer.jsp" />
 
                 <div class="content-backdrop fade"></div>
             </div>
@@ -162,7 +162,7 @@
     </div>
     <div class="layout-overlay layout-menu-toggle"></div>
 </div>
-<jsp:include page="/common/employee/script.jsp" />
+<jsp:include page="/common/employee/component/script.jsp" />
 
 </body>
 </html>

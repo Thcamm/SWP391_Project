@@ -45,10 +45,17 @@ public class Login extends HttpServlet {
         if (user != null && PasswordUtil.checkPassword(password, user.getPasswordHash())) {
 
             String roleCode = new dao.employee.admin.rbac.RoleDao().findRoleCodeById(user.getRoleId());
+            String roleName = null;
+            try {
+                roleName = new RoleDao().findRoleNameById(user.getRoleId());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
             request.getSession().setAttribute("user", user);
             request.getSession().setAttribute("roleCode", roleCode);
             request.getSession().setAttribute("userId", user.getUserId());
             request.getSession().setAttribute("userName", user.getUserName());
+            request.getSession().setAttribute("roleName", roleName);
 
             CustomerDAO customerDAO = new CustomerDAO();
             try {

@@ -11,8 +11,8 @@ public class MailService {
     // Cấu hình SMTP (ví dụ với Gmail)
     private static final String SMTP_HOST = "smtp.gmail.com";
     private static final String SMTP_PORT = "587";
-    private static final String SMTP_USERNAME = "conmechung29102005@gmail.com"; // Thay bằng email của bạn
-    private static final String SMTP_PASSWORD = "rssn inzi pxti qtuh"; // Thay bằng app password
+    private static final String SMTP_USERNAME = "gara.tuanduong.auto2929@gmail.com"; // Thay bằng email của bạn
+    private static final String SMTP_PASSWORD = "pgwk tplf uexx ubxv"; // Thay bằng app password
 
 
     public static boolean sendEmail(String toEmail, String subject, String content) {
@@ -52,7 +52,7 @@ public class MailService {
     }
 
     public static void main(String[] args) {
-        sendEmail("conbodoan29102005@gmail.com", "Test Subject", "This is a test email from Java.");
+        sendEmail("thay mail khac vao di", "SearchServiceType Subject", "This is a test email from Java.");
     }
 }
 

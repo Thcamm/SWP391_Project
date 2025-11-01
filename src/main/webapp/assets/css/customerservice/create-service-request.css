@@ -1,0 +1,669 @@
+/* Service Order - Animations & Effects */
+/* Màu chủ đạo: Trắng, Đen, Xám */
+
+/* Loading Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Apply animations */
+.service-order {
+    animation: fadeIn 0.3s ease;
+}
+
+.dropdown-list {
+    animation: slideDown 0.2s ease;
+}
+
+/* Focus Effects */
+.form-control:focus {
+    animation: inputFocus 0.3s ease;
+}
+
+@keyframes inputFocus {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2);
+    }
+    100% {
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    }
+}
+
+/* Hover Effects for Cards */
+.service-order::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: linear-gradient(to bottom, #000000, #2d2d2d);
+    transition: width 0.3s ease;
+    border-radius: 8px 0 0 8px;
+}
+
+.service-order:hover::before {
+    width: 8px;
+}
+
+/* Button Click Effect */
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Shake animation for validation */
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+.form-control.error {
+    border-color: #dc3545;
+    animation: shake 0.5s;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Table row hover effect */
+.service-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.service-table tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Remove button rotation */
+.remove-btn {
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.remove-btn:hover {
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* Loading state for form submission */
+.btn-submit.loading {
+    position: relative;
+    color: transparent;
+}
+
+.btn-submit.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Dropdown item appear animation */
+.dropdown-item {
+    animation: fadeIn 0.2s ease backwards;
+}
+
+.dropdown-item:nth-child(1) { animation-delay: 0.05s; }
+.dropdown-item:nth-child(2) { animation-delay: 0.1s; }
+.dropdown-item:nth-child(3) { animation-delay: 0.15s; }
+.dropdown-item:nth-child(4) { animation-delay: 0.2s; }
+.dropdown-item:nth-child(5) { animation-delay: 0.25s; }
+
+/* Success message animation */
+@keyframes successPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}
+
+.form-control.success {
+    border-color: #28a745;
+    animation: successPulse 0.6s;
+}
+
+/* Card entrance stagger */
+.customer-info-card {
+    animation: fadeIn 0.5s ease;
+}
+
+.service-order:nth-child(1) {
+    animation-delay: 0.1s;
+    animation-fill-mode: backwards;
+}
+
+.service-order:nth-child(2) {
+    animation-delay: 0.2s;
+    animation-fill-mode: backwards;
+}
+
+.service-order:nth-child(3) {
+    animation-delay: 0.3s;
+    animation-fill-mode: backwards;
+}
+
+/* Icon animations */
+@keyframes carDrive {
+    0% {
+        transform: translateX(-2px);
+    }
+    50% {
+        transform: translateX(2px);
+    }
+    100% {
+        transform: translateX(-2px);
+    }
+}
+
+.form-label:hover::before {
+    animation: carDrive 0.5s ease;
+}
+
+/* Gradient shimmer effect */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.service-order-badge {
+    background: linear-gradient(90deg, #000000 0%, #2d2d2d 50%, #000000 100%);
+    background-size: 200% 100%;
+    animation: shimmer 3s infinite;
+}
+
+/* Focus visible for accessibility */
+.btn:focus-visible,
+.form-control:focus-visible {
+    outline: 3px solid #000000;
+    outline-offset: 2px;
+}
+
+/* Smooth transitions */
+* {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Remove default transitions for animations */
+*[class*="animation"],
+*[class*="animate"] {
+    transition: none;
+}
+/* Service Order - Main Styles */
+/* Màu chủ đạo: Trắng, Đen, Xám */
+
+:root {
+    --color-primary: #000000;
+    --color-secondary: #1a1a1a;
+    --color-gray-dark: #2d2d2d;
+    --color-gray: #666666;
+    --color-gray-light: #cccccc;
+    --color-gray-lighter: #e5e5e5;
+    --color-white: #ffffff;
+    --color-background: #f5f5f5;
+    --color-danger: #dc3545;
+    --color-success: #28a745;
+}
+
+/* Body & Container */
+body {
+    background-color: var(--color-background);
+    color: var(--color-gray-dark);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.main-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Header */
+.page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid var(--color-primary);
+}
+
+.page-title {
+    color: var(--color-primary);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Customer Info Card */
+.customer-info-card {
+    background-color: var(--color-white);
+    border: 2px solid var(--color-gray-lighter);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.customer-info-title {
+    color: var(--color-primary);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-gray-lighter);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.customer-info-title::before {
+    content: "👤";
+    font-size: 1.5rem;
+}
+
+.customer-info-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.customer-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.customer-info-label {
+    color: var(--color-gray);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.customer-info-value {
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 1.05rem;
+}
+
+/* Service Order Card */
+.service-order {
+    background-color: var(--color-white);
+    border: 2px solid var(--color-gray-lighter);
+    border-left: 6px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.service-order:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    border-left-color: var(--color-gray-dark);
+}
+
+.service-order-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.service-order-badge {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Remove Button */
+.remove-order-btn {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-gray-lighter);
+    color: var(--color-gray);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.25rem;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+.remove-order-btn:hover {
+    background-color: var(--color-danger);
+    color: var(--color-white);
+    transform: rotate(90deg);
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.form-label {
+    color: var(--color-gray-dark);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-label::before {
+    content: "🚗";
+    font-size: 1.2rem;
+}
+
+.form-label-service::before {
+    content: "🔧";
+}
+
+.form-label-note::before {
+    content: "📝";
+}
+
+.required-mark {
+    color: var(--color-danger);
+    margin-left: 0.25rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--color-gray-lighter);
+    border-radius: 6px;
+    background-color: var(--color-white);
+    color: var(--color-gray-dark);
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.form-control::placeholder {
+    color: var(--color-gray-light);
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+}
+
+/* Dropdown List */
+.dropdown-list {
+    position: absolute;
+    background: var(--color-white);
+    border: 2px solid var(--color-gray-lighter);
+    border-radius: 6px;
+    width: 100%;
+    z-index: 2000;
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    margin-top: 0.25rem;
+}
+
+.dropdown-item {
+    padding: 0.875rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--color-gray-lighter);
+    transition: all 0.15s ease;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background-color: var(--color-background);
+    padding-left: 1.25rem;
+}
+
+.dropdown-item.disabled {
+    color: var(--color-gray-light);
+    background-color: #fafafa;
+    cursor: not-allowed;
+}
+
+/* Service Table */
+.service-table-wrapper {
+    background-color: var(--color-background);
+    border: 2px solid var(--color-gray-lighter);
+    border-radius: 6px;
+    padding: 1rem;
+    margin-top: 0.75rem;
+}
+
+.service-table-header {
+    color: var(--color-gray);
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.service-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.service-table tbody tr {
+    border-bottom: 1px solid var(--color-gray-lighter);
+}
+
+.service-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.service-table td {
+    padding: 0.75rem 0.5rem;
+    color: var(--color-gray-dark);
+}
+
+.service-table .service-name {
+    font-weight: 500;
+}
+
+.service-table .service-price {
+    text-align: right;
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.service-table .service-action {
+    text-align: right;
+    width: 40px;
+}
+
+.remove-btn {
+    color: var(--color-danger);
+    cursor: pointer;
+    font-weight: 700;
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    font-size: 1.25rem;
+    transition: all 0.2s ease;
+}
+
+.remove-btn:hover {
+    transform: scale(1.2);
+}
+
+.no-service {
+    text-align: center;
+    color: var(--color-gray);
+    font-style: italic;
+    padding: 1.5rem !important;
+}
+
+/* Buttons */
+.btn-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 0.875rem 1.75rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-add {
+    background-color: var(--color-white);
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+}
+
+.btn-add:hover {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+
+.btn-submit {
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    flex: 1;
+    justify-content: center;
+}
+
+.btn-submit:hover {
+    background-color: var(--color-secondary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main-container {
+        padding: 1rem 0.5rem;
+    }
+
+    .customer-info-card {
+        padding: 1.5rem;
+    }
+
+    .customer-info-row {
+        grid-template-columns: 1fr;
+    }
+
+    .service-order {
+        padding: 1.5rem;
+        padding-top: 3rem;
+    }
+
+    .btn-group {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
