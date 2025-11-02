@@ -1,9 +1,11 @@
 package controller.employee.customerservice;
 
 import dao.customer.CustomerDAO;
+import dao.vehicle.CarDataDAO;
 import dao.user.UserDAO;
 import model.customer.Customer;
 import model.user.User;
+import model.vehicle.CarBrand;
 import model.workorder.ServiceRequest;
 import service.carservice.ServiceRequestService;
 import jakarta.servlet.ServletException;
@@ -19,6 +21,8 @@ import java.util.List;
 
 @WebServlet(name = "CustomerCreateRequestServlet", urlPatterns = {"/customerservice/createRequest"})
 public class CreateServiceRequestServlet extends HttpServlet {
+
+    private final CarDataDAO carDataDAO = new CarDataDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -50,7 +54,6 @@ public class CreateServiceRequestServlet extends HttpServlet {
             int customerId = Integer.parseInt(customerIdParam);
 
             CustomerDAO customerDAO = new CustomerDAO();
-
             Customer customer = customerDAO.getCustomerById(customerId);
             if (customer == null) {
                 request.setAttribute("error", "Customer not found.");
@@ -58,6 +61,18 @@ public class CreateServiceRequestServlet extends HttpServlet {
                 return;
             }
             request.setAttribute("customer", customer);
+
+            // ===== LOAD BRANDS CHO MODAL =====
+            try {
+                List<CarBrand> brands = carDataDAO.getAllBrands();
+                request.setAttribute("brands", brands);
+                System.out.println("Loaded " + brands.size() + " brands"); // Debug log
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.err.println("Error loading brands: " + e.getMessage());
+                request.setAttribute("brands", new ArrayList<>()); // Empty list để tránh null
+            }
+            // =================================
 
         } catch (SQLException | NumberFormatException e) {
             e.printStackTrace();

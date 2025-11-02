@@ -1,13 +1,178 @@
+// ===== HELPER FUNCTIONS - ĐỊNH NGHĨA TRƯỚC =====
+function showAlert(message, type = "info") {
+    // Remove alert cũ nếu có
+    const oldAlert = document.querySelector('.custom-alert');
+    if (oldAlert) oldAlert.remove();
+
+    const alertDiv = document.createElement("div");
+    alertDiv.className = `alert alert-${type === "error" ? "danger" : type === "success" ? "success" : type === "warning" ? "warning" : "info"} alert-dismissible fade show custom-alert`;
+    alertDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        animation: slideIn 0.3s ease;
+    `;
+    alertDiv.innerHTML = `
+        <strong>${message}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+    document.body.appendChild(alertDiv);
+
+    // Auto remove sau 4s
+    setTimeout(() => {
+        alertDiv.classList.remove('show');
+        setTimeout(() => alertDiv.remove(), 150);
+    }, 4000);
+}
+
+function closeAllDropdowns() {
+    document.querySelectorAll(".dropdown-list").forEach(d => {
+        d.style.transition = "opacity 0.15s ease";
+        d.style.opacity = "0";
+        setTimeout(() => d.remove(), 150);
+    });
+}
+
+function updateVehicleInActiveOrder(vehicleData) {
+    const orders = document.querySelectorAll(".service-order");
+    let activeOrder = null;
+
+    // Tìm order chưa có vehicle
+    for (let order of orders) {
+        if (!order.dataset.vehicleId || order.dataset.vehicleId === "") {
+            activeOrder = order;
+            break;
+        }
+    }
+
+    // Nếu không tìm thấy order trống, lấy order cuối cùng
+    if (!activeOrder && orders.length > 0) {
+        activeOrder = orders[orders.length - 1];
+    }
+
+    if (activeOrder) {
+        const vehicleInput = activeOrder.querySelector(".vehicle-input");
+        const vehicleIdField = activeOrder.querySelector(".vehicle-id");
+
+        // Remove old vehicle nếu có
+        if (activeOrder.dataset.vehicleId) {
+            const allSelectedVehicles = window.allSelectedVehicles;
+            if (allSelectedVehicles) {
+                allSelectedVehicles.delete(parseInt(activeOrder.dataset.vehicleId));
+            }
+        }
+
+        // Set giá trị xe mới
+        vehicleInput.value = `${vehicleData.licensePlate} | ${vehicleData.brand} ${vehicleData.model}`;
+        vehicleIdField.value = vehicleData.vehicleId;
+
+        const allSelectedVehicles = window.allSelectedVehicles;
+        if (allSelectedVehicles) {
+            allSelectedVehicles.add(vehicleData.vehicleId);
+        }
+
+        activeOrder.dataset.vehicleId = vehicleData.vehicleId.toString();
+        vehicleInput.setAttribute("readonly", true);
+
+        // Add success animation
+        vehicleInput.classList.add("success");
+        setTimeout(() => vehicleInput.classList.remove("success"), 600);
+
+        // Thêm nút clear
+        let clearBtn = activeOrder.querySelector(".clear-vehicle-btn");
+        if (clearBtn) clearBtn.remove();
+
+        clearBtn = document.createElement("button");
+        clearBtn.type = "button";
+        clearBtn.innerHTML = "✖";
+        clearBtn.className = "clear-vehicle-btn";
+        clearBtn.title = "Xóa xe đã chọn";
+
+        clearBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (allSelectedVehicles) {
+                allSelectedVehicles.delete(vehicleData.vehicleId);
+            }
+
+            activeOrder.dataset.vehicleId = "";
+            vehicleInput.value = "";
+            vehicleIdField.value = "";
+            vehicleInput.removeAttribute("readonly");
+            clearBtn.remove();
+
+            closeAllDropdowns();
+            vehicleInput.focus();
+        });
+
+        vehicleInput.parentNode.appendChild(clearBtn);
+    }
+}
+
+// Add animation keyframes
+if (!document.getElementById('alert-animation-styles')) {
+    const style = document.createElement('style');
+    style.id = 'alert-animation-styles';
+    style.textContent = `
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .form-control.success {
+            border-color: #28a745 !important;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+        }
+        .clear-vehicle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #e5e5e5;
+            color: #666;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+        .clear-vehicle-btn:hover {
+            background-color: #dc3545;
+            color: white;
+            transform: translateY(-50%) rotate(90deg);
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// ===== MAIN CODE =====
 document.addEventListener("DOMContentLoaded", () => {
     const ordersContainer = document.getElementById("ordersContainer");
     const addOrderBtn = document.getElementById("addOrderBtn");
     const allSelectedVehicles = new Set();
     const allSelectedServices = new Set();
 
-    // Setup first order
+    // Expose to global scope for updateVehicleInActiveOrder
+    window.allSelectedVehicles = allSelectedVehicles;
+
     setupOrder(ordersContainer.querySelector(".service-order"));
 
-    // Add new order
     addOrderBtn.addEventListener("mousedown", () => {
         closeAllDropdowns();
 
@@ -411,14 +576,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    function closeAllDropdowns() {
-        document.querySelectorAll(".dropdown-list").forEach(d => {
-            d.style.transition = "opacity 0.15s ease";
-            d.style.opacity = "0";
-            setTimeout(() => d.remove(), 150);
-        });
-    }
-
     function updateOrderBadges() {
         const orders = ordersContainer.querySelectorAll(".service-order");
         orders.forEach((order, idx) => {
@@ -428,11 +585,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 badge.textContent = `Order #${idx + 1}`;
             }
         });
-    }
-
-    function showAlert(message, type = "info") {
-        // Simple alert for now - can be replaced with custom modal
-        alert(message);
     }
 
     // === FORM VALIDATION ===
@@ -451,7 +603,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const serviceInput = order.querySelector(".service-input");
                 serviceInput.classList.add("error");
                 setTimeout(() => serviceInput.classList.remove("error"), 500);
-                showAlert(`Service Order #${idx + 1} phải chọn ít nhất 1 dịch vụ`);
+                showAlert(`Service Order #${idx + 1} phải chọn ít nhất 1 dịch vụ`, "warning");
             }
 
             // Check vehicle
@@ -460,7 +612,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const vehicleInput = order.querySelector(".vehicle-input");
                 vehicleInput.classList.add("error");
                 setTimeout(() => vehicleInput.classList.remove("error"), 500);
-                showAlert(`Service Order #${idx + 1} chưa chọn xe`);
+                showAlert(`Service Order #${idx + 1} chưa chọn xe`, "warning");
             }
         });
 
@@ -473,37 +625,142 @@ document.addEventListener("DOMContentLoaded", () => {
         const submitBtn = form.querySelector(".btn-submit");
         submitBtn.classList.add("loading");
         submitBtn.disabled = true;
-
-        // Form will submit normally after this
     });
+});
 
-    // Add clear vehicle button styles dynamically
-    const style = document.createElement("style");
-    style.textContent = `
-        .clear-vehicle-btn {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background-color: #e5e5e5;
-            color: #666;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            z-index: 10;
-        }
-        .clear-vehicle-btn:hover {
-            background-color: #dc3545;
-            color: white;
-            transform: translateY(-50%) rotate(90deg);
-        }
-    `;
-    document.head.appendChild(style);
+// ===== ADD VEHICLE FORM HANDLER =====
+window.addEventListener('DOMContentLoaded', function() {
+    const addVehicleForm = document.getElementById("addVehicleForm");
+
+    if (addVehicleForm) {
+        addVehicleForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Lấy giá trị trực tiếp từ các input elements
+            const brandId = document.getElementById("brandId").value;
+            const modelName = document.getElementById("modelName").value;
+            const licensePlate = document.getElementById("licensePlate").value;
+            const yearManufacture = document.getElementById("yearManufacture").value;
+            let customerIdValue = document.getElementById("modalCustomerId").value;
+
+            // Debug: Kiểm tra data trước khi gửi
+            console.log("=== Form Data Debug (Manual) ===");
+            console.log("brandId:", brandId);
+            console.log("modelName:", modelName);
+            console.log("licensePlate:", licensePlate);
+            console.log("yearManufacture:", yearManufacture);
+            console.log("customerId:", customerIdValue);
+
+            // Kiểm tra từng trường
+            const missingFields = [];
+            if (!brandId || brandId === "") missingFields.push("Hãng xe");
+            if (!modelName || modelName === "") missingFields.push("Model");
+            if (!licensePlate || licensePlate === "") missingFields.push("Biển số");
+            if (!yearManufacture || yearManufacture === "") missingFields.push("Năm sản xuất");
+
+            if (missingFields.length > 0) {
+                showAlert("Vui lòng điền đầy đủ thông tin: " + missingFields.join(", "), "error");
+                return false;
+            }
+
+            // Đảm bảo customerId được gửi đi
+            if (!customerIdValue || customerIdValue === "") {
+                if (typeof customerId !== 'undefined' && customerId !== "") {
+                    customerIdValue = customerId;
+                    console.log("Set customerId from global:", customerId);
+                } else {
+                    showAlert("Không tìm thấy thông tin khách hàng", "error");
+                    return false;
+                }
+            }
+
+            // Disable submit button để tránh double click
+            const submitBtn = addVehicleForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Đang lưu...";
+
+            const apiUrl = (typeof contextPath !== 'undefined' ? contextPath : '') + '/customerservice/addVehicle?action=saveVehicle';
+
+// Tạo payload URL-encoded
+            const payload = new URLSearchParams();
+            payload.append('customerId', customerIdValue);
+            payload.append('brandId', brandId);
+            payload.append('modelName', modelName);
+            payload.append('yearManufacture', yearManufacture);
+            payload.append('licensePlate', licensePlate);
+
+            console.log("=== Payload Contents ===");
+            for (let [key, value] of payload.entries()) {
+                console.log(key + ": " + value);
+            }
+
+            console.log("Sending to:", apiUrl);
+
+            fetch(apiUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+                },
+                body: payload.toString()
+            })
+                .then(res => {
+                    console.log("Response status:", res.status);
+                    console.log("Response headers:", res.headers.get("content-type"));
+
+                    const contentType = res.headers.get("content-type");
+                    if (!contentType || !contentType.includes("application/json")) {
+                        return res.text().then(text => {
+                            console.error("Non-JSON response:", text);
+                            throw new Error('Server không trả về JSON');
+                        });
+                    }
+                    if (!res.ok) {
+                        throw new Error('HTTP error! status: ' + res.status);
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    console.log("Response data:", data);
+
+                    if (data.success) {
+                        // 1. Đóng modal
+                        const modalEl = document.getElementById("addVehicleModal");
+                        const modal = bootstrap.Modal.getInstance(modalEl);
+                        if (modal) {
+                            modal.hide();
+                        }
+
+                        // 2. Reset form
+                        addVehicleForm.reset();
+                        const modelSelect = document.getElementById("modelName");
+                        if (modelSelect) {
+                            modelSelect.disabled = true;
+                            modelSelect.innerHTML = "<option value=''>-- Chọn hãng trước --</option>";
+                        }
+
+                        // 3. Cập nhật xe vào order hiện tại
+                        updateVehicleInActiveOrder(data);
+
+                        // 4. Hiện thông báo thành công
+                        showAlert("✓ Thêm xe thành công!", "success");
+                    } else {
+                        showAlert("✗ " + (data.message || "Có lỗi xảy ra khi thêm xe"), "error");
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    showAlert("✗ Lỗi: " + err.message, "error");
+                })
+                .finally(() => {
+                    // Re-enable submit button
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                });
+
+            return false;
+
+        });
+    }
 });
