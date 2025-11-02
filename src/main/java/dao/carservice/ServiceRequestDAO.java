@@ -10,37 +10,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceRequestDAO extends DbContext {
+    public int createServiceRequestWithDetails(ServiceRequest request, List<Integer> serviceIds) throws SQLException {
+        int requestId;
+        String sqlRequest = "INSERT INTO ServiceRequest (CustomerID, VehicleID, AppointmentID,Note) VALUES (?, ?, ?,?)";
+        String sqlDetail = "INSERT INTO ServiceRequestDetail (RequestID, ServiceID) VALUES (?, ?)";
 
-    public int createServiceRequest(ServiceRequest request) throws SQLException {
-
-        String sql = "INSERT INTO servicerequest (CustomerID, VehicleID, ServiceID, AppointmentID) " +
-                "VALUES (?, ?, ?, ?)";
-
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            ps.setInt(1, request.getCustomerID());
-            ps.setInt(2, request.getVehicleID());
-            ps.setInt(3, request.getServiceID());
-
-            if (request.getAppointmentID() != null) {
-                ps.setInt(4, request.getAppointmentID());
-            } else {
-                ps.setNull(4, Types.INTEGER);
+        try(Connection conn = DbContext.getConnection()) {
+            conn.setAutoCommit(false);
+            try(PreparedStatement ps1 = conn.prepareStatement(sqlRequest, Statement.RETURN_GENERATED_KEYS)) {
+                ps1.setInt(1, request.getCustomerID());
+                ps1.setInt(2, request.getVehicleID());
+                if(request.getAppointmentID()!=null) ps1.setInt(3, request.getAppointmentID());
+                else ps1.setNull(3, java.sql.Types.INTEGER);
+                if(request.getNote()!=null) ps1.setString(4, request.getNote());
+                else ps1.setNull(4, Types.VARCHAR);
+                ps1.executeUpdate();
+                try(ResultSet rs = ps1.getGeneratedKeys()) { rs.next(); requestId = rs.getInt(1); }
             }
 
-            int affectedRows = ps.executeUpdate();
-
-            if (affectedRows > 0) {
-                try (ResultSet rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        return rs.getInt(1);
+            if(serviceIds != null) {
+                try(PreparedStatement ps2 = conn.prepareStatement(sqlDetail)) {
+                    for(Integer sId : serviceIds) {
+                        ps2.setInt(1, requestId);
+                        ps2.setInt(2, sId);
+                        ps2.addBatch();
                     }
+                    ps2.executeBatch();
                 }
             }
-        }
-        return -1;
+            conn.commit();
+        } catch(SQLException e) { throw e; }
+        return requestId;
     }
+
     public List<ServiceHistoryDTO> getServiceHistoryByCustomerId(int customerId) throws SQLException {
         List<ServiceHistoryDTO> history = new ArrayList<>();
         String sql = "SELECT sr.RequestID, st.ServiceName, sr.RequestDate, sr.Status, st.UnitPrice " +

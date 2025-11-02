@@ -1,6 +1,3 @@
-// State management
-console.log("✅ create-customer.js loaded");
-
 
 let vehicles = [];
 let includeVehicle = false;

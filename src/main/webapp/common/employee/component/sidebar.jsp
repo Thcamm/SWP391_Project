@@ -71,17 +71,14 @@
 
     <ul class="menu-inner py-1">
         <!-- Dashboard -->
-        <li class="menu-item ${fn:contains(currentPath,'/home') ? 'active' : ''}">
-            <a href="${pageContext.request.contextPath}/home" class="menu-link">
+        <li class="menu-item ${fn:contains(currentPath,'/customerservice/search-customer') ? 'active' : ''}">
+            <a href="${pageContext.request.contextPath}/customerservice/search-customer" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
                 <div data-i18n="Dashboard">Dashboard</div>
             </a>
         </li>
         <!-- ========== CUSTOMER SERVICE SECTION ========== -->
         <c:if test="${fn:contains(sessionScope.userPermissions, 'cs_access')}">
-            <li class="menu-header small text-uppercase">
-                <span class="menu-header-text">Customer Service</span>
-            </li>
 
             <c:if test="${fn:contains(sessionScope.userPermissions, 'cs_access')}">
                 <li class="menu-item ${fn:contains(currentPath,'/customerservice/search-customer') ? 'active' : ''}">
@@ -92,9 +89,9 @@
                 </li>
             </c:if>
 
-            <c:if test="${fn:contains(sessionScope.userPermissions, 'cs_create_appointment')}">
-                <li class="menu-item ${fn:contains(currentPath,'/customerservice/appointment') ? 'active' : ''}">
-                    <a href="${pageContext.request.contextPath}/customerservice/appointment" class="menu-link">
+            <c:if test="${fn:contains(sessionScope.userPermissions, 'cs_access')}">
+                <li class="menu-item ${fn:contains(currentPath,'/customerservice/appointment-list') ? 'active' : ''}">
+                    <a href="${pageContext.request.contextPath}/customerservice/appointment-list" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-calendar-plus"></i>
                         <div data-i18n="Create Appointment">Create Appointment</div>
                     </a>
@@ -113,10 +110,6 @@
 
         <!-- ========== TECH MANAGER SECTION ========== -->
         <c:if test="${fn:contains(sessionScope.userPermissions, 'tech_manager_access')}">
-            <li class="menu-header small text-uppercase">
-                <span class="menu-header-text">Tech Manager</span>
-            </li>
-
             <c:if test="${fn:contains(sessionScope.userPermissions, 'tech_assign_task')}">
                 <li class="menu-item ${fn:contains(currentPath,'/techmanager/tasks') ? 'active' : ''}">
                     <a href="${pageContext.request.contextPath}/techmanager/tasks" class="menu-link">

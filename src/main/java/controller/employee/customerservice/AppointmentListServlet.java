@@ -95,7 +95,6 @@ public class AppointmentListServlet extends HttpServlet {
 
         response.sendRedirect(request.getContextPath() + "/customerservice/appointment-list");
     }
-
 }
 
 

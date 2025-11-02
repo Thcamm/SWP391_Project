@@ -15,40 +15,26 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class ServiceRequestService {
-
-    private final ServiceRequestDAO serviceRequestDAO = new ServiceRequestDAO();
+    private final ServiceRequestDAO dao = new ServiceRequestDAO();
     private final NotificationDAO notificationDAO = new NotificationDAO();
     private final WorkOrderDAO workOrderDAO = new WorkOrderDAO();
 
-    public boolean createRequestAndNotify(ServiceRequest request, List<Integer> recipientIds) throws SQLException {
+    public boolean createRequestAndNotify(ServiceRequest request, List<Integer> serviceIds, List<Integer> recipientIds) throws SQLException {
+        int requestId = dao.createServiceRequestWithDetails(request, serviceIds);
+        if(requestId <= 0) return false;
 
-        // --- BƯỚC 1: TẠO SERVICE REQUEST ---
-        int newRequestId = serviceRequestDAO.createServiceRequest(request);
-
-        if (newRequestId == -1) {
-            return false;
-        }
-
-        // --- BƯỚC 2: GỬI THÔNG BÁO ---
-        if (recipientIds != null && !recipientIds.isEmpty()) {
-
-            for (Integer userId : recipientIds) {
+        if(recipientIds != null) {
+            for(Integer userId : recipientIds) {
                 Notification notif = new Notification();
-
                 notif.setUserId(userId);
                 notif.setTitle("New Service Request Created");
-                notif.setBody("A new service request #" + newRequestId + " needs review.");
+                notif.setBody("A new service request #" + requestId + " needs review.");
                 notif.setEntityType("SERVICE_REQUEST");
-                notif.setEntityId(newRequestId);
-
-                if (request.getAppointmentID() != null) {
-                    notif.setAppointmentId(request.getAppointmentID());
-                }
-
+                notif.setEntityId(requestId);
+                if(request.getAppointmentID()!=null) notif.setAppointmentId(request.getAppointmentID());
                 notificationDAO.createNotification(notif);
             }
         }
-
         return true;
     }
 

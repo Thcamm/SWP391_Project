@@ -10,12 +10,13 @@ public class ServiceRequest {
     private Integer appointmentID; // Dùng Integer để có thể nhận giá trị null
     private Timestamp requestDate;
     private String status;
+    private String note;
 
     public ServiceRequest() {
     }
 
     public ServiceRequest(int requestID, int customerID, int vehicleID, int serviceID, Integer appointmentID,
-            Timestamp requestDate, String status) {
+            Timestamp requestDate, String status, String note) {
         this.requestID = requestID;
         this.customerID = customerID;
         this.vehicleID = vehicleID;
@@ -23,7 +24,10 @@ public class ServiceRequest {
         this.appointmentID = appointmentID;
         this.requestDate = requestDate;
         this.status = status;
+        this.note = note;
     }
+
+
 
     public int getRequestID() {
         return requestID;
@@ -79,6 +83,13 @@ public class ServiceRequest {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
     }
 
     // Business methods

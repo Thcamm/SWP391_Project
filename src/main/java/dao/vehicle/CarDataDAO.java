@@ -43,4 +43,21 @@ public class CarDataDAO extends DbContext {
         }
         return list;
     }
+    public CarBrand getBrandById(int brandId) throws SQLException {
+        String sql = "SELECT brandid, brandname FROM carbrands WHERE brandid = ?";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, brandId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    CarBrand brand = new CarBrand();
+                    brand.setBrandId(rs.getInt("brandid"));
+                    brand.setBrandName(rs.getString("brandname"));
+                    return brand;
+                }
+            }
+        }
+        return null; // không tìm thấy
+    }
+
 }

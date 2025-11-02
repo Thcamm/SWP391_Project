@@ -253,78 +253,89 @@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
           </div>
         </div>
 
-        <!-- Toggle thêm thông tin xe -->
+        <%--
+        <!-- Toggle thêm thông tin xe -->--%> <%--
         <div class="card">
+          --%> <%--
           <div class="card-content">
+            --%> <%--
             <div class="toggle-container">
+              --%> <%--
               <div>
-                <label class="toggle-label">
+                --%> <%--
+                <label class="toggle-label"
+                  >--%> <%--
                   <svg
                     class="icon"
                     xmlns="http://www.w3.org/2000/svg"
                     width="20"
                     height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    --%
                   >
+                    <%-- viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor"--%> <%-- stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">--%> <%--
                     <path
-                      d="M19 17h2c.6 0 1-.4 1-1v-3
-                                             c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10
-                                             s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5
-                                             c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4
-                                             c0 .6.4 1 1 1h2"
+                      d="M19 17h2c.6 0 1-.4 1-1v-3--%>
+<%--                                             c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10--%>
+<%--                                             s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5--%>
+<%--                                             c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4--%>
+<%--                                             c0 .6.4 1 1 1h2"
                     ></path>
+                    --%> <%--
                     <circle cx="7" cy="17" r="2"></circle>
+                    --%> <%--
                     <path d="M9 17h6"></path>
+                    --%> <%--
                     <circle cx="17" cy="17" r="2"></circle>
-                  </svg>
-                  Thêm thông tin xe (<span id="vehicleCount">0</span>)
-                </label>
+                    --%> <%--</svg
+                  >--%> <%-- Thêm thông tin xe (<span id="vehicleCount">0</span
+                  >)--%> <%-- </label
+                >--%> <%--
                 <p class="toggle-description">
                   Bật để nhập thông tin xe của khách hàng
                 </p>
+                --%> <%--
               </div>
-              <label class="switch">
-                <input type="checkbox" id="includeVehicle" />
-                <span class="slider"></span>
-              </label>
+              --%> <%--
+              <label class="switch"
+                >--%> <%-- <input type="checkbox" id="includeVehicle" />--%>
+                <%-- <span class="slider"></span>--%> <%-- </label
+              >--%> <%--
             </div>
+            --%> <%--
           </div>
+          --%> <%--
         </div>
-
-        <!-- Danh sách xe -->
+        --%> <%--
+        <!-- Danh sách xe -->--%> <%--
         <div
           id="vehiclesSection"
           class="vehicles-section"
           style="display: none"
         >
+          --%> <%--
           <div id="vehiclesList"></div>
-
+          --%> <%--
           <div class="add-vehicle-container">
+            --%> <%--
             <button type="button" id="addVehicleBtn" class="btn btn-outline">
-              <svg
-                class="icon-small"
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
+              --%> <%--
+              <svg class="icon-small" xmlns="http://www.w3.org/2000/svg" --%>
+                <%-- width="16" height="16" viewBox="0 0 24 24" fill="none"--%>
+                <%-- stroke="currentColor" stroke-width="2"
+                stroke-linecap="round"--%> <%-- stroke-linejoin="round">--%>
+                <%--
                 <path d="M5 12h14"></path>
+                --%> <%--
                 <path d="M12 5v14"></path>
-              </svg>
-              Thêm xe
-            </button>
+                --%> <%--</svg
+              >--%> <%-- Thêm xe--%> <%--</button
+            >--%> <%--
           </div>
+          --%> <%--
         </div>
+        --%>
 
         <div class="form-actions">
           <button type="button" class="btn btn-outline" id="cancelBtn">

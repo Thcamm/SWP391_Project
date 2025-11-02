@@ -19,12 +19,6 @@
         --brand-red: #dc3545;
     }
 
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: var(--dark-bg);
-        color: var(--primary-color);
-        padding-top: 120px;
-    }
 
     /* --- Header Top Bar --- */
     .header-top {

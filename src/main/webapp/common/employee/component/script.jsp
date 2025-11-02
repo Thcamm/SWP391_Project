@@ -1,21 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<!-- ======= JAVASCRIPT FILES ======= -->
-<!-- Core JS -->
-<!-- build:js assets/vendor/js/core.js -->
+
 <script src="${pageContext.request.contextPath}/common/employee/layout/vendor/libs/jquery/jquery.js"></script>
 <script src="${pageContext.request.contextPath}/common/employee/layout/vendor/libs/popper/popper.js"></script>
 <script src="${pageContext.request.contextPath}/common/employee/layout/vendor/js/bootstrap.js"></script>
 <script src="${pageContext.request.contextPath}/common/employee/layout/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
-
 <script src="${pageContext.request.contextPath}/common/employee/layout/vendor/js/menu.js"></script>
-<!-- endbuild -->
-
-<!-- Vendors JS -->
-
-<!-- Main JS -->
 <script src="${pageContext.request.contextPath}/common/employee/layout/js/main.js"></script>
 
-<!-- Page JS -->
-
-<!-- Place this tag in your head or just before your close body tag. -->
-<script async defer src="https://buttons.github.io/buttons.js"></script>
