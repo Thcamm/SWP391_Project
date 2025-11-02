@@ -11,7 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VehicleDAO extends DbContext {
+public class VehicleDAO {
 
     public List<Vehicle> getVehiclesByCustomerId(int customerId) throws SQLException {
         List<Vehicle> list = new ArrayList<>();
@@ -133,7 +133,7 @@ public class VehicleDAO extends DbContext {
     }
     public boolean deleteVehicle(int vehicleId, int customerId) throws SQLException {
         String sql = "DELETE FROM Vehicle WHERE VehicleID = ? AND CustomerID = ?";
-        try (Connection conn = getConnection();
+        try (Connection conn = DbContext.getConnection();
              PreparedStatement st = conn.prepareStatement(sql)) {
 
             st.setInt(1, vehicleId);

@@ -1,6 +1,7 @@
 package model.employee.technician;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class TaskAssignment {
     private int assignmentID;
@@ -21,6 +22,29 @@ public class TaskAssignment {
     private String serviceInfo;
     private String customerName;
     private double estimateHours;
+    private String assignedDateFormatted;
+
+    private static final DateTimeFormatter D_HM = DateTimeFormatter.ofPattern("dd/MM HH:mm");
+    private static final DateTimeFormatter D_M_Y_HM = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    // ===== GETTER FORMAT SẴN (KHUYÊN DÙNG TRONG JSP) =====
+    public String getAssignedDateFormatted() {
+        if (assignedDateFormatted != null && !assignedDateFormatted.isEmpty()) return assignedDateFormatted;
+        return assignedDate != null ? assignedDate.format(D_HM) : "-";
+    }
+
+    public void setAssignedDateFormatted(String assignedDateFormatted) {
+        this.assignedDateFormatted = assignedDateFormatted;
+    }
+
+    public String getStartAtFormatted() {
+        return startAt != null ? startAt.format(D_HM) : "-";
+    }
+
+    public String getCompleteAtFormatted() {
+        return completeAt != null ? completeAt.format(D_M_Y_HM) : "-";
+    }
+
 
 
 

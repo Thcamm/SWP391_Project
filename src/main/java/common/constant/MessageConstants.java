@@ -165,6 +165,13 @@ public class MessageConstants {
             "Can only update tasks that are in progress."
     );
 
+    public static final SystemMessage TASK011 = new SystemMessage(
+            "TASK011",
+            MessageType.VALIDATION,
+            "Task permission required",
+            "You dont have permission to create diagnostic for this task. "
+    );
+
     public static final SystemMessage PART001 = new SystemMessage(
             "PART001",
             MessageType.SUCCESS,

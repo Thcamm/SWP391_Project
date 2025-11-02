@@ -78,21 +78,25 @@ public class PartDetail {
 
     // Business Methods
     public String getStockStatus() {
-        if (quantity == 0) return "OUT_OF_STOCK";
-        if (quantity <= minStock) return "LOW_STOCK";
+        int q = quantity == null ? 0 : quantity;
+        int m = minStock == null ? 0 : minStock;
+        if (q == 0) return "OUT_OF_STOCK";
+        if (q <= m) return "LOW_STOCK";
         return "IN_STOCK";
     }
 
+
     public String getStockStatusLabel() {
         switch (getStockStatus()) {
-            case "OUT_OF_STOCK": return " Hết hàng";
-            case "LOW_STOCK": return " Sắp hết";
-            default: return " Đủ";
+            case "OUT_OF_STOCK": return "Hết hàng";
+            case "LOW_STOCK": return "Sắp hết";
+            default: return "Đủ";
         }
     }
 
     public BigDecimal getTotalValue() {
-        return unitPrice.multiply(new BigDecimal(quantity));
+        return unitPrice != null ? unitPrice.multiply(new BigDecimal(quantity != null ? quantity : 0))
+                : BigDecimal.ZERO;
     }
 
     public String getCharacteristicsText() {

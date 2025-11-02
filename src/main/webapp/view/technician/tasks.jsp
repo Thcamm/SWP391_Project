@@ -135,6 +135,9 @@
                                     ${task.priority}
                             </span>
                                     </td>
+                                    <td>${task.status}</td>
+
+
                                     <td class="vehicle-info">
                                             ${task.vehicleInfo}
                                     </td>
@@ -150,7 +153,8 @@
                                     </td>
 
                                     <td>
-                                        <fmt:formatDate value="${task.assignedDate}" pattern="dd/MM/yyyy"/>
+                                            ${task.assignedDateFormatted}
+
                                     </td>
 
                                     <td class="action-buttons">
@@ -160,17 +164,25 @@
                                                       method="post" style="display: inline;">
                                                     <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
                                                     <input type="hidden" name="action" value="accept">
+                                                    <input type="hidden" name="returnTo" value="${pageContext.request.requestURL}?${pageContext.request.queryString}"/>
                                                     <button type="submit" class="btn btn-accept btn-sm">
                                                         Accept🐣
                                                     </button>
                                                 </form>
+
+
+                                                <button type="button" class="btn btn-sm btn-secondary" disabled
+                                                        title="Start the task first to create diagnostic">
+                                                    🩺 Create Diagnostic
+                                                </button>
                                             </c:when>
 
                                             <c:when test="${task.status == 'IN_PROGRESS'}">
-                                                <a href="${pageContext.request.contextPath}/technician/update-progress-form?assignmentId
-                                    =${task.assignmentID}" class="btn btn-update btn-sm">
+                                                <a href="${pageContext.request.contextPath}/technician/update-progress-form?assignmentId=${task.assignmentID}&returnTo=${pageContext.request.requestURL}?${pageContext.request.queryString}"
+                                                   class="btn btn-update btn-sm">
                                                     Update Progress
                                                 </a>
+
 
                                                 <form action="${pageContext.request.contextPath}/technician/update-progress" method="post" style="display: inline">
                                                     <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
@@ -182,6 +194,25 @@
 
 
                                                 </form>
+
+                                                <c:choose>
+                                                    <c:when test="${task.taskType == 'DIAGNOSIS'}">
+                                                        <form method="get"
+                                                              action="${pageContext.request.contextPath}/technician/create-diagnostic"
+                                                              style="display:inline;">
+                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
+                                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                                🩺 Create Diagnostic
+                                                            </button>
+                                                        </form>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary" disabled
+                                                                title="Diagnostic available for DIAGNOSIS tasks only">
+                                                            🩺 Create Diagnostic
+                                                        </button>
+                                                    </c:otherwise>
+                                                </c:choose>
 
                                             </c:when>
                                             <c:when test="${task.status == 'COMPLETE'}">
@@ -200,15 +231,17 @@
                         </table>
 
                         <!-- Pagination -->
-                        <c:if test="${tasks.totalPages > 1}">
+                        <c:if test="${tasks.totalPages > 0}">
                             <div class="pagination">
                                 <c:forEach begin="1" end="${tasks.totalPages}" var="page">
-                                <a href="?page=${page}&status=${param.status}&priority=${param.priority}&search=${param.search}"
-                                   class="page-link ${page == tasks.currentPage ? 'active' : ''}">
-                                        ${page}
-                                    </c:forEach>
+                                    <a href="?page=${page}&status=${param.status}&priority=${param.priority}&search=${param.search}"
+                                       class="page-link ${page == tasks.currentPage ? 'active' : ''}">
+                                            ${page}
+                                    </a>
+                                </c:forEach>
                             </div>
                         </c:if>
+
                     </c:otherwise>
                 </c:choose>
             </div>
