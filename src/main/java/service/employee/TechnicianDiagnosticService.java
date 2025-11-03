@@ -46,28 +46,42 @@ public class TechnicianDiagnosticService {
                 return ServiceResult.error(MessageConstants.TASK011);
             }
 
-            // ===== STEP 2: VALIDATE DATA =====
+            // VALIDATE DATA
             if (!diagnostic.isValid()) {
                 conn.rollback();
                 List<String> errors = diagnostic.getValidationErrors();
                 return ServiceResult.error(MessageConstants.ERR003, errors);
             }
 
-//            // Kiểm tra xem assignment đã có diagnostic chưa
-//            if (diagnosticDAO.hasDiagnostic(conn, diagnostic.getAssignmentID())) {
-//                conn.rollback();
-//                return ServiceResult.error(MessageConstants.ERR003,
-//                        "This task already has a diagnostic report");
-//            }
+            // TÍNH TOTAL ESTIMATE TRƯỚC KHI CREATE
+            // LẤY LABOR TỪ laborCostInput (nếu có)
+            BigDecimal laborCost = diagnostic.getLaborCostInput() != null
+                    ? diagnostic.getLaborCostInput()
+                    : BigDecimal.ZERO;
 
-            // CREATE DIAGNOSTIC
+            BigDecimal totalPartsCost = BigDecimal.ZERO;
+            int partsCount = 0;
+
+            if (diagnostic.getParts() != null && !diagnostic.getParts().isEmpty()) {
+                for (DiagnosticPart part : diagnostic.getParts()) {
+                    BigDecimal price = part.getUnitPrice() == null ? BigDecimal.ZERO : part.getUnitPrice();
+                    BigDecimal line = price.multiply(BigDecimal.valueOf(part.getQuantityNeeded()));
+                    totalPartsCost = totalPartsCost.add(line);
+                    partsCount++;
+                }
+            }
+
+            BigDecimal totalEstimate = laborCost.add(totalPartsCost);
+            diagnostic.setEstimateCost(totalEstimate); // Set total estimate
+
+        // CREATE DIAGNOSTIC (với estimateCost đã đúng)
             int diagnosticId = diagnosticDAO.createDiagnostic(conn, diagnostic);
             if (diagnosticId <= 0) {
                 conn.rollback();
                 return ServiceResult.error(MessageConstants.ERR001);
             }
 
-            // ADD TECHNICIAN AS LEAD =====
+            // ADD TECHNICIAN AS LEAD
             boolean techAdded = diagnosticDAO.addTechnicianToDiagnostic(
                     conn, diagnosticId, technicianId, true, 0.0
             );
@@ -78,13 +92,10 @@ public class TechnicianDiagnosticService {
             }
 
             // ADD PARTS (IF ANY)
-            BigDecimal totalPartsCost = BigDecimal.ZERO;
-            int partsCount = 0;
-
             if (diagnostic.getParts() != null && !diagnostic.getParts().isEmpty()) {
                 for (DiagnosticPart part : diagnostic.getParts()) {
                     part.setVehicleDiagnosticID(diagnosticId);
-                    part.setApproved(false); // Mặc định chưa approve
+                    part.setApproved(false);
 
                     int partId = partDAO.addPartToDiagnostic(conn, part);
                     if (partId <= 0) {
@@ -92,31 +103,16 @@ public class TechnicianDiagnosticService {
                         return ServiceResult.error(MessageConstants.ERR001,
                                 "Failed to add part: " + part.getPartName());
                     }
-                    partsCount++;
                 }
-
-                // Tính tổng chi phí parts
-                totalPartsCost = partDAO.calculateTotalPartsCost(conn, diagnosticId);
             }
 
-            //  UPDATE TOTAL ESTIMATE
-            BigDecimal laborCost = diagnostic.getEstimateCost() != null
-                    ? diagnostic.getEstimateCost()
-                    : BigDecimal.ZERO;
-            BigDecimal totalEstimate = laborCost.add(totalPartsCost);
-
-            diagnosticDAO.updateEstimateCost(conn, diagnosticId, totalEstimate);
-
-
+            // LOG ACTIVITY
             logActivity(conn, technicianId, "DIAGNOSTIC_CREATED",
                     diagnostic.getAssignmentID(),
                     String.format("Created diagnostic with %d part(s), Total: $%.2f",
                             partsCount, totalEstimate));
 
-
             conn.commit();
-
-
             return ServiceResult.success(MessageConstants.DIAG001, diagnosticId);
 
         } catch (Exception e) {
@@ -127,7 +123,6 @@ public class TechnicianDiagnosticService {
             DbContext.close(conn);
         }
     }
-
     /**
      * Thêm parts vào diagnostic đã tồn tại
      * (Trường hợp technician quên thêm parts lúc tạo)
@@ -328,19 +323,19 @@ public class TechnicianDiagnosticService {
                 return ServiceResult.error(MessageConstants.ERR002);
             }
 
-            // TODO: Check if diagnostic is already approved
-            // If approved, cannot update
-
-            // Calculate new total estimate
-            BigDecimal partsCost = partDAO.calculateTotalPartsCost(conn, diagnosticId);
-            BigDecimal totalEstimate = laborCost.add(partsCost);
-
-            // Update diagnostic
-            boolean updated = diagnosticDAO.updateDiagnostic(conn, diagnosticId, issueFound, totalEstimate);
+            // CHỈ UPDATE issueFound
+            boolean updated = diagnosticDAO.updateDiagnosticIssueOnly(conn, diagnosticId, issueFound);
             if (!updated) {
                 conn.rollback();
                 return ServiceResult.error(MessageConstants.ERR001);
             }
+
+            // TÍNH LẠI TOTAL ESTIMATE = laborCost + partsCost
+            BigDecimal partsCost = partDAO.calculateTotalPartsCost(conn, diagnosticId);
+            BigDecimal totalEstimate = laborCost.add(partsCost);
+
+            // UPDATE ESTIMATE COST
+            diagnosticDAO.updateEstimateCost(conn, diagnosticId, totalEstimate);
 
             // Log activity
             logActivity(conn, technicianId, "DIAGNOSTIC_UPDATED",

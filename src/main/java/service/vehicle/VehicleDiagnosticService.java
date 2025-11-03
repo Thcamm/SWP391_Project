@@ -13,6 +13,7 @@ import service.inventory.PartService;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -117,6 +118,30 @@ public class VehicleDiagnosticService {
         public VehicleDiagnostic diagnostic;
         public List<DiagnosticPart> parts = Collections.emptyList();
         public boolean locked; // true: đã có Approved -> không cho sửa
+
+        public VehicleDiagnostic getDiagnostic() {
+            return diagnostic;
+        }
+
+        public void setDiagnostic(VehicleDiagnostic diagnostic) {
+            this.diagnostic = diagnostic;
+        }
+
+        public List<DiagnosticPart> getParts() {
+            return parts;
+        }
+
+        public void setParts(List<DiagnosticPart> parts) {
+            this.parts = parts;
+        }
+
+        public boolean isLocked() {
+            return locked;
+        }
+
+        public void setLocked(boolean locked) {
+            this.locked = locked;
+        }
     }
 
     public ServiceResult getDiagnosticsWithPartsPaged (int assignmentId, int currentPage, int itemsPerPage) {
@@ -169,14 +194,20 @@ public class VehicleDiagnosticService {
 
                     vm.partsTotal.put(id, partsSum);
 
-                    BigDecimal labor = vd.getEstimateCost() == null ? BigDecimal.ZERO : vd.getEstimateCost();
+                    // labor = estimateCost - partsSum
+                    BigDecimal totalEstimate = vd.getEstimateCost() == null ? BigDecimal.ZERO : vd.getEstimateCost();
+                    BigDecimal laborCost = totalEstimate.subtract(partsSum);
+                    if (laborCost.compareTo(BigDecimal.ZERO) < 0) {
+                        laborCost = BigDecimal.ZERO;
+                    }
 
-                    vm.grandTotal.put(id, partsSum.add(labor));
+                    // SET laborCostCalculated vào object
+                    vd.setLaborCostCalculated(laborCost);
+
+                    vm.grandTotal.put(id, totalEstimate); // Total = estimateCost (đã bao gồm labor + parts)
                     vm.approvedCount.put(id, approved);
                     vm.pendingCount.put(id, pending);
                 }
-
-
             }
             return ServiceResult.success(MessageConstants.DIAG003, vm);
         } catch (SQLException e) {
@@ -186,11 +217,10 @@ public class VehicleDiagnosticService {
 
     public ServiceResult loadForEdit (int technicianId, int diagnosticId) {
         try (Connection c = DbContext.getConnection()){
-            VehicleDiagnostic vd = diagnosticDAO.getDiagnosticById(c, diagnosticId);
+            VehicleDiagnostic vd = diagnosticDAO.getDiagnosticWithFullInfo(c, diagnosticId);
 
             if(vd == null || !vd.isStatus()){
                 return ServiceResult.error(MessageConstants.ERR002);
-
             }
 
             if(!diagnosticDAO.canTechnicianAccessDiagnostic(c, diagnosticId, technicianId)){
@@ -203,20 +233,39 @@ public class VehicleDiagnosticService {
             Map<Integer, List<DiagnosticPart>> map = diagnosticDAO.getPartsForDiagnostics(Collections.singletonList(diagnosticId));
             List<DiagnosticPart> parts = map.getOrDefault(diagnosticId, Collections.emptyList());
 
+            // TÍNH TỔNG PARTS
+            BigDecimal partsSum = BigDecimal.ZERO;
+            for (DiagnosticPart dp : parts) {
+                BigDecimal price = dp.getUnitPrice() == null ? BigDecimal.ZERO : dp.getUnitPrice();
+                BigDecimal line = price.multiply(BigDecimal.valueOf(dp.getQuantityNeeded()));
+                partsSum = partsSum.add(line);
+            }
+
+            //TÍNH NGƯỢC LABOR = estimateCost - partsSum
+            BigDecimal totalEstimate = vd.getEstimateCost() == null ? BigDecimal.ZERO : vd.getEstimateCost();
+            BigDecimal laborCost = totalEstimate.subtract(partsSum);
+
+            // Đảm bảo labor không âm
+            if (laborCost.compareTo(BigDecimal.ZERO) < 0) {
+                laborCost = BigDecimal.ZERO;
+            }
+
+            //SET VÀO FIELD RIÊNG
+            vd.setLaborCostCalculated(laborCost);
+
             EditDiagnosticVM vm = new EditDiagnosticVM();
-            vm.diagnostic = vd;
-            vm.parts = parts;
-            vm.locked = locked;
+            vm.setDiagnostic(vd);
+            vm.setParts(parts);
+            vm.setLocked(locked);
 
             return ServiceResult.success(MessageConstants.DIAG003, vm);
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-
     }
 
-    /** Cập nhật bản chẩn đoán (khi vẫn còn pending approval) */
+    /** cap nhat va chuan doan khi van con la pending */
     public ServiceResult updateDiagnosticDraf(
             int technicianId,
             int diagnosticId,
@@ -225,12 +274,11 @@ public class VehicleDiagnosticService {
             List<DiagnosticPart> newParts
     ){
         try (Connection c = DbContext.getConnection(false)){
-            VehicleDiagnostic vd = diagnosticDAO.getDiagnosticById(c, diagnosticId);
+            VehicleDiagnostic vd = diagnosticDAO.getDiagnosticWithFullInfo(c, diagnosticId);
             if(vd == null || !vd.isStatus()){
                 return ServiceResult.error(MessageConstants.ERR002);
             }
 
-            //quyen
             if(!diagnosticDAO.canTechnicianAccessDiagnostic(c, diagnosticId, technicianId)){
                 return ServiceResult.error(MessageConstants.AUTH001);
             }
@@ -250,13 +298,21 @@ public class VehicleDiagnosticService {
                 laborCost = BigDecimal.ZERO;
             }
 
-            if(!diagnosticDAO.updateDiagnostic(c, diagnosticId, issueFound.trim(), laborCost)){
-                DbContext.rollback(c);
-                return ServiceResult.error(MessageConstants.DIAG004);
+
+            String updateSQL = "UPDATE VehicleDiagnostic SET IssueFound = ? WHERE VehicleDiagnosticID = ?";
+            try (PreparedStatement ps = c.prepareStatement(updateSQL)) {
+                ps.setString(1, issueFound.trim());
+                ps.setInt(2, diagnosticId);
+                if (ps.executeUpdate() == 0) {
+                    DbContext.rollback(c);
+                    return ServiceResult.error(MessageConstants.DIAG004);
+                }
             }
 
+            // XÓA PARTS CŨ
             diagnosticDAO.deletePartsByDiagnostic(c, diagnosticId);
 
+            // TÍNH TỔNG PARTS MỚI
             BigDecimal partsSum = BigDecimal.ZERO;
             if(newParts != null){
                 for (DiagnosticPart p : newParts){
@@ -283,12 +339,13 @@ public class VehicleDiagnosticService {
                     diagnosticDAO.insertDiagnosticPart(c, row);
 
                     partsSum = partsSum.add(unit.multiply(BigDecimal.valueOf(qty)));
-
-
                 }
             }
 
-            diagnosticDAO.updateEstimateCost(c, diagnosticId, partsSum.add(laborCost));
+
+            BigDecimal totalEstimate = laborCost.add(partsSum);
+            diagnosticDAO.updateEstimateCost(c, diagnosticId, totalEstimate);
+
             DbContext.commitAndClose(c);
             return ServiceResult.success(MessageConstants.DIAG002, diagnosticId);
         } catch (SQLException e) {

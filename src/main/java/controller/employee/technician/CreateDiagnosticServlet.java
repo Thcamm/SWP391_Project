@@ -290,12 +290,22 @@ public class CreateDiagnosticServlet extends HttpServlet {
             forwardForm(req, resp, task, technician, errors, null);
             return;
         }
+        // TÍNH TOTAL PARTS
+        BigDecimal partsSum = BigDecimal.ZERO;
+        for (DiagnosticPart p : parts) {
+            BigDecimal price = p.getUnitPrice() == null ? BigDecimal.ZERO : p.getUnitPrice();
+            BigDecimal line = price.multiply(BigDecimal.valueOf(p.getQuantityNeeded()));
+            partsSum = partsSum.add(line);
+        }
+        // TÍNH TOTAL ESTIMATE = labor + parts
+        BigDecimal totalEstimate = laborCost.add(partsSum);
 
         // build diagnostic object
         VehicleDiagnostic diagnostic = new VehicleDiagnostic();
         diagnostic.setAssignmentID(assignmentId);
         diagnostic.setIssueFound(issueFound.trim());
-        diagnostic.setEstimateCost(laborCost);
+        diagnostic.setEstimateCost(totalEstimate);  // Total estimate
+        diagnostic.setLaborCostInput(laborCost);     // ✅ THÊM: Lưu labor cost riêng để service dùng
         diagnostic.setStatus(true);
         diagnostic.setParts(parts);
 

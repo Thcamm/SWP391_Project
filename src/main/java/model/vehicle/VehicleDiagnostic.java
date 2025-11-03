@@ -26,7 +26,15 @@ public class VehicleDiagnostic {
     private BigDecimal estimateCost;
     private boolean status;
     private LocalDateTime createdAt;
-    private boolean isSubmitApproval; // Thêm field này
+    private boolean isSubmitApproval;
+
+    private transient BigDecimal laborCostCalculated;
+
+    private transient BigDecimal laborCostInput; //Dùng khi create/update để truyền labor cost
+
+
+
+
 
     // transient fields for display
     private String vehicleInfo;
@@ -52,8 +60,21 @@ public class VehicleDiagnostic {
         this.createdAt = LocalDateTime.now();
     }
 
+    public BigDecimal getLaborCostCalculated() {
+        return laborCostCalculated;
+    }
 
+    public void setLaborCostCalculated(BigDecimal laborCostCalculated) {
+        this.laborCostCalculated = laborCostCalculated;
+    }
 
+    public BigDecimal getLaborCostInput() {
+        return laborCostInput;
+    }
+
+    public void setLaborCostInput(BigDecimal laborCostInput) {
+        this.laborCostInput = laborCostInput;
+    }
     public String getCreatedAtFormatted() {
         return createdAt != null ? createdAt.format(DTF) : "-";
     }

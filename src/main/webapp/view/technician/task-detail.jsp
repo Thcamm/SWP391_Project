@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
@@ -84,104 +84,108 @@
                 </div>
 
                 <c:choose>
-                    <c:when test="${empty vm.page.data}">
-                        <div class="empty-state">
-                            <p>📭 No diagnostics found for this task.</p>
-                            <c:if test="${task.status == 'IN_PROGRESS'}">
-                                <p>Click "Create New Diagnostic" to add one.</p>
-                            </c:if>
-                        </div>
-                    </c:when>
-                    <c:otherwise>
-                        <table class="diagnostic-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Issue Found</th>
-                                    <th>Labor Cost</th>
-                                    <th>Parts Count</th>
-                                    <th>Total Cost</th>
-                                    <th>Status</th>
-                                    <th>Created Date</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <c:forEach items="${vm.page.data}" var="diag">
-                                    <tr>
-                                        <td>#${diag.vehicleDiagnosticID}</td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${fn:length(diag.issueFound) > 50}">
-                                                    ${fn:substring(diag.issueFound, 0, 50)}...
-                                                </c:when>
-                                                <c:otherwise>
-                                                    ${diag.issueFound}
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td>
-                                            <fmt:formatNumber value="${diag.estimateCost}" type="currency" currencySymbol="$"/>
-                                        </td>
-                                        <td>${fn:length(vm.partsMap[diag.vehicleDiagnosticID])}</td>
-                                        <td>
-                                            <fmt:formatNumber value="${vm.grandTotal[diag.vehicleDiagnosticID]}" type="currency" currencySymbol="$"/>
-                                        </td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${diag.status}">
-                                                    <span class="status-badge COMPLETE">Submitted</span>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <span class="status-badge ASSIGNED">Draft</span>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td>
-                                            <c:out value="${diag.createdAtFormatted}"/>
-                                        </td>
-                                        <td>
-                                            <a href="${pageContext.request.contextPath}/technician/diagnostic/view?diagnosticId=${diag.vehicleDiagnosticID}"
-                                               class="btn-sm btn-view">
-                                                👀 View
-                                            </a>
-                                            <c:if test="${!diag.status}">
-                                                <a href="${pageContext.request.contextPath}/technician/diagnostic/edit?diagnosticId=${diag.vehicleDiagnosticID}"
-                                                   class="btn-sm btn-edit">
-                                                    ✏️ Edit
-                                                </a>
-                                                <form action="${pageContext.request.contextPath}/technician/diagnostic/submit"
-                                                      method="post" style="display: inline;">
-                                                    <input type="hidden" name="diagnosticId" value="${diag.vehicleDiagnosticID}"/>
-                                                    <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
-                                                    <button type="submit" class="btn-sm btn-submit"
-                                                            onclick="return confirm('Submit this diagnostic? You cannot edit after submission.');">
-                                                        ✅ Submit
-                                                    </button>
-                                                </form>
-                                            </c:if>
-                                        </td>
-                                    </tr>
-                                </c:forEach>
-                            </tbody>
-                        </table>
-
-                        <!-- Pagination -->
-                        <c:if test="${vm.page.totalPages > 1}">
-                            <div class="pagination">
-                                <c:forEach begin="1" end="${vm.page.totalPages}" var="p">
-                                    <a href="?assignmentId=${task.assignmentID}&page=${p}&size=${vm.page.itemsPerPage}&returnTo=${returnTo}"
-                                       class="page-link ${p == vm.page.currentPage ? 'active' : ''}">
-                                        ${p}
-                                    </a>
-                                </c:forEach>
-                            </div>
+                <c:when test="${empty vm.page.data}">
+                    <div class="empty-state">
+                        <p>📭 No diagnostics found for this task.</p>
+                        <c:if test="${task.status == 'IN_PROGRESS'}">
+                            <p>Click "Create New Diagnostic" to add one.</p>
                         </c:if>
-                    </c:otherwise>
-                </c:choose>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                <table class="diagnostic-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Issue Found</th>
+                        <th>Labor Cost</th>
+                        <th>Parts Count</th>
+                        <th>Total Cost</th>
+                        <th>Status</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <c:forEach items="${vm.page.data}" var="diag">
+                        <tr>
+                            <td>#${diag.vehicleDiagnosticID}</td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${fn:length(diag.issueFound) > 50}">
+                                        ${fn:substring(diag.issueFound, 0, 50)}...
+                                    </c:when>
+                                    <c:otherwise>
+                                        ${diag.issueFound}
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td>
+                                <fmt:formatNumber value="${diag.laborCostCalculated}" type="currency"
+                                                  currencySymbol="$"/>
+                            </td>
+                            <td>${fn:length(vm.partsMap[diag.vehicleDiagnosticID])}</td>
+                            <td>
+                                <fmt:formatNumber value="${vm.grandTotal[diag.vehicleDiagnosticID]}" type="currency"
+                                                  currencySymbol="$"/>
+                            </td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${diag.status}">
+                                        <span class="status-badge COMPLETE">Submitted</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="status-badge ASSIGNED">Draft</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </td>
+                            <td>
+                                <c:out value="${diag.createdAtFormatted}"/>
+                            </td>
+                            <td>
+                                <a href="${pageContext.request.contextPath}/technician/diagnostic/view?diagnosticId=${diag.vehicleDiagnosticID}"
+                                   class="btn-sm btn-view">
+                                    👀 View
+                                </a>
+
+                                <c:set var="approvedCnt"
+                                       value="${vm.approvedCount[diag.vehicleDiagnosticID] != null ? vm.approvedCount[diag.vehicleDiagnosticID] : 0}"/>
+
+                                <c:if test="${approvedCnt == 0}">
+                                    <a class="btn btn-sm btn-outline-secondary"
+                                       href="${pageContext.request.contextPath}/technician/diagnostic/edit?diagnosticId=${diag.vehicleDiagnosticID}">
+                                        🐙 Edit
+                                    </a>
+                                </c:if>
+                                <c:if test="${approvedCnt > 0}">
+                            <span class="text-muted" style="font-size:12px;"
+                                  title="This diagnostic has approved parts and cannot be edited.">(locked)</span>
+                                </c:if>
+
+                            </td>
+                        </tr>
+                    </c:forEach>
+                    </tbody>
+                </table>
             </div>
+
+
+            <!-- Pagination -->
+            <c:if test="${vm.page.totalPages > 1}">
+                <div class="pagination">
+                    <c:forEach begin="1" end="${vm.page.totalPages}" var="p">
+                        <a href="?assignmentId=${task.assignmentID}&page=${p}&size=${vm.page.itemsPerPage}&returnTo=${returnTo}"
+                           class="page-link ${p == vm.page.currentPage ? 'active' : ''}">
+                                ${p}
+                        </a>
+                    </c:forEach>
+                </div>
+            </c:if>
+            </c:otherwise>
+            </c:choose>
         </div>
-    </main>
+</div>
+</main>
 </div>
 
 <jsp:include page="footer.jsp"/>

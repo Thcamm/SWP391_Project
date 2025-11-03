@@ -89,6 +89,15 @@ public class VehicleDiagnosticDAO {
         }
     }
 
+    public boolean updateDiagnosticIssueOnly(Connection c, int diagnosticId, String issueFound) throws SQLException {
+        String sql = "UPDATE VehicleDiagnostic SET issueFound = ? WHERE vehicleDiagnosticID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, issueFound);
+            ps.setInt(2, diagnosticId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
     /**
      * Cập nhật issue found và estimate cost
      */
@@ -691,7 +700,7 @@ public class VehicleDiagnosticDAO {
     }
 
     public boolean hasAnyApprovedParts(Connection conn, int diagnosticId) throws SQLException {
-        String sql = "SELECT COUNT(*) cnt FROM DiagnosticPart WHERE VehicleDiagnosticID = ? AND Approved = 1";
+        String sql = "SELECT COUNT(*) cnt FROM DiagnosticPart WHERE VehicleDiagnosticID = ? AND IsApproved = 1";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, diagnosticId);
@@ -703,9 +712,9 @@ public class VehicleDiagnosticDAO {
 
     public boolean hasApprovedWorkOrderForDiagnostic(Connection conn, int diagnosticId) throws SQLException {
         String sql = """
-                SELECT 1 FROM WorderOrderDetail wod
+                SELECT 1 FROM WorkOrderDetail wod
                 WHERE wod.diagnostic_id = ?
-                AND wod.approval_statuc = 'APPROVED'
+                AND wod.approval_status = 'APPROVED'
                 LIMIT 1
                 """;
 

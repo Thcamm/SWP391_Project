@@ -13,6 +13,7 @@ import model.inventory.DiagnosticPart;
 import model.vehicle.VehicleDiagnostic;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
@@ -41,9 +42,30 @@ public class ViewDiagnosticServlet extends HttpServlet {
                 resp.sendRedirect(req.getContextPath()+"/technician/home");
                 return;
             }
+
             Map<Integer, List<DiagnosticPart>> partsMap = dao.getPartsForDiagnostics(Collections.singletonList(diagnosticId));
+            List<DiagnosticPart> parts = partsMap.getOrDefault(diagnosticId, Collections.emptyList());
+
+            // TÍNH TỔNG PARTS
+            BigDecimal partsSum = BigDecimal.ZERO;
+            for (DiagnosticPart dp : parts) {
+                BigDecimal price = dp.getUnitPrice() == null ? BigDecimal.ZERO : dp.getUnitPrice();
+                BigDecimal line = price.multiply(BigDecimal.valueOf(dp.getQuantityNeeded()));
+                partsSum = partsSum.add(line);
+            }
+
+            //LABOR = estimateCost - partsSum
+            BigDecimal totalEstimate = vd.getEstimateCost() == null ? BigDecimal.ZERO : vd.getEstimateCost();
+            BigDecimal laborCost = totalEstimate.subtract(partsSum);
+
+            if (laborCost.compareTo(BigDecimal.ZERO) < 0) {
+                laborCost = BigDecimal.ZERO;
+            }
+
+            vd.setLaborCostCalculated(laborCost);
+
             req.setAttribute("diagnostic", vd);
-            req.setAttribute("parts", partsMap.getOrDefault(diagnosticId, Collections.emptyList()));
+            req.setAttribute("parts", parts);
             req.getRequestDispatcher("/view/technician/view-diagnostic.jsp").forward(req, resp);
         } catch (SQLException e) {
             MessageHelper.setErrorMessage(req.getSession(), MessageConstants.ERR001);
