@@ -11,7 +11,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 @WebServlet("/customerservice/view-attachment")
-public class ViewAttachmentServlet extends HttpServlet {
+public class ViewAttachment extends HttpServlet {
     private static final String UPLOAD_DIR = "C:/test";
 
     @Override

@@ -15,18 +15,27 @@
 </head>
 
 <body>
-<jsp:include page="/common/employee/component/header.jsp" />
-<div class="layout-wrapper layout-content-navbar">
-    <div class="layout-container">
-        <jsp:include page="/common/employee/component/sidebar.jsp" />
+<jsp:include page="header.jsp"/>
 
-        <div class="layout-page">
-            <jsp:include page="/common/employee/component/navbar.jsp" />
+<div class="container-fluid p-0">
+    <div class="row g-0">
+        <div class="col-auto" style="width: 280px;">
+            <jsp:include page="sidebar.jsp"/>
+        </div>
 
-            <div class="content-wrapper">
-                <div class="container-fluid flex-grow-1 container-p-y">
+        <!-- Main Content Column -->
+        <div class="col">
+            <main class="main" style="padding: 1.25rem; padding-bottom: 0;">
+                <div class="content-card"
+                     style="background: white;
+                      border: 1px solid #e5e7eb;
+                       border-radius: 12px;
+                        padding: 2.5rem;
+                         min-height: calc(100vh - 64px - 1.25rem);
+                          display: flex; flex-direction: column;
+                           align-items: center; padding-top: 0">
+                    <!-- Nội dung trang home của bạn ở đây -->
 
-                    <div class="main-content">
                         <div class="container py-4">
                             <jsp:include page="/view/customerservice/result.jsp" />
                             <!-- HEADER -->
@@ -160,11 +169,13 @@
                                                             <button type="button"
                                                                     class="btn btn-sm btn-outline-primary"
                                                                     data-bs-toggle="popover"
-                                                                    data-bs-html="true"
-                                                                    data-bs-content="${apm.description}">
+                                                                    data-bs-html="false"
+                                                                    data-bs-content="${fn:escapeXml(apm.description)}"
+                                                                    title="Description">
                                                                 ▶
                                                             </button>
                                                         </td>
+
                                                         <td>
                                                             <a href="appointment-detail?id=${apm.appointmentID}" class="btn btn-sm btn-outline-primary">
                                                                 Detail
@@ -189,19 +200,13 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
 
                 </div>
-                <jsp:include page="/common/employee/component/footer.jsp" />
-
-                <div class="content-backdrop fade"></div>
-            </div>
+            </main>
         </div>
     </div>
-    <div class="layout-overlay layout-menu-toggle"></div>
 </div>
-<jsp:include page="/common/employee/component/script.jsp" />
-
+<jsp:include page="footer.jsp"/>
 </body>
 
 

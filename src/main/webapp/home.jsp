@@ -99,7 +99,7 @@
 
 <body>
 <!-- ✅ HEADER -->
-<%@ include file="/common/customer/header.jsp" %>
+<%@ include file="/common/header.jsp" %>
 
 <!-- ✅ MAIN CONTENT -->
 <main class="hero-section">
@@ -130,7 +130,7 @@
 </div>
 
 <!-- ✅ FOOTER -->
-<%@ include file="/common/customer/footer.jsp" %>
+<%@ include file="/common/footer.jsp" %>
 
 <!-- JS -->
 <script src="${pageContext.request.contextPath}/assets/js/user/chatbot.js"></script>

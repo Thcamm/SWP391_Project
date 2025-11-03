@@ -14,7 +14,7 @@ import java.util.Map;
 public class AppointmentDAO extends DbContext {
 
     public List<Map<String, Object>> getAllAppointments() {
-        String sql = "SELECT a.AppointmentID, a.CustomerID, a.VehicleID, a.Date, a.Status, a.Description,c.customerid, " +
+        String sql = "SELECT a.AppointmentID, a.CustomerID, a.VehicleID, a.Date, a.Status, a.Description, " +
                 "u.FullName AS customerName " +
                 "FROM Appointment a " +
                 "JOIN Customer c ON a.CustomerID = c.CustomerID " +
@@ -39,7 +39,6 @@ public class AppointmentDAO extends DbContext {
 
                 row.put("appointment", appointment);
                 row.put("customerName", rs.getString("customerName"));
-                row.put("customerId", rs.getString("customerID"));
                 resultList.add(row);
             }
 
@@ -232,7 +231,7 @@ public class AppointmentDAO extends DbContext {
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder(
-                "SELECT a.AppointmentID, a.CustomerID, a.VehicleID, a.Date, a.Status, a.Description,,c.customerid " +
+                "SELECT a.AppointmentID, a.CustomerID, a.VehicleID, a.Date, a.Status, a.Description " +
                         "u.FullName AS customerName " +
                         "FROM Appointment a " +
                         "JOIN Customer c ON a.CustomerID = c.CustomerID " +
@@ -284,7 +283,6 @@ public class AppointmentDAO extends DbContext {
 
                 row.put("appointment", apm);
                 row.put("customerName", rs.getString("customerName"));
-                row.put("customerId", rs.getString("customerID")); // thông tin khách hàng
                 resultList.add(row);
             }
         }

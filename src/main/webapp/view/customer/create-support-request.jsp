@@ -12,7 +12,7 @@
 </head>
 <body>
 
-<jsp:include page="/common/customer/header.jsp" />
+<jsp:include page="/common/header.jsp" />
 <jsp:include page="/view/customerservice/result.jsp" />
 <main class="container py-5" style="margin-top: 130px;">
     <div class="row justify-content-center">
@@ -88,7 +88,7 @@
     </div>
 </main>
 
-<jsp:include page="/common/customer/footer.jsp" />
+<jsp:include page="/common/footer.jsp" />
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/customer/create-support-request.js"></script>

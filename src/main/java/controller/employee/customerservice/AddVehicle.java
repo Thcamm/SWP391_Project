@@ -29,16 +29,15 @@ public class AddVehicle extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json;charset=UTF-8");
 
         String action = request.getParameter("action");
+
         if ("getModels".equals(action)) {
             handleGetModels(request, response);
             return;
         }
 
-        // Mặc định: load brands cho modal
+        // Default: load brands for modal
         response.setContentType("text/html;charset=UTF-8");
         try {
             List<CarBrand> brands = carDAO.getAllBrands();
@@ -55,29 +54,31 @@ public class AddVehicle extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json;charset=UTF-8");
 
         String action = request.getParameter("action");
 
-        // CRITICAL: Phải check action === "saveVehicle" để trả JSON
-        if (action == null || action.isEmpty() || "saveVehicle".equals(action)) {
+        if ("saveVehicle".equals(action)) {
             handleSaveVehicle(request, response);
             return;
         }
 
-        // Fallback: trả JSON error
-        PrintWriter out = response.getWriter();
-        out.write("{\"success\":false,\"message\":\"Invalid action\"}");
-
+        // Invalid action
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write("{\"success\":false,\"message\":\"Invalid action\"}");
     }
 
+    /**
+     * Handle get models by brand ID
+     */
     private void handleGetModels(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
 
         try {
             String brandIdStr = request.getParameter("brandId");
+
             if (brandIdStr == null || brandIdStr.isEmpty()) {
                 out.write("[]");
                 return;
@@ -86,183 +87,215 @@ public class AddVehicle extends HttpServlet {
             int brandId = Integer.parseInt(brandIdStr);
             List<CarModel> models = carDAO.getModelsByBrandId(brandId);
 
-            StringBuilder sb = new StringBuilder("[");
+            // Build JSON array
+            StringBuilder json = new StringBuilder("[");
             for (int i = 0; i < models.size(); i++) {
-                CarModel m = models.get(i);
-                sb.append("{\"id\":").append(m.getModelId())
-                        .append(",\"name\":\"").append(escapeJson(m.getModelName())).append("\"}");
-                if (i < models.size() - 1) sb.append(",");
+                CarModel model = models.get(i);
+                json.append("{")
+                        .append("\"id\":").append(model.getModelId()).append(",")
+                        .append("\"name\":\"").append(escapeJson(model.getModelName())).append("\"")
+                        .append("}");
+
+                if (i < models.size() - 1) {
+                    json.append(",");
+                }
             }
-            sb.append("]");
-            out.write(sb.toString());
+            json.append("]");
+
+            out.write(json.toString());
+
+            System.out.println("✅ Loaded " + models.size() + " models for brand " + brandId);
 
         } catch (NumberFormatException e) {
+            System.err.println("❌ Invalid brandId format");
             out.write("[]");
+
         } catch (SQLException e) {
+            System.err.println("❌ Database error: " + e.getMessage());
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             out.write("{\"error\":\"Database error\"}");
+        } finally {
+            out.close();
         }
     }
+
+    /**
+     * Handle save new vehicle
+     */
     private void handleSaveVehicle(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
+
+        // Set response type FIRST
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
 
+        String jsonResponse = null;
+
         try {
-            // === DEBUG: Log request info ===
-            System.out.println("=== handleSaveVehicle called ===");
-            System.out.println("Content-Type: " + request.getContentType());
-            System.out.println("Content-Length: " + request.getContentLength());
-            System.out.println("Method: " + request.getMethod());
-
-            // Debug: Log ALL parameters
-            System.out.println("=== All Parameters ===");
-            java.util.Map<String, String[]> paramMap = request.getParameterMap();
-            System.out.println("Parameter Map Size: " + paramMap.size());
-
-            for (java.util.Map.Entry<String, String[]> entry : paramMap.entrySet()) {
-                System.out.println(entry.getKey() + ": " + java.util.Arrays.toString(entry.getValue()));
-            }
-
-            // Lấy parameters
+            // Get parameters
             String customerIdStr = request.getParameter("customerId");
             String brandIdStr = request.getParameter("brandId");
             String modelName = request.getParameter("modelName");
             String yearStr = request.getParameter("yearManufacture");
             String licensePlate = request.getParameter("licensePlate");
 
-            // Debug individual values
-            System.out.println("=== Individual Parameter Values ===");
-            System.out.println("customerId: [" + customerIdStr + "]");
-            System.out.println("brandId: [" + brandIdStr + "]");
-            System.out.println("modelName: [" + modelName + "]");
-            System.out.println("year: [" + yearStr + "]");
-            System.out.println("licensePlate: [" + licensePlate + "]");
+            System.out.println("=== Add Vehicle Request ===");
+            System.out.println("customerId: " + customerIdStr);
+            System.out.println("brandId: " + brandIdStr);
+            System.out.println("modelName: " + modelName);
+            System.out.println("year: " + yearStr);
+            System.out.println("licensePlate: " + licensePlate);
 
-            // Validate parameters
+            // Validation
             List<String> missingFields = new ArrayList<>();
-
-            if (customerIdStr == null || customerIdStr.trim().isEmpty()) missingFields.add("customerId");
-            if (brandIdStr == null || brandIdStr.trim().isEmpty()) missingFields.add("brandId");
-            if (modelName == null || modelName.trim().isEmpty()) missingFields.add("modelName");
-            if (yearStr == null || yearStr.trim().isEmpty()) missingFields.add("year");
-            if (licensePlate == null || licensePlate.trim().isEmpty()) missingFields.add("licensePlate");
+            if (isEmpty(customerIdStr)) missingFields.add("customerId");
+            if (isEmpty(brandIdStr)) missingFields.add("brandId");
+            if (isEmpty(modelName)) missingFields.add("modelName");
+            if (isEmpty(yearStr)) missingFields.add("year");
+            if (isEmpty(licensePlate)) missingFields.add("licensePlate");
 
             if (!missingFields.isEmpty()) {
-                String errorMsg = "{\"success\":false,\"message\":\"Thiếu thông tin: " + String.join(", ", missingFields) + "\"}";
-                System.err.println("❌ Validation failed: " + errorMsg);
-                out.write(errorMsg);
-                out.flush();
+                jsonResponse = buildErrorJson("Thiếu thông tin: " + String.join(", ", missingFields));
+                System.err.println("❌ Validation failed: missing fields");
+                out.write(jsonResponse);
                 return;
             }
 
+            // Parse integers
             int customerId = Integer.parseInt(customerIdStr);
+            int brandId = Integer.parseInt(brandIdStr);
+            int year = Integer.parseInt(yearStr);
 
             // Validate license plate format
             if (!vehicleService.validateLicensePlateFormat(licensePlate)) {
-                String errorMsg = "{\"success\":false,\"message\":\"Biển số không hợp lệ\"}";
-                System.err.println("❌ Invalid license plate: " + errorMsg);
-                out.write(errorMsg);
-                out.flush();
+                jsonResponse = buildErrorJson("Biển số không hợp lệ");
+                System.err.println("❌ Invalid license plate format");
+                out.write(jsonResponse);
                 return;
             }
 
-            // Check if license plate already exists
+            // Check if license plate exists
             if (vehicleService.isLicensePlateTaken(licensePlate, 0)) {
-                String errorMsg = "{\"success\":false,\"message\":\"Biển số đã tồn tại\"}";
-                System.err.println("❌ License plate taken: " + errorMsg);
-                out.write(errorMsg);
-                out.flush();
+                jsonResponse = buildErrorJson("Biển số đã tồn tại");
+                System.err.println("❌ License plate already exists");
+                out.write(jsonResponse);
                 return;
             }
 
             // Validate year
-            int year;
-            try {
-                year = Integer.parseInt(yearStr);
-            } catch (NumberFormatException e) {
-                String errorMsg = "{\"success\":false,\"message\":\"Năm sản xuất không hợp lệ\"}";
-                System.err.println("❌ Invalid year: " + errorMsg);
-                out.write(errorMsg);
-                out.flush();
-                return;
-            }
-
             int currentYear = java.time.Year.now().getValue();
             if (year < 2000 || year > currentYear) {
-                String errorMsg = "{\"success\":false,\"message\":\"Năm sản xuất phải từ 2000 đến " + currentYear + "\"}";
-                System.err.println("❌ Year out of range: " + errorMsg);
-                out.write(errorMsg);
-                out.flush();
+                jsonResponse = buildErrorJson("Năm sản xuất phải từ 2000 đến " + currentYear);
+                System.err.println("❌ Year out of range");
+                out.write(jsonResponse);
                 return;
             }
 
             // Get brand name
-            int brandId = Integer.parseInt(brandIdStr);
             CarBrand brand = carDAO.getBrandById(brandId);
             if (brand == null) {
-                String errorMsg = "{\"success\":false,\"message\":\"Hãng xe không tồn tại\"}";
-                System.err.println("❌ Brand not found: " + errorMsg);
-                out.write(errorMsg);
-                out.flush();
+                jsonResponse = buildErrorJson("Hãng xe không tồn tại");
+                System.err.println("❌ Brand not found");
+                out.write(jsonResponse);
                 return;
             }
+
             String brandName = brand.getBrandName();
 
-            System.out.println("✓ All validations passed, creating vehicle...");
-
-            // Create new vehicle
+            // Create vehicle object
             Vehicle newVehicle = new Vehicle();
             newVehicle.setCustomerID(customerId);
             newVehicle.setBrand(brandName);
             newVehicle.setModel(modelName);
             newVehicle.setYearManufacture(year);
-            newVehicle.setLicensePlate(licensePlate);
+            newVehicle.setLicensePlate(licensePlate.toUpperCase());
 
-            int newId = vehicleDAO.insertVehicle(newVehicle);
+            // Insert into database
+            int newVehicleId = vehicleDAO.insertVehicle(newVehicle);
 
-            System.out.println("✓ Vehicle created with ID: " + newId);
+            if (newVehicleId <= 0) {
+                jsonResponse = buildErrorJson("Không thể thêm xe vào database");
+                System.err.println("❌ Failed to insert vehicle");
+                out.write(jsonResponse);
+                return;
+            }
 
-            // Return success JSON
-            String json = "{"
-                    + "\"success\":true,"
-                    + "\"vehicleId\":" + newId + ","
-                    + "\"brand\":\"" + escapeJson(brandName) + "\","
-                    + "\"model\":\"" + escapeJson(modelName) + "\","
-                    + "\"licensePlate\":\"" + escapeJson(licensePlate) + "\""
-                    + "}";
+            // Build success response
+            jsonResponse = buildSuccessJson(
+                    newVehicleId,
+                    brandName,
+                    modelName,
+                    licensePlate.toUpperCase(),
+                    year
+            );
 
-            System.out.println("=== Sending Response ===");
-            System.out.println(json);
+            System.out.println("✅ Vehicle added successfully with ID: " + newVehicleId);
+            System.out.println("Response: " + jsonResponse);
 
-            out.write(json);
-            out.flush();
+            out.write(jsonResponse);
+
+        } catch (NumberFormatException e) {
+            System.err.println("❌ Number format error: " + e.getMessage());
+            e.printStackTrace();
+            jsonResponse = buildErrorJson("Dữ liệu không hợp lệ");
+            out.write(jsonResponse);
 
         } catch (SQLException e) {
+            System.err.println("❌ Database error: " + e.getMessage());
             e.printStackTrace();
-            System.err.println("❌ SQL Exception: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            String errorMsg = "{\"success\":false,\"message\":\"Lỗi cơ sở dữ liệu: " + escapeJson(e.getMessage()) + "\"}";
-            out.write(errorMsg);
-            out.flush();
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
-            System.err.println("❌ Number Format Exception: " + e.getMessage());
-            String errorMsg = "{\"success\":false,\"message\":\"Dữ liệu không hợp lệ\"}";
-            out.write(errorMsg);
-            out.flush();
+            jsonResponse = buildErrorJson("Lỗi cơ sở dữ liệu: " + e.getMessage());
+            out.write(jsonResponse);
+
         } catch (Exception e) {
+            System.err.println("❌ Unexpected error: " + e.getMessage());
             e.printStackTrace();
-            System.err.println("❌ Unexpected Exception: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            String errorMsg = "{\"success\":false,\"message\":\"Lỗi không xác định: " + escapeJson(e.getMessage()) + "\"}";
-            out.write(errorMsg);
-            out.flush();
+            jsonResponse = buildErrorJson("Lỗi không xác định: " + e.getMessage());
+            out.write(jsonResponse);
+
+        } finally {
+            // CRITICAL: Always close PrintWriter
+            if (out != null) {
+                out.close();
+            }
         }
     }
 
-    // Helper method to escape JSON strings
+    /**
+     * Check if string is null or empty
+     */
+    private boolean isEmpty(String str) {
+        return str == null || str.trim().isEmpty();
+    }
+
+    /**
+     * Build error JSON response
+     */
+    private String buildErrorJson(String message) {
+        return "{\"success\":false,\"message\":\"" + escapeJson(message) + "\"}";
+    }
+
+    /**
+     * Build success JSON response
+     */
+    private String buildSuccessJson(int vehicleId, String brand, String model, String licensePlate, int year) {
+        StringBuilder json = new StringBuilder();
+        json.append("{")
+                .append("\"success\":true,")
+                .append("\"vehicleId\":").append(vehicleId).append(",")
+                .append("\"brand\":\"").append(escapeJson(brand)).append("\",")
+                .append("\"model\":\"").append(escapeJson(model)).append("\",")
+                .append("\"licensePlate\":\"").append(escapeJson(licensePlate)).append("\",")
+                .append("\"year\":").append(year)
+                .append("}");
+        return json.toString();
+    }
+
+    /**
+     * Escape JSON string
+     */
     private String escapeJson(String str) {
         if (str == null) return "";
         return str.replace("\\", "\\\\")

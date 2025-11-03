@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customer/appointment-scheduling.css">
 </head>
 <body>
-<jsp:include page="/common/customer/header.jsp" />
+<jsp:include page="/common/header.jsp" />
 
 <main class="appointment-section">
     <div class="container">
@@ -112,7 +112,7 @@
     </div>
 </main>
 
-<jsp:include page="/common/customer/footer.jsp" />
+<jsp:include page="/common/footer.jsp" />
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @WebServlet("/customerservice/appointment-list")
-public class AppointmentListServlet extends HttpServlet {
+public class AppointmentList extends HttpServlet {
     @Override
     protected void doGet (HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

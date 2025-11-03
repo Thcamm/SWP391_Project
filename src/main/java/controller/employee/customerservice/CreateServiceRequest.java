@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet(name = "CustomerCreateRequestServlet", urlPatterns = {"/customerservice/createRequest"})
-public class CreateServiceRequestServlet extends HttpServlet {
+public class CreateServiceRequest extends HttpServlet {
 
     private final CarDataDAO carDataDAO = new CarDataDAO();
 

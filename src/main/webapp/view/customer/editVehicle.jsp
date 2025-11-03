@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/vehicle/addVehicle.css">
 </head>
 <body>
-<jsp:include page="/common/customer/header.jsp" />
+<jsp:include page="/common/header.jsp" />
 <div class="form-container">
     <h2>Edit Vehicle Information</h2>
 
@@ -62,6 +62,6 @@
         </form>
     </c:if>
 </div>
-<jsp:include page="/common/customer/footer.jsp" />
+<jsp:include page="/common/footer.jsp" />
 </body>
 </html>

@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.sql.Date;
 
 @WebServlet("/customerservice/create-customer")
-public class CreateCustomerServlet extends HttpServlet {
+public class CreateCustomer extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -88,11 +88,13 @@ public class CreateCustomerServlet extends HttpServlet {
             MailService.sendEmail(email,"You have been successfully created!","This is your temporary password " + password );
             request.setAttribute("message", "Customer added successfully! Password: " + password);
             request.setAttribute("messageType", "success");
+            response.sendRedirect("/view/customerservice/customer-deatail.jsp?customerId=" + customer.getCustomerId());
         } else {
             request.setAttribute("message", "Unable to add customer. Please try again.");
             request.setAttribute("messageType", "error");
+            request.getRequestDispatcher("/view/customerservice/create-customer.jsp").forward(request, response);
         }
 
-        request.getRequestDispatcher("/view/customerservice/create-customer.jsp").forward(request, response);
+
     }
 }

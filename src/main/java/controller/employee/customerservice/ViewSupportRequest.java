@@ -19,7 +19,7 @@ import java.util.Map;
 
 @WebServlet("/customerservice/view-support-request")
 @MultipartConfig
-public class ViewSupportRequestServlet extends HttpServlet {
+public class ViewSupportRequest extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
