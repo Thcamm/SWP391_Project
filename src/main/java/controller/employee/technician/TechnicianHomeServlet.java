@@ -16,6 +16,7 @@ import model.pagination.PaginationResponse;
 import service.employee.TechnicianService;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 
 @WebServlet("/technician/home")
 public class TechnicianHomeServlet extends HttpServlet {
@@ -74,6 +75,22 @@ public class TechnicianHomeServlet extends HttpServlet {
                 activitiesPage,
                 DEFAULT_PAGE_SIZE
         );
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM HH:mm");
+
+// Định dạng cho danh sách task mới
+        for (TaskAssignment task : newTasks.getData()) {
+            if (task.getAssignedDate() != null) {
+                task.setAssignedDateFormatted(task.getAssignedDate().format(formatter));
+            }
+        }
+
+// Định dạng cho danh sách task đang làm
+        for (TaskAssignment task : inProgressTasks.getData()) {
+            if (task.getAssignedDate() != null) {
+                task.setAssignedDateFormatted(task.getAssignedDate().format(formatter));
+            }
+        }
 
         req.setAttribute("technician", techinician);
         req.setAttribute("statistics", statistics);

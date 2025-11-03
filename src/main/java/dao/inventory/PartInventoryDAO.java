@@ -14,61 +14,63 @@ import java.util.List;
 
 public class PartInventoryDAO {
 
-    public List<PartDetail> searchAvailableParts(String keyword) {
-        List<PartDetail> parts = new ArrayList<>();
-
-        StringBuilder sql = new StringBuilder(
-                "SELECT pd.*, p.PartCode, p.PartName, p.Category, u.Name as UnitName " +
+    public List<PartDetail> searchAvailableParts(String keyword) throws SQLException {
+        String sql =
+                "SELECT pd.PartDetailID, pd.PartID, pd.SKU, pd.Quantity, pd.MinStock, pd.UnitPrice, pd.Location, " +
+                        "       p.PartCode, p.PartName, p.Category, u.name AS UnitName " +
                         "FROM PartDetail pd " +
-                        "JOIN Part p ON pd.PartID = p.PartID " +
-                        "LEFT JOIN Unit u ON p.base_unit_id = u.UnitID " +
-                        "WHERE pd.Quantity > 0 "
+                        "JOIN Part p ON p.PartID = pd.PartID " +
+                        "JOIN Unit u ON u.unit_id = p.base_unit_id " +
+                        "WHERE pd.Quantity > 0 AND (" +
+                        "      LOWER(p.PartName) LIKE LOWER(CONCAT('%', ?, '%')) OR " +
+                        "      LOWER(pd.SKU)     LIKE LOWER(CONCAT('%', ?, '%')) OR " +
+                        "      LOWER(p.Category) LIKE LOWER(CONCAT('%', ?, '%')) OR " +
+                        "      LOWER(p.Description) LIKE LOWER(CONCAT('%', ?, '%'))" +
+                        ") " +
+                        "ORDER BY p.PartName ASC";
 
-        );
+        List<PartDetail> out = new ArrayList<>();
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            for (int i = 1; i <= 4; i++) ps.setString(i, keyword == null ? "" : keyword.trim());
+            try (ResultSet rs = ps.executeQuery()) {
 
-        List<Object> params = new ArrayList<>();
-
-        if(keyword != null && !keyword.trim().isEmpty()) {
-            sql.append("AND (p.PartName LIKE ? OR p.PartCode LIKE ? OR p.Category LIKE ? OR pd.sku LIKE ?) ");
-            String searchPattern = "%" + keyword.trim() + "%";
-
-            params.add(searchPattern);
-            params.add(searchPattern);
-            params.add(searchPattern);
-            params.add(searchPattern);
-        }
-
-        sql.append("ORDER BY p.PartName, pd.sku");
-        try(Connection conn = DbContext.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-
-            for(int i = 0; i < params.size(); i++) {
-                ps.setObject(i+1, params.get(i));
-            }
-
-            try(ResultSet rs = ps.executeQuery()) {
-                while(rs.next()){
-                    PartDetail part = mapResultSetToPartDetail(rs);
-                    parts.add(part);
+                while (rs.next()) {
+                    PartDetail d = new PartDetail();
+                    d.setPartDetailId(rs.getInt("PartDetailID"));
+                    d.setPartId(rs.getInt("PartID"));
+                    d.setSku(rs.getString("SKU"));
+                    d.setQuantity(rs.getInt("Quantity"));
+                    d.setMinStock(rs.getInt("MinStock"));
+                    d.setUnitPrice(rs.getBigDecimal("UnitPrice"));
+                    d.setLocation(rs.getString("Location"));
+                    d.setPartCode(rs.getString("PartCode"));
+                    d.setPartName(rs.getString("PartName"));
+                    d.setCategory(rs.getString("Category"));
+                    d.setUnitName(rs.getString("UnitName"));
+                    out.add(d);
                 }
-            }
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
 
-        return parts;
+
+            }catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            return out;
+        }
     }
 
-    public List<PartDetail> getAllAvailableParts() {
+
+    public List<PartDetail> getAllAvailableParts() throws SQLException {
         return searchAvailableParts(null);
     }
 
     public PartDetail getPartDetailById(int partDetailId) {
         String sql = "SELECT pd.*, p.PartCode, p.PartName, p.Category, p.Description, "+
-                "u.Name as UnitName " +
+                "u.name as UnitName " +
                 "FROM PartDetail pd " +
                 "JOIN Part p ON pd.PartID = p.PartID " +
-                "LEFT JOIN Unit u ON p.base_unit_id = u.UnitID " +
+                "LEFT JOIN Unit u ON p.base_unit_id = u.unit_id " +
                 "WHERE pd.PartDetailID = ?";
         try (Connection conn = DbContext.getConnection();
         PreparedStatement ps = conn.prepareStatement(sql)){
@@ -93,10 +95,10 @@ public class PartInventoryDAO {
         }
 
         String sql = "SELECT pd.*, p.PartCode, p.PartName, p.Category, p.Description, "+
-                "u.Name as UnitName " +
+                "u.name as UnitName " +
                 "FROM PartDetail pd " +
                 "JOIN Part p ON pd.PartID = p.PartID " +
-                "LEFT JOIN Unit u ON p.base_unit_id = u.UnitID " +
+                "LEFT JOIN Unit u ON p.base_unit_id = u.unit_id " +
                 "WHERE pd.SKU = ?";
         try (Connection conn = DbContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
@@ -118,7 +120,7 @@ public class PartInventoryDAO {
             return false;
         }
 
-        String sql = "SELECT Quantity FROM PartDetail WHERE PartDEtailID = ?";
+        String sql = "SELECT Quantity FROM PartDetail WHERE PartDetailID = ?";
         try(Connection conn = DbContext.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setInt(1, partDetailId);
@@ -159,10 +161,10 @@ public class PartInventoryDAO {
             return parts;
         }
 
-        String sql = "SELECT pd.*, p.PartCode, p.PartName, p.Category, p.Description, u.Name as UnitName " +
+        String sql = "SELECT pd.*, p.PartCode, p.PartName, p.Category, p.Description, u.name as UnitName " +
                 "FROM PartDetail pd " +
                 "JOIN Part p ON pd.PartID = p.PartID " +
-                "LEFT JOIN Unit u ON p.base_unit_id = u.UnitID " +
+                "LEFT JOIN Unit u ON p.base_unit_id = u.unit_id " +
                 "WHERE pd.Quantity > 0 AND p.Category = ? " +
                 "ORDER BY p.PartName, pd.SKU";
 
@@ -207,10 +209,10 @@ public class PartInventoryDAO {
     public List<PartDetail> getLowStockParts() {
         List<PartDetail> parts = new ArrayList<>();
 
-        String sql = "SELECT pd.*, p.PartCode, p.PartName, p.Category, p.Description, u.Name as UnitName " +
+        String sql = "SELECT pd.*, p.PartCode, p.PartName, p.Category, p.Description, u.name as UnitName " +
                 "FROM PartDetail pd " +
                 "JOIN Part p ON pd.PartID = p.PartID " +
-                "LEFT JOIN Unit u ON p.base_unit_id = u.UnitID " +
+                "LEFT JOIN Unit u ON p.base_unit_id = u.unit_id " +
                 "WHERE pd.Quantity > 0 AND pd.Quantity <= pd.MinStock " +
                 "ORDER BY pd.Quantity ASC, p.PartName";
 
@@ -231,10 +233,10 @@ public class PartInventoryDAO {
     public List<PartDetail> getOutOfStockParts() {
         List<PartDetail> parts = new ArrayList<>();
 
-        String sql = "SELECT pd.*, p.PartCode, p.PartName, p.Category, p.Description, u.Name as UnitName " +
+        String sql = "SELECT pd.*, p.PartCode, p.PartName, p.Category, p.Description, u.name as UnitName " +
                 "FROM PartDetail pd " +
                 "JOIN Part p ON pd.PartID = p.PartID " +
-                "LEFT JOIN Unit u ON p.base_unit_id = u.UnitID " +
+                "LEFT JOIN Unit u ON p.base_unit_id = u.unit_id " +
                 "WHERE pd.Quantity = 0 " +
                 "ORDER BY p.PartName";
 
@@ -255,12 +257,13 @@ public class PartInventoryDAO {
     public List<CharacteristicValue> getPartDetailCharacteristics(int partDetailId) {
         List<CharacteristicValue> characteristics = new ArrayList<>();
 
-        String sql = "SELECT cv.* " +
+        String sql = "SELECT cv.*, ct.Name AS TypeName " +
                 "FROM PartDetail_Characteristic pdc " +
                 "JOIN CharacteristicValue cv ON pdc.ValueID = cv.ValueID " +
                 "JOIN CharacteristicType ct ON cv.TypeID = ct.TypeID " +
                 "WHERE pdc.PartDetailID = ? " +
-                "ORDER BY ct.TypeName, cv.ValueName";
+                "ORDER BY ct.Name, cv.ValueName";
+
         try (Connection conn = DbContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, partDetailId);
@@ -292,7 +295,7 @@ public class PartInventoryDAO {
         return part;
     }
 
-    public List<PartDetail> searchPartsWithCharacteristics(String keyword) {
+    public List<PartDetail> searchPartsWithCharacteristics(String keyword) throws SQLException {
         List<PartDetail> parts = searchAvailableParts(keyword);
 
         // Load characteristics for each part
@@ -329,10 +332,10 @@ public class PartInventoryDAO {
             return parts;
         }
 
-        String sql = "SELECT pd.*, p.PartCode, p.PartName, p.Category, p.Description, u.Name as UnitName " +
+        String sql = "SELECT pd.*, p.PartCode, p.PartName, p.Category, p.Description, u.name as UnitName " +
                 "FROM PartDetail pd " +
                 "JOIN Part p ON pd.PartID = p.PartID " +
-                "LEFT JOIN Unit u ON p.base_unit_id = u.UnitID " +
+                "LEFT JOIN Unit u ON p.base_unit_id = u.unit_id " +
                 "WHERE pd.Location = ? " +
                 "ORDER BY p.PartName, pd.SKU";
 

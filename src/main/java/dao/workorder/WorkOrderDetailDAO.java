@@ -11,7 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WorkOrderDetailDAO extends DbContext {
+public class WorkOrderDetailDAO {
 
     public int createWorkOrderDetail(WorkOrderDetail detail) throws SQLException {
         // Note: Column names in DB are lowercase with underscores: source,

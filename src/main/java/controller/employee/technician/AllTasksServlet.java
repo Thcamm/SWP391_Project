@@ -12,6 +12,8 @@ import model.employee.technician.TaskStatistics;
 import model.pagination.PaginationResponse;
 import service.employee.TechnicianService;
 
+import java.time.format.DateTimeFormatter;
+
 
 @WebServlet("/technician/tasks")
 public class AllTasksServlet extends HttpServlet {
@@ -19,7 +21,7 @@ public class AllTasksServlet extends HttpServlet {
     private final TechnicianService technicianService = new TechnicianService();
 
     private static final int DEFAULT_PAGE = 1;
-    private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final int DEFAULT_PAGE_SIZE = 5;
 
     public AllTasksServlet() {
         super();
@@ -56,6 +58,13 @@ public class AllTasksServlet extends HttpServlet {
                 page,
                 DEFAULT_PAGE_SIZE
         );
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        for (TaskAssignment task : tasks.getData()) {
+            if (task.getAssignedDate() != null) {
+                task.setAssignedDateFormatted(task.getAssignedDate().format(formatter));
+            }
+        }
 
         ServiceResult statsResult = technicianService.getAllTasksStatistics(
                 technician.getEmployeeId()

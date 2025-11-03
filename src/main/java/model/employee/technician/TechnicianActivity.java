@@ -1,6 +1,7 @@
 package model.employee.technician;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class TechnicianActivity {
     private int activityID;
@@ -12,6 +13,12 @@ public class TechnicianActivity {
 
     private String vehicleInfo;
     private String taskInfo;
+
+    private static final DateTimeFormatter DMY_HM = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    public String getActivityTimeFormatted() {
+        return activityTime != null ? activityTime.format(DMY_HM) : "-";
+    }
 
 
 
