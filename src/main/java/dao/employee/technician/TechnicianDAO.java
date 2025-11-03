@@ -5,9 +5,7 @@ import model.employee.Employee;
 import model.employee.technician.TaskAssignment;
 import model.employee.technician.TaskStatistics;
 import model.employee.technician.TechnicianActivity;
-import org.checkerframework.checker.units.qual.A;
 
-import java.lang.reflect.Type;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -203,8 +201,7 @@ public class TechnicianDAO {
             int technicianId,
             String status,
             String priority,
-            String search
-    ) {
+            String search) {
         StringBuilder sql = new StringBuilder(
                 "SELECT ta.*, " +
                         "wd.TaskDescription AS WorkOrderDetailDesc,  " +
@@ -220,23 +217,23 @@ public class TechnicianDAO {
                         "JOIN Service_Type st ON sr.ServiceID = st.ServiceID " +
                         "JOIN Customer c ON v.CustomerID = c.CustomerID " +
                         "JOIN User u ON c.UserID = u.UserID " +
-                        "WHERE ta.AssignToTechID = ? "
-        );
+                        "WHERE ta.AssignToTechID = ? ");
 
         List<Object> params = new ArrayList<>();
         params.add(technicianId);
-        if(status != null && !status.trim().isEmpty()) {
+        if (status != null && !status.trim().isEmpty()) {
             sql.append("AND ta.Status = ? ");
             params.add(status);
         }
 
-        if(priority != null && !priority.trim().isEmpty()) {
+        if (priority != null && !priority.trim().isEmpty()) {
             sql.append("AND ta.priority = ? ");
             params.add(priority);
         }
 
-        if(search != null && !search.trim().isEmpty()) {
-            sql.append("AND (v.LicensePlate LIKE ? OR v.Brand LIKE ? OR v.Model LIKE ? OR u.FullName LIKE ? OR st.ServiceName LIKE ?) ");
+        if (search != null && !search.trim().isEmpty()) {
+            sql.append(
+                    "AND (v.LicensePlate LIKE ? OR v.Brand LIKE ? OR v.Model LIKE ? OR u.FullName LIKE ? OR st.ServiceName LIKE ?) ");
             String searchPattern = "%" + search + "%";
             params.add(searchPattern);
             params.add(searchPattern);
@@ -248,19 +245,19 @@ public class TechnicianDAO {
         sql.append("ORDER BY ta.priority DESC, ta.AssignedDate DESC");
 
         List<TaskAssignment> tasks = new ArrayList<>();
-        try(Connection conn = DbContext.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql.toString())){
-            for(int i = 0; i < params.size(); i++){
-                ps.setObject(i+1, params.get(i));
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
             }
 
-            try(ResultSet rs = ps.executeQuery()){
-                while(rs.next()) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
                     TaskAssignment task = mapResultSetToTask(rs);
                     tasks.add(task);
                 }
             }
-        }catch(SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
 
         }
@@ -277,18 +274,18 @@ public class TechnicianDAO {
                 "SUM(CASE WHEN ta.Status = 'COMPLETE' THEN 1 ELSE 0 END) as completed_count " +
                 "FROM TaskAssignment ta " +
                 "WHERE ta.AssignToTechID = ?";
-        try(Connection conn = DbContext.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)){
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, technicianId);
-            try (ResultSet rs = ps.executeQuery()){
-                if(rs.next()){
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
                     stats.setTotalTasksCount(rs.getInt("total_tasks"));
                     stats.setNewTasksCount(rs.getInt("assigned_count"));
                     stats.setInProgressCount(rs.getInt("in_progress_count"));
                     stats.setCompletedTodayCount(rs.getInt("completed_count"));
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -512,6 +509,58 @@ public class TechnicianDAO {
         activity.setTaskInfo(rs.getString("ServiceName"));
 
         return activity;
+    }
+
+    /**
+     * Get all Technicians for TechManager to assign tasks
+     * Used in diagnosis/repair assignment screens
+     */
+    public List<Employee> getAllTechnicians() {
+        List<Employee> technicians = new ArrayList<>();
+        String sql = "SELECT e.*, u.FullName, u.UserName, u.Email, u.PhoneNumber, u.Gender " +
+                "FROM Employee e " +
+                "JOIN User u ON e.UserID = u.UserID " +
+                "JOIN RoleInfo r ON u.RoleID = r.RoleID " +
+                "WHERE r.RoleName = 'Technician' " +
+                "AND u.ActiveStatus = 1 " +
+                "ORDER BY u.FullName ASC";
+
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                technicians.add(mapResultSetToEmployee(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return technicians;
+    }
+
+    /**
+     * Get Technician by EmployeeID
+     * Used when creating notifications or fetching specific technician info
+     */
+    public Employee getTechnicianById(int employeeId) {
+        String sql = "SELECT e.*, u.FullName, u.UserName, u.Email, u.PhoneNumber, u.Gender " +
+                "FROM Employee e " +
+                "JOIN User u ON e.UserID = u.UserID " +
+                "WHERE e.EmployeeID = ?";
+
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, employeeId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToEmployee(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
