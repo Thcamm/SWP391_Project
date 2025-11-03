@@ -69,7 +69,7 @@ public class UserEditServlet extends BaseAdminServlet {
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID");
         } catch (Exception e) {
-            handleError(request, response, "Lỗi khi tải form edit: " + e.getMessage());
+            handleError(request, response, "Error when editing user: " + e.getMessage());
         }
     }
 
@@ -103,13 +103,13 @@ public class UserEditServlet extends BaseAdminServlet {
 
             // Validate required fields: fullName and roleId. Email is optional.
             if (isNullOrEmpty(fullName) || isNullOrEmpty(roleParam)) {
-                redirectWithMessage(response, redirectUrl, "Vui lòng điền đầy đủ thông tin bắt buộc!", "error");
+                redirectWithMessage(response, redirectUrl, "Please fill in all required fields!", "error");
                 return;
             }
 
             Integer newRoleId = parseIntParameter(roleParam);
             if (newRoleId == null || newRoleId <= 0) {
-                redirectWithMessage(response, redirectUrl, "Role ID không hợp lệ!", "error");
+                redirectWithMessage(response, redirectUrl, "Role ID is invalid!", "error");
                 return;
             }
 
@@ -127,9 +127,9 @@ public class UserEditServlet extends BaseAdminServlet {
 
             if (success) {
                 // Redirect back to the edit page so the user sees fresh values
-                redirectWithMessage(response, redirectUrl, "Cập nhật thông tin user thành công!", "success");
+                redirectWithMessage(response, redirectUrl, "Update user information successfully!", "success");
             } else {
-                redirectWithMessage(response, redirectUrl, "Cập nhật user thất bại!", "error");
+                redirectWithMessage(response, redirectUrl, "Update user failed!", "error");
             }
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID");

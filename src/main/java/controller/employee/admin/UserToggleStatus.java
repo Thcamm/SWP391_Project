@@ -77,7 +77,7 @@ public class UserToggleStatus extends BaseAdminServlet {
 
             boolean success = adminService.toggleUserStatus(userId, newStatus, currentUser);
 
-            String message = success ? "Đã thay đổi trạng thái user" : "Không thể thay đổi trạng thái user";
+            String message = success ? "Changed user status successfully" : "Cannot change user status";
             String messageType = success ? "success" : "error";
             redirectWithMessage(response, redirectUrl, message, messageType);
 
@@ -85,7 +85,7 @@ public class UserToggleStatus extends BaseAdminServlet {
             redirectWithMessage(response, redirectUrl, "Invalid user ID", "error");
         } catch (Exception e) {
             e.printStackTrace();
-            redirectWithMessage(response, redirectUrl, "Lỗi hệ thống: " + e.getMessage(), "error");
+            redirectWithMessage(response, redirectUrl, "System error: " + e.getMessage(), "error");
         }
     }
 }

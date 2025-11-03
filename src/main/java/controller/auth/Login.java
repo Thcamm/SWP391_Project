@@ -73,7 +73,6 @@ public class Login extends HttpServlet {
             }
             request.getSession().setAttribute("userPermissions", userPermissions);
 
-
             request.getSession().setMaxInactiveInterval(30 * 60);
             String redirectAfterLogin = (String) request.getSession().getAttribute("redirectAfterLogin");
             if (redirectAfterLogin != null && !redirectAfterLogin.isEmpty()) {
@@ -81,29 +80,31 @@ public class Login extends HttpServlet {
                 response.sendRedirect(redirectAfterLogin);
                 return;
             }
-//7 roles: ADMIN, TechManager, Technical, Accountant, Store Keeper, Customer Service,Customer
-            if(user.getRoleId() == 1) {
+            // 7 roles: ADMIN, TechManager, Technical, Accountant, Store Keeper, Customer
+            // Service,Customer
+            if (user.getRoleId() == 1) {
                 response.sendRedirect(request.getContextPath() + "/admin/users");
                 return;
-            } else if(user.getRoleId() == 2) {
-                response.sendRedirect(request.getContextPath() + "/techmanager/home");
+            } else if (user.getRoleId() == 2) {
+                response.sendRedirect(request.getContextPath() + "/techmanager/dashboard");
                 return;
-            } else if(user.getRoleId() == 3) {
+            } else if (user.getRoleId() == 3) {
                 response.sendRedirect(request.getContextPath() + "/technician/home");
                 return;
-            } else if(user.getRoleId() == 4) {
+            } else if (user.getRoleId() == 4) {
                 response.sendRedirect(request.getContextPath() + "/inventory/dashboard");
                 return;
-            } else if(user.getRoleId() == 5) {
+            } else if (user.getRoleId() == 5) {
                 response.sendRedirect(request.getContextPath() + "/accountant/home");
                 return;
-            } else if(user.getRoleId() == 6) {
+            } else if (user.getRoleId() == 6) {
                 response.sendRedirect(request.getContextPath() + "/customerservice/home");
                 return;
-            } else if(user.getRoleId() == 7) {
+            } else if (user.getRoleId() == 7) {
                 response.sendRedirect(request.getContextPath() + "/Home");
                 return;
-            }        } else {
+            }
+        } else {
             request.setAttribute("errorMessage", "Invalid username or password.");
             request.getRequestDispatcher("/login.jsp").forward(request, response);
         }
