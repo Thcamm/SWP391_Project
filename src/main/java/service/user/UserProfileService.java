@@ -78,8 +78,14 @@ public class UserProfileService {
         }
 
         if (user.getBirthDate() != null) {
-            if (!isValidBirthDate(user.getBirthDate())) {
+            LocalDate dob = user.getBirthDate().toLocalDate();
+            int age = Period.between(dob, LocalDate.now()).getYears();
+            if (age < 18) {
                 result.setMessage("User must be at least 18 years old.");
+                return result;
+            }
+            if (age > 100) {
+                result.setMessage("Age cannot exceed 100 years.");
                 return result;
             }
         }
@@ -97,7 +103,8 @@ public class UserProfileService {
         if (dob.isAfter(today)) {
             return false;
         }
-        return Period.between(dob, today).getYears() >= 18;
+        int age = Period.between(dob, today).getYears();
+        return age >= 18 && age <= 100;
     }
 
     private boolean isValidEmail(String email) {

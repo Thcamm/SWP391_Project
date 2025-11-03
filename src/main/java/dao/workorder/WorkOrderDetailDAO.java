@@ -2,7 +2,6 @@ package dao.workorder;
 
 import common.DbContext;
 import model.workorder.WorkOrderDetail;
-import model.workorder.TaskAssignment;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WorkOrderDetailDAO extends DbContext {
+public class WorkOrderDetailDAO {
 
     public int createWorkOrderDetail(WorkOrderDetail detail) throws SQLException {
         String sql = "INSERT INTO WorkOrderDetail (WorkOrderID, Source, DiagnosticID, ApprovalStatus, TaskDescription, EstimateHours, EstimateAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
