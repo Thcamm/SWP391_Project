@@ -1,0 +1,94 @@
+/* ===========================
+   Tech Manager Base Styles
+   =========================== */
+
+:root {
+  /* Brand Colors */
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-light: #3b82f6;
+
+  /* Background & Text */
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --brand: #2563eb;
+
+  /* Status Colors */
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #ea580c;
+  --info: #0891b2;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.6 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 20px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+.main-nav ul {
+  display: flex;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nav-link {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  text-decoration: none;
+}
+.nav-link:hover {
+  background: #f3f4f6;
+}
+.nav-link.active {
+  background: var(--brand);
+  color: #fff;
+  border-color: var(--brand);
+}
+.footer {
+  border-top: 1px solid var(--border);
+  background: var(--card);
+}
+.footer .footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.layout {
+  display: flex; /* cho phép sidebar và main nằm ngang */
+  min-height: calc(100vh - 64px); /* trừ chiều cao header */
+  background: #f9fafb;
+}
+
+.main {
+  flex: 1; /* chiếm toàn bộ phần còn lại */
+  padding: 20px;
+  overflow-y: auto;
+}

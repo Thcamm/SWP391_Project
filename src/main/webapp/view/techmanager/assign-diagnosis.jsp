@@ -11,23 +11,24 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <jsp:include page="../common/sidebar-techmanager.jsp" />
-
-            <!-- Main Content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">
-                        <i class="bi bi-person-check"></i> Assign Diagnosis Tasks
-                    </h1>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <a href="${pageContext.request.contextPath}/techmanager/service-requests" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-arrow-left"></i> Back to Requests
-                        </a>
-                    </div>
+    <%@ include file="header-techmanager.jsp" %>
+    
+    <div class="main-container">
+        <jsp:include page="sidebar-techmanager.jsp">
+            <jsp:param name="activeMenu" value="assign-diagnosis" />
+        </jsp:include>
+        
+        <div class="content-wrapper">
+            <div class="page-header">
+                <h1 class="h2">
+                    <i class="bi bi-person-check"></i> Assign Diagnosis Tasks
+                </h1>
+                <div class="btn-toolbar">
+                    <a href="${pageContext.request.contextPath}/techmanager/service-requests" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back to Requests
+                    </a>
                 </div>
+            </div>
 
                 <!-- Alert Messages -->
                 <c:if test="${param.message != null}">
@@ -147,7 +148,6 @@
                         </div>
                     </div>
                 </div>
-            </main>
         </div>
     </div>
 
@@ -240,5 +240,7 @@
             });
         }, 5000);
     </script>
+    
+    <%@ include file="footer-techmanager.jsp" %>
 </body>
 </html>

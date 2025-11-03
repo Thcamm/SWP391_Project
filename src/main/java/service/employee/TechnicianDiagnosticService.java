@@ -9,7 +9,6 @@ import dao.employee.technician.TechnicianActivityDAO;
 import model.vehicle.VehicleDiagnostic;
 import model.inventory.DiagnosticPart;
 
-
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.List;
@@ -74,7 +73,7 @@ public class TechnicianDiagnosticService {
             BigDecimal totalEstimate = laborCost.add(totalPartsCost);
             diagnostic.setEstimateCost(totalEstimate); // Set total estimate
 
-        // CREATE DIAGNOSTIC (với estimateCost đã đúng)
+            // CREATE DIAGNOSTIC (với estimateCost đã đúng)
             int diagnosticId = diagnosticDAO.createDiagnostic(conn, diagnostic);
             if (diagnosticId <= 0) {
                 conn.rollback();
@@ -83,8 +82,7 @@ public class TechnicianDiagnosticService {
 
             // ADD TECHNICIAN AS LEAD
             boolean techAdded = diagnosticDAO.addTechnicianToDiagnostic(
-                    conn, diagnosticId, technicianId, true, 0.0
-            );
+                    conn, diagnosticId, technicianId, true, 0.0);
 
             if (!techAdded) {
                 conn.rollback();
@@ -123,17 +121,18 @@ public class TechnicianDiagnosticService {
             DbContext.close(conn);
         }
     }
+
     /**
      * Thêm parts vào diagnostic đã tồn tại
      * (Trường hợp technician quên thêm parts lúc tạo)
      *
      * @param technicianId EmployeeID
      * @param diagnosticId VehicleDiagnosticID
-     * @param parts List of DiagnosticPart to add
+     * @param parts        List of DiagnosticPart to add
      * @return ServiceResult
      */
     public ServiceResult addPartsToDiagnostic(int technicianId, int diagnosticId,
-                                              List<DiagnosticPart> parts) {
+            List<DiagnosticPart> parts) {
         Connection conn = null;
         try {
             conn = DbContext.getConnection();
@@ -240,7 +239,7 @@ public class TechnicianDiagnosticService {
      * Lấy danh sách diagnostics của technician
      *
      * @param technicianId EmployeeID
-     * @param limit Số lượng records (0 = unlimited)
+     * @param limit        Số lượng records (0 = unlimited)
      * @return ServiceResult with List<VehicleDiagnostic>
      */
     public ServiceResult getMyDiagnostics(int technicianId, int limit) {
@@ -249,8 +248,7 @@ public class TechnicianDiagnosticService {
             conn = DbContext.getConnection();
 
             List<VehicleDiagnostic> diagnostics = diagnosticDAO.getDiagnosticsByTechnician(
-                    conn, technicianId, limit
-            );
+                    conn, technicianId, limit);
 
             if (diagnostics.isEmpty()) {
                 return ServiceResult.success(MessageConstants.MSG001, diagnostics);
@@ -299,12 +297,12 @@ public class TechnicianDiagnosticService {
      *
      * @param technicianId EmployeeID
      * @param diagnosticId VehicleDiagnosticID
-     * @param issueFound Mô tả issue mới
-     * @param laborCost Chi phí công mới
+     * @param issueFound   Mô tả issue mới
+     * @param laborCost    Chi phí công mới
      * @return ServiceResult
      */
     public ServiceResult updateDiagnostic(int technicianId, int diagnosticId,
-                                          String issueFound, BigDecimal laborCost) {
+            String issueFound, BigDecimal laborCost) {
         Connection conn = null;
         try {
             conn = DbContext.getConnection();
@@ -357,7 +355,7 @@ public class TechnicianDiagnosticService {
     /**
      * Xóa part khỏi diagnostic
      *
-     * @param technicianId EmployeeID
+     * @param technicianId     EmployeeID
      * @param diagnosticPartId DiagnosticPartID
      * @return ServiceResult
      */
@@ -489,18 +487,18 @@ public class TechnicianDiagnosticService {
      * Kiểm tra technician có quyền tạo diagnostic cho assignment không
      * (Phải là người được assign task đó và task phải IN_PROGRESS)
      *
-     * @param conn Database connection
+     * @param conn         Database connection
      * @param technicianId EmployeeID
      * @param assignmentId TaskAssignmentID
      * @return true nếu có quyền
      */
     private boolean canTechnicianCreateDiagnostic(Connection conn, int technicianId, int assignmentId) {
         try {// BỎ điều kiện task_type vì không chắc cột này tồn tại
-                    String sql = "SELECT COUNT(*) AS cnt " +
-                            "FROM TaskAssignment " +
-                            "WHERE AssignmentID = ? " +
-                            "  AND AssignToTechID = ? " +
-                            "  AND Status = 'IN_PROGRESS' ";
+            String sql = "SELECT COUNT(*) AS cnt " +
+                    "FROM TaskAssignment " +
+                    "WHERE AssignmentID = ? " +
+                    "  AND AssignToTechID = ? " +
+                    "  AND Status = 'IN_PROGRESS' ";
 
             try (java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, assignmentId);
@@ -520,14 +518,14 @@ public class TechnicianDiagnosticService {
     /**
      * Log activity vào TechnicianActivityLog
      *
-     * @param conn Database connection
+     * @param conn         Database connection
      * @param technicianId EmployeeID
      * @param activityType Activity type (DIAGNOSTIC_CREATED, etc.)
      * @param assignmentId TaskAssignmentID
-     * @param description Description
+     * @param description  Description
      */
     private void logActivity(Connection conn, int technicianId, String activityType,
-                             int assignmentId, String description) {
+            int assignmentId, String description) {
         try {
             activityDAO.logActivity(conn, technicianId, activityType, assignmentId, description);
         } catch (Exception e) {
