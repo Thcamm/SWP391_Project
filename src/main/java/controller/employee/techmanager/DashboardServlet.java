@@ -1,5 +1,6 @@
 package controller.employee.techmanager;
 
+import dao.workorder.RejectedTaskDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,6 +21,8 @@ import common.DbContext;
  */
 @WebServlet("/techmanager/dashboard")
 public class DashboardServlet extends HttpServlet {
+
+    private final RejectedTaskDAO rejectedTaskDAO = new RejectedTaskDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -47,6 +50,9 @@ public class DashboardServlet extends HttpServlet {
             // Recent activity
             stats.put("todayRequests", countTodayRequests(conn));
             stats.put("thisWeekCompleted", countThisWeekCompleted(conn));
+
+            // Management alerts - use DAO instead of direct SQL
+            stats.put("rejectedTasks", rejectedTaskDAO.countRejectedTasks());
 
             request.setAttribute("stats", stats);
             request.getRequestDispatcher("/view/techmanager/dashboard.jsp").forward(request, response);

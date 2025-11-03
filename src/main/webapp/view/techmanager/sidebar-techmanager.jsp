@@ -75,15 +75,6 @@ parameter --%>
           <span>Review Diagnosis</span>
         </a>
       </div>
-      <div class="nav-item">
-        <a
-          href="${pageContext.request.contextPath}/techmanager/create-quote"
-          class="nav-link ${activeMenu == 'create-quote' ? 'active' : ''}"
-        >
-          <i class="bi bi-cash-coin"></i>
-          <span>Create Quotes</span>
-        </a>
-      </div>
     </div>
 
     <!-- Phase 3: Repair Assignment -->
@@ -125,10 +116,19 @@ parameter --%>
       </div>
     </div>
 
-    <!-- Other -->
+    <!-- Management -->
     <div class="nav-section">
       <div class="nav-section-title">
-        <span>Other</span>
+        <span>Management</span>
+      </div>
+      <div class="nav-item">
+        <a
+          href="${pageContext.request.contextPath}/techmanager/rejected-tasks"
+          class="nav-link ${activeMenu == 'rejected-tasks' ? 'active' : ''}"
+        >
+          <i class="bi bi-x-circle text-danger"></i>
+          <span>Rejected Tasks</span>
+        </a>
       </div>
       <div class="nav-item">
         <a
@@ -145,7 +145,10 @@ parameter --%>
   <!-- Footer -->
   <div class="sidebar-footer">
     <div class="nav-item">
-      <a href="${pageContext.request.contextPath}/logout" class="nav-link">
+      <a
+        href="${pageContext.request.contextPath}/Home?action=logout"
+        class="nav-link"
+      >
         <i class="bi bi-box-arrow-right"></i>
         <span>Logout</span>
       </a>

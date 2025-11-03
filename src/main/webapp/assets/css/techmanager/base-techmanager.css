@@ -81,6 +81,34 @@ body {
   gap: 12px;
   flex-wrap: wrap;
 }
+
+/* Main Layout */
+.main-container {
+  display: flex;
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+.content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.content-wrapper > .page-header,
+.content-wrapper > .row,
+.content-wrapper > .phase-section,
+.content-wrapper > .card {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.content-wrapper > .page-header:first-of-type {
+  margin-top: 20px;
+}
+
 .layout {
   display: flex; /* cho phép sidebar và main nằm ngang */
   min-height: calc(100vh - 64px); /* trừ chiều cao header */
