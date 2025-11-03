@@ -8,60 +8,17 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard - Tech Manager</title>
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
       rel="stylesheet"
     />
-    <style>
-      .stats-card {
-        border-radius: 12px;
-        border: 1px solid #e5e7eb;
-        transition: all 0.2s ease;
-      }
-      .stats-card:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        transform: translateY(-2px);
-      }
-      .stats-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-      }
-      .phase-section {
-        background: white;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-        border: 1px solid #e5e7eb;
-      }
-      .phase-header {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 1.25rem;
-      }
-      .phase-badge {
-        padding: 0.25rem 0.75rem;
-        border-radius: 9999px;
-        font-size: 0.75rem;
-        font-weight: 600;
-      }
-      .badge-active {
-        background: #dcfce7;
-        color: #16a34a;
-      }
-      .badge-soon {
-        background: #f3f4f6;
-        color: #6b7280;
-      }
-    </style>
+    <link
+      rel="stylesheet"
+      href="${pageContext.request.contextPath}/assets/css/techmanager/base-techmanager.css"
+    />
+    <link
+      rel="stylesheet"
+      href="${pageContext.request.contextPath}/assets/css/techmanager/dashboard-techmanager.css"
+    />
   </head>
   <body>
     <div class="main-container">
@@ -96,6 +53,30 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
         <!-- Quick Stats -->
         <div class="row mb-4">
+          <!-- Rejected Tasks Alert (if any) -->
+          <c:if test="${stats.rejectedTasks > 0}">
+            <div class="col-md-12 mb-3">
+              <div class="alert alert-danger d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill me-3"></i>
+                <div class="flex-grow-1">
+                  <strong
+                    >⚠️ ${stats.rejectedTasks} Task(s) Rejected by
+                    Technicians</strong
+                  >
+                  <p class="mb-0">
+                    These tasks need to be reassigned to other technicians.
+                  </p>
+                </div>
+                <a
+                  href="${pageContext.request.contextPath}/techmanager/rejected-tasks"
+                  class="btn btn-danger"
+                >
+                  <i class="bi bi-arrow-right"></i> View & Reassign
+                </a>
+              </div>
+            </div>
+          </c:if>
+
           <div class="col-md-3">
             <div class="stats-card card">
               <div class="card-body">
@@ -161,10 +142,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         <!-- Phase 1: Reception & Diagnosis -->
         <div class="phase-section">
           <div class="phase-header">
-            <i
-              class="bi bi-1-circle-fill text-success"
-              style="font-size: 1.75rem"
-            ></i>
+            <i class="bi bi-1-circle-fill text-success"></i>
             <div>
               <h5 class="mb-0">Phase 1: Reception & Diagnosis</h5>
               <small class="text-muted"
@@ -226,10 +204,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         <!-- Phase 2: Review & Quote -->
         <div class="phase-section">
           <div class="phase-header">
-            <i
-              class="bi bi-2-circle-fill text-primary"
-              style="font-size: 1.75rem"
-            ></i>
+            <i class="bi bi-2-circle-fill text-primary"></i>
             <div>
               <h5 class="mb-0">Phase 2: Review & Quote</h5>
               <small class="text-muted"
@@ -284,10 +259,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         <!-- Phase 3: Repair Assignment -->
         <div class="phase-section">
           <div class="phase-header">
-            <i
-              class="bi bi-3-circle-fill text-info"
-              style="font-size: 1.75rem"
-            ></i>
+            <i class="bi bi-3-circle-fill text-info"></i>
             <div>
               <h5 class="mb-0">Phase 3: Repair Assignment</h5>
               <small class="text-muted"
@@ -340,10 +312,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
         <!-- Phase 4: Monitor & Complete -->
         <div class="phase-section">
           <div class="phase-header">
-            <i
-              class="bi bi-4-circle text-secondary"
-              style="font-size: 1.75rem"
-            ></i>
+            <i class="bi bi-4-circle text-secondary"></i>
             <div>
               <h5 class="mb-0">Phase 4: Monitor & Complete</h5>
               <small class="text-muted"
