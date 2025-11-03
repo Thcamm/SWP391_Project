@@ -1,15 +1,19 @@
 package dao.vehicle;
 
+import common.DbContext;
+import model.inventory.DiagnosticPart;
 import model.vehicle.VehicleDiagnostic;
 import model.vehicle.VehicleDiagnostic.DiagnosticTechnician;
 
 
+import javax.tools.Diagnostic;
 import java.math.BigDecimal;
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class VehicleDiagnosticDAO {
@@ -147,6 +151,19 @@ public class VehicleDiagnosticDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return mapDiagnostic(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public Integer getAssignmentIdByDiagnostic(Connection conn, int diagnosticId) throws SQLException {
+        String sql = "SELECT AssignmentID FROm VehicleDiagnostic WHERE VehicleDiagnosticID = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, diagnosticId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("AssignmentID");
                 }
             }
         }
@@ -519,6 +536,87 @@ public class VehicleDiagnosticDAO {
         return 0;
     }
 
+    public List<VehicleDiagnostic> getByAssignmentPaged(int assignmentId, int offset, int limit) throws SQLException {
+        String sql = """
+        SELECT vd.*
+        FROM VehicleDiagnostic vd
+        WHERE vd.AssignmentID = ?
+        ORDER BY vd.CreatedAt DESC, vd.VehicleDiagnosticID DESC
+        LIMIT ? OFFSET ?
+    """;
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, assignmentId);
+            ps.setInt(2, limit);
+            ps.setInt(3, offset);
+            try (ResultSet rs = ps.executeQuery()) {
+                List<VehicleDiagnostic> out = new ArrayList<>();
+                while (rs.next()) out.add(mapDiagnostic(rs));
+                return out;
+            }
+        }
+    }
+
+    public Map<Integer, List<DiagnosticPart>> getPartsForDiagnostics(List<Integer> diagIds) throws SQLException {
+        Map<Integer, List<DiagnosticPart>> map = new HashMap<>();
+        if(diagIds == null || diagIds.isEmpty()){return map;}
+
+        String placeholders = diagIds.stream().map(id -> "?").collect(Collectors.joining(", "));
+        String sql = """
+                SELECT dp.*, pd.SKU, p.PartName, p.PartCode, p.Category
+                FROM DiagnosticPart dp
+                JOIN PartDetail pd ON dp.PartDetailID = pd.PartDetailID
+                JOIN Part p ON p.PartID = pd.PartID
+                WHERE dp.VehicleDiagnosticID IN (%s)
+                ORDER BY dp.VehicleDiagnosticID, dp.DiagnosticPartID
+                
+                """.formatted(placeholders);
+
+        try (Connection c = DbContext.getConnection();
+        PreparedStatement ps = c.prepareStatement(sql)){
+            int idx = 1;
+            for (Integer id : diagIds)
+                ps.setInt(idx++, id);
+
+            try (ResultSet rs = ps.executeQuery()){
+                while (rs.next()) {
+                    DiagnosticPart d = new DiagnosticPart();
+                    int diagId = rs.getInt("VehicleDiagnosticID");
+                    d.setDiagnosticPartID(rs.getInt("DiagnosticPartID"));
+                    d.setVehicleDiagnosticID(diagId);
+                    d.setPartDetailID(rs.getInt("PartDetailID"));
+                    d.setQuantityNeeded(rs.getInt("QuantityNeeded"));
+                    d.setUnitPrice(rs.getBigDecimal("UnitPrice"));
+                    d.setPartCondition(rs.getString("PartCondition"));
+                    d.setReasonForReplacement(rs.getString("ReasonForReplacement"));
+                    d.setApproved(rs.getBoolean("IsApproved"));
+
+                    d.setSku(rs.getString("SKU"));
+                    d.setPartName(rs.getString("PartName"));
+                    d.setPartCode(rs.getString("PartCode"));
+                    d.setCategory(rs.getString("Category"));
+
+                    map.computeIfAbsent(diagId, k -> new ArrayList<>()).add(d);
+                }
+            }
+        }
+
+        return map;
+    }
+
+    public int countByAssignment(int assignmentId) throws SQLException {
+        String sql = "SELECT COUNT(*) AS total FROM VehicleDiagnostic WHERE AssignmentID = ?";
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, assignmentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt("total") : 0;
+            }
+        }
+    }
+
+
+
     /**
      * Đếm diagnostics pending approval
      */
@@ -591,6 +689,62 @@ public class VehicleDiagnosticDAO {
         }
         return false;
     }
+
+    public boolean hasAnyApprovedParts(Connection conn, int diagnosticId) throws SQLException {
+        String sql = "SELECT COUNT(*) cnt FROM DiagnosticPart WHERE VehicleDiagnosticID = ? AND Approved = 1";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, diagnosticId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() && rs.getInt("cnt") > 0;
+            }
+        }
+    }
+
+    public boolean hasApprovedWorkOrderForDiagnostic(Connection conn, int diagnosticId) throws SQLException {
+        String sql = """
+                SELECT 1 FROM WorderOrderDetail wod
+                WHERE wod.diagnostic_id = ?
+                AND wod.approval_statuc = 'APPROVED'
+                LIMIT 1
+                """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, diagnosticId);
+            try (ResultSet rs = ps.executeQuery()) {
+                   return rs.next();
+            }
+        }
+    }
+
+    /** Xoá hết parts của 1 diagnostic (để re-insert theo form edit) */
+    public int deletePartsByDiagnostic(Connection conn, int diagnosticId) throws SQLException {
+        String sql = "DELETE FROM DiagnosticPart WHERE VehicleDiagnosticID = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, diagnosticId);
+            return ps.executeUpdate();
+        }
+    }
+
+    /** Insert 1 dòng part */
+    public int insertDiagnosticPart(Connection conn, DiagnosticPart p) throws SQLException{
+        String sql = "INSERT INTO DiagnosticPart " +
+                "(VehicleDiagnosticID, PartDetailID, QuantityNeeded, UnitPrice, PartCondition, ReasonForReplacement, IsApproved) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, p.getVehicleDiagnosticID());
+            ps.setInt(2, p.getPartDetailID());
+            ps.setInt(3, p.getQuantityNeeded());
+            ps.setBigDecimal(4, p.getUnitPrice());
+            ps.setString(5, p.getPartCondition().name());
+            ps.setString(6, p.getReasonForReplacement());
+            ps.setBoolean(7, Boolean.TRUE.equals(p.isApproved())); // edit draft: thường false
+            return ps.executeUpdate();
+        }
+    }
+
+
 
     /**
      * Kiểm tra technician có quyền access diagnostic không

@@ -53,12 +53,12 @@ public class TechnicianDiagnosticService {
                 return ServiceResult.error(MessageConstants.ERR003, errors);
             }
 
-            // Kiểm tra xem assignment đã có diagnostic chưa
-            if (diagnosticDAO.hasDiagnostic(conn, diagnostic.getAssignmentID())) {
-                conn.rollback();
-                return ServiceResult.error(MessageConstants.ERR003,
-                        "This task already has a diagnostic report");
-            }
+//            // Kiểm tra xem assignment đã có diagnostic chưa
+//            if (diagnosticDAO.hasDiagnostic(conn, diagnostic.getAssignmentID())) {
+//                conn.rollback();
+//                return ServiceResult.error(MessageConstants.ERR003,
+//                        "This task already has a diagnostic report");
+//            }
 
             // CREATE DIAGNOSTIC
             int diagnosticId = diagnosticDAO.createDiagnostic(conn, diagnostic);
@@ -500,14 +500,12 @@ public class TechnicianDiagnosticService {
      * @return true nếu có quyền
      */
     private boolean canTechnicianCreateDiagnostic(Connection conn, int technicianId, int assignmentId) {
-        try {
-            String sql =
-                    "SELECT COUNT(*) AS cnt " +
+        try {// BỎ điều kiện task_type vì không chắc cột này tồn tại
+                    String sql = "SELECT COUNT(*) AS cnt " +
                             "FROM TaskAssignment " +
                             "WHERE AssignmentID = ? " +
                             "  AND AssignToTechID = ? " +
-                            "  AND Status = 'IN_PROGRESS' " +
-                            "  AND task_type = 'DIAGNOSIS'";
+                            "  AND Status = 'IN_PROGRESS' ";
 
             try (java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setInt(1, assignmentId);

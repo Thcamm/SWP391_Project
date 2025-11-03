@@ -27,7 +27,7 @@ public class TaskAssignment {
     private static final DateTimeFormatter D_HM = DateTimeFormatter.ofPattern("dd/MM HH:mm");
     private static final DateTimeFormatter D_M_Y_HM = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    // ===== GETTER FORMAT SẴN (KHUYÊN DÙNG TRONG JSP) =====
+
     public String getAssignedDateFormatted() {
         if (assignedDateFormatted != null && !assignedDateFormatted.isEmpty()) return assignedDateFormatted;
         return assignedDate != null ? assignedDate.format(D_HM) : "-";

@@ -158,6 +158,14 @@
                                     </td>
 
                                     <td class="action-buttons">
+                                        <c:url var="detailUrl" value="/technician/task-detail">
+                                            <c:param name="assignmentId" value="${task.assignmentID}"/>
+                                            <c:param name="returnTo"
+                                                     value="${pageContext.request.requestURI}${empty pageContext.request.queryString ? '' : '?'.concat(pageContext.request.queryString)}"/>
+                                        </c:url>
+                                        <a href="${detailUrl}" class="btn btn-outline-primary btn-sm">
+                                            👀 View Details
+                                        </a>
                                         <c:choose>
                                             <c:when test="${task.status == 'ASSIGNED'}">
                                                 <form action="${pageContext.request.contextPath}/technician/tasks-action"
@@ -195,25 +203,14 @@
 
                                                 </form>
 
-                                                <c:choose>
-                                                    <c:when test="${task.taskType == 'DIAGNOSIS'}">
-                                                        <form method="get"
-                                                              action="${pageContext.request.contextPath}/technician/create-diagnostic"
-                                                              style="display:inline;">
-                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
-                                                            <button type="submit" class="btn btn-primary btn-sm">
-                                                                🩺 Create Diagnostic
-                                                            </button>
-                                                        </form>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <button type="button" class="btn btn-sm btn-outline-secondary" disabled
-                                                                title="Diagnostic available for DIAGNOSIS tasks only">
-                                                            🩺 Create Diagnostic
-                                                        </button>
-                                                    </c:otherwise>
-                                                </c:choose>
-
+                                                <form method="get"
+                                                      action="${pageContext.request.contextPath}/technician/create-diagnostic"
+                                                      style="display:inline;">
+                                                    <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
+                                                    <button type="submit" class="btn btn-primary btn-sm">
+                                                        🩺 Create Diagnostic
+                                                    </button>
+                                                </form>
                                             </c:when>
                                             <c:when test="${task.status == 'COMPLETE'}">
                                     <span class="btn btn-sm" style="background: #e0e0e0; color: #666; cursor: default;">

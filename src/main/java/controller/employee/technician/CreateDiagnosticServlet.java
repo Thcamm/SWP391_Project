@@ -20,21 +20,75 @@ import service.inventory.PartService;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+/**
+ * Create Diagnostic for technician
+ */
 @WebServlet("/technician/create-diagnostic")
 public class CreateDiagnosticServlet extends HttpServlet {
     private final TechnicianService technicianService = new TechnicianService();
     private final TechnicianDiagnosticService diagnosticService = new TechnicianDiagnosticService();
     private final PartService partService = new PartService();
 
+
+    private int parseIntOr(String s, int def) {
+        try { return Integer.parseInt(s); } catch (Exception ignored) { return def; }
+    }
+
+    /** Nạp list parts để hiển thị + map các part đã chọn (để option selected vẫn xuất hiện). */
+    private void loadPartsForDisplay(HttpServletRequest req, String partQuery, String[] partDetailIds) {
+        int page = parseIntOr(req.getParameter("page"), 1);
+        int size = parseIntOr(req.getParameter("size"), 20);
+
+        ServiceResult partsResult = partService.searchAvailableParts(partQuery, page, size);
+        var pageData = partsResult.getData(model.pagination.PaginationResponse.class);
+
+        req.setAttribute("availableParts", pageData.getData());
+        req.setAttribute("partQuery", partQuery);
+        req.setAttribute("partsPage", pageData.getCurrentPage());
+        req.setAttribute("partsTotalPages", pageData.getTotalPages());
+        req.setAttribute("partsTotalItems", pageData.getTotalItems());
+        req.setAttribute("partsPageSize", pageData.getItemsPerPage());
+
+
+        Map<Integer, PartDetail> selectedPartMap = new HashMap<>();
+        if (partDetailIds != null) {
+            for (String s : partDetailIds) {
+                if (s == null || s.isBlank()) continue;
+                try {
+                    int pid = Integer.parseInt(s);
+                    ServiceResult pr = partService.getPartDetailById(pid);
+                    if (pr.isSuccess() && pr.getData() != null) {
+                        selectedPartMap.put(pid, pr.getData(PartDetail.class));
+                    }
+                } catch (NumberFormatException ignored) { }
+            }
+        }
+        req.setAttribute("selectedPartMap", selectedPartMap);
+    }
+
+    private void forwardForm(HttpServletRequest req, HttpServletResponse resp,
+                             TaskAssignment task, Employee technician,
+                             List<String> formErrors, String successMessage)
+            throws ServletException, IOException {
+        if (task != null) req.setAttribute("task", task);
+        if (technician != null) req.setAttribute("technician", technician);
+        if (formErrors != null && !formErrors.isEmpty()) {
+            req.setAttribute("formErrors", formErrors);
+        }
+        if (successMessage != null) {
+            req.setAttribute("successMessage", successMessage);
+            req.setAttribute("showSuccessInline", true);
+        }
+        req.getRequestDispatcher("/view/technician/create-diagnostic.jsp").forward(req, resp);
+    }
+
+
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
         HttpSession session = req.getSession(false);
         Integer userId = (Integer) session.getAttribute("userId");
 
@@ -55,7 +109,6 @@ public class CreateDiagnosticServlet extends HttpServlet {
 
         try {
             int assignmentId = Integer.parseInt(assignmentIdStr);
-
             ServiceResult taskResult = technicianService.getTaskById(technician.getEmployeeId(), assignmentId);
             if (taskResult.isError()) {
                 MessageHelper.setErrorMessage(session, taskResult.getMessage());
@@ -64,38 +117,16 @@ public class CreateDiagnosticServlet extends HttpServlet {
             }
             TaskAssignment task = taskResult.getData(TaskAssignment.class);
 
-            if (task.getTaskType() != TaskAssignment.TaskType.DIAGNOSIS ||
-                    task.getStatus()   != TaskAssignment.TaskStatus.IN_PROGRESS) {
+            if (task.getStatus() != TaskAssignment.TaskStatus.IN_PROGRESS) {
                 MessageHelper.setErrorMessage(session, MessageConstants.TASK010);
                 resp.sendRedirect(req.getContextPath() + "/technician/home");
                 return;
             }
 
-            // === NEW: đọc tham số tìm kiếm & phân trang
-            String partQuery = req.getParameter("partQuery");
-            int page = 1, size = 20;
-            try { page = Integer.parseInt(req.getParameter("page")); } catch (Exception ignored) {}
-            try { size = Integer.parseInt(req.getParameter("size")); } catch (Exception ignored) {}
-
-            // Gọi service mới (trả về PaginationResponse<PartDetail>)
-            ServiceResult partsResult = partService.searchAvailableParts(partQuery, page, size);
-            model.pagination.PaginationResponse<model.inventory.PartDetail> pageData =
-                    partsResult.getData(model.pagination.PaginationResponse.class);
-
+            loadPartsForDisplay(req, req.getParameter("partQuery"), null);
             req.setAttribute("task", task);
             req.setAttribute("technician", technician);
-
-            // list + meta phân trang
-            req.setAttribute("availableParts", pageData.getData());
-            req.setAttribute("partQuery", partQuery);
-            req.setAttribute("partsPage", pageData.getCurrentPage());
-            req.setAttribute("partsTotalPages", pageData.getTotalPages());
-            req.setAttribute("partsTotalItems", pageData.getTotalItems());
-            req.setAttribute("partsPageSize", pageData.getItemsPerPage());
-            req.setAttribute("selectedPartMap", java.util.Collections.emptyMap());
-
             req.getRequestDispatcher("/view/technician/create-diagnostic.jsp").forward(req, resp);
-
         } catch (NumberFormatException e) {
             MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
             resp.sendRedirect(req.getContextPath() + "/technician/home");
@@ -103,12 +134,12 @@ public class CreateDiagnosticServlet extends HttpServlet {
     }
 
 
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
         HttpSession session = req.getSession(false);
-
         Integer userId = (Integer) session.getAttribute("userId");
 
         ServiceResult techResult = technicianService.getTechnicianByUserId(userId);
@@ -117,14 +148,12 @@ public class CreateDiagnosticServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/technician/home");
             return;
         }
-
         Employee technician = techResult.getData(Employee.class);
 
         String assignmentIdStr = req.getParameter("assignmentId");
         String action = req.getParameter("action");
 
-
-        // Parts arrays (cần để forward lại JSP giữ dữ liệu người dùng)
+        // mảng parts từ form
         String[] partDetailIds = req.getParameterValues("partDetailId[]");
         String[] quantities    = req.getParameterValues("quantity[]");
         String[] conditions    = req.getParameterValues("condition[]");
@@ -137,15 +166,14 @@ public class CreateDiagnosticServlet extends HttpServlet {
         }
 
         int assignmentId;
-        try {
-            assignmentId = Integer.parseInt(assignmentIdStr);
-        } catch (NumberFormatException e) {
+        try { assignmentId = Integer.parseInt(assignmentIdStr); }
+        catch (NumberFormatException e) {
             MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
             resp.sendRedirect(req.getContextPath() + "/technician/home");
             return;
         }
 
-        // Lấy task để hiển thị header khi forward lại
+        // lấy task (để render header/validate trạng thái)
         ServiceResult taskResult = technicianService.getTaskById(technician.getEmployeeId(), assignmentId);
         if (taskResult.isError()) {
             MessageHelper.setErrorMessage(session, taskResult.getMessage());
@@ -154,31 +182,12 @@ public class CreateDiagnosticServlet extends HttpServlet {
         }
         TaskAssignment task = taskResult.getData(TaskAssignment.class);
 
+        // --- Các action phụ: search/clear/add/remove ---
         if ("filterParts".equals(action) || "clearFilter".equals(action)
                 || "addPart".equals(action) || (action != null && action.startsWith("removePart"))) {
 
-            String partQuery = req.getParameter("partQuery");
-            int page = 1, size = 20;
-            try { page = Integer.parseInt(req.getParameter("page")); } catch (Exception ignored) {}
-            try { size = Integer.parseInt(req.getParameter("size")); } catch (Exception ignored) {}
-
-            if ("clearFilter".equals(action)) {
-                partQuery = "";
-                page = 1;
-            }
-
-            ServiceResult partsResult = partService.searchAvailableParts(partQuery, page, size);
-            model.pagination.PaginationResponse<model.inventory.PartDetail> pageData =
-                    partsResult.getData(model.pagination.PaginationResponse.class);
-
-            req.setAttribute("task", task);
-            req.setAttribute("technician", technician);
-            req.setAttribute("availableParts", pageData.getData());
-            req.setAttribute("partQuery", partQuery);
-            req.setAttribute("partsPage", pageData.getCurrentPage());
-            req.setAttribute("partsTotalPages", pageData.getTotalPages());
-            req.setAttribute("partsTotalItems", pageData.getTotalItems());
-            req.setAttribute("partsPageSize", pageData.getItemsPerPage());
+            String partQuery = "clearFilter".equals(action) ? "" : req.getParameter("partQuery");
+            loadPartsForDisplay(req, partQuery, partDetailIds);
 
             if (action != null && action.startsWith("removePart")) {
                 try {
@@ -186,168 +195,121 @@ public class CreateDiagnosticServlet extends HttpServlet {
                     req.setAttribute("removeIndex", idx);
                 } catch (NumberFormatException ignored) {}
             }
-
-            Map<Integer, PartDetail> selectedPartMap = new HashMap<>();
-            if (partDetailIds != null) {
-                for (String s : partDetailIds) {
-                    if (s == null || s.isBlank()) continue;
-                    try {
-                        int pid = Integer.parseInt(s);
-                        ServiceResult pr = partService.getPartDetailById(pid);
-                        if (pr.isSuccess() && pr.getData() != null) {
-                            selectedPartMap.put(pid, pr.getData(PartDetail.class));
-                        }
-                    } catch (NumberFormatException ignored) { }
-                }
-            }
-            req.setAttribute("selectedPartMap", selectedPartMap);
-
-            // bam add another part -> render 1 hang trong
             if ("addPart".equals(action)) {
                 req.setAttribute("appendEmptyRow", true);
             }
+
+            req.setAttribute("task", task);
+            req.setAttribute("technician", technician);
             req.getRequestDispatcher("/view/technician/create-diagnostic.jsp").forward(req, resp);
             return;
         }
 
-        //  nhanh submit that
+        // --------- Submit thật ---------
         String issueFound   = req.getParameter("issueFound");
         String laborCostStr = req.getParameter("laborCost");
 
-        // BASIC VALIDATION
+        List<String> errors = new ArrayList<>();
+
+        // validate issue
         if (issueFound == null || issueFound.trim().isEmpty()) {
-            MessageHelper.setErrorMessage(session, MessageConstants.VAL001);
-            resp.sendRedirect(req.getContextPath() + "/technician/create-diagnostic?assignmentId=" + assignmentId);
-            return;
+            errors.add("Issue Found is required.");
+        } else if (issueFound.trim().length() < 20) {
+            errors.add("Issue description must be at least 20 characters.");
         }
 
-        // Validate issue description length
-        if (issueFound.trim().length() < 20) {
-            MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
-            resp.sendRedirect(req.getContextPath() + "/technician/create-diagnostic?assignmentId=" + assignmentId);
-            return;
+        // labor cost
+        BigDecimal laborCost = BigDecimal.ZERO;
+        if (laborCostStr != null && !laborCostStr.trim().isEmpty()) {
+            try {
+                laborCost = new BigDecimal(laborCostStr.trim());
+                if (laborCost.compareTo(BigDecimal.ZERO) < 0) {
+                    errors.add("Labor cost must be >= 0.");
+                }
+            } catch (NumberFormatException ex) {
+                errors.add("Labor cost is not a valid number.");
+            }
         }
 
-        try {
-            //  PARSE LABOR COST
-            BigDecimal laborCost = BigDecimal.ZERO;
-            if (laborCostStr != null && !laborCostStr.trim().isEmpty()) {
+        // parse & validate parts
+        List<DiagnosticPart> parts = new ArrayList<>();
+        if (partDetailIds != null && partDetailIds.length > 0) {
+            for (int i = 0; i < partDetailIds.length; i++) {
+                String idStr = partDetailIds[i];
+                String qtyStr = (quantities != null && i < quantities.length) ? quantities[i] : null;
+
+                // Bỏ qua dòng trống hoàn toàn
+                if ((idStr == null || idStr.isBlank()) &&
+                        (qtyStr == null || qtyStr.isBlank())) {
+                    continue;
+                }
+
+                if (idStr == null || idStr.isBlank()) {
+                    errors.add("Line " + (i + 1) + ": Part is required.");
+                    continue;
+                }
+                int qty;
+                int partDetailId;
                 try {
-                    laborCost = new BigDecimal(laborCostStr);
-                    if (laborCost.compareTo(BigDecimal.ZERO) < 0) {
-                        MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
-                        resp.sendRedirect(req.getContextPath() + "/technician/create-diagnostic?assignmentId=" + assignmentId);
-                        return;
-                    }
-                } catch (NumberFormatException e) {
-                    MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
-                    resp.sendRedirect(req.getContextPath() + "/technician/create-diagnostic?assignmentId=" + assignmentId);
-                    return;
+                    partDetailId = Integer.parseInt(idStr);
+                    qty = Integer.parseInt(qtyStr);
+                } catch (NumberFormatException ex) {
+                    errors.add("Line " + (i + 1) + ": Invalid number format.");
+                    continue;
                 }
-            }
-
-            // CREATE VEHICLE DIAGNOSTIC OBJECT
-            VehicleDiagnostic diagnostic = new VehicleDiagnostic();
-            diagnostic.setAssignmentID(assignmentId);
-            diagnostic.setIssueFound(issueFound.trim());
-            diagnostic.setEstimateCost(laborCost);
-            diagnostic.setStatus(true);
-
-            //  PARSE PARTS
-            List<DiagnosticPart> parts = new ArrayList<>();
-
-            if (partDetailIds != null && partDetailIds.length > 0) {
-                for (int i = 0; i < partDetailIds.length; i++) {
-                    if (partDetailIds[i] != null && !partDetailIds[i].trim().isEmpty()) {
-                        try {
-                            int partDetailId = Integer.parseInt(partDetailIds[i]);
-                            int qty = Integer.parseInt(quantities[i]);
-
-                            if (qty <= 0) {
-                                MessageHelper.setErrorMessage(session, MessageConstants.ERR003); // invalid input
-                                resp.sendRedirect(req.getContextPath() + "/technician/create-diagnostic?assignmentId=" + assignmentId);
-                                return;
-                            }
-
-                            ServiceResult pr = partService.getPartDetailById(partDetailId);
-                            if (pr.isError() || pr.getData() == null) {
-                                MessageHelper.setErrorMessage(session, MessageConstants.ERR002); // Not found
-                                resp.sendRedirect(req.getContextPath() + "/technician/create-diagnostic?assignmentId=" + assignmentId);
-                                return;
-                            }
-
-                            PartDetail pd = pr.getData(PartDetail.class);
-
-                            if (pd.getQuantity() < qty) {
-                                MessageHelper.setErrorMessage(
-                                        session,
-                                        String.format("Insufficient stock for %s (%s). Available: %d, Requested: %d",
-                                                pd.getPartName(), pd.getSku(), pd.getQuantity(), qty)
-                                );
-                                resp.sendRedirect(req.getContextPath() + "/technician/create-diagnostic?assignmentId=" + assignmentId);
-                                return;
-                            }
-
-
-
-
-                            DiagnosticPart part = new DiagnosticPart();
-                            part.setPartDetailID(Integer.parseInt(partDetailIds[i]));
-                            part.setQuantityNeeded(Integer.parseInt(quantities[i]));
-                            part.setUnitPrice(pd.getUnitPrice());
-                            part.setPartCondition(conditions[i]);
-                            part.setReasonForReplacement(reasons[i]);
-                            part.setApproved(false);
-
-
-
-                            parts.add(part);
-
-                        } catch (NumberFormatException e) {
-                            MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
-                            resp.sendRedirect(req.getContextPath() + "/technician/create-diagnostic?assignmentId=" + assignmentId);
-                            return;
-                        }
-                    }
+                if (qty <= 0) {
+                    errors.add("Line " + (i + 1) + ": Quantity must be ≥ 1.");
+                    continue;
                 }
+
+                ServiceResult pr = partService.getPartDetailById(partDetailId);
+                if (pr.isError() || pr.getData() == null) {
+                    errors.add("Line " + (i + 1) + ": Part not found.");
+                    continue;
+                }
+                PartDetail pd = pr.getData(PartDetail.class);
+                if (pd.getQuantity() < qty) {
+                    errors.add(String.format("Line %d: Insufficient stock for %s (%s). Available: %d, requested: %d",
+                            (i + 1), pd.getPartName(), pd.getSku(), pd.getQuantity(), qty));
+                    continue;
+                }
+
+                DiagnosticPart row = new DiagnosticPart();
+                row.setPartDetailID(partDetailId);
+                row.setQuantityNeeded(qty);
+                row.setUnitPrice(pd.getUnitPrice());
+                row.setPartCondition((conditions != null && i < conditions.length) ? conditions[i] : null);
+                row.setReasonForReplacement((reasons != null && i < reasons.length) ? reasons[i] : null);
+                row.setApproved(false);
+                parts.add(row);
             }
+        }
 
-            diagnostic.setParts(parts);
+        if (!errors.isEmpty()) {
+            loadPartsForDisplay(req, req.getParameter("partQuery"), partDetailIds);
+            forwardForm(req, resp, task, technician, errors, null);
+            return;
+        }
 
-            // CALL SERVICE TO CREATE DIAGNOSTIC
-            ServiceResult result = diagnosticService.createDiagnosticWithParts(
-                    technician.getEmployeeId(), diagnostic
-            );
+        // build diagnostic object
+        VehicleDiagnostic diagnostic = new VehicleDiagnostic();
+        diagnostic.setAssignmentID(assignmentId);
+        diagnostic.setIssueFound(issueFound.trim());
+        diagnostic.setEstimateCost(laborCost);
+        diagnostic.setStatus(true);
+        diagnostic.setParts(parts);
 
-            // HANDLE RESULT
-            if (result.isSuccess()) {
-                req.setAttribute("task", task);               // để header vẫn có thông tin
-                req.setAttribute("successMessage", result.getMessage());
-                req.setAttribute("showSuccessInline", true);
+        // call service
+        ServiceResult result = diagnosticService.createDiagnosticWithParts(
+                technician.getEmployeeId(), diagnostic);
 
-                String partQuery = ""; int page = 1, size = 20;
-                ServiceResult partsResult = partService.searchAvailableParts(partQuery, page, size);
-                var pageData = partsResult.getData(model.pagination.PaginationResponse.class);
-                req.setAttribute("availableParts", pageData.getData());
-                req.setAttribute("partsPage", pageData.getCurrentPage());
-                req.setAttribute("partsTotalPages", pageData.getTotalPages());
-                req.setAttribute("partsTotalItems", pageData.getTotalItems());
-                req.setAttribute("partsPageSize", pageData.getItemsPerPage());
-                req.setAttribute("selectedPartMap", java.util.Collections.emptyMap());
-                req.getRequestDispatcher("/view/technician/create-diagnostic.jsp").forward(req, resp);
-                return;
-            } else {
-                MessageHelper.setErrorMessage(session, result.getMessage());
-                resp.sendRedirect(req.getContextPath() + "/technician/create-diagnostic?assignmentId=" + assignmentId);
-            }
-
-        } catch (NumberFormatException e) {
-            MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
-            resp.sendRedirect(req.getContextPath() + "/technician/home");
-        } catch (Exception e) {
-            e.printStackTrace();
-            MessageHelper.setErrorMessage(session, MessageConstants.ERR001);
-            resp.sendRedirect(req.getContextPath() + "/technician/home");
+        if (result.isSuccess()) {
+            loadPartsForDisplay(req, "", null);
+            forwardForm(req, resp, task, technician, null, String.valueOf(result.getMessage()));
+        } else {
+            loadPartsForDisplay(req, req.getParameter("partQuery"), partDetailIds);
+            req.setAttribute("errorMessage", result.getMessage());
+            forwardForm(req, resp, task, technician, null, null);
         }
     }
 }

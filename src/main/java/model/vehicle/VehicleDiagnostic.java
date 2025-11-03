@@ -26,6 +26,7 @@ public class VehicleDiagnostic {
     private BigDecimal estimateCost;
     private boolean status;
     private LocalDateTime createdAt;
+    private boolean isSubmitApproval; // Thêm field này
 
     // transient fields for display
     private String vehicleInfo;
@@ -79,6 +80,7 @@ public class VehicleDiagnostic {
                 .filter(p -> p.getPartCondition() == DiagnosticPart.PartCondition.REQUIRED)
                 .count();
     }
+
 
 
     public int getRecommendedPartsCount() {
@@ -223,6 +225,11 @@ public class VehicleDiagnostic {
         this.technicians = technicians;
     }
 
+    public boolean isSubmitApproval() { return isSubmitApproval; }
+    public void setSubmitApproval(boolean submitApproval) {
+        isSubmitApproval = submitApproval;
+    }
+
     // ===== OVERRIDE METHODS =====
 
     @Override
@@ -323,3 +330,4 @@ public class VehicleDiagnostic {
         }
     }
 }
+

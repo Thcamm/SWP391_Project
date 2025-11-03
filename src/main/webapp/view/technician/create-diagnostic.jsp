@@ -49,7 +49,23 @@
         <!-- Form -->
         <form action="${pageContext.request.contextPath}/technician/create-diagnostic" method="post"
               id="diagnosticForm">
-            <input type="hidden" name="assignmentId" value="<c:out value='${task.assignmentID}'/>"/>
+            <c:set var="assignmentIdValue" value="${not empty task.assignmentID ? task.assignmentID : param.assignmentId}"/>
+            <input type="hidden" name="assignmentId" value="<c:out value='${assignmentIdValue}'/>"/>
+
+
+            <!-- Hiển thị error message nếu có -->
+            <c:if test="${not empty errorMessage}">
+                <div class="alert alert-danger" role="alert">
+                    ❌ <strong>Error:</strong> <c:out value="${errorMessage}"/>
+                </div>
+            </c:if>
+
+            <c:if test="${not empty formErrors}">
+                <div class="alert alert-danger"><ul class="mb-0">
+                    <c:forEach items="${formErrors}" var="e"><li>${e}</li></c:forEach>
+                </ul></div>
+            </c:if>
+
 
             <!-- Diagnostic details -->
             <div class="card">
@@ -60,7 +76,7 @@
                                 class="required-star">*</span></label>
                         <textarea name="issueFound" id="issueFound" class="form-control" rows="6"
                                   placeholder="Describe the problems found in detail... (minimum 20 characters)"
-                                  required minlength="20"><c:out value="${param.issueFound}"/></textarea>
+                                  required minlength="20"><c:out value="${not empty param.issueFound ? param.issueFound : ''}"/></textarea>
                         <small class="form-hint">Be specific (symptoms, tests, observations...).</small>
                     </div>
 
@@ -68,7 +84,7 @@
                         <label for="laborCost" class="form-label">Estimated Labor Cost ($)</label>
                         <input type="number" name="laborCost" id="laborCost" class="form-control"
                                step="0.01" min="0"
-                               value="<c:out value='${empty param.laborCost ? "0" : param.laborCost}'/>"
+                               value="<c:out value='${not empty param.laborCost ? param.laborCost : "0"}'/>"
                                placeholder="0.00"/>
                         <small class="form-hint">Labor/service only (excluding parts).</small>
                     </div>
@@ -120,8 +136,8 @@
                         <div class="btn-group">
                             <button type="submit" name="action" value="filterParts"
                                     class="btn btn-sm btn-outline-primary"
-                                    <c:if test='${partsPage <= 1}'>disabled</c:if>
-                                    formaction="${pageContext.request.contextPath}/technician/create-diagnostic?page=${partsPage - 1}"
+                            ${partsPage <= 1 ? 'disabled' : ''}
+                                    formaction="${pageContext.request.contextPath}/technician/create-diagnostic?assignmentId=${assignmentIdValue}&page=${partsPage - 1}"
                                     formnovalidate>Prev
                             </button>
 
@@ -132,8 +148,8 @@
 
                             <button type="submit" name="action" value="filterParts"
                                     class="btn btn-sm btn-outline-primary"
-                                    <c:if test='${partsTotalPages != null && partsPage >= partsTotalPages}'>disabled</c:if>
-                                    formaction="${pageContext.request.contextPath}/technician/create-diagnostic?page=${partsPage + 1}"
+                            ${partsTotalPages != null && partsPage >= partsTotalPages ? 'disabled' : ''}
+                                    formaction="${pageContext.request.contextPath}/technician/create-diagnostic?assignmentId=${assignmentIdValue}&page=${partsPage + 1}"
                                     formnovalidate>Next
                             </button>
                         </div>
@@ -371,7 +387,7 @@
                     <div class="col-4">
                         <strong>Labor Cost:</strong>
                         $<span id="laborPreview"><fmt:formatNumber
-                            value="${empty param.laborCost ? 0 : param.laborCost}" pattern="#,##0.00"/></span>
+                            value="${not empty param.laborCost ? param.laborCost : 0}" pattern="#,##0.00"/></span>
                     </div>
                     <div class="col-4">
                         <strong>Parts Cost:</strong>
@@ -386,7 +402,7 @@
                 </div>
             </div>
 
-            <c:if test="${showSuccessInline}">
+            <c:if test="${requestScope.showSuccessInline}">
                 <div class="alert alert-success mt-4" role="alert" style="display:flex;align-items:center;justify-content:space-between;">
                     <div>
                         ✅ <strong>Diagnostic report created successfully!</strong>
@@ -411,7 +427,7 @@
                 <button type="submit" name="action" value="submit" class="btn btn-primary btn-lg">
                     😶‍🌫️ Submit Diagnostic Report
                 </button>
-                <a href="${pageContext.request.contextPath}/technician/home" class="btn btn-secondary btn-lg ms-2">
+                <a href="${pageContext.request.contextPath}/technician/tasks" class="btn btn-secondary btn-lg ms-2">
                     💣 Cancel
                 </a>
             </div>
