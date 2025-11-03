@@ -151,6 +151,27 @@ public class MessageConstants {
             "Please provide notes for this action."
     );
 
+    public static final SystemMessage TASK009 = new SystemMessage(
+            "TASK009",
+            MessageType.VALIDATION,
+            "Task permission required",
+            "You do not have permission to modify this task."
+    );
+
+    public static final SystemMessage TASK010 = new SystemMessage(
+            "TASK010",
+            MessageType.VALIDATION,
+            "Task update",
+            "Can only update tasks that are in progress."
+    );
+
+    public static final SystemMessage TASK011 = new SystemMessage(
+            "TASK011",
+            MessageType.VALIDATION,
+            "Task permission required",
+            "You dont have permission to create diagnostic for this task. "
+    );
+
     public static final SystemMessage PART001 = new SystemMessage(
             "PART001",
             MessageType.SUCCESS,
@@ -184,6 +205,23 @@ public class MessageConstants {
             MessageType.SUCCESS,
             "Diagnostic updated successfully",
             "Diagnostic report updated successfully!"
+    );
+
+
+
+
+    public static final SystemMessage DIAG003 = new SystemMessage(
+            "DIAG003",
+            MessageType.SUCCESS,
+            "Diagnostic task details loaded",
+            "Diagnostics page loaded!"
+    );
+
+    public static final SystemMessage DIAG004 = new SystemMessage(
+            "DIAG004",
+            MessageType.ERROR,
+            "Diagnostic updated failed",
+            "Diagnostic report updated failed!"
     );
 
     public static final SystemMessage ERR001 = new SystemMessage(

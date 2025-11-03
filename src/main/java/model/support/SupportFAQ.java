@@ -1,7 +1,9 @@
 package model.support;
 
+import java.util.Objects;
+
 public class SupportFAQ {
-    private int FAQId ;
+    private Integer FAQId ;
     private String question;
     private String answer ;
     private boolean isActive ;
@@ -9,20 +11,20 @@ public class SupportFAQ {
     public SupportFAQ() {
     }
 
-    public SupportFAQ(int FAQId, String question, String answer) {
+    public SupportFAQ(Integer FAQId, String question, String answer) {
         this.FAQId = FAQId;
         this.question = question;
         this.answer = answer;
     }
 
-    public SupportFAQ(int FAQId, String question, String answer, boolean isActive) {
+    public SupportFAQ(Integer FAQId, String question, String answer, boolean isActive) {
         this.FAQId = FAQId;
         this.question = question;
         this.answer = answer;
         this.isActive = isActive;
     }
 
-    public int getFAQId() {
+    public Integer getFAQId() {
         return FAQId;
     }
 
@@ -52,6 +54,17 @@ public class SupportFAQ {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof SupportFAQ that)) return false;
+        return Objects.equals(FAQId, that.FAQId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(FAQId);
     }
 
     @Override

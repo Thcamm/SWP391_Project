@@ -139,8 +139,66 @@ public class CustomerDAO extends DbContext {
         return false;
     }
 
-    public List<Customer> searchCustomers(String name, String emailOrPhone, String licensePlate,
-                                          String sortOrder, String fromDate, String toDate) {
+    public int countSearchCustomers(String name, String emailOrPhone, String licensePlate,
+                                    String fromDate, String toDate) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(DISTINCT c.CustomerID) " +
+                        "FROM customer c " +
+                        "JOIN user u ON c.UserID = u.UserID " +
+                        "LEFT JOIN vehicle v ON c.CustomerID = v.CustomerID " +
+                        "WHERE 1=1 "
+        );
+
+        if (name != null && !name.trim().isEmpty()) {
+            sql.append("AND u.FullName LIKE ? ");
+        }
+        if (emailOrPhone != null && !emailOrPhone.trim().isEmpty()) {
+            sql.append("AND (u.Email LIKE ? OR u.PhoneNumber LIKE ?) ");
+        }
+        if (licensePlate != null && !licensePlate.trim().isEmpty()) {
+            sql.append("AND v.LicensePlate LIKE ? ");
+        }
+        if (fromDate != null && !fromDate.isEmpty()) {
+            sql.append("AND u.CreatedAt >= ? ");
+        }
+        if (toDate != null && !toDate.isEmpty()) {
+            sql.append("AND u.CreatedAt <= ? ");
+        }
+
+        try (PreparedStatement ps = DbContext.getConnection().prepareStatement(sql.toString())) {
+            int index = 1;
+
+            if (name != null && !name.trim().isEmpty()) {
+                ps.setString(index++, "%" + name.trim() + "%");
+            }
+            if (emailOrPhone != null && !emailOrPhone.trim().isEmpty()) {
+                ps.setString(index++, "%" + emailOrPhone.trim() + "%");
+                ps.setString(index++, "%" + emailOrPhone.trim() + "%");
+            }
+            if (licensePlate != null && !licensePlate.trim().isEmpty()) {
+                ps.setString(index++, "%" + licensePlate.trim() + "%");
+            }
+            if (fromDate != null && !fromDate.isEmpty()) {
+                ps.setDate(index++, java.sql.Date.valueOf(fromDate));
+            }
+            if (toDate != null && !toDate.isEmpty()) {
+                ps.setDate(index++, java.sql.Date.valueOf(toDate));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public List<Customer> searchCustomersWithLimit(String name, String emailOrPhone, String licensePlate,
+                                                   String sortOrder, String fromDate, String toDate,
+                                                   int limit, int offset) {
         Map<Integer, Customer> customerMap = new LinkedHashMap<>();
 
         StringBuilder sql = new StringBuilder(
@@ -169,9 +227,10 @@ public class CustomerDAO extends DbContext {
         }
 
         sql.append("ORDER BY u.CreatedAt ");
-        sql.append("oldest".equalsIgnoreCase(sortOrder) ? "ASC" : "DESC");
+        sql.append("oldest".equalsIgnoreCase(sortOrder) ? "ASC " : "DESC ");
+        sql.append("LIMIT ? OFFSET ?");
 
-        try (PreparedStatement ps = getConnection().prepareStatement(sql.toString())) {
+        try (PreparedStatement ps = DbContext.getConnection().prepareStatement(sql.toString())) {
             int index = 1;
 
             if (name != null && !name.trim().isEmpty()) {
@@ -191,34 +250,37 @@ public class CustomerDAO extends DbContext {
                 ps.setDate(index++, java.sql.Date.valueOf(toDate));
             }
 
-            ResultSet rs = ps.executeQuery();
+            ps.setInt(index++, limit);
+            ps.setInt(index, offset);
 
-            while (rs.next()) {
-                int customerID = rs.getInt("CustomerID");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int customerID = rs.getInt("CustomerID");
 
-                Customer customer = customerMap.get(customerID);
-                if (customer == null) {
-                    customer = new Customer();
-                    customer.setCustomerId(customerID);
-                    customer.setUserId(rs.getInt("UserID"));
-                    customer.setFullName(rs.getString("FullName"));
-                    customer.setEmail(rs.getString("Email"));
-                    customer.setPhoneNumber(rs.getString("PhoneNumber"));
-                    customer.setCreatedAt(rs.getTimestamp("CreatedAt"));
-                    customer.setVehicles(new ArrayList<>());
-                    customerMap.put(customerID, customer);
-                }
+                    Customer customer = customerMap.get(customerID);
+                    if (customer == null) {
+                        customer = new Customer();
+                        customer.setCustomerId(customerID);
+                        customer.setUserId(rs.getInt("UserID"));
+                        customer.setFullName(rs.getString("FullName"));
+                        customer.setEmail(rs.getString("Email"));
+                        customer.setPhoneNumber(rs.getString("PhoneNumber"));
+                        customer.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                        customer.setVehicles(new ArrayList<>());
+                        customerMap.put(customerID, customer);
+                    }
 
-                int vehicleID = rs.getInt("VehicleID");
-                if (vehicleID != 0) {
-                    Vehicle v = new Vehicle();
-                    v.setVehicleID(vehicleID);
-                    v.setCustomerID(customerID);
-                    v.setLicensePlate(rs.getString("LicensePlate"));
-                    v.setBrand(rs.getString("Brand"));
-                    v.setModel(rs.getString("Model"));
-                    v.setYearManufacture(rs.getInt("YearManufacture"));
-                    customer.getVehicles().add(v);
+                    int vehicleID = rs.getInt("VehicleID");
+                    if (vehicleID != 0) {
+                        Vehicle v = new Vehicle();
+                        v.setVehicleID(vehicleID);
+                        v.setCustomerID(customerID);
+                        v.setLicensePlate(rs.getString("LicensePlate"));
+                        v.setBrand(rs.getString("Brand"));
+                        v.setModel(rs.getString("Model"));
+                        v.setYearManufacture(rs.getInt("YearManufacture"));
+                        customer.getVehicles().add(v);
+                    }
                 }
             }
 
@@ -230,7 +292,19 @@ public class CustomerDAO extends DbContext {
     }
 
 
-    public List<Customer> getAllCustomers() {
+    public int countCustomers() {
+        String sql = "SELECT COUNT(*) FROM customer";
+        try (PreparedStatement ps = DbContext.getConnection().prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+
+    public List<Customer> getCustomersWithLimit(int limit, int offset) {
         Map<Integer, Customer> customerMap = new LinkedHashMap<>();
 
         String sql = "SELECT c.CustomerID, u.UserID, u.FullName, u.Email, u.PhoneNumber, u.CreatedAt, " +
@@ -238,47 +312,51 @@ public class CustomerDAO extends DbContext {
                 "FROM customer c " +
                 "JOIN user u ON c.UserID = u.UserID " +
                 "LEFT JOIN vehicle v ON c.CustomerID = v.CustomerID " +
-                "ORDER BY u.CreatedAt" ;
+                "ORDER BY u.CreatedAt " +
+                "LIMIT ? OFFSET ?";
 
-        try (PreparedStatement ps = DbContext.getConnection().prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (PreparedStatement ps = DbContext.getConnection().prepareStatement(sql)) {
+            ps.setInt(1, limit);
+            ps.setInt(2, offset);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    int customerID = rs.getInt("CustomerID");
 
-            while (rs.next()) {
-                int customerID = rs.getInt("CustomerID");
+                    Customer customer = customerMap.get(customerID);
+                    if (customer == null) {
+                        customer = new Customer();
+                        customer.setCustomerId(customerID);
+                        customer.setUserId(rs.getInt("UserID"));
+                        customer.setFullName(rs.getString("FullName"));
+                        customer.setEmail(rs.getString("Email"));
+                        customer.setPhoneNumber(rs.getString("PhoneNumber"));
+                        customer.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                        customer.setVehicles(new ArrayList<>());
+                        customerMap.put(customerID, customer);
+                    }
 
-                // Kiểm tra xem đã có customer này trong map chưa
-                Customer customer = customerMap.get(customerID);
-                if (customer == null) {
-                    customer = new Customer();
-                    customer.setCustomerId(customerID);
-                    customer.setUserId(rs.getInt("UserID"));
-                    customer.setFullName(rs.getString("FullName"));
-                    customer.setEmail(rs.getString("Email"));
-                    customer.setPhoneNumber(rs.getString("PhoneNumber"));
-                    customer.setCreatedAt(rs.getTimestamp("CreatedAt"));
-                    customer.setVehicles(new ArrayList<>());
-                    customerMap.put(customerID, customer);
-                }
-
-                // Nếu có vehicle thì thêm vào list
-                int vehicleID = rs.getInt("VehicleID");
-                if (vehicleID != 0) {
-                    Vehicle v = new Vehicle();
-                    v.setVehicleID(vehicleID);
-                    v.setCustomerID(customerID);
-                    v.setLicensePlate(rs.getString("LicensePlate"));
-                    v.setBrand(rs.getString("Brand"));
-                    v.setModel(rs.getString("Model"));
-                    v.setYearManufacture(rs.getInt("YearManufacture"));
-                    customer.getVehicles().add(v);
+                    int vehicleID = rs.getInt("VehicleID");
+                    if (vehicleID != 0) {
+                        Vehicle v = new Vehicle();
+                        v.setVehicleID(vehicleID);
+                        v.setCustomerID(customerID);
+                        v.setLicensePlate(rs.getString("LicensePlate"));
+                        v.setBrand(rs.getString("Brand"));
+                        v.setModel(rs.getString("Model"));
+                        v.setYearManufacture(rs.getInt("YearManufacture"));
+                        customer.getVehicles().add(v);
+                    }
                 }
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return new ArrayList<>(customerMap.values());
+    }
+
+    public List<Customer> getAllCustomers() {
+        return getCustomersWithLimit(Integer.MAX_VALUE, 0);
     }
 
     public int getCustomerIdByUserId(int userId) {

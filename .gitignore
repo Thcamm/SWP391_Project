@@ -1,7 +1,13 @@
 
 # Build output
 target/
+# Don't commit DbContext (may contain DB credentials)
+# Ignore source in repository layout and any compiled class variants
+src/main/java/common/DbContext.java
+**/DbContext.java
+**/DbContext.class
 
+src/main/webapp/META-INF/context.xml
 
 # Log files
 *.log
@@ -55,3 +61,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+.smarttomcat/
+

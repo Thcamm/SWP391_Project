@@ -1,11 +1,9 @@
 package controller.employee.customerservice;
 
-
 import dao.carservice.CarServiceDAO;
 import dao.customer.CustomerDAO;
 import dao.user.UserDAO;
 import dao.vehicle.VehicleDAO;
-
 
 import model.customer.Customer;
 import model.servicetype.Service;
@@ -24,7 +22,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet(name = "CustomerCreateRequestServlet", urlPatterns = {"/customerservice/createRequest"})
+@WebServlet(name = "CustomerCreateRequestServlet", urlPatterns = { "/customerservice/createRequest" })
 public class CreateRequestServlet extends HttpServlet {
 
     @Override
@@ -74,6 +72,7 @@ public class CreateRequestServlet extends HttpServlet {
 
         request.getRequestDispatcher("/view/customerservice/createRequest.jsp").forward(request, response);
     }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -125,7 +124,8 @@ public class CreateRequestServlet extends HttpServlet {
         } catch (SQLException | NumberFormatException e) {
             e.printStackTrace();
             session.setAttribute("errorMessage", "An error occurred: " + e.getMessage());
-            response.sendRedirect(request.getContextPath() + "/customerservice/createRequest?customerId=" + customerIdParam);
+            response.sendRedirect(
+                    request.getContextPath() + "/customerservice/createRequest?customerId=" + customerIdParam);
         }
     }
 }

@@ -1,333 +1,241 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: ADMIN
-  Date: 10/19/2025
-  Time: 4:37 PM
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
-
-
 <jsp:include page="header.jsp"/>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/technician_home.css">
 
-<section class="welcome-section">
-    <div class="welcome-left">
-        <h2>Welcome back, ${technician.fullName}!</h2>
-        <p class="welcome-date">
-            <jsp:useBean id="now" class="java.util.Date" />
-            <fmt:formatDate value="${now}" pattern="EEEE, dd MMMM yyy"/>
-        </p>
 
-    </div>
-    <div class="welcome-right">
-        <span class="employee-code">ID: ${technician.employeeCode}</span>
-    </div>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/base.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/technician_home.css"/>
+<div class="layout">
 
-</section>
+    <jsp:include page="sidebar.jsp"/>
 
-<jsp:include page="message-display.jsp" />
-
-<section class="dashboard-stats">
-    <div class="stat-card stat-new">
-        <div class="stat-icon">📋</div>
-        <div class="stat-info">
-            <h3>New Tasks</h3>
-            <p class="count">${statistics.newTasksCount}</p>
+    <!-- Main content -->
+    <main class="main">
+        <!-- Topbar -->
+        <div class="topbar card">
+            <div class="welcome">
+                <h2>My Dashboard</h2>
+                <p class="muted">
+                    Welcome back,
+                    <strong>${technician.fullName}</strong>
+                    • ID: ${technician.employeeCode}
+                </p>
+            </div>
+            <div class="avatar">
+                <img src="${pageContext.request.contextPath}/assets/img/avatar-default.png" alt="avatar"/>
+                <div class="role">Technician</div>
+            </div>
         </div>
-    </div>
 
-    <div class="stat-card stat-progress">
-        <div class="stat-icon">⚙️</div>
-        <div class="stat-info">
-            <h3>In Progress</h3>
-            <p class="count">${statistics.inProgressCount}</p>
-        </div>
-    </div>
-
-    <div class="stat-card stat-completed">
-        <div class="stat-icon">✅</div>
-        <div class="stat-info">
-            <h3>Completed Today</h3>
-            <p class="count">${statistics.completedTodayCount}</p>
-        </div>
-    </div>
-
-    <div class="stat-card stat-parts">
-        <div class="stat-icon">🔧</div>
-        <div class="stat-info">
-            <h3>Pending Parts</h3>
-            <p class="count">${statistics.pendingPartsCount}</p>
-        </div>
-    </div>
-</section>
-
-<section class="task-section">
-    <h2>🆕 New Tasks Assigned to You</h2>
-
-    <c:choose>
-    <c:when test="${empty newTasks.data}">
-    <div class="empty-state">
-        <p>✨ No new tasks at the moment. Great job staying on top of your work!</p>
-    </div>
-    </c:when>
-    <c:otherwise>
-    <div class="task-table-wrapper">
-        <table class="task-table">
-            <thead>
-            <tr>
-                <th>Priority</th>
-                <th>Vehicle</th>
-                <th>Customer</th>
-                <th>Service</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th>Est. Hours</th>
-                <th>Assigned</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <c:forEach items="${newTasks.data}" var="task">
-                <tr class="task-row">
-                    <td>
-                                    <span class="priority-badge ${task.priority.cssClass}">
-                                            ${task.priority}
-                                    </span>
-                    </td>
-                    <td class="vehicle-info">${task.vehicleInfo}</td>
-                    <td>${task.customerName}</td>
-                    <td>${task.serviceInfo}</td>
-                    <td>
-                        <span class="task-type-badge">${task.taskType}</span>
-                    </td>
-                    <td class="task-description">
-                            ${fn:substring(task.taskDescription, 0, 50)}
-                        <c:if test="${fn:length(task.taskDescription) > 50}">...</c:if>
-                    </td>
-                    <td>${task.estimateHours}h</td>
-                    <td>
-                        <fmt:formatDate value="${task.assignedDate}" pattern="dd/MM HH:mm" />
-                    </td>
-                    <td class="action-buttons">
-                        <form action="${pageContext.request.contextPath}/technician/task-action"
-                              method="post" style="display:inline;">
-                            <input type="hidden" name="assignmentId" value="${task.assignmentID}">
-                            <input type="hidden" name="action" value="accept">
-                            <button type="submit" class="btn btn-accept"
-                                    onclick="return confirm('Accept this task?')">
-                                Accept
-                            </button>
-                        </form>
-                        <form action="${pageContext.request.contextPath}/technician/task-action"
-                              method="post" style="display:inline;">
-                            <input type="hidden" name="assignmentId" value="${task.assignmentID}">
-                            <input type="hidden" name="action" value="reject">
-                            <button type="submit" class="btn btn-reject"
-                                    onclick="return confirm('Reject this task?')">
-                                Reject
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-            </c:forEach>
-            </tbody>
-        </table>
-        <c:if test="${newTasks.totalPages > 1}">
-            <div class="pagination">
-                <c:forEach begin="1" end="${newTasks.totalPages}" var="page">
-                    <a href="?newTasksPage=${page}"
-                       class="page-link ${page == newTasks.currentPage ? 'active' : ''}">
-                            ${page}
-                    </a>
-                </c:forEach>
+        <!-- Stats -->
+        <section class="stats grid-4">
+            <div class="stat card">
+                <div class="stat-title">New</div>
+                <div class="stat-value">${statistics.newTasksCount}</div>
+                <div class="stat-sub">Assigned last 24h</div>
             </div>
-        </c:if>
-    </div>
-    </c:otherwise>
-    </c:choose>
-</section>
-
-<section class="task-section">
-    <h2>⚙️ Tasks In Progress</h2>
-
-    <c:choose>
-        <c:when test="${empty inProgressTasks.data}">
-            <div class="empty-state">
-                <p>📭 No tasks in progress. Accept a new task to get started!</p>
+            <div class="stat card">
+                <div class="stat-title">In Progress</div>
+                <div class="stat-value">${statistics.inProgressCount}</div>
+                <div class="stat-sub">Currently working</div>
             </div>
-        </c:when>
-        <c:otherwise>
-            <div class="task-table-wrapper">
-                <table class="task-table">
-                    <thead>
-                    <tr>
-                        <th>Vehicle</th>
-                        <th>Service</th>
-                        <th>Started</th>
-                        <th>Progress</th>
-                        <th>Notes</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <c:forEach items="${inProgressTasks.data}" var="task">
-                        <tr class="task-row">
-                            <td class="vehicle-info">${task.vehicleInfo}</td>
-                            <td>${task.serviceInfo}</td>
-                            <td>
-                                <fmt:formatDate value="${task.startAt}" pattern="dd/MM HH:mm" />
-                            </td>
-                            <td>
-                                <div class="progress-container">
-                                    <div class="progress-bar">
-                                        <div class="progress-fill"
-                                             style="width: ${task.progressPercentage}%"></div>
-                                    </div>
-                                    <span class="progress-text">${task.progressPercentage}%</span>
-                                </div>
-                            </td>
-                            <td class="task-notes">
-                                    ${fn:substring(task.notes, 0, 30)}
-                                <c:if test="${fn:length(task.notes) > 30}">...</c:if>
-                            </td>
-                            <td class="action-buttons">
-                                <button type="button" class="btn btn-update"
-                                        onclick="openProgressModal(${task.assignmentID}, ${task.progressPercentage}, '${fn:escapeXml(task.notes)}')">
-                                    Update
-                                </button>
-                                <button type="button" class="btn btn-complete"
-                                        onclick="completeTask(${task.assignmentID})">
-                                    Complete
-                                </button>
-                            </td>
-                        </tr>
-                    </c:forEach>
-                    </tbody>
-                </table>
-
-                <!-- Pagination cho In Progress Tasks -->
-                <c:if test="${inProgressTasks.totalPages > 1}">
-                    <div class="pagination">
-                        <c:forEach begin="1" end="${inProgressTasks.totalPages}" var="page">
-                            <a href="?inProgressPage=${page}"
-                               class="page-link ${page == inProgressTasks.currentPage ? 'active' : ''}">
-                                    ${page}
-                            </a>
-                        </c:forEach>
-                    </div>
-                </c:if>
+            <div class="stat card">
+                <div class="stat-title">Completed Today</div>
+                <div class="stat-value">${statistics.completedTodayCount}</div>
+                <div class="stat-sub">Great job!</div>
             </div>
-        </c:otherwise>
-    </c:choose>
-</section>
-
-<section class="activity-section">
-    <h2>📜 Recent Activities</h2>
-
-    <c:choose>
-        <c:when test="${empty recentActivities.data}">
-            <div class="empty-state">
-                <p>No recent activities.</p>
+            <div class="stat card">
+                <div class="stat-title">Pending Parts</div>
+                <div class="stat-value">${statistics.pendingPartsCount}</div>
+                <div class="stat-sub">Waiting for parts</div>
             </div>
-        </c:when>
-        <c:otherwise>
-            <div class="activity-list">
-                <c:forEach items="${recentActivities.data}" var="activity">
-                    <div class="activity-item">
-                        <div class="activity-content">
-                            <p class="activity-text">
-                                <strong>${activity.activityType.displayText}</strong>
-                                <c:if test="${not empty activity.vehicleInfo}">
-                                    - ${activity.vehicleInfo}
-                                </c:if>
-                                <c:if test="${not empty activity.taskInfo}">
-                                    (${activity.taskInfo})
-                                </c:if>
-                            </p>
-                            <p class="activity-time">
-                                <fmt:formatDate value="${activity.activityTime}" pattern="dd/MM/yyyy HH:mm" />
-                            </p>
-                        </div>
-                    </div>
-                </c:forEach>
-            </div>
+        </section>
 
-            <!-- Pagination cho Activities -->
-            <c:if test="${recentActivities.totalPages > 1}">
-                <div class="pagination">
-                    <c:forEach begin="1" end="${recentActivities.totalPages}" var="page">
-                        <a href="?activitiesPage=${page}"
-                           class="page-link ${page == recentActivities.currentPage ? 'active' : ''}">
-                                ${page}
-                        </a>
-                    </c:forEach>
+        <!-- New tasks -->
+        <section class="panel card">
+            <div class="panel-head">
+                <h3>🆕 New Tasks</h3>
+                <div class="panel-actions">
+<%--                    <span class="badge" title="Total">${newTasks.}</span>--%>
                 </div>
-            </c:if>
-        </c:otherwise>
-    </c:choose>
-</section>
-
-<section class="quick-actions">
-    <h2>⚡ Quick Actions</h2>
-    <div class="action-grid">
-        <a href="${pageContext.request.contextPath}/technician/diagnostics" class="action-card">
-            <div class="action-icon">🔍</div>
-            <h3>Diagnose Vehicle</h3>
-            <p>Perform vehicle diagnostics</p>
-        </a>
-
-        <a href="${pageContext.request.contextPath}/technician/parts" class="action-card">
-            <div class="action-icon">🔧</div>
-            <h3>Request Parts</h3>
-            <p>Request parts for repairs</p>
-        </a>
-
-        <a href="${pageContext.request.contextPath}/technician/specifications" class="action-card">
-            <div class="action-icon">📋</div>
-            <h3>Technical Specs</h3>
-            <p>View technical manuals</p>
-        </a>
-
-        <a href="${pageContext.request.contextPath}/technician/tasks" class="action-card">
-            <div class="action-icon">📊</div>
-            <h3>All Tasks</h3>
-            <p>View complete task list</p>
-        </a>
-    </div>
-</section>
-
-<div id="progressModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeProgressModal()">&times;</span>
-        <h2>Update Task Progress</h2>
-        <form action="${pageContext.request.contextPath}/technician/update-progress" method="post">
-            <input type="hidden" id="modalAssignmentId" name="assignmentId">
-            <input type="hidden" name="action" value="update">
-
-            <div class="form-group">
-                <label for="progressPercentage">Progress (%)</label>
-                <input type="range" id="progressPercentage" name="progressPercentage"
-                       min="0" max="100" value="0" oninput="updateProgressValue(this.value)">
-                <span id="progressValue">0%</span>
             </div>
 
-            <div class="form-group">
-                <label for="notes">Notes</label>
-                <textarea id="notes" name="notes" rows="4"
-                          placeholder="Enter any notes about the progress..."></textarea>
+            <c:choose>
+                <c:when test="${empty newTasks.data}">
+                    <div class="empty">✨ No new tasks right now.</div>
+                </c:when>
+                <c:otherwise>
+                    <div class="table-wrap">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th><th>Priority</th><th>Vehicle</th><th>Customer</th>
+                                <th>Service</th><th>Type</th><th>Description</th>
+                                <th>Est.</th><th>Assigned</th><th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <c:forEach items="${newTasks.data}" var="task" varStatus="st">
+                                <tr>
+                                    <td>${st.count}</td>
+                                    <td><span class="pill ${task.priority.cssClass}">${task.priority}</span></td>
+                                    <td class="mono">${task.vehicleInfo}</td>
+                                    <td>${task.customerName}</td>
+                                    <td>${task.serviceInfo}</td>
+                                    <td><span class="pill light">${task.taskType}</span></td>
+                                    <td>
+                                            ${fn:substring(task.taskDescription, 0, 50)}
+                                        <c:if test="${fn:length(task.taskDescription) > 50}">…</c:if>
+                                    </td>
+                                    <td>${task.estimateHours}h</td>
+                                    <td>${task.assignedDateFormatted}</td>
+
+                                    <td class="actions">
+                                        <form action="${pageContext.request.contextPath}/technician/tasks-action" method="post">
+                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
+                                            <input type="hidden" name="action" value="accept"/>
+                                            <button class="btn success" onclick="return confirm('Accept this task?')">Accept</button>
+                                        </form>
+                                        <form action="${pageContext.request.contextPath}/technician/tasks-action" method="post">
+                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
+                                            <input type="hidden" name="action" value="reject"/>
+                                            <button class="btn danger" onclick="return confirm('Reject this task?')">Reject</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <c:if test="${newTasks.totalPages > 1}">
+                        <div class="pagination">
+                            <c:forEach begin="1" end="${newTasks.totalPages}" var="p">
+                                <a class="page ${p == newTasks.currentPage ? 'active' : ''}" href="?newTasksPage=${p}">${p}</a>
+                            </c:forEach>
+                        </div>
+                    </c:if>
+                </c:otherwise>
+            </c:choose>
+        </section>
+
+
+
+        <!-- In progress -->
+        <section class="panel card">
+            <div class="panel-head">
+                <h3>⚙️ In Progress</h3>
             </div>
 
-            <div class="modal-actions">
-                <button type="submit" class="btn btn-primary">Update Progress</button>
-                <button type="button" class="btn btn-secondary" onclick="closeProgressModal()">Cancel</button>
-            </div>
-        </form>
-    </div>
+            <c:choose>
+                <c:when test="${empty inProgressTasks.data}">
+                    <div class="empty">📭 No tasks in progress.</div>
+                </c:when>
+                <c:otherwise>
+                    <div class="table-wrap">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Vehicle</th>
+                                <th>Service</th>
+                                <th>Started</th>
+                                <th>Progress</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <c:forEach items="${inProgressTasks.data}" var="task" varStatus="st">
+                                <tr>
+                                    <td>${st.count}</td>
+                                    <td class="mono">${task.vehicleInfo}</td>
+                                    <td>${task.serviceInfo}</td>
+                                    <td><td>${task.startAtFormatted}</td></td>
+                                    <td>
+                                        <div class="progress">
+                                            <div class="progress-fill" style="width:${task.progressPercentage}%;"></div>
+                                        </div>
+                                        <span class="mono">${task.progressPercentage}%</span>
+                                    </td>
+                                    <td>
+                                            ${fn:substring(task.notes, 0, 30)}
+                                        <c:if test="${fn:length(task.notes) > 30}">…</c:if>
+                                    </td>
+                                    <td class="actions">
+                                        <a class="btn" href="${pageContext.request.contextPath}/technician/update-progress-form?assignmentId=${task.assignmentID}">Update</a>
+                                        <form action="${pageContext.request.contextPath}/technician/update-progress" method="post">
+                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
+                                            <input type="hidden" name="action" value="complete"/>
+                                            <button class="btn success">Complete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <c:if test="${inProgressTasks.totalPages > 1}">
+                        <div class="pagination">
+                            <c:forEach begin="1" end="${inProgressTasks.totalPages}" var="p">
+                                <a class="page ${p == inProgressTasks.currentPage ? 'active' : ''}" href="?inProgressPage=${p}">${p}</a>
+                            </c:forEach>
+                        </div>
+                    </c:if>
+                </c:otherwise>
+            </c:choose>
+        </section>
+
+        <!-- Activities + Quick actions -->
+        <div class="grid-2">
+            <section class="panel card">
+                <div class="panel-head"><h3>📜 Recent Activities</h3></div>
+                <c:choose>
+                    <c:when test="${empty recentActivities.data}">
+                        <div class="empty">No recent activities.</div>
+                    </c:when>
+                    <c:otherwise>
+                        <ul class="activity">
+                            <c:forEach items="${recentActivities.data}" var="a">
+                                <li class="activity-item">
+                                    <div>
+                                        <strong>${a.activityType.displayText}</strong>
+                                        <c:if test="${not empty a.vehicleInfo}"> - ${a.vehicleInfo}</c:if>
+                                        <c:if test="${not empty a.taskInfo}"> (${a.taskInfo})</c:if>
+                                    </div>
+                                    <div class="muted">${a.activityTimeFormatted}</div>
+
+                                </li>
+                            </c:forEach>
+                        </ul>
+                    </c:otherwise>
+                </c:choose>
+            </section>
+
+            <section class="panel card">
+                <div class="panel-head"><h3>⚡ Quick Actions</h3></div>
+                <div class="actions-grid">
+                    <a class="action-card" href="${pageContext.request.contextPath}/technician/diagnostics">
+                        <div class="action-ic">🔍</div><div>Diagnose Vehicle</div>
+                    </a>
+                    <a class="action-card" href="${pageContext.request.contextPath}/technician/parts">
+                        <div class="action-ic">🔧</div><div>Request Parts</div>
+                    </a>
+                    <a class="action-card" href="${pageContext.request.contextPath}/technician/specifications">
+                        <div class="action-ic">📋</div><div>Technical Specs</div>
+                    </a>
+                    <a class="action-card" href="${pageContext.request.contextPath}/technician/tasks">
+                        <div class="action-ic">📊</div><div>All Tasks</div>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
 </div>
 
-<jsp:include page="footer.jsp" />
+<jsp:include page="footer.jsp"/>

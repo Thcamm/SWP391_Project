@@ -6,6 +6,15 @@ public class TaskStatistics {
     private int completedTodayCount;
     private int pendingPartsCount;
 
+    private int totalTasksCount;
+
+    public int getTotalTasksCount() {
+        return totalTasksCount;
+    }
+
+    public void setTotalTasksCount(int totalTasksCount) {
+        this.totalTasksCount = totalTasksCount;
+    }
 
     public TaskStatistics() {}
 

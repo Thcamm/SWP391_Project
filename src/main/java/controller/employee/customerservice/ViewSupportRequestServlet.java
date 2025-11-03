@@ -35,7 +35,7 @@ public class ViewSupportRequestServlet extends HttpServlet {
 
         SupportDAO dao = new SupportDAO();
 
-        // ======== Xử lý xem chi tiết ========
+
         String idParam = request.getParameter("id");
         if (idParam != null && !idParam.isEmpty()) {
             try {

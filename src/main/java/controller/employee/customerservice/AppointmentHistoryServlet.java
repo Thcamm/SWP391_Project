@@ -1,4 +1,4 @@
-package controller.customer;
+package controller.employee.customerservice;
 
 import dao.appointment.AppointmentDAO;
 import dao.customer.CustomerDAO;
@@ -67,7 +67,6 @@ public class AppointmentHistoryServlet extends HttpServlet {
 
             int appointmentID = Integer.parseInt(appointmentIDStr);
 
-
             AppointmentDAO dao = new AppointmentDAO();
             AppointmentService service = new AppointmentService();
 
@@ -88,7 +87,8 @@ public class AppointmentHistoryServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error updating status: " + e.getMessage());
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Error updating status: " + e.getMessage());
         }
     }
 
