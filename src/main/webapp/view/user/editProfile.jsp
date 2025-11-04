@@ -39,9 +39,8 @@
                     <td>
                         <select name="gender" class="form-input">
                             <option value="">Select Gender</option>
-                            <option value="male" ${user.gender == 'male' ? 'selected' : ''}>Male</option>
-                            <option value="female" ${user.gender == 'female' ? 'selected' : ''}>Female</option>
-                            <option value="other" ${user.gender == 'other' ? 'selected' : ''}>Other</option>
+                            <option value="Male" ${user.gender == 'Male' ? 'selected' : ''}>Male</option>
+                            <option value="Female" ${user.gender == 'Female' ? 'selected' : ''}>Female</option>
                         </select>
                     </td>
                 </tr>
