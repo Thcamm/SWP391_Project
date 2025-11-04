@@ -6,6 +6,7 @@ import common.utils.PaginationUtils;
 import dao.employee.technician.TechnicianDAO;
 import model.employee.Employee;
 import model.employee.technician.TaskAssignment;
+import model.employee.technician.TaskStatistics;
 import model.employee.technician.TechnicianActivity;
 import model.pagination.PaginationResponse;
 import model.servicetype.Service;
@@ -46,6 +47,22 @@ public class TechnicianService {
         }
 
         return ServiceResult.success(null, stats);
+    }
+
+    public ServiceResult getTaskById(int technicianId, int assignmentId) {
+        if (technicianId <= 0 || assignmentId <= 0) {
+            return ServiceResult.error(MessageConstants.ERR003); // invalid inpur
+        }
+        TaskAssignment task = technicianDAO.getTaskById(assignmentId);
+        if (task == null) {
+            return ServiceResult.error(MessageConstants.ERR002); //data not found
+
+        }
+
+        if (task.getAssignToTechID() != technicianId) {
+            return ServiceResult.error(MessageConstants.TASK009); // dont permission to change this task
+        }
+        return ServiceResult.success(null, task);
     }
 
     //task list with pagination
@@ -110,6 +127,49 @@ public class TechnicianService {
                 result.getTotalPages()
         );
 
+    }
+
+    public PaginationResponse<TaskAssignment> getAllTasksWithFilter(
+            int technicianId,
+            String status,
+            String priority,
+            String search,
+            int page,
+            int itemsPerPage
+    ){
+        if(technicianId <= 0) {
+            return createEmptyPaginationResponse(page, itemsPerPage);
+        }
+
+        List<TaskAssignment> allTasks = technicianDAO.getAllTasksWithFilter(
+                technicianId,
+                status,
+                priority,
+                search
+        );
+
+        PaginationUtils.PaginationResult<TaskAssignment> result =
+                PaginationUtils.paginate(allTasks, page, itemsPerPage);
+
+        return new PaginationResponse<>(
+                result.getPaginatedData(),
+                result.getCurrentPage(),
+                result.getItemsPerPage(),
+                result.getTotalItems(),
+                result.getTotalPages()
+        );
+    }
+
+    public ServiceResult getAllTasksStatistics(int technicianId) {
+        if(technicianId <= 0) {
+            return ServiceResult.error(MessageConstants.ERR003);
+        }
+        TaskStatistics stats = technicianDAO.getAllTasksStatistics(technicianId);
+        if(stats == null) {
+            return ServiceResult.error(MessageConstants.ERR002);
+        }
+
+        return ServiceResult.success(null, stats);
     }
 
     public ServiceResult acceptTask (int technocianId, int assignmentId) {

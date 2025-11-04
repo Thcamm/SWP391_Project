@@ -17,7 +17,6 @@ public class PermissionFilter implements Filter {
     private Map<String, String> routePerm;
     private Map<String, String> areaGate;
 
-
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         this.auth = new AuthService(new RoleDao());
@@ -74,9 +73,11 @@ public class PermissionFilter implements Filter {
         routePerm.put("GET:/view/customerservice/serviceRequest.jsp", "cs_access");
         routePerm.put("POST:/view/customerservice/serviceRequest.jsp", "cs_access");
 
-
+        // Tech manager - chỉ dashboard, workorders được forward đến WorkOrderController
+        routePerm.put("GET:/techmanager/home", "tech_manager_access");
 
         // WorkOrder management - tất cả operations được xử lý bởi WorkOrderController
+        routePerm.put("GET:/view/techmanager/home.jsp", "tech_manager_access");
         routePerm.put("GET:/view/techmanager/home.jsp", "tech_manager_access");
         routePerm.put("POST:/view/techmanager/home.jsp", "tech_manager_access");
         routePerm.put("GET:/view/techmanager/workorders/list", "tech_manager_access");
@@ -130,7 +131,7 @@ public class PermissionFilter implements Filter {
 
 
 
-        //User
+        // User
         routePerm.put("GET:/view/user/viewProfile.jsp", "user_access");
         routePerm.put("POST:/view/user/viewProfile.jsp", "user_access");
         routePerm.put("GET:/view/user/editProfile.jsp", "user_access");
@@ -164,7 +165,10 @@ public class PermissionFilter implements Filter {
         String method = req.getMethod();
         String key = method + ":" + path;
 
-        if (isPublic(path)) { chain.doFilter(sr, ss); return; }
+        if (isPublic(path)) {
+            chain.doFilter(sr, ss);
+            return;
+        }
 
         HttpSession session = req.getSession(false);
         Integer userId = (session == null) ? null : (Integer) session.getAttribute("userId");
@@ -179,7 +183,7 @@ public class PermissionFilter implements Filter {
 
         if (required == null) {
             for (Map.Entry<String, String> e : areaGate.entrySet()) {
-                if(path.startsWith(e.getKey())) {
+                if (path.startsWith(e.getKey())) {
                     required = e.getValue();
                     break;
                 }
@@ -201,16 +205,16 @@ public class PermissionFilter implements Filter {
             }
         }
 
-
-
-        res.setHeader("Cache-Control","no-cache, no-store, must-revalidate");
-        res.setHeader("Pragma","no-cache");
-        res.setDateHeader("Expires",0);
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        res.setHeader("Pragma", "no-cache");
+        res.setDateHeader("Expires", 0);
 
         chain.doFilter(sr, ss);
     }
 
-    @Override public void destroy() {}
+    @Override
+    public void destroy() {
+    }
 
     private boolean isPublic(String path) {
         return path.equals("/") ||

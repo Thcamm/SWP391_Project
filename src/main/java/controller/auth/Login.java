@@ -36,8 +36,6 @@ public class Login extends HttpServlet {
         UserLoginService userService = new UserLoginService(userDAO);
         User user = userService.findByUserName(username);
 
-
-
         if (user != null && PasswordUtil.checkPassword(password, user.getPasswordHash())) {
 
             String roleCode = new dao.employee.admin.rbac.RoleDao().findRoleCodeById(user.getRoleId());
@@ -45,7 +43,6 @@ public class Login extends HttpServlet {
             request.getSession().setAttribute("roleCode", roleCode);
             request.getSession().setAttribute("userId", user.getUserId());
             request.getSession().setAttribute("userName", user.getUserName());
-
 
             CustomerDAO customerDAO = new CustomerDAO();
             try {
@@ -63,12 +60,12 @@ public class Login extends HttpServlet {
                 response.sendRedirect(redirectAfterLogin);
                 return;
             }
-            //7 roles: ADMIN, TechManager, Technical, Accountant, Store Keeper, Customer Service,Customer
+//7 roles: ADMIN, TechManager, Technical, Accountant, Store Keeper, Customer Service,Customer
             if(user.getRoleId() == 1) {
                 response.sendRedirect(request.getContextPath() + "/admin/users");
                 return;
             } else if(user.getRoleId() == 2) {
-                response.sendRedirect(request.getContextPath() + "/techmanager/dashboard");
+                response.sendRedirect(request.getContextPath() + "/techmanager/home");
                 return;
             } else if(user.getRoleId() == 3) {
                 response.sendRedirect(request.getContextPath() + "/technician/home");
@@ -77,7 +74,7 @@ public class Login extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/inventory");
                 return;
             } else if(user.getRoleId() == 5) {
-                response.sendRedirect(request.getContextPath() + "/accountant");
+                response.sendRedirect(request.getContextPath() + "/accountant/home");
                 return;
             } else if(user.getRoleId() == 6) {
                 response.sendRedirect(request.getContextPath() + "/customerservice/home");
@@ -85,8 +82,7 @@ public class Login extends HttpServlet {
             } else if(user.getRoleId() == 7) {
                 response.sendRedirect(request.getContextPath() + "/Home");
                 return;
-                }
-        } else {
+            }        } else {
             request.setAttribute("errorMessage", "Invalid username or password.");
             request.getRequestDispatcher("/login.jsp").forward(request, response);
         }
