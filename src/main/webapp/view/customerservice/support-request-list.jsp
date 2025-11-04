@@ -35,8 +35,7 @@
                         padding: 2.5rem;
                          min-height: calc(100vh - 64px - 1.25rem);
                           display: flex; flex-direction: column;
-                           align-items: center;
-                            text-align: center; padding-top: 0;">
+                           align-items: center; padding-top: 0;">
                     <!-- Nội dung trang home của bạn ở đây -->
                     <div class="container py-4">
 
@@ -126,15 +125,15 @@
 
                                     <tbody>
                                     <c:choose>
-                                        <c:when test="${empty supportrequests}">
+                                        <c:when test="${empty supportrequestList.paginatedData}">
                                             <tr class="text-center text-muted">
                                                 <td colspan="6">No request found.</td>
                                             </tr>
                                         </c:when>
                                         <c:otherwise>
-                                            <c:forEach var="sr" items="${supportrequests}" varStatus="loop">
+                                            <c:forEach var="sr" items="${supportrequestList.paginatedData}" varStatus="loop">
                                                 <tr>
-                                                    <td>${loop.index + 1}</td>
+                                                    <td>${(supportrequestList.currentPage - 1) * supportrequestList.itemsPerPage + loop.index + 1}</td>
                                                     <td>${categoryMap[sr.categoryId]}</td>
 
 
@@ -194,6 +193,24 @@
                                     </tbody>
                                 </table>
                             </div>
+
+
+                            <!-- PAGINATION -->
+                            <c:set var="statusQuery" value="" />
+                            <c:if test="${not empty paramValues.status}">
+                                <c:forEach var="s" items="${paramValues.status}">
+                                    <c:set var="statusQuery" value="${statusQuery}&status=${s}" />
+                                </c:forEach>
+                            </c:if>
+
+                            <jsp:include page="/view/customerservice/pagination.jsp">
+                                <jsp:param name="currentPage" value="${supportrequestList.currentPage}" />
+                                <jsp:param name="totalPages" value="${supportrequestList.totalPages}" />
+                                <jsp:param name="baseUrl" value="/customerservice/view-support-request" />
+                                <jsp:param name="queryString"
+                                           value="&searchName=${param.categoryId}&fromDate=${param.fromDate}&toDate=${param.toDate}&sortOrder=${param.sortOrder}${statusQuery}" />
+                            </jsp:include>
+
                         </div>
                     </div>
                 </div>

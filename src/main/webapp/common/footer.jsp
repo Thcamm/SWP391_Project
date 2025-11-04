@@ -130,13 +130,6 @@
 </style>
 
 <section class="footer-section">
-    <section class="contact-bar">
-        <div class="text-content">
-            <h2>carspavn@gmail.com</h2>
-            <p>Hãy để đội ngũ chuyên nghiệp của chúng tôi giúp bạn giải quyết mọi vấn đề về xe. Liên hệ với chúng tôi ngay để nhận được dịch vụ tốt nhất.</p>
-        </div>
-    </section>
-
     <footer class="main-footer">
         <div class="footer-logo">
             <%-- Nếu có logo: <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="Carspa Logo"> --%>

@@ -57,7 +57,7 @@ public class ServiceRequestService {
             conn.setAutoCommit(false);
             
             // Step 1: Lock and check ServiceRequest status
-            ServiceRequest sr = serviceRequestDAO.getServiceRequestForUpdate(conn, requestId);
+            ServiceRequest sr = dao.getServiceRequestForUpdate(conn, requestId);
             
             if (sr == null) {
                 conn.rollback();
@@ -72,7 +72,7 @@ public class ServiceRequestService {
             }
             
             // Step 2: Update ServiceRequest status to APPROVE
-            boolean updated = serviceRequestDAO.updateServiceRequestStatus(conn, requestId, "APPROVE");
+            boolean updated = dao.updateServiceRequestStatus(conn, requestId, "APPROVE");
             if (!updated) {
                 conn.rollback();
                 System.err.println("[ServiceRequestService] Failed to update request status");

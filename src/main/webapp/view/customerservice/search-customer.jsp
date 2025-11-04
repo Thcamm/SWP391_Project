@@ -129,11 +129,10 @@
                                                     <c:forEach var="c" items="${customerList.paginatedData}" varStatus="loop">
                                                         <tr>
                                                             <td>${(customerList.currentPage - 1) * customerList.itemsPerPage + loop.index + 1}</td>
-                                                            <td>
-                                                                <a href="${pageContext.request.contextPath}/user/profile?id=${c.userId}">
-                                                                        ${c.fullName}
-                                                                </a>
+                                                            <td style="cursor: pointer;" onclick="window.location='${pageContext.request.contextPath}/customerservice/customer-detail?id=${c.userId}'">
+                                                                    ${c.fullName}
                                                             </td>
+
                                                             <td>
                                                                 <div>
                                                                     <c:choose>
@@ -198,6 +197,7 @@
                                 <jsp:include page="/view/customerservice/pagination.jsp">
                                     <jsp:param name="currentPage" value="${customerList.currentPage}" />
                                     <jsp:param name="totalPages" value="${customerList.totalPages}" />
+                                    <jsp:param name="baseUrl" value="/customerservice/search-customer" />
                                     <jsp:param name="queryString"
                                                value="&searchName=${param.searchName}&searchLicensePlate=${param.searchLicensePlate}&searchEmail=${param.searchEmail}&fromDate=${param.fromDate}&toDate=${param.toDate}&sortOrder=${param.sortOrder}" />
                                 </jsp:include>

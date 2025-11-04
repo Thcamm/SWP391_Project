@@ -464,6 +464,8 @@ public Customer getCustomerById(int customerId) throws SQLException {
                     customer.setPhoneNumber(rs.getString("PhoneNumber"));
                 }
             }
+        }catch (SQLException e) {
+            throw new RuntimeException("Lỗi khi lấy thông tin khách hàng theo ID", e);
         }
         return customer;
     }

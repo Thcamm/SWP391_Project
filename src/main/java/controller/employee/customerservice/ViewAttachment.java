@@ -12,7 +12,7 @@ import java.io.IOException;
 
 @WebServlet("/customerservice/view-attachment")
 public class ViewAttachment extends HttpServlet {
-    private static final String UPLOAD_DIR = "C:/test";
+    private static final String UPLOAD_DIR = "C:/garage_support_uploads";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

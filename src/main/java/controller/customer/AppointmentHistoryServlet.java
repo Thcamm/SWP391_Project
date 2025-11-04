@@ -1,4 +1,4 @@
-package controller.employee.customerservice;
+package controller.customer;
 
 import dao.appointment.AppointmentDAO;
 import dao.customer.CustomerDAO;
@@ -20,6 +20,12 @@ public class AppointmentHistoryServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
+        if (session.getAttribute("message") != null) {
+            request.setAttribute("message", session.getAttribute("message"));
+            request.setAttribute("messageType", session.getAttribute("messageType"));
+            session.removeAttribute("message");
+            session.removeAttribute("messageType");
+        }
         User user = (User) session.getAttribute("user");
         CustomerDAO customerDAO = new CustomerDAO();
         Customer customer = null;

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!DOCTYPE html>
 <html lang="vi">
@@ -29,7 +30,7 @@
                          min-height: calc(100vh - 64px - 1.25rem);
                           display: flex; flex-direction: column;
                            align-items: center; justify-content: center;
-                            text-align: center;">
+                          ">
                     <!-- Nội dung trang home của bạn ở đây -->
                     <div class="container py-4">
                         <h3>Support Request Detail</h3>
@@ -53,13 +54,14 @@
                             <p><strong>Description:</strong></p>
                             <p class="border p-2 bg-white">${supportRequest.description}</p>
 
-                            <c:if test="${not empty supportRequest.attachmentPath}">
-                                <p><strong>Attachment:</strong>
-                                    <a href="${pageContext.request.contextPath}/customerservice/view-attachment?file=${supportRequest.attachmentPath}" target="_blank">
-                                        View in Browser
+                            <c:forEach var="file" items="${fn:split(supportRequest.attachmentPath, ';')}">
+                                <p>
+                                    <a href="${pageContext.request.contextPath}/customerservice/view-attachment?file=${file}" target="_blank">
+                                            ${file}
                                     </a>
                                 </p>
-                            </c:if>
+                            </c:forEach>
+
 
 
                             <div class="mt-3">

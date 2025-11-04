@@ -19,6 +19,12 @@
         --brand-red: #dc3545;
     }
 
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--dark-bg);
+        color: var(--primary-color);
+        padding-top: 120px;
+    }
 
     /* --- Header Top Bar --- */
     .header-top {
@@ -212,30 +218,30 @@
             <div class="d-flex gap-4">
                 <a href="https://www.google.com/maps/search/?api=1&query=757+Huỳnh+Tấn+Phát,+Phú+Thuận,+Q7"
                    target="_blank" class="info-item">
-                    <i class="fas fa-map-marker-alt"></i> 757 Huỳnh Tấn Phát, Phú Thuận, Q7
+                    <i class="fas fa-map-marker-alt"></i> 757 Huynh Tan Phat, Phu Thuan, District 7
                 </a>
 
-                <span class="info-item"><i class="fas fa-clock"></i> Thứ 2 - 7 / 08.00AM - 17.00PM</span>
+                <span class="info-item"><i class="fas fa-clock"></i> Monday - Saturday / 08:00 AM - 05:00 PM</span>
                 <a href="tel:0909579579" class="info-item">
-                    <i class="fas fa-phone-alt"></i> Hotline: 0909 579 579 (Mr. Hưng)
+                    <i class="fas fa-phone-alt"></i> Hotline: 0909 579 579 (Mr. Hung)
                 </a>
             </div>
 
-            <!-- Nếu user đã đăng nhập -->
+            <!-- If user is logged in -->
             <c:if test="${not empty sessionScope.user}">
                 <div class="d-flex align-items-center gap-3">
                     <span class="welcome-user">
-                        <i class="fas fa-user"></i> Xin chào, ${sessionScope.user.fullName}
+                        <i class="fas fa-user"></i> Hello, ${sessionScope.user.fullName}
                     </span>
                     <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout">
-                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                        <i class="fas fa-sign-out-alt"></i> Logout
                     </a>
                 </div>
             </c:if>
 
-            <!-- Nếu chưa đăng nhập -->
+            <!-- If user is not logged in -->
             <c:if test="${empty sessionScope.user}">
-                <a href="${pageContext.request.contextPath}/login" class="btn btn-contact-top">Đăng nhập</a>
+                <a href="${pageContext.request.contextPath}/login" class="btn btn-contact-top">Login</a>
             </c:if>
         </div>
     </div>
@@ -278,7 +284,7 @@
             <span>Frequently Asked Questions</span>
         </a>
         <a href="${pageContext.request.contextPath}/customer/garage" class="menu-item">
-            <span>QUẢN LÝ XE (MY GARAGE)</span>
+            <span>Vehicle Management (My Garage)</span>
         </a>
     </nav>
 </div>

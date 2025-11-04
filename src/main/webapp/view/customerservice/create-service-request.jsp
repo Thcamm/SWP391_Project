@@ -32,7 +32,7 @@
                          min-height: calc(100vh - 64px - 1.25rem);
                           display: flex; flex-direction: column;
                            <%--align-items: center; justify-content: center;--%>
-                           <%-- text-align: center;">--%>
+                           ">
                     <!-- Nội dung trang home của bạn ở đây -->
                     <div class="main-container">
                         <!-- Page Header -->
@@ -48,22 +48,22 @@
                                 <div class="customer-info-item">
                                     <span class="customer-info-label">Full Name</span>
                                     <span class="customer-info-value">
-                        <c:out value="${customer.fullName}" />
-                    </span>
+                                        <c:out value="${customer.fullName}" />
+                                    </span>
                                 </div>
 
                                 <div class="customer-info-item">
                                     <span class="customer-info-label">Email</span>
                                     <span class="customer-info-value">
-                        <c:out value="${customer.email}" />
-                    </span>
+                                        <c:out value="${customer.email}" />
+                                    </span>
                                 </div>
 
                                 <div class="customer-info-item">
                                     <span class="customer-info-label">Phone Number</span>
                                     <span class="customer-info-value">
-                        <c:out value="${customer.phoneNumber}" />
-                    </span>
+                                        <c:out value="${customer.phoneNumber}" />
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -92,8 +92,7 @@
                                         <input type="hidden" name="vehicleIds[0]" class="vehicle-id" required/>
                                         <input type="text"
                                                class="form-control vehicle-input"
-                                               placeholder="
-Find a car by license plate or model..."
+                                               placeholder="Find a car by license plate or model..."
                                                autocomplete="off"
                                                required/>
                                     </div>
@@ -158,6 +157,8 @@ Find a car by license plate or model..."
     const contextPath = "${pageContext.request.contextPath}";
     const customerId = "${customer.customerId}";
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script src="${pageContext.request.contextPath}/assets/js/customerservice/create-service-request.js"></script>
 
 </body>

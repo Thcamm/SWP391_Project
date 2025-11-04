@@ -1,5 +1,6 @@
 package controller.employee.customerservice;
 
+import common.utils.PaginationUtils;
 import dao.customer.CustomerDAO;
 import dao.support.SupportDAO;
 import jakarta.servlet.ServletException;
@@ -85,20 +86,45 @@ public class ViewSupportRequest extends HttpServlet {
         String fromDate = request.getParameter("fromDate");
         String toDate = request.getParameter("toDate");
         String sortOrder = request.getParameter("sortOrder");
+        int currentPage = 1;
+        int itemsPerPage = 10;
 
+        if (request.getParameter("page") != null) {
+            try {
+                currentPage = Integer.parseInt(request.getParameter("page"));
+            } catch (NumberFormatException ignored) {
+            }
+        }
         try {
             List<SupportCategory> categories = dao.getAllSupportCategories();
             List<String> statuses = dao.getAllStatuses();
 
             List<SupportRequest> supportRequests;
+            PaginationUtils.PaginationResult<SupportRequest> result;
             if ((category == null) && (statusList == null || statusList.length == 0)
                     && (fromDate == null || fromDate.isEmpty())
                     && (toDate == null || toDate.isEmpty())
                     && (sortOrder == null || sortOrder.isEmpty())) {
-                supportRequests = dao.getAllSupportRequests();
+                int totalItems = dao.countSupportRequests();
+                PaginationUtils.PaginationCalculation calc =
+                        PaginationUtils.calculateParams(totalItems, currentPage, itemsPerPage);
+                supportRequests = dao.getAllSupportRequestsWithLimit(itemsPerPage, calc.getOffset());
+                result = new PaginationUtils.PaginationResult<>(
+                        supportRequests, totalItems, calc.getTotalPages(),
+                        calc.getSafePage(), itemsPerPage
+                );
             } else {
+                int totalItems = dao.countFilteredSupportRequests(
+                        category, statusList, fromDate, toDate
+                );
+                PaginationUtils.PaginationCalculation calc =
+                        PaginationUtils.calculateParams(totalItems, currentPage, itemsPerPage);
                 supportRequests = dao.getFilteredSupportRequests(
-                        category, statusList, fromDate, toDate, sortOrder
+                        category, statusList, fromDate, toDate, sortOrder,itemsPerPage, calc.getOffset()
+                );
+                result = new PaginationUtils.PaginationResult<>(
+                        supportRequests, totalItems, calc.getTotalPages(),
+                        calc.getSafePage(), itemsPerPage
                 );
             }
 
@@ -119,7 +145,7 @@ public class ViewSupportRequest extends HttpServlet {
 
             request.setAttribute("customerEmailMap", customerEmailMap);
             request.setAttribute("customerNameMap", customerNameMap);
-            request.setAttribute("supportrequests", supportRequests);
+            request.setAttribute("supportrequestList", result);
             request.setAttribute("categoryMap", categoryMap);
             request.setAttribute("categories", categories);
             request.setAttribute("statuses", statuses);

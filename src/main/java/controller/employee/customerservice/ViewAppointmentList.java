@@ -1,5 +1,6 @@
 package controller.employee.customerservice;
 
+import common.utils.PaginationUtils;
 import dao.appointment.AppointmentDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @WebServlet("/customerservice/appointment-list")
-public class AppointmentList extends HttpServlet {
+public class ViewAppointmentList extends HttpServlet {
     @Override
     protected void doGet (HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -29,29 +30,58 @@ public class AppointmentList extends HttpServlet {
         String name = request.getParameter("searchName");
         String fromDate = request.getParameter("fromDate");
         String toDate = request.getParameter("toDate");
-
         String[] statusList = request.getParameterValues("status");
-
         String sortOrder = request.getParameter("sortOrder");
+
+        int currentPage = 1;
+        int itemsPerPage = 10;
+
+        if (request.getParameter("page") != null) {
+            try {
+                currentPage = Integer.parseInt(request.getParameter("page"));
+            } catch (NumberFormatException ignored) {
+            }
+        }
         AppointmentDAO dao = new AppointmentDAO();
         List<Map<String, Object>> appointments;
-
+        PaginationUtils.PaginationResult<Map<String, Object>> result;
         if ((name == null || name.isEmpty()) &&
                 (fromDate == null || fromDate.isEmpty()) &&
                 (toDate == null || toDate.isEmpty()) &&
                 (statusList == null || statusList.length == 0) &&
                 (sortOrder == null || sortOrder.isEmpty())) {
+            int totalItems = dao.countAppointment();
+            PaginationUtils.PaginationCalculation calc =
+                    PaginationUtils.calculateParams(totalItems, currentPage, itemsPerPage);
 
-            appointments = dao.getAllAppointments();
+            appointments = dao.getAllAppointmentsWithLimit(itemsPerPage, calc.getOffset());
+            result = new PaginationUtils.PaginationResult<>(
+                    appointments, totalItems, calc.getTotalPages(),
+                    calc.getSafePage(), itemsPerPage);
 
         } else {
+            int totalItems = 0;
             try {
-                appointments = dao.searchAppointment(name,fromDate, toDate, statusList, sortOrder);
+                totalItems = dao.countSearchAppointment(name, fromDate, toDate, statusList);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+            PaginationUtils.PaginationCalculation calc =
+                    PaginationUtils.calculateParams(totalItems, currentPage, itemsPerPage);
+
+            try {
+                appointments = dao.searchAppointmentWithLimit(
+                        name, fromDate, toDate, statusList, sortOrder,
+                        itemsPerPage, calc.getOffset());
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+            result = new PaginationUtils.PaginationResult<>(
+                    appointments, totalItems, calc.getTotalPages(),
+                    calc.getSafePage(), itemsPerPage);
         }
-        request.setAttribute("appointments", appointments);
+        request.setAttribute("appointmentList", result);
         request.getRequestDispatcher("/view/customerservice/appointment-list.jsp")
                 .forward(request, response);
 

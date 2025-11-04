@@ -16,7 +16,8 @@
 <main class="appointment-section">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-8"><div class="appointment-form">
+            <div class="col-lg-8">
+                <div class="appointment-form">
                 <p class="text-uppercase text-muted mb-2" style="font-size: 14px; letter-spacing: 2px;">
                     THÔNG TIN VỀ CHÚNG TÔI
                 </p>
