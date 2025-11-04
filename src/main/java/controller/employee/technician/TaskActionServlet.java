@@ -19,67 +19,79 @@ public class TaskActionServlet extends HttpServlet {
 
     private final TechnicianService technicianService = new TechnicianService();
 
-    public TaskActionServlet() {
-        super();
-    }
-
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doGet(req, resp);
-    }
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        HttpSession session = req.getSession();
+        // Lấy session an toàn
+        HttpSession session = req.getSession(false);
 
         Integer userId = (Integer) session.getAttribute("userId");
 
+        // Lấy technician
         ServiceResult techResult = technicianService.getTechnicianByUserId(userId);
-
         if (techResult.isError()) {
             MessageHelper.setErrorMessage(session, techResult.getMessage());
             resp.sendRedirect(req.getContextPath() + "/technician/home");
             return;
         }
-
         Employee technician = techResult.getData(Employee.class);
 
-        String action = req.getParameter("action");
+        // Params
+        String action = req.getParameter("action");             // accept | reject | start
         String assignmentIdStr = req.getParameter("assignmentId");
+        String returnTo = req.getParameter("returnTo");         // optional: cho phép quay lại đúng trang lọc
+        if (returnTo == null || returnTo.isBlank()) {
+            // fallback: dùng Referer nếu có
+            String referer = req.getHeader("Referer");
+            if (referer != null && !referer.isBlank()) {
+                returnTo = referer;
+            } else {
+                returnTo = req.getContextPath() + "/technician/tasks";
+            }
+        }
 
-        if(action == null || assignmentIdStr == null) {
-            MessageHelper.setErrorMessage(session, MessageConstants.ERR003); //invalid input
-            resp.sendRedirect(req.getContextPath() + "/technician/home");
+        if (action == null || assignmentIdStr == null) {
+            MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
+            resp.sendRedirect(returnTo);
             return;
         }
 
         try {
             int assignmentId = Integer.parseInt(assignmentIdStr);
 
-            ServiceResult result ;
-            switch (action.toLowerCase()) {
-                case "accept" :
+
+            String normalized = action.trim().toLowerCase();
+            if ("start".equals(normalized)) normalized = "accept";
+
+            ServiceResult result;
+            switch (normalized) {
+                case "accept":
                     result = technicianService.acceptTask(technician.getEmployeeId(), assignmentId);
                     break;
-
-                case "reject" :
+                case "reject":
                     result = technicianService.rejectTask(technician.getEmployeeId(), assignmentId);
                     break;
-                default :
+                default:
                     MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
-                    resp.sendRedirect(req.getContextPath() + "/technician/home");
+                    resp.sendRedirect(returnTo);
                     return;
             }
-            if(result.isSuccess()) {
+
+            if (result.isSuccess()) {
                 MessageHelper.setSuccessMessage(session, result.getMessage());
-            }else {
+            } else {
                 MessageHelper.setErrorMessage(session, result.getMessage());
             }
-        }catch (NumberFormatException e){
+
+        } catch (NumberFormatException e) {
             MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
+        } catch (Exception e) {
+            e.printStackTrace();
+            MessageHelper.setErrorMessage(session, MessageConstants.ERR001);
         }
 
-        resp.sendRedirect(req.getContextPath() + "/technician/home");
 
+        resp.sendRedirect(returnTo);
     }
 }

@@ -5,28 +5,12 @@
 
 <jsp:include page="header.jsp"/>
 
+
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/base.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/technician_home.css"/>
-
 <div class="layout">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="brand">SealsCRM</div>
 
-        <div class="menu-section">
-            <div class="menu-title">Main menu</div>
-            <a class="menu-item active" href="#">Home</a>
-            <a class="menu-item" href="${pageContext.request.contextPath}/technician/tasks">Tasks</a>
-            <a class="menu-item" href="${pageContext.request.contextPath}/technician/parts">Parts</a>
-            <a class="menu-item" href="${pageContext.request.contextPath}/technician/contacts">Contacts</a>
-            <a class="menu-item" href="${pageContext.request.contextPath}/technician/settings">Settings</a>
-        </div>
-
-        <div class="sidebar-footer">
-            <form action="${pageContext.request.contextPath}/logout" method="post">
-                <button class="btn-logout" type="submit">⇦ Logout</button>
-            </form>
-        </div>
-    </aside>
+    <jsp:include page="sidebar.jsp"/>
 
     <!-- Main content -->
     <main class="main">
@@ -107,7 +91,8 @@
                                         <c:if test="${fn:length(task.taskDescription) > 50}">…</c:if>
                                     </td>
                                     <td>${task.estimateHours}h</td>
-                                    <td><fmt:formatDate value="${task.assignedDate}" pattern="dd/MM HH:mm"/></td>
+                                    <td>${task.assignedDateFormatted}</td>
+
                                     <td class="actions">
                                         <form action="${pageContext.request.contextPath}/technician/tasks-action" method="post">
                                             <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
@@ -137,6 +122,8 @@
             </c:choose>
         </section>
 
+
+
         <!-- In progress -->
         <section class="panel card">
             <div class="panel-head">
@@ -152,8 +139,13 @@
                         <table class="table">
                             <thead>
                             <tr>
-                                <th>#</th><th>Vehicle</th><th>Service</th><th>Started</th>
-                                <th>Progress</th><th>Notes</th><th>Actions</th>
+                                <th>#</th>
+                                <th>Vehicle</th>
+                                <th>Service</th>
+                                <th>Started</th>
+                                <th>Progress</th>
+                                <th>Notes</th>
+                                <th>Actions</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -162,7 +154,7 @@
                                     <td>${st.count}</td>
                                     <td class="mono">${task.vehicleInfo}</td>
                                     <td>${task.serviceInfo}</td>
-                                    <td><fmt:formatDate value="${task.startAt}" pattern="dd/MM HH:mm"/></td>
+                                    <td><td>${task.startAtFormatted}</td></td>
                                     <td>
                                         <div class="progress">
                                             <div class="progress-fill" style="width:${task.progressPercentage}%;"></div>
@@ -215,7 +207,8 @@
                                         <c:if test="${not empty a.vehicleInfo}"> - ${a.vehicleInfo}</c:if>
                                         <c:if test="${not empty a.taskInfo}"> (${a.taskInfo})</c:if>
                                     </div>
-                                    <div class="muted"><fmt:formatDate value="${a.activityTime}" pattern="dd/MM/yyyy HH:mm"/></div>
+                                    <div class="muted">${a.activityTimeFormatted}</div>
+
                                 </li>
                             </c:forEach>
                         </ul>
@@ -242,6 +235,7 @@
             </section>
         </div>
     </main>
+
 </div>
 
 <jsp:include page="footer.jsp"/>

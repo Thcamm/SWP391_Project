@@ -136,29 +136,24 @@ public class TechnicianService {
             String search,
             int page,
             int itemsPerPage
-    ){
-        if(technicianId <= 0) {
+    ) {
+        if (technicianId <= 0) {
             return createEmptyPaginationResponse(page, itemsPerPage);
         }
 
-        List<TaskAssignment> allTasks = technicianDAO.getAllTasksWithFilter(
-                technicianId,
-                status,
-                priority,
-                search
-        );
+        int totalItems = technicianDAO.countAllTasksWithFilter(technicianId, status, priority, search);
+        int totalPages = (int) Math.ceil((double) totalItems / itemsPerPage);
+        int offset = (page - 1) * itemsPerPage;
 
-        PaginationUtils.PaginationResult<TaskAssignment> result =
-                PaginationUtils.paginate(allTasks, page, itemsPerPage);
+        List<TaskAssignment> tasks = technicianDAO.getAllTasksWithFilterPaged(
+                technicianId, status, priority, search, offset, itemsPerPage
+        );
 
         return new PaginationResponse<>(
-                result.getPaginatedData(),
-                result.getCurrentPage(),
-                result.getItemsPerPage(),
-                result.getTotalItems(),
-                result.getTotalPages()
+                tasks, page, itemsPerPage, totalItems, totalPages
         );
     }
+
 
     public ServiceResult getAllTasksStatistics(int technicianId) {
         if(technicianId <= 0) {

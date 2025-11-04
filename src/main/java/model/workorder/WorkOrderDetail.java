@@ -1,5 +1,7 @@
 package model.workorder;
 
+import model.employee.technician.TaskAssignment;
+
 import java.sql.Timestamp;
 import java.math.BigDecimal;
 import java.util.List;
