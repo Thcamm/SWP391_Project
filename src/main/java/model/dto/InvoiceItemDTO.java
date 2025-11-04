@@ -20,4 +20,7 @@ public class InvoiceItemDTO {
     public void setUnitPrice(BigDecimal unitPrice) { this.unitPrice = unitPrice; }
     public BigDecimal getAmount() { return amount; }
     public void setAmount(BigDecimal amount) { this.amount = amount; }
+
+    public void setQuantity(BigDecimal bigDecimal) {
+    }
 }

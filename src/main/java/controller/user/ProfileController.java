@@ -38,16 +38,14 @@ public class ProfileController extends HttpServlet {
             response.sendRedirect(contextPath + "/login");
             return;
         }
-        String idParam = request.getParameter("id");
-        int userIdToView = sessionUser.getUserId(); // mặc định là chính mình
-
-        if (idParam != null && !idParam.isEmpty()) {
-            userIdToView = Integer.parseInt(idParam); // nếu có id khác thì lấy id đó
-        }
-        showViewProfilePage(request, response, userIdToView);
 
         String action = request.getParameter("action");
+        String idParam = request.getParameter("id");
+        int userIdToView = sessionUser.getUserId();
 
+        if (idParam != null && !idParam.isEmpty()) {
+            userIdToView = Integer.parseInt(idParam);
+        }
         if ("edit".equals(action)) {
             showEditProfilePage(request, response, sessionUser.getUserId());
         } else {
@@ -124,25 +122,31 @@ public class ProfileController extends HttpServlet {
         }
     }
 
-    private void showViewProfilePage(HttpServletRequest request, HttpServletResponse response, int userId) throws ServletException, IOException {
+    private void showViewProfilePage(HttpServletRequest request, HttpServletResponse response, int userId)
+            throws ServletException, IOException {
         User user = userProfileService.getUserProfile(userId);
         request.setAttribute("user", user);
         HttpSession session = request.getSession(false);
 
-        Customer customer = (session != null) ? (Customer) session.getAttribute("customer") : null;
+        String roleCode = (session != null) ? (String) session.getAttribute("roleCode") : null;
 
-        if (customer != null) {
-            try {
-                ServiceRequestDAO serviceRequestDAO = new ServiceRequestDAO();
-                List<ServiceHistoryDTO> serviceHistory = serviceRequestDAO.getServiceHistoryByCustomerId(customer.getCustomerId());
-                request.setAttribute("serviceHistory", serviceHistory);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                request.setAttribute("historyError", "Could not load service history.");
+        if ("CUSTOMER".equals(roleCode)) {
+            Customer customer = (Customer) session.getAttribute("customer");
+            if (customer != null) {
+                try {
+                    ServiceRequestDAO serviceRequestDAO = new ServiceRequestDAO();
+                    List<ServiceHistoryDTO> serviceHistory = serviceRequestDAO.getServiceHistoryByCustomerId(customer.getCustomerId());
+                    request.setAttribute("serviceHistory", serviceHistory);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    request.setAttribute("historyError", "Could not load service history.");
+                }
             }
         }
+
         request.getRequestDispatcher("/view/user/viewProfile.jsp").forward(request, response);
     }
+
 
 
     private void showEditProfilePage(HttpServletRequest request, HttpServletResponse response, int userId) throws ServletException, IOException {

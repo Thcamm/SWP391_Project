@@ -3,6 +3,7 @@ package dao.inventory;
 import common.DbContext;
 import model.inventory.CharacteristicValue;
 import model.inventory.PartDetail;
+import model.inventory.WorkOrderPart;
 import org.checkerframework.checker.units.qual.A;
 
 import java.sql.Connection;
@@ -11,6 +12,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static common.DbContext.getConnection;
 
 public class PartInventoryDAO {
 
@@ -39,7 +42,7 @@ public class PartInventoryDAO {
         }
 
         sql.append("ORDER BY p.PartName, pd.sku");
-        try(Connection conn = DbContext.getConnection();
+        try(Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
             for(int i = 0; i < params.size(); i++) {
@@ -70,7 +73,7 @@ public class PartInventoryDAO {
                 "JOIN Part p ON pd.PartID = p.PartID " +
                 "LEFT JOIN Unit u ON p.base_unit_id = u.UnitID " +
                 "WHERE pd.PartDetailID = ?";
-        try (Connection conn = DbContext.getConnection();
+        try (Connection conn = getConnection();
         PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setInt(1, partDetailId);
             try(ResultSet rs = ps.executeQuery()) {
@@ -98,7 +101,7 @@ public class PartInventoryDAO {
                 "JOIN Part p ON pd.PartID = p.PartID " +
                 "LEFT JOIN Unit u ON p.base_unit_id = u.UnitID " +
                 "WHERE pd.SKU = ?";
-        try (Connection conn = DbContext.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setString(1, sku.trim());
             try(ResultSet rs = ps.executeQuery()) {
@@ -119,7 +122,7 @@ public class PartInventoryDAO {
         }
 
         String sql = "SELECT Quantity FROM PartDetail WHERE PartDEtailID = ?";
-        try(Connection conn = DbContext.getConnection();
+        try(Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setInt(1, partDetailId);
             try(ResultSet rs = ps.executeQuery()) {
@@ -137,7 +140,7 @@ public class PartInventoryDAO {
 
     public Integer getPartDetailQuantity(int partDetailId) {
         String sql = "SELECT Quantity FROM PartDetail WHERE PartDetailID = ?";
-        try(Connection conn = DbContext.getConnection();
+        try(Connection conn = getConnection();
         PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setInt(1, partDetailId);
             try(ResultSet rs = ps.executeQuery()) {
@@ -166,7 +169,7 @@ public class PartInventoryDAO {
                 "WHERE pd.Quantity > 0 AND p.Category = ? " +
                 "ORDER BY p.PartName, pd.SKU";
 
-        try(Connection conn = DbContext.getConnection();
+        try(Connection conn = getConnection();
         PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setString(1, category.trim());
 
@@ -187,7 +190,7 @@ public class PartInventoryDAO {
 
         String sql = "SELECT DISTINCT Category FROM Part WHERE Category IS NOT NULL ORDER BY Category";
 
-        try (Connection conn = DbContext.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -214,7 +217,7 @@ public class PartInventoryDAO {
                 "WHERE pd.Quantity > 0 AND pd.Quantity <= pd.MinStock " +
                 "ORDER BY pd.Quantity ASC, p.PartName";
 
-        try (Connection conn = DbContext.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -238,7 +241,7 @@ public class PartInventoryDAO {
                 "WHERE pd.Quantity = 0 " +
                 "ORDER BY p.PartName";
 
-        try (Connection conn = DbContext.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
 
@@ -261,7 +264,7 @@ public class PartInventoryDAO {
                 "JOIN CharacteristicType ct ON cv.TypeID = ct.TypeID " +
                 "WHERE pdc.PartDetailID = ? " +
                 "ORDER BY ct.TypeName, cv.ValueName";
-        try (Connection conn = DbContext.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, partDetailId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -308,7 +311,7 @@ public class PartInventoryDAO {
     public boolean partDetailExists(int partDetailId) {
         String sql = "SELECT 1 FROM PartDetail WHERE PartDetailID = ?";
 
-        try (Connection conn = DbContext.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, partDetailId);
 
@@ -336,7 +339,7 @@ public class PartInventoryDAO {
                 "WHERE pd.Location = ? " +
                 "ORDER BY p.PartName, pd.SKU";
 
-        try (Connection conn = DbContext.getConnection();
+        try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, location.trim());
 
@@ -353,8 +356,42 @@ public class PartInventoryDAO {
     }
 
 
+    public List<WorkOrderPart> getPartsByWorkOrderId(int workOrderId) {
+        List<WorkOrderPart> parts = new ArrayList<>();
+        // We JOIN WorkOrderPart (aliased 'p') with WorkOrderDetail (aliased 'd')
+        // to find all parts associated with the target WorkOrderID.
+        String sql = "SELECT p.* " +
+                "FROM WorkOrderPart p " +
+                "JOIN WorkOrderDetail d ON p.DetailID = d.DetailID " +
+                "WHERE d.WorkOrderID = ?";
 
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
+            ps.setInt(1, workOrderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    parts.add(mapResultSetToWorkOrderPart(rs));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error getting WorkOrderParts by WorkOrderID: " + e.getMessage());
+        }
+        return parts;
+    }
+    private WorkOrderPart mapResultSetToWorkOrderPart(ResultSet rs) throws SQLException {
+        WorkOrderPart part = new WorkOrderPart();
+        part.setWorkOrderPartId(rs.getInt("WorkOrderPartID"));
+        part.setDetailID(rs.getInt("DetailID"));
+        part.setPartDetailID(rs.getInt("PartDetailID"));
+        part.setRequestByID(rs.getInt("RequestedByID"));
+        part.setQuantityUsed(rs.getInt("QuantityUsed"));
+        part.setUnitPrice(rs.getBigDecimal("UnitPrice"));
+        part.setRequestStatus(rs.getString("request_status"));
+        part.setRequestedAt(rs.getTimestamp("requested_at").toLocalDateTime());
+        return part;
+    }
     private PartDetail mapResultSetToPartDetail(ResultSet rs) throws SQLException {
         PartDetail part = new PartDetail();
 

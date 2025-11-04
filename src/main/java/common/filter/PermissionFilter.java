@@ -53,8 +53,8 @@ public class PermissionFilter implements Filter {
         routePerm.put("GET:/view/admin/user-edit.jsp", "role_permission_manage");
 
         // Customer Service
-        routePerm.put("GET:/view/customerservice/customerservice-home.jsp", "cs_access");
-        routePerm.put("POST:/view/customerservice/customerservice-home.jsp", "cs_access");
+        routePerm.put("GET:/view/customerservice/home.jsp", "cs_access");
+        routePerm.put("POST:/view/customerservice/home.jsp", "cs_access");
         routePerm.put("GET:/view/customerservice/appointment-list.jsp", "cs_access");
         routePerm.put("POST:/view/customerservice/appointment-list.jsp", "cs_access");
         routePerm.put("GET:/view/customerservice/search-customer.jsp", "cs_access");
@@ -72,7 +72,8 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/view/customerservice/createRequest.jsp", "cs_access");
         routePerm.put("GET:/view/customerservice/serviceRequest.jsp", "cs_access");
         routePerm.put("POST:/view/customerservice/serviceRequest.jsp", "cs_access");
-
+        routePerm.put("GET:/view/customerservice/service-types.jsp", "cs_access");
+        routePerm.put("POST:/view/customerservice/service-types.jsp", "cs_access");
         // Tech manager - chỉ dashboard, workorders được forward đến WorkOrderController
         routePerm.put("GET:/techmanager/home", "tech_manager_access");
 
@@ -113,12 +114,30 @@ public class PermissionFilter implements Filter {
         routePerm.put("GET:/view/storekepper/inventory-import.jsp", "inventory_access");
 
         // Accountant
-        routePerm.put("GET:/view/accountant/dashboard.jsp", "accountant_access");
-        routePerm.put("POST:/view/accountant/dashboard.jsp", "accountant_access");
-        routePerm.put("GET:/view/invoice/invoiceDetails.jsp", "accountant_access");
-        routePerm.put("POST:/view/invoice/invoiceDetails.jsp", "accountant_access");
-        routePerm.put("GET:/view/accountant/recordPayment.jsp", "accountant_access");
-        routePerm.put("POST:/view/accountant/recordPayment.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/home.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/home.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/create-invoice.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/create-invoice.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/create-payment.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/create-payment.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/invoice-list.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/invoice-list.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/invoice-detail.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/invoice-detail.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/payment-list.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/payment-list.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/payment-detail.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/payment-detail.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/report-dashboard.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/report-dashboard.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/report-revenue.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/report-revenue.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/report-customer.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/report-customer.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/report-overdue.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/report-overdue.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/statistics.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/statistics.jsp", "accountant_access");
 
 
         // Customer

@@ -29,9 +29,21 @@ public class VehicleServlet extends HttpServlet {
             return;
         }
 
+        // Lấy biển số xe cần tìm (nếu có)
+        String licensePlate = request.getParameter("licensePlate");
+
         try {
-            List<Vehicle> vehicleList = vehicleDAO.getVehiclesByCustomerId(customer.getCustomerId());
+            List<Vehicle> vehicleList;
+
+            if (licensePlate != null && !licensePlate.trim().isEmpty()) {
+                vehicleList = vehicleDAO.searchVehiclesByPlate(customer.getCustomerId(), licensePlate.trim());
+            } else {
+                vehicleList = vehicleDAO.getVehiclesByCustomerId(customer.getCustomerId());
+            }
+
             request.setAttribute("vehicleList", vehicleList);
+            request.setAttribute("licensePlate", licensePlate); // để hiển thị lại trên form tìm kiếm
+
             // pull any flash messages
             Object success = session.getAttribute("success");
             Object error = session.getAttribute("error");
@@ -41,7 +53,7 @@ public class VehicleServlet extends HttpServlet {
             request.getRequestDispatcher("/view/customer/garage.jsp").forward(request, response);
         } catch (SQLException e) {
             e.printStackTrace();
-            request.setAttribute("error", "Sorry, can not load vehicles now.");
+            request.setAttribute("error", "Sorry, cannot load vehicles now.");
             request.getRequestDispatcher("/view/error.jsp").forward(request, response);
         }
     }

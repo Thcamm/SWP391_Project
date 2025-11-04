@@ -174,31 +174,90 @@ public class WorkOrderDAO extends DbContext {
 
 
     /**
-     * Retrieves all service/task details for a specific WorkOrder.
-     * @param workOrderId The ID of the WorkOrder.
-     * @return A list of InvoiceItemDTO representing services/tasks.
+     * Get WorkOrderDetails for Invoice display
+     * COMPLETELY REWRITTEN - Safe version with fallback
      */
-    public List<InvoiceItemDTO> getWorkOrderDetailsForInvoice(int workOrderId) throws SQLException {
-        List<InvoiceItemDTO> items = new ArrayList<>();
-        // Assuming WorkOrderDetail has TaskDescription and EstimateAmount (used as final price here)
-        String sql = "SELECT TaskDescription, 1 AS Quantity, EstimateAmount AS UnitPrice " +
-                "WHERE WorkOrderID = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, workOrderId);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    InvoiceItemDTO item = new InvoiceItemDTO();
-                    item.setDescription(rs.getString("TaskDescription"));
-                    item.setQuantity(rs.getInt("Quantity")); // Hardcoded to 1 for now
-                    BigDecimal price = rs.getBigDecimal("UnitPrice");
-                    item.setUnitPrice(price);
-                    item.setAmount(price); // Since Quantity is 1
-                    items.add(item);
-                }
+    public List<WorkOrderDetail> getWorkOrderDetailsForInvoice(int workOrderID) throws SQLException {
+        List<WorkOrderDetail> details = new ArrayList<>();
+
+        // Use backticks to ensure column name recognition
+        String sql = "SELECT " +
+                "`DetailID`, " +
+                "`WorkOrderID`, " +
+                "`source`, " +
+                "`diagnostic_id`, " +
+                "`approval_status`, " +
+                "`approved_by_user_id`, " +
+                "`approved_at`, " +
+                "`TaskDescription`, " +  // With backticks
+                "`EstimateHours`, " +
+                "`EstimateAmount`, " +
+                "`ActualHours` " +
+                "FROM `garage_mgmt`.`WorkOrderDetail` " +  // Explicit database name
+                "WHERE `WorkOrderID` = ? " +
+                "ORDER BY `DetailID`";
+
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DbContext.getConnection();
+
+            // Verify we're connected to correct database
+            String currentDB = conn.getCatalog();
+            if (!currentDB.equals("garage_mgmt")) {
+                System.err.println("WARNING: Connected to wrong database: " + currentDB);
+                conn.setCatalog("garage_mgmt");
             }
+
+            stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, workOrderID);
+
+            rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                WorkOrderDetail detail = new WorkOrderDetail();
+
+                // Use column index to avoid name issues
+                detail.setDetailId(rs.getInt(1));           // DetailID
+                detail.setWorkOrderId(rs.getInt(2));        // WorkOrderID
+
+                String source = rs.getString(3);             // source
+                detail.setSource(source != null ? source : "REQUEST");
+
+                String taskDesc = rs.getString(8);           // TaskDescription (column 8)
+                detail.setTaskDescription(taskDesc != null && !taskDesc.trim().isEmpty()
+                        ? taskDesc
+                        : "General service task");
+
+                BigDecimal estimateHours = rs.getBigDecimal(9);  // EstimateHours
+                detail.setEstimateHours(estimateHours != null ? estimateHours : BigDecimal.ZERO);
+
+                BigDecimal estimateAmount = rs.getBigDecimal(10); // EstimateAmount
+                detail.setEstimateAmount(estimateAmount != null ? estimateAmount : BigDecimal.ZERO);
+
+                BigDecimal actualHours = rs.getBigDecimal(11);    // ActualHours
+                detail.setActualHours(actualHours != null ? actualHours : BigDecimal.ZERO);
+
+                details.add(detail);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("ERROR in getWorkOrderDetailsForInvoice:");
+            System.err.println("  WorkOrderID: " + workOrderID);
+            System.err.println("  SQL: " + sql);
+            System.err.println("  Error: " + e.getMessage());
+            throw e;
+
+        } finally {
+            // Clean up resources
+            if (rs != null) try { rs.close(); } catch (SQLException e) { /* ignore */ }
+            if (stmt != null) try { stmt.close(); } catch (SQLException e) { /* ignore */ }
+            if (conn != null) try { conn.close(); } catch (SQLException e) { /* ignore */ }
         }
-        return items;
+
+        return details;
     }
 
     /**

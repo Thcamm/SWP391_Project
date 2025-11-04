@@ -3,82 +3,132 @@ package dao.payment;
 import common.DbContext;
 import model.payment.Payment;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Handles database operations for the 'Payment' table.
- */
-public class PaymentDAO extends DbContext {
+public class PaymentDAO {
 
-    /**
-     * Records a new payment in the database.
-     *
-     * @param payment The Payment object containing payment details.
-     * @return The newly generated PaymentID if successful, or -1 on failure.
-     * @throws SQLException If a database access error occurs.
-     */
-    public int recordPayment(Payment payment) throws SQLException {
-        String sql = "INSERT INTO Payment (InvoiceID, WorkOrderID, PaymentDate, Amount, Method, ReferenceNo, AccountantID, Note) " +
+    public int insert(Payment payment) throws Exception {
+        String sql = "INSERT INTO Payment (InvoiceID, WorkOrderID, PaymentDate, Amount, " +
+                "Method, ReferenceNo, AccountantID, Note) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            ps.setInt(1, payment.getInvoiceID());
-            ps.setInt(2, payment.getWorkOrderID());
-            ps.setTimestamp(3, payment.getPaymentDate()); // java.sql.Timestamp
-            ps.setBigDecimal(4, payment.getAmount());
-            ps.setString(5, payment.getMethod()); // 'ONLINE' or 'OFFLINE'
-            ps.setString(6, payment.getReferenceNo());
-            ps.setInt(7, payment.getAccountantID());
-            ps.setString(8, payment.getNote());
+            stmt.setInt(1, payment.getInvoiceID());
+            stmt.setInt(2, payment.getWorkOrderID());
+            stmt.setTimestamp(3, payment.getPaymentDate());
+            stmt.setBigDecimal(4, payment.getAmount());
+            stmt.setString(5, payment.getMethod());
+            stmt.setString(6, payment.getReferenceNo());
+            stmt.setInt(7, payment.getAccountantID());
+            stmt.setString(8, payment.getNote());
 
-            int affectedRows = ps.executeUpdate();
+            int affectedRows = stmt.executeUpdate();
 
             if (affectedRows > 0) {
-                try (ResultSet rs = ps.getGeneratedKeys()) {
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
                     if (rs.next()) {
-                        return rs.getInt(1); // Return the new PaymentID
+                        int generatedId = rs.getInt(1);
+                        payment.setPaymentID(generatedId);
+                        return generatedId;
                     }
                 }
             }
+            throw new Exception("Tạo payment thất bại, không có ID được tạo.");
         }
-        return -1;
     }
 
-    /**
-     * Retrieves all payments associated with a specific invoice.
-     *
-     * @param invoiceId The ID of the invoice.
-     * @return A list of Payment objects.
-     * @throws SQLException If a database access error occurs.
-     */
-    public List<Payment> getPaymentsByInvoiceId(int invoiceId) throws SQLException {
+    public Payment getById(int paymentID) throws Exception {
+        String sql = "SELECT * FROM Payment WHERE PaymentID = ?";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, paymentID);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToPayment(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+
+    public List<Payment> getByInvoiceID(int invoiceID) throws Exception {
         List<Payment> payments = new ArrayList<>();
         String sql = "SELECT * FROM Payment WHERE InvoiceID = ? ORDER BY PaymentDate DESC";
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, invoiceId);
-            try (ResultSet rs = ps.executeQuery()) {
+            stmt.setInt(1, invoiceID);
+
+            try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    payments.add(mapRowToPayment(rs));
+                    payments.add(mapResultSetToPayment(rs));
                 }
             }
         }
         return payments;
     }
 
-    /**
-     * Helper method to map a ResultSet row to a Payment object.
-     * @param rs The ResultSet containing payment data.
-     * @return A Payment object.
-     * @throws SQLException
-     */
-    private Payment mapRowToPayment(ResultSet rs) throws SQLException {
+    public List<Payment> getAll() throws Exception {
+        List<Payment> payments = new ArrayList<>();
+        String sql = "SELECT * FROM Payment ORDER BY PaymentDate DESC";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                payments.add(mapResultSetToPayment(rs));
+            }
+        }
+        return payments;
+    }
+
+
+    public void delete(int paymentID) throws Exception {
+        String sql = "DELETE FROM Payment WHERE PaymentID = ?";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, paymentID);
+            int affectedRows = stmt.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new Exception("Xóa payment thất bại, không tìm thấy payment với ID: " + paymentID);
+            }
+        }
+    }
+
+    public BigDecimal getTotalRevenueByDateRange(java.sql.Date startDate, java.sql.Date endDate) throws Exception {
+        String sql = "SELECT COALESCE(SUM(Amount), 0) FROM Payment " +
+                "WHERE DATE(PaymentDate) BETWEEN ? AND ?";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setDate(1, startDate);
+            stmt.setDate(2, endDate);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal(1);
+                }
+            }
+        }
+        return BigDecimal.ZERO;
+    }
+
+    private Payment mapResultSetToPayment(ResultSet rs) throws SQLException {
         Payment payment = new Payment();
         payment.setPaymentID(rs.getInt("PaymentID"));
         payment.setInvoiceID(rs.getInt("InvoiceID"));
@@ -91,5 +141,4 @@ public class PaymentDAO extends DbContext {
         payment.setNote(rs.getString("Note"));
         return payment;
     }
-
 }

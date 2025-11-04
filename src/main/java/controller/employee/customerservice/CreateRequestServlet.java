@@ -1,6 +1,6 @@
 package controller.employee.customerservice;
 
-import dao.carservice.CarServiceDAO;
+import dao.carservice.ServiceDAO;
 import dao.customer.CustomerDAO;
 import dao.user.UserDAO;
 import dao.vehicle.VehicleDAO;
@@ -49,7 +49,7 @@ public class CreateRequestServlet extends HttpServlet {
 
             CustomerDAO customerDAO = new CustomerDAO();
             VehicleDAO vehicleDAO = new VehicleDAO();
-            CarServiceDAO carServiceDAO = new CarServiceDAO();
+            ServiceDAO carServiceDAO = new ServiceDAO();
 
             Customer customer = customerDAO.getCustomerById(customerId);
             List<Vehicle> vehicles = vehicleDAO.getVehiclesByCustomerId(customerId);

@@ -78,14 +78,13 @@ prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
                     required
                   />
                   <div class="form-text">
-                    Nhập ID của service request đã được phê duyệt để tạo work
-                    order.
+                    Enter the ID of the approved service request to create a work order.
                   </div>
                 </div>
 
                 <div class="mb-3">
                   <label for="estimateAmount" class="form-label"
-                    >Chi phí ước tính <span class="text-danger">*</span></label
+                    >Estimated Cost <span class="text-danger">*</span></label
                   >
                   <div class="input-group">
                     <span class="input-group-text">$</span>
@@ -101,7 +100,7 @@ prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
                     />
                   </div>
                   <div class="form-text">
-                    Nhập tổng chi phí ước tính cho work order này.
+                    Enter the total estimated cost for this work order.
                   </div>
                 </div>
 
@@ -110,10 +109,10 @@ prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
                     href="${pageContext.request.contextPath}/techmanager/workorders/list"
                     class="btn btn-secondary"
                   >
-                    <i class="bi bi-x-circle"></i> Hủy
+                    <i class="bi bi-x-circle"></i> Cancel
                   </a>
                   <button type="submit" class="btn btn-success">
-                    <i class="bi bi-check-circle"></i> Tạo WorkOrder
+                    <i class="bi bi-check-circle"></i> Create WorkOrder
                   </button>
                 </div>
               </form>

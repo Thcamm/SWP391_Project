@@ -5,143 +5,260 @@ import model.invoice.Invoice;
 
 import java.math.BigDecimal;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-/**
- * Handles database operations for the 'Invoice' table.
- */
-public class InvoiceDAO extends DbContext {
+public class InvoiceDAO {
 
     /**
-     * Creates a new invoice in the database.
-     * Assumes Subtotal and TaxAmount are calculated beforehand.
-     * Generated columns (TotalAmount, BalanceAmount) and defaults (PaymentStatus, CreatedAt) are handled by the DB.
-     *
-     * @param invoice The Invoice object to insert.
-     * @return The newly generated InvoiceID if successful, or -1 on failure.
-     * @throws SQLException If a database access error occurs.
+     * Tạo invoice mới
      */
-    public int createInvoice(Invoice invoice) throws SQLException {
-        String sql = "INSERT INTO Invoice (WorkOrderID, InvoiceNumber, InvoiceDate, DueDate, Subtotal, TaxAmount, Notes) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+    public int insert(Invoice invoice) throws SQLException {
+        String sql = "INSERT INTO Invoice (" +
+                "WorkOrderID, InvoiceNumber, InvoiceDate, DueDate, " +
+                "Subtotal, TaxAmount, PaidAmount, PaymentStatus, Notes, " +
+                "CreatedAt, UpdatedAt" +
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            ps.setInt(1, invoice.getWorkOrderID());
-            ps.setString(2, invoice.getInvoiceNumber());
-            ps.setDate(3, invoice.getInvoiceDate()); // java.sql.Date
+            stmt.setInt(1, invoice.getWorkOrderID());
+            stmt.setString(2, invoice.getInvoiceNumber());
+            stmt.setDate(3, invoice.getInvoiceDate());
+            stmt.setDate(4, invoice.getDueDate());
+            stmt.setBigDecimal(5, invoice.getSubtotal());
+            stmt.setBigDecimal(6, invoice.getTaxAmount());
+            stmt.setBigDecimal(7, invoice.getPaidAmount());
+            stmt.setString(8, invoice.getPaymentStatus());
+            stmt.setString(9, invoice.getNotes());
+            stmt.setTimestamp(10, invoice.getCreatedAt());
+            stmt.setTimestamp(11, invoice.getUpdatedAt());
 
-            if (invoice.getDueDate() != null) {
-                ps.setDate(4, invoice.getDueDate());
-            } else {
-                ps.setNull(4, Types.DATE);
+            int affectedRows = stmt.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new SQLException("Creating invoice failed, no rows affected.");
             }
 
-            ps.setBigDecimal(5, invoice.getSubtotal());
-            ps.setBigDecimal(6, invoice.getTaxAmount());
-            ps.setString(7, invoice.getNotes());
-
-            int affectedRows = ps.executeUpdate();
-
-            if (affectedRows > 0) {
-                try (ResultSet rs = ps.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        return rs.getInt(1); // Return the new InvoiceID
-                    }
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1);
+                } else {
+                    throw new SQLException("Creating invoice failed, no ID obtained.");
                 }
             }
         }
-        return -1;
     }
 
-    /**
-     * Retrieves a single invoice by its ID.
-     *
-     * @param invoiceId The ID of the invoice to retrieve.
-     * @return An Invoice object if found, otherwise null.
-     * @throws SQLException If a database access error occurs.
-     */
-    public Invoice getInvoiceById(int invoiceId) throws SQLException {
-        Invoice invoice = null;
-        // Select all columns, including generated ones
+    public void delete(int invoiceId) throws SQLException {
+        String sql = "DELETE FROM Invoice WHERE InvoiceID = ?";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, invoiceId);
+            stmt.executeUpdate();
+        }
+    }
+
+    public void update(Invoice invoice) throws Exception {
+        String sql = "UPDATE Invoice SET " +
+                "InvoiceDate = ?, DueDate = ?, Subtotal = ?, TaxAmount = ?, " +
+                "PaidAmount = ?, PaymentStatus = ?, Notes = ?, UpdatedAt = ? " +
+                "WHERE InvoiceID = ?";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setDate(1, invoice.getInvoiceDate());
+            stmt.setDate(2, invoice.getDueDate());
+            stmt.setBigDecimal(3, invoice.getSubtotal());
+            stmt.setBigDecimal(4, invoice.getTaxAmount());
+            stmt.setBigDecimal(5, invoice.getPaidAmount());
+            stmt.setString(6, invoice.getPaymentStatus());
+            stmt.setString(7, invoice.getNotes());
+            stmt.setTimestamp(8, new Timestamp(System.currentTimeMillis()));
+            stmt.setInt(9, invoice.getInvoiceID());
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new Exception("Cập nhật invoice thất bại, không tìm thấy invoice với ID: " + invoice.getInvoiceID());
+            }
+        }
+    }
+
+    public Invoice getById(int invoiceID) throws Exception {
         String sql = "SELECT * FROM Invoice WHERE InvoiceID = ?";
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, invoiceId);
-            try (ResultSet rs = ps.executeQuery()) {
+            stmt.setInt(1, invoiceID);
+
+            try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    invoice = mapRowToInvoice(rs);
+                    return mapResultSetToInvoice(rs);
                 }
             }
         }
-        return invoice;
+        return null;
+    }
+
+    public List<Invoice> getAll() throws Exception {
+        List<Invoice> invoices = new ArrayList<>();
+        String sql = "SELECT * FROM Invoice ORDER BY CreatedAt DESC";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                invoices.add(mapResultSetToInvoice(rs));
+            }
+        }
+        return invoices;
     }
 
     /**
-     * Retrieves an invoice by its associated WorkOrderID.
-     * Since WorkOrderID is unique in the Invoice table, this should return at most one invoice.
-     *
-     * @param workOrderId The ID of the WorkOrder.
-     * @return An Invoice object if found, otherwise null.
-     * @throws SQLException If a database access error occurs.
+     * Check if invoice exists for a WorkOrder
      */
-    public Invoice getInvoiceByWorkOrderId(int workOrderId) throws SQLException {
-        Invoice invoice = null;
-        String sql = "SELECT * FROM Invoice WHERE WorkOrderID = ?";
+    public boolean existsByWorkOrderID(int workOrderID) throws SQLException {
+        String sql = "SELECT COUNT(*) as Count FROM Invoice WHERE WorkOrderID = ?";
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, workOrderId);
-            try (ResultSet rs = ps.executeQuery()) {
+            stmt.setInt(1, workOrderID);
+
+            try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    invoice = mapRowToInvoice(rs);
+                    return rs.getInt("Count") > 0;
                 }
             }
         }
-        return invoice;
+
+        return false;
     }
 
+    public int getNextSequenceForDate(LocalDate date) throws SQLException {
+        String sql = "SELECT COUNT(*) + 1 as NextSequence " +
+                "FROM Invoice " +
+                "WHERE DATE(InvoiceDate) = ?";
 
-    /**
-     * Updates the payment-related fields of an invoice.
-     * Typically called after a payment is recorded.
-     *
-     * @param invoiceId The ID of the invoice to update.
-     * @param newPaidAmount The total amount paid so far.
-     * @param newPaymentStatus The new payment status ('UNPAID', 'PARTIALLY_PAID', 'PAID', 'VOID').
-     * @return true if the update was successful, false otherwise.
-     * @throws SQLException If a database access error occurs.
-     */
-    public boolean updateInvoicePayment(int invoiceId, BigDecimal newPaidAmount, String newPaymentStatus) throws SQLException {
-        // Only update PaidAmount and PaymentStatus
-        // TotalAmount and BalanceAmount are generated columns and will update automatically.
-        String sql = "UPDATE Invoice SET PaidAmount = ?, PaymentStatus = ? WHERE InvoiceID = ?";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+            stmt.setDate(1, Date.valueOf(date));
 
-            ps.setBigDecimal(1, newPaidAmount);
-            ps.setString(2, newPaymentStatus);
-            ps.setInt(3, invoiceId);
-
-            return ps.executeUpdate() > 0;
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("NextSequence");
+                }
+            }
         }
+
+        return 1;
     }
 
+    public List<Invoice> getByStatus(String status) throws Exception {
+        List<Invoice> invoices = new ArrayList<>();
+        String sql = "SELECT * FROM Invoice WHERE PaymentStatus = ? ORDER BY CreatedAt DESC";
 
-    /**
-     * Helper method to map a ResultSet row to an Invoice object.
-     * @param rs The ResultSet containing invoice data.
-     * @return An Invoice object.
-     * @throws SQLException
-     */
-    private Invoice mapRowToInvoice(ResultSet rs) throws SQLException {
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, status);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    invoices.add(mapResultSetToInvoice(rs));
+                }
+            }
+        }
+        return invoices;
+    }
+
+    public List<Invoice> getOverdueInvoices() throws Exception {
+        List<Invoice> invoices = new ArrayList<>();
+        String sql = "SELECT * FROM Invoice " +
+                "WHERE PaymentStatus IN ('UNPAID', 'PARTIALLY_PAID') " +
+                "AND DueDate < CURDATE() " +
+                "ORDER BY DueDate ASC";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                invoices.add(mapResultSetToInvoice(rs));
+            }
+        }
+        return invoices;
+    }
+
+    public List<Invoice> search(String keyword) throws Exception {
+        List<Invoice> invoices = new ArrayList<>();
+        String sql = "SELECT i.* FROM Invoice i " +
+                "WHERE i.InvoiceNumber LIKE ? " +
+                "OR i.Notes LIKE ? " +
+                "ORDER BY i.CreatedAt DESC";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            String searchPattern = "%" + keyword + "%";
+            stmt.setString(1, searchPattern);
+            stmt.setString(2, searchPattern);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    invoices.add(mapResultSetToInvoice(rs));
+                }
+            }
+        }
+        return invoices;
+    }
+
+    public List<Invoice> getInvoicesWithPagination(int page, int pageSize) throws Exception {
+        List<Invoice> invoices = new ArrayList<>();
+        int offset = (page - 1) * pageSize;
+
+        String sql = "SELECT * FROM Invoice " +
+                "ORDER BY CreatedAt DESC " +
+                "LIMIT ? OFFSET ?";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, pageSize);
+            stmt.setInt(2, offset);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    invoices.add(mapResultSetToInvoice(rs));
+                }
+            }
+        }
+        return invoices;
+    }
+
+    public int getTotalCount() throws Exception {
+        String sql = "SELECT COUNT(*) FROM Invoice";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    private Invoice mapResultSetToInvoice(ResultSet rs) throws SQLException {
         Invoice invoice = new Invoice();
         invoice.setInvoiceID(rs.getInt("InvoiceID"));
         invoice.setWorkOrderID(rs.getInt("WorkOrderID"));
@@ -150,49 +267,13 @@ public class InvoiceDAO extends DbContext {
         invoice.setDueDate(rs.getDate("DueDate"));
         invoice.setSubtotal(rs.getBigDecimal("Subtotal"));
         invoice.setTaxAmount(rs.getBigDecimal("TaxAmount"));
-       // invoice.setTotalAmount(rs.getBigDecimal("TotalAmount"));
+        invoice.setTotalAmount(rs.getBigDecimal("TotalAmount"));
         invoice.setPaidAmount(rs.getBigDecimal("PaidAmount"));
-       // invoice.setBalanceAmount(rs.getBigDecimal("BalanceAmount"));
+        invoice.setBalanceAmount(rs.getBigDecimal("BalanceAmount"));
         invoice.setPaymentStatus(rs.getString("PaymentStatus"));
         invoice.setNotes(rs.getString("Notes"));
         invoice.setCreatedAt(rs.getTimestamp("CreatedAt"));
         invoice.setUpdatedAt(rs.getTimestamp("UpdatedAt"));
         return invoice;
     }
-    public List<Invoice> getInvoicesByStatus(String... statuses) throws SQLException {
-        // Handle empty input gracefully
-        if (statuses == null || statuses.length == 0) {
-            return Collections.emptyList(); // Return an empty list immediately
-        }
-
-        List<Invoice> invoices = new ArrayList<>();
-
-        // Build the SQL query dynamically based on the number of statuses
-        // Creates placeholders like (?, ?) or (?, ?, ?)
-        StringBuilder sql = new StringBuilder("SELECT * FROM Invoice WHERE PaymentStatus IN (");
-        for (int i = 0; i < statuses.length; i++) {
-            sql.append("?");
-            if (i < statuses.length - 1) {
-                sql.append(", ");
-            }
-        }
-        sql.append(") ORDER BY InvoiceDate DESC"); // Order by newest invoice date
-
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-
-            // Set the status parameters in the PreparedStatement
-            for (int i = 0; i < statuses.length; i++) {
-                ps.setString(i + 1, statuses[i]); // Parameter index starts at 1
-            }
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    invoices.add(mapRowToInvoice(rs)); // Use the existing helper method
-                }
-            }
-        }
-        return invoices;
-    }
-
 }

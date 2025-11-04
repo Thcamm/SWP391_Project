@@ -21,7 +21,7 @@
 
     body {
         font-family: 'Inter', sans-serif;
-        background-color: var(--dark-bg);
+        /*background-color: var(--dark-bg);*/
         color: var(--primary-color);
         padding-top: 120px;
     }
@@ -221,9 +221,9 @@
                     <i class="fas fa-map-marker-alt"></i> 757 Huỳnh Tấn Phát, Phú Thuận, Q7
                 </a>
 
-                <span class="info-item"><i class="fas fa-clock"></i> Thứ 2 - 7 / 08.00AM - 17.00PM</span>
+                <span class="info-item"><i class="fas fa-clock"></i> Mon - Sat / 08.00AM - 05.00PM</span>
                 <a href="tel:0909579579" class="info-item">
-                    <i class="fas fa-phone-alt"></i> Hotline: 0909 579 579 (Mr. Hưng)
+                    <i class="fas fa-phone-alt"></i> Hotline: 0909 579 579 (Mr. Hung)
                 </a>
             </div>
 
@@ -231,17 +231,19 @@
             <c:if test="${not empty sessionScope.user}">
                 <div class="d-flex align-items-center gap-3">
                     <span class="welcome-user">
-                        <i class="fas fa-user"></i> Xin chào, ${sessionScope.user.fullName}
+                        <a href="${pageContext.request.contextPath}/user/profile">
+                        <i class="fas fa-user"></i> Hello, ${sessionScope.user.fullName}
+                        </a>
                     </span>
-                    <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout">
-                        <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                    <a href="${pageContext.request.contextPath}/Home?action=logout" class="btn btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
                     </a>
                 </div>
             </c:if>
 
             <!-- Nếu chưa đăng nhập -->
             <c:if test="${empty sessionScope.user}">
-                <a href="${pageContext.request.contextPath}/login" class="btn btn-contact-top">Đăng nhập</a>
+                <a href="${pageContext.request.contextPath}/login" class="btn btn-contact-top">Login</a>
             </c:if>
         </div>
     </div>
@@ -249,7 +251,28 @@
     <!-- Main Navbar -->
     <nav class="main-navbar">
         <div class="container d-flex justify-content-between align-items-center">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/Home">
+            <c:set var="homeLink" value="${pageContext.request.contextPath}/Home" />
+            <c:choose>
+                <c:when test="${sessionScope.roleCode == 'ADMIN'}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/admin/users" />
+                </c:when>
+                <c:when test="${sessionScope.roleCode == 'TECHMANAGER'}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/techmanager/home" />
+                </c:when>
+                <c:when test="${sessionScope.roleCode == 'TECHNICAL'}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/technician/home" />
+                </c:when>
+                <c:when test="${sessionScope.roleCode == 'Store Keeper'}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/inventory/dashboard" />
+                </c:when>
+                <c:when test="${sessionScope.roleCode == 'ACCOUNTANT'}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/accountant/home" />
+                </c:when>
+                <c:when test="${sessionScope.roleCode == 'CUSTOMER_SERVICE'}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/customerservice/home" />
+                </c:when>
+            </c:choose>
+            <a class="navbar-brand" href="${homeLink}">
                 CS<span>CARSPA.VN</span>
             </a>
             <div class="nav-icons d-flex align-items-center">
@@ -284,7 +307,7 @@
             <span>Frequently Asked Questions</span>
         </a>
         <a href="${pageContext.request.contextPath}/customer/garage" class="menu-item">
-            <span>QUẢN LÝ XE (MY GARAGE)</span>
+            <span>MY GARAGE</span>
         </a>
     </nav>
 </div>

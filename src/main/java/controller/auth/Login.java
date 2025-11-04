@@ -8,8 +8,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import model.customer.Customer;
+import model.employee.Employee;
 import model.user.User;
 import service.auth.AuthService;
 import service.user.UserLoginService;
@@ -17,7 +17,6 @@ import util.PasswordUtil;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Set;
 
 @WebServlet("/login")
@@ -39,7 +38,6 @@ public class Login extends HttpServlet {
         UserDAO userDAO = new UserDAO();
         UserLoginService userService = new UserLoginService(userDAO);
         User user = userService.findByUserName(username);
-
         if (user != null && PasswordUtil.checkPassword(password, user.getPasswordHash())) {
 
             String roleCode = new dao.employee.admin.rbac.RoleDao().findRoleCodeById(user.getRoleId());
@@ -47,6 +45,13 @@ public class Login extends HttpServlet {
             request.getSession().setAttribute("roleCode", roleCode);
             request.getSession().setAttribute("userId", user.getUserId());
             request.getSession().setAttribute("userName", user.getUserName());
+
+            Employee employee = userService.findEmployeeByUserName(username);
+
+            if (employee != null) {
+                request.getSession().setAttribute("employeeID", employee.getEmployeeId());
+                request.getSession().setAttribute("employeeCode", employee.getEmployeeCode());
+            }
 
             CustomerDAO customerDAO = new CustomerDAO();
             try {
@@ -88,7 +93,7 @@ public class Login extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/inventory/dashboard");
                 return;
             } else if(user.getRoleId() == 5) {
-                response.sendRedirect(request.getContextPath() + "/accountant/dashboard");
+                response.sendRedirect(request.getContextPath() + "/accountant/home");
                 return;
             } else if(user.getRoleId() == 6) {
                 response.sendRedirect(request.getContextPath() + "/customerservice/home");

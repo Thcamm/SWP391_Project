@@ -33,7 +33,7 @@
     </style>
 </head>
 <body>
-<jsp:include page="/common/header.jsp" />
+<jsp:include page="/common/customer/header.jsp" />
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
@@ -142,6 +142,6 @@
         crossorigin="anonymous"></script>
 <script src="${pageContext.request.contextPath}/assets/js/user/address.js"></script>
 <script src="${pageContext.request.contextPath}/assets/js/user/editProfile.js"></script>
-<jsp:include page="/common/footer.jsp" />
+<jsp:include page="/common/customer/footer.jsp" />
 </body>
 </html>

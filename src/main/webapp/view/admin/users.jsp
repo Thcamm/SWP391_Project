@@ -6,7 +6,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quản lý Users - Admin</title>
+    <title>User Management - Admin</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -55,7 +55,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                 <!-- Action Menu -->
                 <div class="row mb-3">
                     <div class="col-md-8">
-                        <h3><i class="bi bi-search"></i> Tìm kiếm Users</h3>
+                        <h3><i class="bi bi-search"></i> Search Users</h3>
                     </div>
                     <div class="col-md-4 text-end">
                         <div class="btn-group">

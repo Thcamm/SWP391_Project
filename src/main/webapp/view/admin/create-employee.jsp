@@ -6,7 +6,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tạo Employee - Admin</title>
+    <title>Create Employee - Admin</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -385,15 +385,15 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
         const selectedRole = this.options[this.selectedIndex].text;
         const employeeCodeField = document.getElementById("employeeCode");
 
-        if (selectedRole && selectedRole !== "-- Chọn chức vụ --") {
+        if (selectedRole && selectedRole !== "-- Select position --") {
           // Generate suggested employee code
           const rolePrefix = selectedRole.substring(0, 3).toUpperCase();
           const timestamp = new Date().getTime().toString().slice(-4);
           const suggestedCode = rolePrefix + timestamp;
 
-          employeeCodeField.placeholder = `Gợi ý: ${suggestedCode}`;
+          employeeCodeField.placeholder = `Suggestion: ${suggestedCode}`;
         } else {
-          employeeCodeField.placeholder = "Tự động tạo nếu để trống";
+          employeeCodeField.placeholder = "Auto-generated if left blank";
         }
       });
 
@@ -403,7 +403,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
         .addEventListener("submit", function (e) {
           const salary = document.getElementById("salary").value;
           if (salary && salary < 0) {
-            alert("Lương không thể âm");
+            alert("Salary cannot be negative");
             e.preventDefault();
             return false;
           }

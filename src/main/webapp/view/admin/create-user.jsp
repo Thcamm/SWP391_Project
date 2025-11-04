@@ -8,7 +8,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tạo User Mới - Admin</title>
+    <title>Create New User - Admin</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -76,8 +76,8 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                     <div class="col-lg-8">
                         <div class="card shadow">
                             <div class="card-header bg-primary text-white">
-                                <h4 class="mb-0">Tạo User Mới</h4>
-                                <small>Điền thông tin để tạo user mới trong hệ thống</small>
+                                <h4 class="mb-0">Create New User</h4>
+                                <small>Fill in information to create a new user in the system</small>
                             </div>
 
                             <div class="card-body">
@@ -90,14 +90,14 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                                         <div class="col-md-6">
                                             <div class="mb-3">
                                                 <label for="fullName" class="form-label">
-                                                    <span class="text-danger">*</span> Họ và Tên
+                                                    <span class="text-danger">*</span> Full Name
                                                 </label>
                                                 <input
                                                         type="text"
                                                         class="form-control"
                                                         id="fullName"
                                                         name="fullName"
-                                                        placeholder="Nhập họ và tên đầy đủ"
+                                                        placeholder="Enter full name"
                                                         required
                                                 />
                                             </div>

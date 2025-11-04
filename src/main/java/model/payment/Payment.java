@@ -1,7 +1,7 @@
 package model.payment;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp; // Use Timestamp for DATETIME
+import java.sql.Timestamp;
 
 public class Payment {
 
@@ -17,6 +17,17 @@ public class Payment {
 
     // Default constructor
     public Payment() {}
+
+    // Constructor with essential fields
+    public Payment(int invoiceID, int workOrderID, BigDecimal amount,
+                   String method, int accountantID) {
+        this.invoiceID = invoiceID;
+        this.workOrderID = workOrderID;
+        this.amount = amount;
+        this.method = method;
+        this.accountantID = accountantID;
+        this.paymentDate = new Timestamp(System.currentTimeMillis());
+    }
 
     // Getters and Setters
     public int getPaymentID() {
@@ -89,5 +100,17 @@ public class Payment {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    @Override
+    public String toString() {
+        return "Payment{" +
+                "paymentID=" + paymentID +
+                ", invoiceID=" + invoiceID +
+                ", amount=" + amount +
+                ", method='" + method + '\'' +
+                ", referenceNo='" + referenceNo + '\'' +
+                ", paymentDate=" + paymentDate +
+                '}';
     }
 }

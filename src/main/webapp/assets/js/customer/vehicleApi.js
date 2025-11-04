@@ -189,32 +189,27 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        // Tìm brand data
         const brandData = vehicleData.find(item => item.brand === selectedBrand);
 
         if (brandData && Array.isArray(brandData.models)) {
             const models = brandData.models;
 
-            // Đổ models vào select
             models.forEach(modelName => {
                 const opt = document.createElement('option');
                 opt.value = modelName;
                 opt.textContent = modelName;
-
-                if (modelName === currentModel) {
-                    opt.selected = true;
-                }
                 modelSelect.appendChild(opt);
             });
 
-            // Hiển thị số lượng models
+            if (currentModel) {
+                $(modelSelect).val(currentModel).trigger('change');
+            }
+
             modelCount.textContent = `Found ${models.length} models`;
             modelCount.style.display = 'block';
-
-            // Trigger Select2 update
-            $(modelSelect).trigger('change');
         }
     }
+
 
     /**
      * Load danh sách years

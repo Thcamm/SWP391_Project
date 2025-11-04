@@ -7,8 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import model.employee.Employee;
 import model.user.User;
-import common.DbContext;
 
 public class UserDAO extends DbContext {
 
@@ -108,6 +109,25 @@ public class UserDAO extends DbContext {
             ps.setBoolean(5, user.isActiveStatus());
             return ps.executeUpdate() > 0;
         }
+    }
+
+    public Employee getEmployeeByUserName(String userName) {
+        String sql = "SELECT e.* FROM Employee e JOIN User u ON e.UserID = u.UserID WHERE u.UserName = ?";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, userName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Employee employee = new Employee();
+                    employee.setEmployeeId(rs.getInt("EmployeeID"));
+                    employee.setEmployeeCode(rs.getString("EmployeeCode"));
+                    return employee;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public boolean updateUser(User user) throws SQLException {
@@ -237,4 +257,6 @@ public class UserDAO extends DbContext {
         user.setCreatedAt(rs.getTimestamp("CreatedAt"));
         return user;
     }
+
+
 }

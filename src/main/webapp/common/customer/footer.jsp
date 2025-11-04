@@ -133,7 +133,7 @@
     <section class="contact-bar">
         <div class="text-content">
             <h2>carspavn@gmail.com</h2>
-            <p>Hãy để đội ngũ chuyên nghiệp của chúng tôi giúp bạn giải quyết mọi vấn đề về xe. Liên hệ với chúng tôi ngay để nhận được dịch vụ tốt nhất.</p>
+            <p>Let our professional team help you solve all your vehicle problems. Contact us now to get the best service.</p>
         </div>
     </section>
 
@@ -142,7 +142,7 @@
             <%-- Nếu có logo: <img src="${pageContext.request.contextPath}/assets/images/logo.png" alt="Carspa Logo"> --%>
         </div>
         <p class="footer-commitment">
-            Carspa cam kết đem đến sự hài lòng và tin tưởng cho khách hàng với dịch vụ chăm sóc và làm đẹp xe chất lượng hàng đầu.
+            Carspa is committed to bringing satisfaction and trust to customers with top-quality car care and beauty services.
         </p>
         <div class="footer-info-grid">
             <div class="info-col">
@@ -170,8 +170,8 @@
                 <div class="icon-wrapper">
                     <i class="fa-solid fa-plane"></i>
                 </div>
-                <h4>T2-T7: 8:00-17:00</h4>
-                <p>Chủ Nhật nghỉ</p>
+                <h4>Mon-Sat: 8:00-17:00</h4>
+                <p>Closed on Sunday</p>
             </div>
         </div>
     </footer>
