@@ -93,7 +93,9 @@ public class UserCreateCustomerServlet extends BaseAdminServlet {
 
         if (!Validate.isValidDateOfBirth(dobStr)) {
             redirectWithMessage(response, redirectUrl,
-                    "Birth date must be in the format " + IConstant.DATE_FORMAT + ")!", "error");
+                    "Birth date must be in the format " + IConstant.DATE_FORMAT
+                            + " and cannot be in the future or more than 100 years ago!",
+                    "error");
             return;
         }
 
@@ -106,15 +108,15 @@ public class UserCreateCustomerServlet extends BaseAdminServlet {
         try {
             // Check duplicate username
             if (adminService.isUsernameExists(userName.trim())) {
-                redirectWithMessage(response, redirectUrl, 
-                    "Username '" + userName + "' already exists! Please choose another username.", "error");
+                redirectWithMessage(response, redirectUrl,
+                        "Username '" + userName + "' already exists! Please choose another username.", "error");
                 return;
             }
 
             // Check duplicate email
             if (adminService.isEmailExists(email.trim())) {
-                redirectWithMessage(response, redirectUrl, 
-                    "Email '" + email + "' is already registered! Please use another email.", "error");
+                redirectWithMessage(response, redirectUrl,
+                        "Email '" + email + "' is already registered! Please use another email.", "error");
                 return;
             }
 

@@ -60,27 +60,10 @@ parameter --%>
       </div>
     </div>
 
-    <!-- Phase 2: Review & Quote -->
+    <!-- Phase 2: Repair Assignment (After Customer Approval) -->
     <div class="nav-section">
       <div class="nav-section-title">
-        <span>Phase 2: Review & Quote</span>
-        <span class="phase-badge active-2">Active</span>
-      </div>
-      <div class="nav-item">
-        <a
-          href="${pageContext.request.contextPath}/techmanager/diagnosis-review"
-          class="nav-link ${activeMenu == 'diagnosis-review' ? 'active' : ''}"
-        >
-          <i class="bi bi-file-earmark-text"></i>
-          <span>Review Diagnosis</span>
-        </a>
-      </div>
-    </div>
-
-    <!-- Phase 3: Repair Assignment -->
-    <div class="nav-section">
-      <div class="nav-section-title">
-        <span>Phase 3: Repair Assignment</span>
+        <span>Phase 2: Repair Assignment</span>
         <span class="phase-badge active-2">Active</span>
       </div>
       <div class="nav-item">
@@ -94,17 +77,19 @@ parameter --%>
       </div>
     </div>
 
-    <!-- Phase 4: Monitor & Complete -->
+    <!-- Phase 3: Monitor & Complete -->
     <div class="nav-section">
       <div class="nav-section-title">
-        <span>Phase 4: Monitor & Complete</span>
-        <span class="phase-badge soon">Soon</span>
+        <span>Phase 3: Monitor & Complete</span>
+        <span class="phase-badge active-3">Active</span>
       </div>
       <div class="nav-item">
-        <a href="#" class="nav-link disabled">
-          <i class="bi bi-list-task"></i>
-          <span>Monitor Progress</span>
-          <span class="badge-soon">Soon</span>
+        <a
+          href="${pageContext.request.contextPath}/techmanager/rejected-tasks"
+          class="nav-link ${activeMenu == 'rejected-tasks' ? 'active' : ''}"
+        >
+          <i class="bi bi-x-circle text-danger"></i>
+          <span>Rejected Tasks</span>
         </a>
       </div>
       <div class="nav-item">
@@ -116,19 +101,10 @@ parameter --%>
       </div>
     </div>
 
-    <!-- Management -->
+    <!-- Reports & Analytics -->
     <div class="nav-section">
       <div class="nav-section-title">
-        <span>Management</span>
-      </div>
-      <div class="nav-item">
-        <a
-          href="${pageContext.request.contextPath}/techmanager/rejected-tasks"
-          class="nav-link ${activeMenu == 'rejected-tasks' ? 'active' : ''}"
-        >
-          <i class="bi bi-x-circle text-danger"></i>
-          <span>Rejected Tasks</span>
-        </a>
+        <span>Reports & Analytics</span>
       </div>
       <div class="nav-item">
         <a

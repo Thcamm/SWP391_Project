@@ -180,7 +180,12 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                             class="form-control"
                             id="birthDate"
                             name="birthDate"
+                            max=""
                           />
+                          <div
+                            id="birthDateError"
+                            class="invalid-feedback"
+                          ></div>
                         </div>
                       </div>
 
@@ -392,5 +397,8 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
 
     <!-- Custom Scripts for Employee Form -->
     <script src="${pageContext.request.contextPath}/assets/js/admin/create-employee.js"></script>
+
+    <!-- Birth Date Validation Script -->
+    <script src="${pageContext.request.contextPath}/assets/js/admin/birthdate-validation.js"></script>
   </body>
 </html>

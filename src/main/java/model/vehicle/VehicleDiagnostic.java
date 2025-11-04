@@ -19,22 +19,31 @@ import java.util.stream.Collectors;
  */
 public class VehicleDiagnostic {
 
+    /**
+     * Status enum for VehicleDiagnostic approval workflow
+     * SUBMITTED: Technician has submitted the diagnostic, waiting for customer
+     * approval
+     * APPROVED: Customer has approved the diagnostic quote
+     * REJECTED: Customer has rejected the diagnostic quote
+     */
+    public enum Status {
+        SUBMITTED,
+        APPROVED,
+        REJECTED
+    }
+
     // core fields
     private int vehicleDiagnosticID;
     private int assignmentID;
     private String issueFound;
     private BigDecimal estimateCost;
-    private boolean status;
+    private Status status; // Changed from boolean to Status enum
     private LocalDateTime createdAt;
     private boolean isSubmitApproval;
 
     private transient BigDecimal laborCostCalculated;
 
-    private transient BigDecimal laborCostInput; //Dùng khi create/update để truyền labor cost
-
-
-
-
+    private transient BigDecimal laborCostInput; // Dùng khi create/update để truyền labor cost
 
     // transient fields for display
     private String vehicleInfo;
@@ -45,18 +54,16 @@ public class VehicleDiagnostic {
     private List<DiagnosticTechnician> technicians = new ArrayList<>();
     private BigDecimal totalPartsCost = BigDecimal.ZERO;
 
-
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-
-
-    public VehicleDiagnostic() {}
+    public VehicleDiagnostic() {
+    }
 
     public VehicleDiagnostic(int assignmentID, String issueFound, BigDecimal estimateCost) {
         this.assignmentID = assignmentID;
         this.issueFound = issueFound;
         this.estimateCost = estimateCost;
-        this.status = true;
+        this.status = Status.SUBMITTED; // Default status
         this.createdAt = LocalDateTime.now();
     }
 
@@ -75,6 +82,7 @@ public class VehicleDiagnostic {
     public void setLaborCostInput(BigDecimal laborCostInput) {
         this.laborCostInput = laborCostInput;
     }
+
     public String getCreatedAtFormatted() {
         return createdAt != null ? createdAt.format(DTF) : "-";
     }
@@ -87,14 +95,10 @@ public class VehicleDiagnostic {
         return "$" + getTotalEstimate().toString();
     }
 
-
-
-
     public BigDecimal getTotalEstimate() {
         return (estimateCost != null ? estimateCost : BigDecimal.ZERO)
                 .add(totalPartsCost);
     }
-
 
     public int getRequiredPartsCount() {
         return (int) parts.stream()
@@ -102,14 +106,11 @@ public class VehicleDiagnostic {
                 .count();
     }
 
-
-
     public int getRecommendedPartsCount() {
         return (int) parts.stream()
                 .filter(p -> p.getPartCondition() == DiagnosticPart.PartCondition.RECOMMENDED)
                 .count();
     }
-
 
     public int getOptionalPartsCount() {
         return (int) parts.stream()
@@ -117,23 +118,19 @@ public class VehicleDiagnostic {
                 .count();
     }
 
-
     public boolean hasOutOfStockParts() {
         return parts.stream().anyMatch(p -> !p.isInStock());
     }
 
-
     public boolean hasApprovedParts() {
         return parts.stream().anyMatch(DiagnosticPart::isApproved);
     }
-
 
     public int getApprovedPartsCount() {
         return (int) parts.stream()
                 .filter(DiagnosticPart::isApproved)
                 .count();
     }
-
 
     public BigDecimal getApprovedPartsCost() {
         return parts.stream()
@@ -142,12 +139,11 @@ public class VehicleDiagnostic {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-
     public boolean allPartsApproved() {
-        if (parts.isEmpty()) return false;
+        if (parts.isEmpty())
+            return false;
         return parts.stream().allMatch(DiagnosticPart::isApproved);
     }
-
 
     public List<DiagnosticPart> getPartsByCondition(DiagnosticPart.PartCondition condition) {
         return parts.stream()
@@ -155,14 +151,12 @@ public class VehicleDiagnostic {
                 .collect(Collectors.toList());
     }
 
-
     public DiagnosticTechnician getLeadTechnician() {
         return technicians.stream()
                 .filter(DiagnosticTechnician::isLead)
                 .findFirst()
                 .orElse(null);
     }
-
 
     public double getTotalHoursSpent() {
         return technicians.stream()
@@ -172,13 +166,11 @@ public class VehicleDiagnostic {
 
     // ===== VALIDATION =====
 
-
     public boolean isValid() {
         return assignmentID > 0
                 && issueFound != null && !issueFound.trim().isEmpty()
                 && estimateCost != null && estimateCost.compareTo(BigDecimal.ZERO) >= 0;
     }
-
 
     public List<String> getValidationErrors() {
         List<String> errors = new ArrayList<>();
@@ -200,33 +192,94 @@ public class VehicleDiagnostic {
 
     // ===== GETTERS & SETTERS =====
 
-    public int getVehicleDiagnosticID() { return vehicleDiagnosticID; }
+    public int getVehicleDiagnosticID() {
+        return vehicleDiagnosticID;
+    }
+
     public void setVehicleDiagnosticID(int vehicleDiagnosticID) {
         this.vehicleDiagnosticID = vehicleDiagnosticID;
     }
 
-    public int getAssignmentID() { return assignmentID; }
-    public void setAssignmentID(int assignmentID) { this.assignmentID = assignmentID; }
+    public int getAssignmentID() {
+        return assignmentID;
+    }
 
-    public String getIssueFound() { return issueFound; }
-    public void setIssueFound(String issueFound) { this.issueFound = issueFound; }
+    public void setAssignmentID(int assignmentID) {
+        this.assignmentID = assignmentID;
+    }
 
-    public BigDecimal getEstimateCost() { return estimateCost; }
-    public void setEstimateCost(BigDecimal estimateCost) { this.estimateCost = estimateCost; }
+    public String getIssueFound() {
+        return issueFound;
+    }
 
-    public boolean isStatus() { return status; }
-    public void setStatus(boolean status) { this.status = status; }
+    public void setIssueFound(String issueFound) {
+        this.issueFound = issueFound;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public BigDecimal getEstimateCost() {
+        return estimateCost;
+    }
 
-    public String getVehicleInfo() { return vehicleInfo; }
-    public void setVehicleInfo(String vehicleInfo) { this.vehicleInfo = vehicleInfo; }
+    public void setEstimateCost(BigDecimal estimateCost) {
+        this.estimateCost = estimateCost;
+    }
 
-    public String getTechnicianName() { return technicianName; }
-    public void setTechnicianName(String technicianName) { this.technicianName = technicianName; }
+    public Status getStatus() {
+        return status;
+    }
 
-    public List<DiagnosticPart> getParts() { return parts; }
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    /**
+     * Check if diagnostic is pending customer approval
+     */
+    public boolean isPendingApproval() {
+        return status == Status.SUBMITTED;
+    }
+
+    /**
+     * Check if diagnostic has been approved by customer
+     */
+    public boolean isApproved() {
+        return status == Status.APPROVED;
+    }
+
+    /**
+     * Check if diagnostic has been rejected by customer
+     */
+    public boolean isRejected() {
+        return status == Status.REJECTED;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getVehicleInfo() {
+        return vehicleInfo;
+    }
+
+    public void setVehicleInfo(String vehicleInfo) {
+        this.vehicleInfo = vehicleInfo;
+    }
+
+    public String getTechnicianName() {
+        return technicianName;
+    }
+
+    public void setTechnicianName(String technicianName) {
+        this.technicianName = technicianName;
+    }
+
+    public List<DiagnosticPart> getParts() {
+        return parts;
+    }
 
     public void setParts(List<DiagnosticPart> parts) {
         this.parts = parts;
@@ -236,17 +289,26 @@ public class VehicleDiagnostic {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public BigDecimal getTotalPartsCost() { return totalPartsCost; }
+    public BigDecimal getTotalPartsCost() {
+        return totalPartsCost;
+    }
+
     public void setTotalPartsCost(BigDecimal totalPartsCost) {
         this.totalPartsCost = totalPartsCost;
     }
 
-    public List<DiagnosticTechnician> getTechnicians() { return technicians; }
+    public List<DiagnosticTechnician> getTechnicians() {
+        return technicians;
+    }
+
     public void setTechnicians(List<DiagnosticTechnician> technicians) {
         this.technicians = technicians;
     }
 
-    public boolean isSubmitApproval() { return isSubmitApproval; }
+    public boolean isSubmitApproval() {
+        return isSubmitApproval;
+    }
+
     public void setSubmitApproval(boolean submitApproval) {
         isSubmitApproval = submitApproval;
     }
@@ -261,8 +323,9 @@ public class VehicleDiagnostic {
                 ", vehicle='" + vehicleInfo + '\'' +
                 ", technician='" + technicianName + '\'' +
                 ", issue='" + (issueFound != null && issueFound.length() > 50
-                ? issueFound.substring(0, 47) + "..."
-                : issueFound) + '\'' +
+                        ? issueFound.substring(0, 47) + "..."
+                        : issueFound)
+                + '\'' +
                 ", estimateCost=" + estimateCost +
                 ", totalPartsCost=" + totalPartsCost +
                 ", totalEstimate=" + getTotalEstimate() +
@@ -275,8 +338,10 @@ public class VehicleDiagnostic {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         VehicleDiagnostic that = (VehicleDiagnostic) o;
         return vehicleDiagnosticID == that.vehicleDiagnosticID;
     }
@@ -294,10 +359,11 @@ public class VehicleDiagnostic {
         private boolean isLead;
         private double hoursSpent;
 
-        public DiagnosticTechnician() {}
+        public DiagnosticTechnician() {
+        }
 
         public DiagnosticTechnician(int technicianID, String technicianName,
-                                    boolean isLead, double hoursSpent) {
+                boolean isLead, double hoursSpent) {
             this.technicianID = technicianID;
             this.technicianName = technicianName;
             this.isLead = isLead;
@@ -313,20 +379,34 @@ public class VehicleDiagnostic {
         }
 
         // Getters & Setters
-        public int getTechnicianID() { return technicianID; }
+        public int getTechnicianID() {
+            return technicianID;
+        }
+
         public void setTechnicianID(int technicianID) {
             this.technicianID = technicianID;
         }
 
-        public String getTechnicianName() { return technicianName; }
+        public String getTechnicianName() {
+            return technicianName;
+        }
+
         public void setTechnicianName(String technicianName) {
             this.technicianName = technicianName;
         }
 
-        public boolean isLead() { return isLead; }
-        public void setLead(boolean lead) { isLead = lead; }
+        public boolean isLead() {
+            return isLead;
+        }
 
-        public double getHoursSpent() { return hoursSpent; }
+        public void setLead(boolean lead) {
+            isLead = lead;
+        }
+
+        public double getHoursSpent() {
+            return hoursSpent;
+        }
+
         public void setHoursSpent(double hoursSpent) {
             this.hoursSpent = hoursSpent;
         }
@@ -339,8 +419,10 @@ public class VehicleDiagnostic {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
             DiagnosticTechnician that = (DiagnosticTechnician) o;
             return technicianID == that.technicianID;
         }
@@ -351,4 +433,3 @@ public class VehicleDiagnostic {
         }
     }
 }
-
