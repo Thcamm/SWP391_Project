@@ -46,7 +46,7 @@ prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
   </head>
 
   <body class="bg-light">
-    <jsp:include page="/common/customer/header.jsp" />
+    <jsp:include page="/common/header.jsp" />
 
     <div class="container py-5">
       <div class="card shadow-lg">
@@ -211,6 +211,6 @@ prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
       });
     </script>
 
-    <jsp:include page="/common/customer/footer.jsp" />
+    <jsp:include page="/common/footer.jsp" />
   </body>
 </html>

@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/vehicle/garage.css">
 </head>
 <body>
-<jsp:include page="/common/customer/header.jsp" />
+<jsp:include page="/common/header.jsp" />
 
 <main class="garage-container container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -118,7 +118,7 @@
     </c:choose>
 </main>
 
-<jsp:include page="/common/customer/footer.jsp" />
+<jsp:include page="/common/footer.jsp" />
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -127,4 +127,3 @@ public class ViewAppointmentList extends HttpServlet {
     }
 }
 
-

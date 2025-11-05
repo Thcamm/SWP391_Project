@@ -21,7 +21,6 @@
 
     body {
         font-family: 'Inter', sans-serif;
-        background-color: var(--dark-bg);
         color: var(--primary-color);
         padding-top: 120px;
     }
@@ -231,9 +230,10 @@
             <c:if test="${not empty sessionScope.user}">
                 <div class="d-flex align-items-center gap-3">
                     <span class="welcome-user">
+                        <a href="${pageContext.request.contextPath}/user/profile" class="welcome-user" style="text-decoration: none; color: white;">
                         <i class="fas fa-user"></i> Hello, ${sessionScope.user.fullName}
                     </span>
-                    <a href="${pageContext.request.contextPath}/logout" class="btn btn-logout">
+                    <a href="${pageContext.request.contextPath}/Home?action=logout" class="btn btn-logout">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </a>
                 </div>

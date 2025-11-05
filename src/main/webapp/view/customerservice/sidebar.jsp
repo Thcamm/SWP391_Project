@@ -98,28 +98,26 @@
                         <i class="bi bi-house-door"></i>
                         <span>Dashboard</span>
                     </a>
+                                        <a class="nav-link ${fn:contains(currentURI, '/search-customer') ? 'active' : ''}"
+                                           href="${pageContext.request.contextPath}/customerservice/service-types">
+                                            <i class="bi bi-receipt"></i>
+                                            <span>Services</span>
+                                        </a>
                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link ${fn:contains(currentURI, '/search-customer') ? 'active' : ''}"
-                                       href="${pageContext.request.contextPath}/customerservice/service-types">
-                                        <i class="bi bi-receipt"></i>
-                                        <span>Services</span>
-                                    </a>
-                                </li>
-<%--                <li class="nav-item">--%>
-<%--                    <a class="nav-link ${fn:contains(currentURI, '/search-customer') ? 'active' : ''}"--%>
-<%--                       href="${pageContext.request.contextPath}/customerservice/search-customer">--%>
-<%--                        <i class="bi bi-receipt"></i>--%>
-<%--                        <span>Customers</span>--%>
-<%--                    </a>--%>
-<%--                </li>--%>
-<%--                <li class="nav-item">--%>
-<%--                    <a class="nav-link ${fn:contains(currentURI, '/appointment-list') ? 'active' : ''}"--%>
-<%--                       href="${pageContext.request.contextPath}/customerservice/appointment-list">--%>
-<%--                        <i class="bi bi-cash-coin"></i>--%>
-<%--                        <span>Appointments</span>--%>
-<%--                    </a>--%>
-<%--                </li>--%>
+                <%--                <li class="nav-item">--%>
+                <%--                    <a class="nav-link ${fn:contains(currentURI, '/search-customer') ? 'active' : ''}"--%>
+                <%--                       href="${pageContext.request.contextPath}/customerservice/search-customer">--%>
+                <%--                        <i class="bi bi-receipt"></i>--%>
+                <%--                        <span>Customers</span>--%>
+                <%--                    </a>--%>
+                <%--                </li>--%>
+                <%--                <li class="nav-item">--%>
+                <%--                    <a class="nav-link ${fn:contains(currentURI, '/appointment-list') ? 'active' : ''}"--%>
+                <%--                       href="${pageContext.request.contextPath}/customerservice/appointment-list">--%>
+                <%--                        <i class="bi bi-cash-coin"></i>--%>
+                <%--                        <span>Appointments</span>--%>
+                <%--                    </a>--%>
+                <%--                </li>--%>
             </ul>
 
             <div class="menu-title">Customer</div>
@@ -159,13 +157,13 @@
                         <span>Support Requests</span>
                     </a>
                 </li>
-<%--                <li class="nav-item">--%>
-<%--                    <a class="nav-link"--%>
-<%--                       href="${pageContext.request.contextPath}/accountant/invoice?action=create">--%>
-<%--                        <i class="bi bi-plus-circle text-success"></i>--%>
-<%--                        <span>Create Invoice</span>--%>
-<%--                    </a>--%>
-<%--                </li>--%>
+                <%--                <li class="nav-item">--%>
+                <%--                    <a class="nav-link"--%>
+                <%--                       href="${pageContext.request.contextPath}/accountant/invoice?action=create">--%>
+                <%--                        <i class="bi bi-plus-circle text-success"></i>--%>
+                <%--                        <span>Create Invoice</span>--%>
+                <%--                    </a>--%>
+                <%--                </li>--%>
             </ul>
         </nav>
 

@@ -44,29 +44,29 @@
             <div class="col-md-6 col-12 text-center text-md-start">
                 <p>&copy; 2025 Garage Management System. All rights reserved.</p>
             </div>
-<%--            <div class="col-md-6 col-12">--%>
-<%--                <div class="footer-links d-flex justify-content-center justify-content-md-end gap-2 flex-wrap">--%>
-<%--                    <a href="${pageContext.request.contextPath}/help">--%>
-<%--                        <i class="bi bi-question-circle"></i>--%>
-<%--                        <span>Help</span>--%>
-<%--                    </a>--%>
-<%--                    <a href="${pageContext.request.contextPath}/contact">--%>
-<%--                        <i class="bi bi-envelope"></i>--%>
-<%--                        <span>Contact</span>--%>
-<%--                    </a>--%>
-<%--                    <a href="${pageContext.request.contextPath}/terms">--%>
-<%--                        <i class="bi bi-file-text"></i>--%>
-<%--                        <span>Terms</span>--%>
-<%--                    </a>--%>
-<%--                </div>--%>
-<%--            </div>--%>
+            <div class="col-md-6 col-12">
+                <div class="footer-links d-flex justify-content-center justify-content-md-end gap-2 flex-wrap">
+                    <a href="${pageContext.request.contextPath}/help">
+                        <i class="bi bi-question-circle"></i>
+                        <span>Help</span>
+                    </a>
+                    <a href="${pageContext.request.contextPath}/contact">
+                        <i class="bi bi-envelope"></i>
+                        <span>Contact</span>
+                    </a>
+                    <a href="${pageContext.request.contextPath}/terms">
+                        <i class="bi bi-file-text"></i>
+                        <span>Terms</span>
+                    </a>
+                </div>
+            </div>
         </div>
     </footer>
 </div>
 
 <!-- Bootstrap JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="${pageContext.request.contextPath}/assets/js/main.js"></script>
-<script src="${pageContext.request.contextPath}/assets/js/technician-dashboard.js"></script>
+<%--<script src="${pageContext.request.contextPath}/assets/js/main.js"></script>--%>
+<%--<script src="${pageContext.request.contextPath}/assets/js/technician-dashboard.js"></script>--%>
 </body>
 </html>
