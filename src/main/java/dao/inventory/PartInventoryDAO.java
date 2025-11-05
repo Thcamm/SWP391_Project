@@ -3,6 +3,7 @@ package dao.inventory;
 import common.DbContext;
 import model.inventory.CharacteristicValue;
 import model.inventory.PartDetail;
+import model.inventory.WorkOrderPart;
 import org.checkerframework.checker.units.qual.A;
 
 import java.sql.Connection;
@@ -12,27 +13,30 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static common.DbContext.getConnection;
+
 public class PartInventoryDAO {
 
     public List<PartDetail> searchAvailableParts(String keyword) throws SQLException {
-        String sql =
-                "SELECT pd.PartDetailID, pd.PartID, pd.SKU, pd.Quantity, pd.MinStock, pd.UnitPrice, pd.Location, " +
-                        "       p.PartCode, p.PartName, p.Category, u.name AS UnitName " +
-                        "FROM PartDetail pd " +
-                        "JOIN Part p ON p.PartID = pd.PartID " +
-                        "JOIN Unit u ON u.unit_id = p.base_unit_id " +
-                        "WHERE pd.Quantity > 0 AND (" +
-                        "      LOWER(p.PartName) LIKE LOWER(CONCAT('%', ?, '%')) OR " +
-                        "      LOWER(pd.SKU)     LIKE LOWER(CONCAT('%', ?, '%')) OR " +
-                        "      LOWER(p.Category) LIKE LOWER(CONCAT('%', ?, '%')) OR " +
-                        "      LOWER(p.Description) LIKE LOWER(CONCAT('%', ?, '%'))" +
-                        ") " +
-                        "ORDER BY p.PartName ASC";
+        String sql = "SELECT pd.PartDetailID, pd.PartID, pd.SKU, pd.Quantity, pd.MinStock, pd.UnitPrice, pd.Location, "
+                +
+                "       p.PartCode, p.PartName, p.Category, u.name AS UnitName " +
+                "FROM PartDetail pd " +
+                "JOIN Part p ON p.PartID = pd.PartID " +
+                "JOIN Unit u ON u.unit_id = p.base_unit_id " +
+                "WHERE pd.Quantity > 0 AND (" +
+                "      LOWER(p.PartName) LIKE LOWER(CONCAT('%', ?, '%')) OR " +
+                "      LOWER(pd.SKU)     LIKE LOWER(CONCAT('%', ?, '%')) OR " +
+                "      LOWER(p.Category) LIKE LOWER(CONCAT('%', ?, '%')) OR " +
+                "      LOWER(p.Description) LIKE LOWER(CONCAT('%', ?, '%'))" +
+                ") " +
+                "ORDER BY p.PartName ASC";
 
         List<PartDetail> out = new ArrayList<>();
         try (Connection c = DbContext.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            for (int i = 1; i <= 4; i++) ps.setString(i, keyword == null ? "" : keyword.trim());
+                PreparedStatement ps = c.prepareStatement(sql)) {
+            for (int i = 1; i <= 4; i++)
+                ps.setString(i, keyword == null ? "" : keyword.trim());
             try (ResultSet rs = ps.executeQuery()) {
 
                 while (rs.next()) {
@@ -51,8 +55,7 @@ public class PartInventoryDAO {
                     out.add(d);
                 }
 
-
-            }catch (SQLException e) {
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
 
@@ -60,28 +63,27 @@ public class PartInventoryDAO {
         }
     }
 
-
     public List<PartDetail> getAllAvailableParts() throws SQLException {
         return searchAvailableParts(null);
     }
 
     public PartDetail getPartDetailById(int partDetailId) {
-        String sql = "SELECT pd.*, p.PartCode, p.PartName, p.Category, p.Description, "+
+        String sql = "SELECT pd.*, p.PartCode, p.PartName, p.Category, p.Description, " +
                 "u.name as UnitName " +
                 "FROM PartDetail pd " +
                 "JOIN Part p ON pd.PartID = p.PartID " +
                 "LEFT JOIN Unit u ON p.base_unit_id = u.unit_id " +
                 "WHERE pd.PartDetailID = ?";
-        try (Connection conn = DbContext.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)){
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, partDetailId);
-            try(ResultSet rs = ps.executeQuery()) {
-                if(rs.next()) {
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
                     return mapResultSetToPartDetail(rs);
                 }
             }
 
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -90,25 +92,25 @@ public class PartInventoryDAO {
     }
 
     public PartDetail getPartDetailBySku(String sku) {
-        if(sku == null || sku.trim().isEmpty()) {
+        if (sku == null || sku.trim().isEmpty()) {
             return null;
         }
 
-        String sql = "SELECT pd.*, p.PartCode, p.PartName, p.Category, p.Description, "+
+        String sql = "SELECT pd.*, p.PartCode, p.PartName, p.Category, p.Description, " +
                 "u.name as UnitName " +
                 "FROM PartDetail pd " +
                 "JOIN Part p ON pd.PartID = p.PartID " +
                 "LEFT JOIN Unit u ON p.base_unit_id = u.unit_id " +
                 "WHERE pd.SKU = ?";
-        try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)){
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, sku.trim());
-            try(ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return mapResultSetToPartDetail(rs);
                 }
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
@@ -116,21 +118,21 @@ public class PartInventoryDAO {
     }
 
     public boolean hasEnoughQuantity(int partDetailId, Integer requestdQty) {
-        if(requestdQty == null || requestdQty <= 0) {
+        if (requestdQty == null || requestdQty <= 0) {
             return false;
         }
 
         String sql = "SELECT Quantity FROM PartDetail WHERE PartDetailID = ?";
-        try(Connection conn = DbContext.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)){
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, partDetailId);
-            try(ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     int availableQty = rs.getInt("Quantity");
                     return availableQty >= requestdQty;
                 }
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -139,15 +141,15 @@ public class PartInventoryDAO {
 
     public Integer getPartDetailQuantity(int partDetailId) {
         String sql = "SELECT Quantity FROM PartDetail WHERE PartDetailID = ?";
-        try(Connection conn = DbContext.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)){
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, partDetailId);
-            try(ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt("Quantity");
                 }
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -157,7 +159,7 @@ public class PartInventoryDAO {
     public List<PartDetail> getPartsByCategory(String category) {
         List<PartDetail> parts = new ArrayList<>();
 
-        if(category == null || category.trim().isEmpty()) {
+        if (category == null || category.trim().isEmpty()) {
             return parts;
         }
 
@@ -168,17 +170,17 @@ public class PartInventoryDAO {
                 "WHERE pd.Quantity > 0 AND p.Category = ? " +
                 "ORDER BY p.PartName, pd.SKU";
 
-        try(Connection conn = DbContext.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)){
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, category.trim());
 
-            try (ResultSet rs = ps.executeQuery()){
-                while(rs.next()){
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
                     parts.add(mapResultSetToPartDetail(rs));
                 }
 
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return parts;
@@ -189,9 +191,9 @@ public class PartInventoryDAO {
 
         String sql = "SELECT DISTINCT Category FROM Part WHERE Category IS NOT NULL ORDER BY Category";
 
-        try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 String category = rs.getString("Category");
@@ -216,9 +218,9 @@ public class PartInventoryDAO {
                 "WHERE pd.Quantity > 0 AND pd.Quantity <= pd.MinStock " +
                 "ORDER BY pd.Quantity ASC, p.PartName";
 
-        try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 parts.add(mapResultSetToPartDetail(rs));
@@ -240,9 +242,9 @@ public class PartInventoryDAO {
                 "WHERE pd.Quantity = 0 " +
                 "ORDER BY p.PartName";
 
-        try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 parts.add(mapResultSetToPartDetail(rs));
@@ -265,7 +267,7 @@ public class PartInventoryDAO {
                 "ORDER BY ct.Name, cv.ValueName";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, partDetailId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -279,7 +281,7 @@ public class PartInventoryDAO {
                 }
             }
 
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -300,8 +302,7 @@ public class PartInventoryDAO {
 
         // Load characteristics for each part
         for (PartDetail part : parts) {
-            List<CharacteristicValue> characteristics =
-                    getPartDetailCharacteristics(part.getPartDetailId());
+            List<CharacteristicValue> characteristics = getPartDetailCharacteristics(part.getPartDetailId());
             part.setCharacteristics(characteristics);
         }
 
@@ -311,8 +312,8 @@ public class PartInventoryDAO {
     public boolean partDetailExists(int partDetailId) {
         String sql = "SELECT 1 FROM PartDetail WHERE PartDetailID = ?";
 
-        try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, partDetailId);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -339,8 +340,8 @@ public class PartInventoryDAO {
                 "WHERE pd.Location = ? " +
                 "ORDER BY p.PartName, pd.SKU";
 
-        try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, location.trim());
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -355,8 +356,43 @@ public class PartInventoryDAO {
         return parts;
     }
 
+    public List<WorkOrderPart> getPartsByWorkOrderId(int workOrderId) {
+        List<WorkOrderPart> parts = new ArrayList<>();
+        // We JOIN WorkOrderPart (aliased 'p') with WorkOrderDetail (aliased 'd')
+        // to find all parts associated with the target WorkOrderID.
+        String sql = "SELECT p.* " +
+                "FROM WorkOrderPart p " +
+                "JOIN WorkOrderDetail d ON p.DetailID = d.DetailID " +
+                "WHERE d.WorkOrderID = ?";
 
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
+            ps.setInt(1, workOrderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    parts.add(mapResultSetToWorkOrderPart(rs));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error getting WorkOrderParts by WorkOrderID: " + e.getMessage());
+        }
+        return parts;
+    }
+
+    private WorkOrderPart mapResultSetToWorkOrderPart(ResultSet rs) throws SQLException {
+        WorkOrderPart part = new WorkOrderPart();
+        part.setWorkOrderPartId(rs.getInt("WorkOrderPartID"));
+        part.setDetailID(rs.getInt("DetailID"));
+        part.setPartDetailID(rs.getInt("PartDetailID"));
+        part.setRequestByID(rs.getInt("RequestedByID"));
+        part.setQuantityUsed(rs.getInt("QuantityUsed"));
+        part.setUnitPrice(rs.getBigDecimal("UnitPrice"));
+        part.setRequestStatus(rs.getString("request_status"));
+        part.setRequestedAt(rs.getTimestamp("requested_at").toLocalDateTime());
+        return part;
+    }
 
     private PartDetail mapResultSetToPartDetail(ResultSet rs) throws SQLException {
         PartDetail part = new PartDetail();

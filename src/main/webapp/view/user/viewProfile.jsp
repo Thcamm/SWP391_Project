@@ -34,7 +34,6 @@
         </form>
         <a href="${pageContext.request.contextPath}/user/changePassword" class="btn btn-secondary">Change Password</a>
         <c:set var="homeLink" value="${pageContext.request.contextPath}/Home" />
-
         <c:choose>
             <c:when test="${sessionScope.roleCode == 'ADMIN'}">
                 <c:set var="homeLink" value="${pageContext.request.contextPath}/admin/users" />
@@ -58,11 +57,17 @@
 
         <a href="${homeLink}" class="btn btn-info">Back to Home</a>
     </div>
-
+    <c:if test="${sessionScope.roleCode == 'CUSTOMER'}">
     <h2>Service History</h2>
     <table class="service-table">
         <thead>
-        <tr><th>Service ID</th><th>Service Name</th><th>Date</th><th>Status</th><th>Price</th></tr>
+        <tr>
+            <th>License Plate</th>
+            <th>Service Name</th>
+            <th>Details</th>
+            <th>Status</th>
+            <th>Price</th>
+        </tr>
         </thead>
         <tbody>
         <c:if test="${not empty historyError}">
@@ -75,15 +80,18 @@
             <c:when test="${not empty serviceHistory}">
                 <c:forEach var="item" items="${serviceHistory}">
                     <tr>
-                        <td>#${item.requestId}</td>
+                        <td>${vehicle.licensePlate}</td>
                         <td><c:out value="${item.serviceName}"/></td>
                         <td>
-                            <fmt:formatDate value="${item.requestDate}" pattern="dd/MM/yyyy HH:mm" />
+                            <a href="#"
+                               class="btn btn-sm btn-info">
+                                Details
+                            </a>
                         </td>
                         <td>
                             <span class="status status-${item.status.toLowerCase()}">
-                                    <c:out value="${item.status}"/>
-                                </span>
+                                <c:out value="${item.status}"/>
+                            </span>
                         </td>
                         <td>
                             <fmt:formatNumber value="${item.price}" type="currency" currencySymbol=""/> VND
@@ -108,9 +116,9 @@
             <div id="pageNumbers"></div>
             <button onclick="nextPage()" id="nextBtn" disabled>Next</button>
         </div>
+        </c:if>
     </div>
-</div>
-<jsp:include page="/common/footer.jsp" />
+<jsp:include page="/common/customer/footer.jsp" />
 <script src="${pageContext.request.contextPath}/assets/js/user/viewProfile.js"></script>
 </body>
 </html>

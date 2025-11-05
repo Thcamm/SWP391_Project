@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Đặt lịch hẹn</title>
+    <title>Schedule Appointment</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customer/appointment-scheduling.css">
@@ -19,10 +19,10 @@
             <div class="col-lg-8">
                 <div class="appointment-form">
                 <p class="text-uppercase text-muted mb-2" style="font-size: 14px; letter-spacing: 2px;">
-                    THÔNG TIN VỀ CHÚNG TÔI
+                    ABOUT US
                 </p>
                 <h2 class="mb-4" style="font-size: 32px; font-weight: 700; color: #000;">
-                    ĐẶT LỊCH SỬA XE VÀ BẢO DƯỠNG
+                    SCHEDULE CAR REPAIR AND MAINTENANCE
                 </h2>
                 <%-- Hiển thị success message ---%>
                 <% if (request.getAttribute("successMessage") != null) { %>
@@ -94,15 +94,15 @@
 
                     <!-- Mô tả - Full width -->
                     <div class="mb-4">
-                        <label for="description" class="form-label">Mô tả thêm</label>
+                        <label for="description" class="form-label">Additional Description</label>
                         <textarea class="form-control" id="description" name="description"
-                                  rows="4" placeholder="Nhập mô tả chi tiết về vấn đề của xe (nếu có)"></textarea>
+                                  rows="4" placeholder="Enter detailed description of your vehicle's issue (if any)"></textarea>
                     </div>
 
                     <!-- Button submit -->
                     <div class="text-center">
                         <button type="submit" class="btn btn-submit">
-                            <i class="fas fa-paper-plane"></i> Đặt lịch hẹn
+                            <i class="fas fa-paper-plane"></i> Schedule Appointment
                         </button>
                     </div>
                 </form>

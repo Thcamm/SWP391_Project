@@ -53,7 +53,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
             <div class="card-body">
               <!-- WorkOrder Info -->
               <div class="alert alert-info">
-                <h6>Thông tin WorkOrder:</h6>
+                <h6>WorkOrder Information:</h6>
                 <p class="mb-1">
                   <strong>Request ID:</strong> ${workOrder.requestId}
                 </p>
@@ -61,18 +61,18 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   <strong>Status:</strong>
                   <c:choose>
                     <c:when test="${workOrder.status == 'PENDING'}">
-                      <span class="badge bg-warning">Đang chờ</span>
+                      <span class="badge bg-warning">Pending</span>
                     </c:when>
                     <c:when test="${workOrder.status == 'IN_PROCESS'}">
-                      <span class="badge bg-primary">Đang xử lý</span>
+                      <span class="badge bg-primary">In Process</span>
                     </c:when>
                     <c:when test="${workOrder.status == 'COMPLETE'}">
-                      <span class="badge bg-success">Hoàn thành</span>
+                      <span class="badge bg-success">Completed</span>
                     </c:when>
                   </c:choose>
                 </p>
                 <p class="mb-0">
-                  <strong>Chi phí ước tính:</strong>
+                  <strong>Estimated Cost:</strong>
                   <fmt:formatNumber
                     value="${workOrder.estimateAmount}"
                     type="currency"
@@ -135,34 +135,34 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   >
                     <option value="">Select source...</option>
                     <option value="CUSTOMER" ${customerSelected}>
-                      Khách hàng
+                      Customer
                     </option>
                     <option value="TECHNICIAN" ${technicianSelected}>
-                      Kỹ thuật viên
+                      Technician
                     </option>
-                    <option value="SYSTEM" ${systemSelected}>Hệ thống</option>
+                    <option value="SYSTEM" ${systemSelected}>System</option>
                   </select>
                   <div class="form-text">
-                    Chọn nguồn gốc của chi tiết đơn hàng này.
+                    Select the source of this order detail.
                   </div>
                 </div>
 
                 <div class="mb-3">
                   <label for="taskDescription" class="form-label"
-                    >Mô tả công việc <span class="text-danger">*</span></label
+                    >Task Description <span class="text-danger">*</span></label
                   >
                   <textarea
                     class="form-control"
                     id="taskDescription"
                     name="taskDescription"
                     rows="4"
-                    placeholder="Mô tả chi tiết công việc cần thực hiện"
+                    placeholder="Describe the task to be performed in detail"
                     required
                   >
                         ${workOrderDetail.taskDescription}</textarea
                   >
                   <div class="form-text">
-                    Cung cấp mô tả chi tiết về công việc.
+                    Provide a detailed description of the work.
                   </div>
                 </div>
 
@@ -170,7 +170,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   <div class="col-md-6">
                     <div class="mb-3">
                       <label for="estimateHours" class="form-label"
-                        >Thời gian ước tính
+                        >Estimated Time
                         <span class="text-danger">*</span></label
                       >
                       <input
@@ -185,14 +185,14 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                         required
                       />
                       <div class="form-text">
-                        Thời gian ước tính để hoàn thành công việc này.
+                        Estimated time to complete this task.
                       </div>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="mb-3">
                       <label for="estimateAmount" class="form-label"
-                        >Thành tiền ước tính
+                        >Estimated Amount
                         <span class="text-danger">*</span></label
                       >
                       <div class="input-group">
@@ -210,7 +210,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                         />
                       </div>
                       <div class="form-text">
-                        Thành tiền ước tính cho công việc này.
+                        Estimated amount for this task.
                       </div>
                     </div>
                   </div>
@@ -221,10 +221,10 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                     href="${pageContext.request.contextPath}/techmanager/workorders/details?workOrderId=${workOrder.workOrderId}"
                     class="btn btn-secondary"
                   >
-                    <i class="bi bi-x-circle"></i> Hủy
+                    <i class="bi bi-x-circle"></i> Cancel
                   </a>
                   <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-pencil-square"></i> Cập nhật chi tiết
+                    <i class="bi bi-pencil-square"></i> Update Detail
                   </button>
                 </div>
               </form>
