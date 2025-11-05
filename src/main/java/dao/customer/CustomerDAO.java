@@ -469,5 +469,24 @@ public Customer getCustomerById(int customerId) throws SQLException {
         }
         return customer;
     }
+    public Integer getCustomerIdByWorkOrderId(int workOrderId) throws SQLException {
+        String sql = """
+            SELECT s.CustomerID
+            FROM WorkOrder w
+            JOIN ServiceRequest s ON w.RequestID = s.RequestID
+            WHERE w.WorkOrderID = ?
+        """;
 
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, workOrderId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("CustomerID");
+            }
+        }
+        return null;
+    }
 }

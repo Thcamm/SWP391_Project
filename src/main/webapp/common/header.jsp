@@ -283,6 +283,9 @@
         <a href="${pageContext.request.contextPath}/support-faq" class="menu-item">
             <span>Frequently Asked Questions</span>
         </a>
+        <a href="${pageContext.request.contextPath}/customer/workorder-list" class="menu-item">
+            <span>WORK ORDER LIST</span>
+        </a>
         <a href="${pageContext.request.contextPath}/customer/garage" class="menu-item">
             <span>Vehicle Management (My Garage)</span>
         </a>
