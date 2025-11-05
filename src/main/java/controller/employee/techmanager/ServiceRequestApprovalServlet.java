@@ -12,7 +12,7 @@ import dao.carservice.ServiceRequestDAO;
 import dao.employee.admin.AdminDAO;
 import dao.workorder.WorkOrderDAO;
 import dao.workorder.WorkOrderDetailDAO;
-import model.servicetype.ServiceRequestViewDTO;
+import model.dto.ServiceRequestViewDTO;
 import model.workorder.WorkOrder;
 import model.workorder.WorkOrderDetail;
 

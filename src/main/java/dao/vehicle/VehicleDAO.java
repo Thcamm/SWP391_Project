@@ -77,21 +77,21 @@ public class VehicleDAO {
         }
     }
 
-    // public int getVehicleIdByLicensePlate(String licensePlate) {
-    // String sql = "SELECT VehicleID FROM vehicle WHERE LicensePlate = ?";
-    // try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql))
-    // {
-    // st.setString(1, licensePlate);
-    // ResultSet rs = st.executeQuery();
-    // if (rs.next()) {
-    // int vehicleID = rs.getInt("VehicleID");
-    // return vehicleID;
-    // }
-    // return -1;
-    // } catch (SQLException e) {
-    // throw new RuntimeException("Lỗi khi lấy VehicleID theo biển số xe", e);
-    // }
-    // }
+    public int getVehicleIdByLicensePlate(String licensePlate) {
+        String sql = "SELECT VehicleID FROM vehicle WHERE LicensePlate = ?";
+        try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
+            st.setString(1, licensePlate);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                int vehicleID = rs.getInt("VehicleID");
+                return vehicleID;
+            }
+            return -1;
+        } catch (SQLException e) {
+            throw new RuntimeException("Lỗi khi lấy VehicleID theo biển số xe", e);
+        }
+    }
+
     private Vehicle extractVehicleFromResultSet(ResultSet rs) throws SQLException {
         Vehicle v = new Vehicle();
         v.setVehicleID(rs.getInt("VehicleID"));
