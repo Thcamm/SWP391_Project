@@ -21,7 +21,7 @@ public final class Validate implements IConstant {
     private static final Pattern USERNAME_REGEX = Pattern.compile(USERNAME_PATTERN);
     private static final Pattern EMPLOYEE_CODE_REGEX = Pattern.compile(EMPLOYEE_CODE_PATTERN);
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
-    private static final List<String> VALID_GENDERS = Arrays.asList("Nam", "Nữ", "Khác");
+    private static final List<String> VALID_GENDERS = Arrays.asList("Male", "Female", "Other");
 
     /**
      * Private constructor to prevent instantiation of this utility class.
