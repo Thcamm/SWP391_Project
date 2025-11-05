@@ -10,13 +10,24 @@ public class AppointmentService {
         this.appointmentDAO = new AppointmentDAO();
     }
 
-    public boolean updateAppointment(model.appointment.Appointment appointment) {
+    public boolean updateAppointment(Appointment appointment) throws Exception {
+        Appointment current = appointmentDAO.getAppointmentById(appointment.getAppointmentID());
+        if (current == null) {
+            throw new Exception("Appointment not found.");
+        }
+
+        // Giả sử chỉ cho phép reschedule 1 lần
+        if (current.getRescheduleCount() >= 1) {
+            throw new Exception("This appointment has already been rescheduled once and cannot be changed again.");
+        }
+
         return appointmentDAO.updateAppointment(appointment);
     }
 
-    public void getAllAppointments() {
-        appointmentDAO.getAllAppointments();
-    }
+
+//    public void getAllAppointments() {
+//        appointmentDAO.getAllAppointments();
+//    }
 
     public void getAppointmentById(int appointmentID) {
         appointmentDAO.getAppointmentById(appointmentID);

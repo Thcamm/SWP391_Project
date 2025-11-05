@@ -10,16 +10,18 @@ public class Appointment {
     private LocalDateTime AppointmentDate;
     private String Status;
     private String Description;
+    private int rescheduleCount;
 
     public Appointment() {
     }
-    public Appointment(int AppointmentID, int CustomerID, int VehicleID,LocalDateTime AppointmentDate, String Status,String Description) {
+    public Appointment(int AppointmentID, int CustomerID, int VehicleID,LocalDateTime AppointmentDate, String Status,String Description,int rescheduleCount) {
         this.AppointmentID = AppointmentID;
         this.CustomerID = CustomerID;
         this.VehicleID = VehicleID;
         this.Status = Status;
         this.AppointmentDate = AppointmentDate;
         this.Description = Description;
+        this.rescheduleCount= rescheduleCount;
     }
 
     public LocalDateTime getAppointmentDate() {
@@ -68,5 +70,13 @@ public class Appointment {
 
     public void setDescription(String description) {
         Description = description;
+    }
+
+    public int getRescheduleCount() {
+        return rescheduleCount;
+    }
+
+    public void setRescheduleCount(int rescheduleCount) {
+        this.rescheduleCount = rescheduleCount;
     }
 }

@@ -6,7 +6,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Thêm chi tiết WorkOrder</title>
+    <title>Add WorkOrder Detail</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -21,14 +21,14 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
     <nav class="navbar navbar-dark bg-dark">
       <div class="container-fluid">
         <span class="navbar-brand">
-          <i class="bi bi-tools"></i> Thêm chi tiết WorkOrder
+          <i class="bi bi-tools"></i> Add WorkOrder Detail
         </span>
         <div>
           <a
             href="${pageContext.request.contextPath}/techmanager/workorders/details?workOrderId=${workOrder.workOrderId}"
             class="btn btn-outline-light btn-sm"
           >
-            <i class="bi bi-arrow-left"></i> Quay lại chi tiết
+            <i class="bi bi-arrow-left"></i> Back to Details
           </a>
           <a
             href="${pageContext.request.contextPath}/techmanager/dashboard"
@@ -46,13 +46,13 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
           <div class="card">
             <div class="card-header">
               <h5 class="mb-0">
-                Thêm chi tiết cho WorkOrder #${workOrder.workOrderId}
+                Add detail for WorkOrder #${workOrder.workOrderId}
               </h5>
             </div>
             <div class="card-body">
               <!-- WorkOrder Info -->
               <div class="alert alert-info">
-                <h6>Thông tin WorkOrder:</h6>
+                <h6>WorkOrder Information:</h6>
                 <p class="mb-1">
                   <strong>Request ID:</strong> ${workOrder.requestId}
                 </p>
@@ -60,18 +60,18 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   <strong>Status:</strong>
                   <c:choose>
                     <c:when test="${workOrder.status == 'PENDING'}">
-                      <span class="badge bg-warning">Đang chờ</span>
+                      <span class="badge bg-warning">Pending</span>
                     </c:when>
                     <c:when test="${workOrder.status == 'IN_PROCESS'}">
-                      <span class="badge bg-primary">Đang xử lý</span>
+                      <span class="badge bg-primary">In Process</span>
                     </c:when>
                     <c:when test="${workOrder.status == 'COMPLETE'}">
-                      <span class="badge bg-success">Hoàn thành</span>
+                      <span class="badge bg-success">Completed</span>
                     </c:when>
                   </c:choose>
                 </p>
                 <p class="mb-0">
-                  <strong>Chi phí ước tính:</strong>
+                  <strong>Estimated Cost:</strong>
                   <fmt:formatNumber
                     value="${workOrder.estimateAmount}"
                     type="currency"
@@ -113,19 +113,19 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                     name="source"
                     required
                   >
-                    <option value="">Chọn Source...</option>
-                    <option value="CUSTOMER">Khách hàng</option>
-                    <option value="TECHNICIAN">Kỹ thuật viên</option>
-                    <option value="SYSTEM">Hệ thống</option>
+                    <option value="">Select Source...</option>
+                    <option value="CUSTOMER">Customer</option>
+                    <option value="TECHNICIAN">Technician</option>
+                    <option value="SYSTEM">System</option>
                   </select>
                   <div class="form-text">
-                    Chọn Source của chi tiết work order này.
+                    Select the source of this work order detail.
                   </div>
                 </div>
 
                 <div class="mb-3">
                   <label for="taskDescription" class="form-label"
-                    >Mô tả công việc <span class="text-danger">*</span></label
+                    >Task Description <span class="text-danger">*</span></label
                   >
                   <textarea
                     class="form-control"
@@ -136,7 +136,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                     required
                   ></textarea>
                   <div class="form-text">
-                    Cung cấp mô tả chi tiết về công việc cần thực hiện.
+                    Provide a detailed description of the work to be performed.
                   </div>
                 </div>
 
@@ -144,7 +144,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   <div class="col-md-6">
                     <div class="mb-3">
                       <label for="estimateHours" class="form-label"
-                        >Thời gian ước tính
+                        >Estimated Time
                         <span class="text-danger">*</span></label
                       >
                       <input
@@ -158,14 +158,14 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                         required
                       />
                       <div class="form-text">
-                        Thời gian ước tính để hoàn thành công việc này.
+                        Estimated time to complete this task.
                       </div>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="mb-3">
                       <label for="estimateAmount" class="form-label"
-                        >Chi phí ước tính
+                        >Estimated Cost
                         <span class="text-danger">*</span></label
                       >
                       <div class="input-group">
@@ -182,7 +182,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                         />
                       </div>
                       <div class="form-text">
-                        Chi phí ước tính cho công việc này.
+                        Estimated cost for this task.
                       </div>
                     </div>
                   </div>
@@ -196,7 +196,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                     <i class="bi bi-x-circle"></i> Cancel
                   </a>
                   <button type="submit" class="btn btn-success">
-                    <i class="bi bi-plus-circle"></i> Thêm chi tiết
+                    <i class="bi bi-plus-circle"></i> Add Detail
                   </button>
                 </div>
               </form>

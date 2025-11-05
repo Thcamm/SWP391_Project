@@ -53,8 +53,8 @@ public class PermissionFilter implements Filter {
         routePerm.put("GET:/view/admin/user-edit.jsp", "role_permission_manage");
 
         // Customer Service
-        routePerm.put("GET:/view/customerservice/customerservice-home.jsp", "cs_access");
-        routePerm.put("POST:/view/customerservice/customerservice-home.jsp", "cs_access");
+        routePerm.put("GET:/view/customerservice/home.jsp", "cs_access");
+        routePerm.put("POST:/view/customerservice/home.jsp", "cs_access");
         routePerm.put("GET:/view/customerservice/appointment-list.jsp", "cs_access");
         routePerm.put("POST:/view/customerservice/appointment-list.jsp", "cs_access");
         routePerm.put("GET:/view/customerservice/search-customer.jsp", "cs_access");
@@ -72,7 +72,8 @@ public class PermissionFilter implements Filter {
         routePerm.put("POST:/view/customerservice/createRequest.jsp", "cs_access");
         routePerm.put("GET:/view/customerservice/serviceRequest.jsp", "cs_access");
         routePerm.put("POST:/view/customerservice/serviceRequest.jsp", "cs_access");
-
+        routePerm.put("GET:/view/customerservice/service-types.jsp", "cs_access");
+        routePerm.put("POST:/view/customerservice/service-types.jsp", "cs_access");
         // Tech manager - chỉ dashboard, workorders được forward đến WorkOrderController
         routePerm.put("GET:/techmanager/home", "tech_manager_access");
 
@@ -114,6 +115,30 @@ public class PermissionFilter implements Filter {
 
         // Accountant
         routePerm.put("GET:/view/accountant/home.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/home.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/create-invoice.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/create-invoice.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/create-payment.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/create-payment.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/invoice-list.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/invoice-list.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/invoice-detail.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/invoice-detail.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/payment-list.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/payment-list.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/payment-detail.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/payment-detail.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/report-dashboard.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/report-dashboard.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/report-revenue.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/report-revenue.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/report-customer.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/report-customer.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/report-overdue.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/report-overdue.jsp", "accountant_access");
+        routePerm.put("GET:/view/accountant/statistics.jsp", "accountant_access");
+        routePerm.put("POST:/view/accountant/statistics.jsp", "accountant_access");
+
 
         // Customer
         routePerm.put("GET:/view/customer/appointment-scheduling.jsp", "customer_access");
@@ -153,7 +178,8 @@ public class PermissionFilter implements Filter {
         areaGate.put("/inventory/", "inventory_access"); // Store Keeper
         areaGate.put("/accountant/", "accountant_access"); // Accountant
         areaGate.put("/customer/", "customer_access"); // Customer
-        areaGate.put("/user/", "user_access"); // User
+        areaGate.put("/user/", "user_access");
+        areaGate.put("/invoices/", "accountant_access");// User
     }
 
     @Override

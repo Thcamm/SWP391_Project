@@ -164,6 +164,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                             <option value="">-- Select Gender --</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
+                            <option value="Other">Other</option>
                           </select>
                         </div>
 
@@ -176,7 +177,12 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                             class="form-control"
                             id="birthDate"
                             name="birthDate"
+                            max=""
                           />
+                          <div
+                            id="birthDateError"
+                            class="invalid-feedback"
+                          ></div>
                         </div>
 
                         <div class="mb-3">
@@ -310,5 +316,8 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
 
     <!-- Footer -->
     <%@ include file="footer.jsp" %>
+
+    <!-- Birth Date Validation Script -->
+    <script src="${pageContext.request.contextPath}/assets/js/admin/birthdate-validation.js"></script>
   </body>
 </html>

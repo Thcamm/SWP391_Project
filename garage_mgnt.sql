@@ -960,3 +960,110 @@
 			REFERENCES PartDetail(PartDetailID)
 			ON UPDATE RESTRICT ON DELETE RESTRICT
 	) ENGINE=InnoDB;
+    
+    ALTER TABLE VehicleDiagnostic
+  MODIFY COLUMN Status ENUM('SUBMITTED','APPROVED','REJECTED')
+  NOT NULL DEFAULT 'SUBMITTED';
+
+CREATE INDEX ix_vd_status ON VehicleDiagnostic(Status);
+
+-- Gắn WOP về DiagnosticPart để trace
+ALTER TABLE WorkOrderPart
+  ADD COLUMN DiagnosticPartID INT NULL AFTER PartDetailID,
+  ADD CONSTRAINT fk_wop_diagpart
+    FOREIGN KEY (DiagnosticPartID) REFERENCES DiagnosticPart(DiagnosticPartID)
+    ON UPDATE RESTRICT ON DELETE SET NULL;
+
+-- 1 VehicleDiagnostic chỉ đổ sang đúng 1 WorkOrderDetail (source=DIAGNOSTIC)
+CREATE UNIQUE INDEX ux_wod_unique_diag
+  ON WorkOrderDetail(diagnostic_id);
+
+-- Không tạo trùng WOP theo cùng Detail & dòng diagnostic
+CREATE UNIQUE INDEX ux_wop_detail_diagpart
+  ON WorkOrderPart(DetailID, DiagnosticPartID);
+
+-- (Tối ưu cho UI liệt kê các dòng đã duyệt)
+CREATE INDEX ix_dp_vd_isapproved
+  ON DiagnosticPart(VehicleDiagnosticID, IsApproved);
+  
+  DELIMITER $$
+
+CREATE PROCEDURE SP_OnVehicleDiagnosticApproved(IN p_vd_id INT)
+BEGIN
+    DECLARE v_assignment_id INT;
+    DECLARE v_detail_id_src INT;
+    DECLARE v_work_order_id INT;
+    DECLARE v_new_detail_id INT;
+    DECLARE v_issue TEXT;
+    DECLARE v_estimate DECIMAL(12,2);
+
+    -- Lấy chain: VD -> Assignment -> Detail(REQUEST) -> WorkOrder
+    SELECT AssignmentID, IssueFound, EstimateCost
+      INTO v_assignment_id, v_issue, v_estimate
+    FROM VehicleDiagnostic
+    WHERE VehicleDiagnosticID = p_vd_id;
+
+    SELECT DetailID INTO v_detail_id_src
+    FROM TaskAssignment
+    WHERE AssignmentID = v_assignment_id;
+
+    SELECT WorkOrderID INTO v_work_order_id
+    FROM WorkOrderDetail
+    WHERE DetailID = v_detail_id_src;
+
+    START TRANSACTION;
+
+      /* 1) Tạo WorkOrderDetail (source=DIAGNOSTIC).
+            Nhờ unique index ux_wod_unique_diag, nếu đã tồn tại sẽ bỏ qua. */
+      INSERT IGNORE INTO WorkOrderDetail
+        (WorkOrderID, source, diagnostic_id, approval_status, TaskDescription, EstimateAmount)
+      VALUES
+        (v_work_order_id, 'DIAGNOSTIC', p_vd_id, 'APPROVED', v_issue, v_estimate);
+
+      -- Lấy DetailID đã tạo (hoặc có sẵn)
+      IF ROW_COUNT() > 0 THEN
+        SET v_new_detail_id = LAST_INSERT_ID();
+      ELSE
+        SELECT DetailID INTO v_new_detail_id
+        FROM WorkOrderDetail
+        WHERE diagnostic_id = p_vd_id
+        LIMIT 1;
+      END IF;
+
+      /* 2) Sinh WorkOrderPart cho các dòng KH đã duyệt */
+      INSERT IGNORE INTO WorkOrderPart
+        (DetailID, PartDetailID, DiagnosticPartID, RequestedByID, QuantityUsed, UnitPrice, request_status, requested_at)
+      SELECT
+        v_new_detail_id,
+        dp.PartDetailID,
+        dp.DiagnosticPartID,
+        -- ai request: tạm dùng TechManager của WO; nếu muốn khác thì đổi ở đây
+        wo.TechManagerID,
+        dp.QuantityNeeded,
+        dp.UnitPrice,
+        'PENDING',
+        NOW()
+      FROM DiagnosticPart dp
+      JOIN WorkOrderDetail wod_src ON wod_src.DetailID = v_detail_id_src
+      JOIN WorkOrder wo ON wo.WorkOrderID = wod_src.WorkOrderID
+      WHERE dp.VehicleDiagnosticID = p_vd_id
+        AND dp.IsApproved = 1;
+
+    COMMIT;
+END$$
+
+DELIMITER ;
+-- Trigger theo dõi Status
+DELIMITER $$
+
+CREATE TRIGGER trg_vd_on_status_approved
+AFTER UPDATE ON VehicleDiagnostic
+FOR EACH ROW
+BEGIN
+  -- Chỉ chạy khi chuyển sang APPROVED
+  IF (OLD.Status <> 'APPROVED') AND (NEW.Status = 'APPROVED') THEN
+      CALL SP_OnVehicleDiagnosticApproved(NEW.VehicleDiagnosticID);
+  END IF;
+END$$
+
+DELIMITER ;

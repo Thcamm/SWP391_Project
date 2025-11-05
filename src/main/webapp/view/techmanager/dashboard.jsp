@@ -77,6 +77,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             </div>
           </c:if>
 
+          <!-- Row 1: Overview Stats -->
           <div class="col-md-3">
             <div class="stats-card card">
               <div class="card-body">
@@ -92,6 +93,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               </div>
             </div>
           </div>
+
           <div class="col-md-3">
             <div class="stats-card card">
               <div class="card-body">
@@ -107,6 +109,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               </div>
             </div>
           </div>
+
           <div class="col-md-3">
             <div class="stats-card card">
               <div class="card-body">
@@ -122,6 +125,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               </div>
             </div>
           </div>
+
           <div class="col-md-3">
             <div class="stats-card card">
               <div class="card-body">
@@ -139,116 +143,60 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           </div>
         </div>
 
-        <!-- Phase 1: Reception & Diagnosis -->
-        <div class="phase-section">
-          <div class="phase-header">
-            <i class="bi bi-1-circle-fill text-success"></i>
-            <div>
-              <h5 class="mb-0">Phase 1: Reception & Diagnosis</h5>
-              <small class="text-muted"
-                >Accept requests and assign diagnosis tasks</small
-              >
-            </div>
-            <span class="badge-active phase-badge ms-auto">Active</span>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="card border-0 bg-light">
-                <div class="card-body">
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="stats-icon bg-primary text-white">
-                      <i class="bi bi-clipboard-check"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                      <p class="mb-0 text-muted small">
-                        Pending Service Requests
-                      </p>
-                      <h4 class="mb-0">${stats.pendingRequests}</h4>
-                    </div>
-                    <a
-                      href="${pageContext.request.contextPath}/techmanager/service-requests"
-                      class="btn btn-sm btn-primary"
-                    >
-                      <i class="bi bi-arrow-right"></i>
-                    </a>
-                  </div>
-                </div>
+        <!-- Service Requests Section -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                  <i class="bi bi-clipboard-check"></i> Service Requests
+                </h5>
               </div>
-            </div>
-            <div class="col-md-6">
-              <div class="card border-0 bg-light">
-                <div class="card-body">
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="stats-icon bg-info text-white">
-                      <i class="bi bi-person-plus"></i>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="card border-0 bg-light mb-3">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                          <div class="stats-icon bg-primary text-white">
+                            <i class="bi bi-hourglass-split"></i>
+                          </div>
+                          <div class="flex-grow-1">
+                            <p class="mb-0 text-muted small">
+                              Pending Service Requests
+                            </p>
+                            <h4 class="mb-0">${stats.pendingRequests}</h4>
+                          </div>
+                          <a
+                            href="${pageContext.request.contextPath}/techmanager/service-requests"
+                            class="btn btn-sm btn-primary"
+                          >
+                            <i class="bi bi-arrow-right"></i> View
+                          </a>
+                        </div>
+                      </div>
                     </div>
-                    <div class="flex-grow-1">
-                      <p class="mb-0 text-muted small">
-                        Assigned Diagnosis Tasks
-                      </p>
-                      <h4 class="mb-0">${stats.assignedDiagnosis}</h4>
-                    </div>
-                    <a
-                      href="${pageContext.request.contextPath}/techmanager/assign-diagnosis"
-                      class="btn btn-sm btn-info"
-                    >
-                      <i class="bi bi-arrow-right"></i>
-                    </a>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Phase 2: Review & Quote -->
-        <div class="phase-section">
-          <div class="phase-header">
-            <i class="bi bi-2-circle-fill text-primary"></i>
-            <div>
-              <h5 class="mb-0">Phase 2: Review & Quote</h5>
-              <small class="text-muted"
-                >Review diagnosis and approve quotes</small
-              >
-            </div>
-            <span class="badge-active phase-badge ms-auto">Active</span>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="card border-0 bg-light">
-                <div class="card-body">
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="stats-icon bg-success text-white">
-                      <i class="bi bi-file-earmark-text"></i>
+                  <div class="col-md-6">
+                    <div class="card border-0 bg-light mb-3">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                          <div class="stats-icon bg-success text-white">
+                            <i class="bi bi-check-circle"></i>
+                          </div>
+                          <div class="flex-grow-1">
+                            <p class="mb-0 text-muted small">Approved Quotes</p>
+                            <h4 class="mb-0">${stats.approvedQuotes}</h4>
+                          </div>
+                          <a
+                            href="${pageContext.request.contextPath}/techmanager/assign-repair"
+                            class="btn btn-sm btn-success"
+                          >
+                            <i class="bi bi-arrow-right"></i> Assign
+                          </a>
+                        </div>
+                      </div>
                     </div>
-                    <div class="flex-grow-1">
-                      <p class="mb-0 text-muted small">Completed Diagnosis</p>
-                      <h4 class="mb-0">${stats.completedDiagnosis}</h4>
-                    </div>
-                    <a
-                      href="${pageContext.request.contextPath}/techmanager/diagnosis-review"
-                      class="btn btn-sm btn-success"
-                    >
-                      <i class="bi bi-arrow-right"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="card border-0 bg-light">
-                <div class="card-body">
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="stats-icon bg-warning text-white">
-                      <i class="bi bi-hourglass-split"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                      <p class="mb-0 text-muted small">
-                        Pending Customer Approval
-                      </p>
-                      <h4 class="mb-0">${stats.pendingApproval}</h4>
-                    </div>
-                    <span class="badge bg-warning">Waiting</span>
                   </div>
                 </div>
               </div>
@@ -256,52 +204,73 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           </div>
         </div>
 
-        <!-- Phase 3: Repair Assignment -->
-        <div class="phase-section">
-          <div class="phase-header">
-            <i class="bi bi-3-circle-fill text-info"></i>
-            <div>
-              <h5 class="mb-0">Phase 3: Repair Assignment</h5>
-              <small class="text-muted"
-                >Assign approved repairs to technicians</small
-              >
-            </div>
-            <span class="badge-active phase-badge ms-auto">Active</span>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="card border-0 bg-light">
-                <div class="card-body">
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="stats-icon bg-primary text-white">
-                      <i class="bi bi-check-circle"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                      <p class="mb-0 text-muted small">Approved Quotes</p>
-                      <h4 class="mb-0">${stats.approvedQuotes}</h4>
-                    </div>
-                    <a
-                      href="${pageContext.request.contextPath}/techmanager/assign-repair"
-                      class="btn btn-sm btn-primary"
-                    >
-                      <i class="bi bi-arrow-right"></i>
-                    </a>
-                  </div>
-                </div>
+        <!-- Diagnosis Tasks Section -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                  <i class="bi bi-search"></i> Diagnosis Tasks
+                </h5>
               </div>
-            </div>
-            <div class="col-md-6">
-              <div class="card border-0 bg-light">
-                <div class="card-body">
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="stats-icon bg-warning text-white">
-                      <i class="bi bi-tools"></i>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="card border-0 bg-light mb-3">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                          <div class="stats-icon bg-info text-white">
+                            <i class="bi bi-person-plus"></i>
+                          </div>
+                          <div class="flex-grow-1">
+                            <p class="mb-0 text-muted small">
+                              Assigned Diagnosis
+                            </p>
+                            <h4 class="mb-0">${stats.assignedDiagnosis}</h4>
+                          </div>
+                          <a
+                            href="${pageContext.request.contextPath}/techmanager/assign-diagnosis"
+                            class="btn btn-sm btn-info"
+                          >
+                            <i class="bi bi-arrow-right"></i> Assign
+                          </a>
+                        </div>
+                      </div>
                     </div>
-                    <div class="flex-grow-1">
-                      <p class="mb-0 text-muted small">Active Repair Tasks</p>
-                      <h4 class="mb-0">${stats.activeRepairs}</h4>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="card border-0 bg-light mb-3">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                          <div class="stats-icon bg-warning text-white">
+                            <i class="bi bi-tools"></i>
+                          </div>
+                          <div class="flex-grow-1">
+                            <p class="mb-0 text-muted small">In-Progress</p>
+                            <h4 class="mb-0">${stats.inProgressDiagnosis}</h4>
+                          </div>
+                          <span class="badge bg-warning">Working</span>
+                        </div>
+                      </div>
                     </div>
-                    <span class="badge bg-warning">In Progress</span>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="card border-0 bg-light mb-3">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                          <div class="stats-icon bg-secondary text-white">
+                            <i class="bi bi-file-earmark-text"></i>
+                          </div>
+                          <div class="flex-grow-1">
+                            <p class="mb-0 text-muted small">
+                              Pending Customer Approval
+                            </p>
+                            <h4 class="mb-0">${stats.pendingQuotes}</h4>
+                          </div>
+                          <span class="badge bg-secondary">Waiting</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -309,51 +278,48 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           </div>
         </div>
 
-        <!-- Phase 4: Monitor & Complete -->
-        <div class="phase-section">
-          <div class="phase-header">
-            <i class="bi bi-4-circle text-secondary"></i>
-            <div>
-              <h5 class="mb-0">Phase 4: Monitor & Complete</h5>
-              <small class="text-muted"
-                >Monitor progress and complete work orders</small
-              >
-            </div>
-            <span class="badge-soon phase-badge ms-auto">Soon</span>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="card border-0 bg-light">
-                <div class="card-body">
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="stats-icon bg-success text-white">
-                      <i class="bi bi-check-circle"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                      <p class="mb-0 text-muted small">Completed Repairs</p>
-                      <h4 class="mb-0">${stats.completedRepairs}</h4>
-                    </div>
-                    <button class="btn btn-sm btn-secondary" disabled>
-                      Soon
-                    </button>
-                  </div>
-                </div>
+        <!-- Repair Tasks Section -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-wrench"></i> Repair Tasks</h5>
               </div>
-            </div>
-            <div class="col-md-6">
-              <div class="card border-0 bg-light">
-                <div class="card-body">
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="stats-icon bg-info text-white">
-                      <i class="bi bi-list-task"></i>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="card border-0 bg-light mb-3">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                          <div class="stats-icon bg-warning text-white">
+                            <i class="bi bi-gear"></i>
+                          </div>
+                          <div class="flex-grow-1">
+                            <p class="mb-0 text-muted small">Active Repairs</p>
+                            <h4 class="mb-0">${stats.activeRepairs}</h4>
+                          </div>
+                          <span class="badge bg-warning">In Progress</span>
+                        </div>
+                      </div>
                     </div>
-                    <div class="flex-grow-1">
-                      <p class="mb-0 text-muted small">Ready for Completion</p>
-                      <h4 class="mb-0">0</h4>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="card border-0 bg-light mb-3">
+                      <div class="card-body">
+                        <div class="d-flex align-items-center gap-3">
+                          <div class="stats-icon bg-success text-white">
+                            <i class="bi bi-check-circle"></i>
+                          </div>
+                          <div class="flex-grow-1">
+                            <p class="mb-0 text-muted small">
+                              Completed Repairs
+                            </p>
+                            <h4 class="mb-0">${stats.completedRepairs}</h4>
+                          </div>
+                          <span class="badge bg-success">Done</span>
+                        </div>
+                      </div>
                     </div>
-                    <button class="btn btn-sm btn-secondary" disabled>
-                      Soon
-                    </button>
                   </div>
                 </div>
               </div>

@@ -77,20 +77,20 @@ public class VehicleDAO {
         }
     }
 
-    public int getVehicleIdByLicensePlate(String licensePlate) {
-        String sql = "SELECT VehicleID FROM vehicle WHERE LicensePlate = ?";
-        try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
-            st.setString(1, licensePlate);
-            ResultSet rs = st.executeQuery();
-            if (rs.next()) {
-                int vehicleID = rs.getInt("VehicleID");
-                return vehicleID;
-            }
-            return -1;
-        } catch (SQLException e) {
-            throw new RuntimeException("Lỗi khi lấy VehicleID theo biển số xe", e);
-        }
-    }
+//    public int getVehicleIdByLicensePlate(String licensePlate) {
+//        String sql = "SELECT VehicleID FROM vehicle WHERE LicensePlate = ?";
+//        try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
+//            st.setString(1, licensePlate);
+//            ResultSet rs = st.executeQuery();
+//            if (rs.next()) {
+//                int vehicleID = rs.getInt("VehicleID");
+//                return vehicleID;
+//            }
+//            return -1;
+//        } catch (SQLException e) {
+//            throw new RuntimeException("Lỗi khi lấy VehicleID theo biển số xe", e);
+//        }
+//    }
     private Vehicle extractVehicleFromResultSet(ResultSet rs) throws SQLException {
         Vehicle v = new Vehicle();
         v.setVehicleID(rs.getInt("VehicleID"));
@@ -142,6 +142,142 @@ public class VehicleDAO {
             return st.executeUpdate() > 0;
         }
     }
+//    public List<String> getAllLicensePlates() throws SQLException {
+//        List<String> plates = new ArrayList<>();
+//        String sql = "SELECT LicensePlate FROM Vehicle";
+//        try (Connection conn = DbContext.getConnection();
+//             PreparedStatement st = conn.prepareStatement(sql);
+//             ResultSet rs = st.executeQuery()) {
+//            while (rs.next()) {
+//                plates.add(rs.getString("LicensePlate"));
+//            }
+//        }
+//        return plates;
+//    }
+    public List<String> getAllLicensePlates() throws SQLException {
+        List<String> plates = new ArrayList<>();
+        String sql = "SELECT LicensePlate FROM Vehicle";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+            while (rs.next()) {
+                plates.add(rs.getString("LicensePlate"));
+            }
+        }
+        return plates;
+    }
+    public int getVehicleIdByLicensePlate(String licensePlate) throws SQLException {
+        String sql = "SELECT VehicleID FROM vehicle WHERE LicensePlate = ?";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setString(1, licensePlate);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) return rs.getInt("VehicleID");
+            }
+        }
+        return -1;
+    }
+    public List<String> getAllBrands() throws SQLException {
+        String sql = "SELECT DISTINCT Brand FROM Vehicle ORDER BY Brand";
+        List<String> brands = new ArrayList<>();
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                brands.add(rs.getString("Brand"));
+            }
+        }
+        return brands;
+    }
+
+    public int countVehicles(int customerId, String keyword, String brandFilter) throws SQLException {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM Vehicle WHERE CustomerID = ?");
+        if (keyword != null && !keyword.isEmpty()) {
+            sql.append(" AND (Brand LIKE ? OR Model LIKE ? OR LicensePlate LIKE ?)");
+        }
+        if (brandFilter != null && !brandFilter.isEmpty()) {
+            sql.append(" AND Brand = ?");
+        }
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int idx = 1;
+            ps.setInt(idx++, customerId);
+            if (keyword != null && !keyword.isEmpty()) {
+                ps.setString(idx++, "%" + keyword + "%");
+                ps.setString(idx++, "%" + keyword + "%");
+                ps.setString(idx++, "%" + keyword + "%");
+            }
+            if (brandFilter != null && !brandFilter.isEmpty()) {
+                ps.setString(idx++, brandFilter);
+            }
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            return rs.getInt(1);
+        }
+    }
+
+    public List<Vehicle> searchVehicles(int customerId, String keyword, String brandFilter, int page, int pageSize) throws SQLException {
+        StringBuilder sql = new StringBuilder("SELECT * FROM Vehicle WHERE CustomerID = ?");
+        if (keyword != null && !keyword.isEmpty()) {
+            sql.append(" AND (Brand LIKE ? OR Model LIKE ? OR LicensePlate LIKE ?)");
+        }
+        if (brandFilter != null && !brandFilter.isEmpty()) {
+            sql.append(" AND Brand = ?");
+        }
+        sql.append(" ORDER BY VehicleID DESC LIMIT ? OFFSET ?");
+
+        List<Vehicle> list = new ArrayList<>();
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int idx = 1;
+            ps.setInt(idx++, customerId);
+            if (keyword != null && !keyword.isEmpty()) {
+                ps.setString(idx++, "%" + keyword + "%");
+                ps.setString(idx++, "%" + keyword + "%");
+                ps.setString(idx++, "%" + keyword + "%");
+            }
+            if (brandFilter != null && !brandFilter.isEmpty()) {
+                ps.setString(idx++, brandFilter);
+            }
+            ps.setInt(idx++, pageSize);
+            ps.setInt(idx, (page - 1) * pageSize);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Vehicle v = new Vehicle();
+                v.setVehicleID(rs.getInt("VehicleID"));
+                v.setBrand(rs.getString("Brand"));
+                v.setModel(rs.getString("Model"));
+                v.setYearManufacture(rs.getInt("YearManufacture"));
+                v.setLicensePlate(rs.getString("LicensePlate"));
+                list.add(v);
+            }
+        }
+        return list;
+    }
+    public List<Vehicle> searchVehiclesByPlate(int customerId, String licensePlate) throws SQLException {
+        List<Vehicle> vehicles = new ArrayList<>();
+        String sql = "SELECT * FROM Vehicle WHERE CustomerID = ? AND LicensePlate LIKE ?";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.setString(2, "%" + licensePlate + "%");
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Vehicle v = new Vehicle();
+                    v.setVehicleID(rs.getInt("VehicleID"));
+                    v.setCustomerID(rs.getInt("CustomerID"));
+                    v.setBrand(rs.getString("Brand"));
+                    v.setModel(rs.getString("Model"));
+                    v.setLicensePlate(rs.getString("LicensePlate"));
+                    vehicles.add(v);
+                }
+            }
+        }
+        return vehicles;
+    }
+
     public List<Vehicle> searchVehicles(String keyword, int customerId, int limit, int offset) throws SQLException {
         List<Vehicle> list = new ArrayList<>();
         String sql = "SELECT * FROM Vehicle " +

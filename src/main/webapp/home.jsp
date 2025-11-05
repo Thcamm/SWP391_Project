@@ -4,10 +4,10 @@ uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Carspa | Dịch Vụ Chăm Sóc Xe Tốt Nhất</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carspa | Best Car Care Services</title>
 
     <!-- Bootstrap -->
     <link
@@ -28,8 +28,8 @@ uri="http://java.sun.com/jsp/jstl/core" %>
 
     <style>
       :root {
-        --primary-color: #ffffff;
-        --secondary-color: #adb5bd;
+        --primary-color: #3a3a3c;
+        --secondary-color: #dfdfdf;
         --dark-bg: #111111;
         --brand-red: #dc3545;
       }
@@ -113,21 +113,21 @@ uri="http://java.sun.com/jsp/jstl/core" %>
 
   <body>
     <!-- ✅ HEADER -->
-    <%@ include file="/common/customer/header.jsp" %>
+    <%@ include file="/common/header.jsp" %>
 
     <!-- ✅ MAIN CONTENT -->
     <main class="hero-section">
       <div class="container">
         <div class="row">
-          <div class="col-lg-8">
-            <div class="hero-content">
-              <p class="sub-heading">Carspa. Khắc phục mọi vấn đề cho xe</p>
-              <h1>Trung tâm sửa chữa ô tô <strong>chuyên nghiệp.</strong></h1>
-              <a href="#" class="btn btn-view-services">
-                Xem tất cả dịch vụ <i class="fas fa-arrow-right ms-2"></i>
-              </a>
+            <div class="col-lg-8">
+                <div class="hero-content">
+                    <p class="sub-heading">Carspa. Solving all vehicle problems</p>
+                    <h1>Professional auto repair <strong>center.</strong></h1>
+                    <a href="#" class="btn btn-view-services">
+                        View all services <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
             </div>
-          </div>
         </div>
       </div>
     </main>
@@ -144,7 +144,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
     </div>
 
     <!-- ✅ FOOTER -->
-    <%@ include file="/common/customer/footer.jsp" %>
+    <%@ include file="/common/footer.jsp" %>
 
     <!-- JS -->
     <script src="${pageContext.request.contextPath}/assets/js/user/chatbot.js"></script>
