@@ -3,6 +3,26 @@
     padding: 24px;
 }
 
+:root{
+    --bg:#f6f7fb;
+    --card:#ffffff;
+    --text:#12161c;
+    --muted:#6b7280;
+    --border:#e5e7eb;
+    --brand:#111827;
+    --pill:#eef2ff;
+    --ok:#10b981;
+    --warn:#f59e0b;
+    --danger:#ef4444;
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,Segoe UI,Roboto,Arial}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+
+.layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+
 .breadcrumb {
     display: flex;
     gap: 8px;
@@ -10,6 +30,10 @@
     color: #6b7280;
     margin-bottom: 12px;
 }
+.parts-table { table-layout: fixed; width: 100%; }
+.parts-table th, .parts-table td { vertical-align: middle; white-space: nowrap; }
+.parts-table .part-cell { white-space: normal; }        /* chỉ cột Part được wrap */
+.parts-table .text-end { text-align: right !important; } /* đảm bảo canh phải */
 
 .page-header {
     display: flex;

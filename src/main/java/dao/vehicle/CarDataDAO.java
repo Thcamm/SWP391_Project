@@ -13,8 +13,8 @@ public class CarDataDAO extends DbContext {
         List<CarBrand> list = new ArrayList<>();
         String sql = "SELECT BrandID, BrandName FROM CarBrands ORDER BY BrandName";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement st = conn.prepareStatement(sql);
-             ResultSet rs = st.executeQuery()) {
+                PreparedStatement st = conn.prepareStatement(sql);
+                ResultSet rs = st.executeQuery()) {
             while (rs.next()) {
                 CarBrand brand = new CarBrand();
                 brand.setBrandId(rs.getInt("BrandID"));
@@ -29,7 +29,7 @@ public class CarDataDAO extends DbContext {
         List<CarModel> list = new ArrayList<>();
         String sql = "SELECT ModelID, ModelName, BrandID FROM CarModels WHERE BrandID = ? ORDER BY ModelName";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement st = conn.prepareStatement(sql)) {
+                PreparedStatement st = conn.prepareStatement(sql)) {
             st.setInt(1, brandId);
             try (ResultSet rs = st.executeQuery()) {
                 while (rs.next()) {
@@ -43,10 +43,11 @@ public class CarDataDAO extends DbContext {
         }
         return list;
     }
+
     public CarBrand getBrandById(int brandId) throws SQLException {
         String sql = "SELECT brandid, brandname FROM carbrands WHERE brandid = ?";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, brandId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {

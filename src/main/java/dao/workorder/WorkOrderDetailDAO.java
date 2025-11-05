@@ -175,4 +175,83 @@ public class WorkOrderDetailDAO {
 
         return detail;
     }
+
+    public void recomputeActualHoursAndMaybeMarkComplete(int assignmentId) {
+        String sql = """
+        SELECT DetailID
+        FROM TaskAssignment
+        WHERE AssignmentID = ?
+    """;
+        try (Connection c = DbContext.getConnection()) {
+            c.setAutoCommit(false);
+
+            Integer detailId = null;
+            try (PreparedStatement ps = c.prepareStatement(sql)) {
+                ps.setInt(1, assignmentId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) detailId = rs.getInt(1);
+                }
+            }
+            if (detailId == null) { c.rollback(); return; }
+
+            // 1) Tính tổng giờ thực tế của tất cả task thuộc DetailID
+            String updHours = """
+            UPDATE WorkOrderDetail wod
+            JOIN (
+                SELECT ta.DetailID,
+                       COALESCE(SUM(
+                           GREATEST(0,
+                               TIMESTAMPDIFF(MINUTE, ta.StartAt,
+                                   COALESCE(ta.CompleteAt, NOW()))
+                           )
+                       ),0) AS minutes_total
+                FROM TaskAssignment ta
+                WHERE ta.DetailID = ?
+                GROUP BY ta.DetailID
+            ) x ON x.DetailID = wod.DetailID
+            SET wod.ActualHours = ROUND(x.minutes_total / 60.0, 2)
+            WHERE wod.DetailID = ?
+        """;
+            try (PreparedStatement ps = c.prepareStatement(updHours)) {
+                ps.setInt(1, detailId);
+                ps.setInt(2, detailId);
+                ps.executeUpdate();
+            }
+
+            // 2) Kiểm tra tất cả task của WOD đã COMPLETE chưa
+            String allDoneSql = """
+            SELECT SUM(CASE WHEN Status = 'COMPLETE' THEN 1 ELSE 0 END) AS done_cnt,
+                   COUNT(*) AS all_cnt
+            FROM TaskAssignment
+            WHERE DetailID = ?
+        """;
+            boolean allDone = false;
+            try (PreparedStatement ps = c.prepareStatement(allDoneSql)) {
+                ps.setInt(1, detailId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        int done = rs.getInt("done_cnt");
+                        int allc = rs.getInt("all_cnt");
+                        allDone = (allc > 0 && done == allc);
+                    }
+                }
+            }
+
+            if (allDone) {
+                String markDone = "UPDATE WorkOrderDetail SET detail_status = 'COMPLETE' WHERE DetailID = ?";
+                try (PreparedStatement ps = c.prepareStatement(markDone)) {
+                    ps.setInt(1, detailId);
+                    ps.executeUpdate();
+                }
+            }
+
+
+            c.commit();
+        } catch (SQLException e) {
+            // log error
+        }
+
+    }
+
+
 }

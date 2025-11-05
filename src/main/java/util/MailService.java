@@ -1,6 +1,5 @@
 package util;
 
-
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.*;
 import jakarta.mail.internet.MimeMessage;
@@ -17,7 +16,6 @@ public class MailService {
     private static final String SMTP_PORT = "587";
     private static final String SMTP_USERNAME = "gara.tuanduong.auto2929@gmail.com"; // Thay bằng email của bạn
     private static final String SMTP_PASSWORD = "pgwk tplf uexx ubxv"; // Thay bằng app password
-
 
     public static boolean sendEmail(String toEmail, String subject, String content) {
         Properties props = new Properties();
@@ -109,7 +107,6 @@ public class MailService {
         return sendHtmlEmail(customerEmail, subject, htmlBody);
     }
 
-
     /**
      * Send invoice created notification
      */
@@ -128,8 +125,8 @@ public class MailService {
 
     public static void main(String[] args) {
         // Test 1: Simple email
-//        System.out.println("Test 1: Simple Email");
-//        sendEmail("conbodoan29102005@gmail.com", "Test Simple", "Test content");
+        // System.out.println("Test 1: Simple Email");
+        // sendEmail("conbodoan29102005@gmail.com", "Test Simple", "Test content");
 
         // Test 2: Payment confirmation
         System.out.println("\nTest 2: Payment Confirmation Email");
@@ -160,4 +157,3 @@ public class MailService {
         }
     }
 }
-

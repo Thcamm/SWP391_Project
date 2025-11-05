@@ -1,6 +1,7 @@
 /* ========= Technician Diagnostic Page (light, matches base.css) ========= */
 /* dùng biến từ base.css: --bg, --card, --text, --muted, --border, --brand */
 
+
 .breadcrumb{
     display:flex; gap:8px; align-items:center;
     color: var(--muted); font-size:13px; margin: 2px 0 14px;

@@ -21,15 +21,16 @@ public class VehicleDiagnosticService {
     private final VehicleDiagnosticDAO diagnosticDAO = new VehicleDiagnosticDAO();
     private final PartService partService = new PartService();
 
-    public static class DiagnosticPageView {
 
-        public PaginationResponse<VehicleDiagnostic> page;
+    public static  class DiagnosticPageView {
+
+        public PaginationResponse<VehicleDiagnostic> page ;
         public Map<Integer, List<DiagnosticPart>> partsMap = Collections.emptyMap();
 
         public Map<Integer, BigDecimal> partsTotal = new HashMap<>();
         public Map<Integer, BigDecimal> grandTotal = new HashMap<>();
-        public Map<Integer, Integer> approvedCount = new HashMap<>();
-        public Map<Integer, Integer> pendingCount = new HashMap<>();
+        public Map<Integer, Integer>   approvedCount = new HashMap<>();
+        public Map<Integer, Integer>   pendingCount  = new HashMap<>();
         public Integer latestDiagnosticId;
 
         // Thêm các convenience getters để JSP dễ truy cập
@@ -143,13 +144,12 @@ public class VehicleDiagnosticService {
         }
     }
 
-    public ServiceResult getDiagnosticsWithPartsPaged(int assignmentId, int currentPage, int itemsPerPage) {
+    public ServiceResult getDiagnosticsWithPartsPaged (int assignmentId, int currentPage, int itemsPerPage) {
         try {
             int totalItems = diagnosticDAO.countByAssignment(assignmentId);
             int size = Math.max(5, Math.min(itemsPerPage > 0 ? itemsPerPage : 10, 50));
 
-            PaginationUtils.PaginationCalculation calc = PaginationUtils.calculateParams(totalItems,
-                    Math.max(1, currentPage), size);
+            PaginationUtils.PaginationCalculation calc = PaginationUtils.calculateParams(totalItems, Math.max(1, currentPage), size);
 
             List<VehicleDiagnostic> rows = totalItems == 0 ? Collections.emptyList()
                     : diagnosticDAO.getByAssignmentPaged(assignmentId, calc.getOffset(), size);
@@ -159,13 +159,14 @@ public class VehicleDiagnosticService {
                     calc.getSafePage(),
                     size,
                     totalItems,
-                    calc.getTotalPages());
+                    calc.getTotalPages()
+            );
 
             DiagnosticPageView vm = new DiagnosticPageView();
             vm.setPage(page);
             vm.setLatestDiagnosticId(rows.isEmpty() ? null : rows.get(0).getVehicleDiagnosticID());
 
-            if (!rows.isEmpty()) {
+            if(!rows.isEmpty()) {
                 List<Integer> ids = new ArrayList<>(rows.size());
                 for (VehicleDiagnostic vd : rows) {
                     ids.add(vd.getVehicleDiagnosticID());
@@ -184,9 +185,9 @@ public class VehicleDiagnosticService {
                         BigDecimal price = dp.getUnitPrice() == null ? BigDecimal.ZERO : dp.getUnitPrice();
                         BigDecimal line = price.multiply(BigDecimal.valueOf(dp.getQuantityNeeded()));
                         partsSum = partsSum.add(line);
-                        if (Boolean.TRUE.equals(dp.isApproved())) {
+                        if(Boolean.TRUE.equals(dp.isApproved())) {
                             approved++;
-                        } else {
+                        }else  {
                             pending++;
                         }
                     }
@@ -214,23 +215,26 @@ public class VehicleDiagnosticService {
         }
     }
 
-    public ServiceResult loadForEdit(int technicianId, int diagnosticId) {
-        try (Connection c = DbContext.getConnection()) {
+    public ServiceResult loadForEdit (int technicianId, int diagnosticId) {
+        try (Connection c = DbContext.getConnection()){
             VehicleDiagnostic vd = diagnosticDAO.getDiagnosticWithFullInfo(c, diagnosticId);
 
-            if (vd == null || !vd.isApproved()) {
+            if(vd == null){
                 return ServiceResult.error(MessageConstants.ERR002);
             }
 
-            if (!diagnosticDAO.canTechnicianAccessDiagnostic(c, diagnosticId, technicianId)) {
+            if(!diagnosticDAO.canTechnicianAccessDiagnostic(c, diagnosticId, technicianId)){
                 return ServiceResult.error(MessageConstants.AUTH001);
+            }
+
+            if (vd.isApproved()) {
+                return ServiceResult.error(MessageConstants.DIAG005 /* "Diagnostic is approved and cannot be edited." */);
             }
 
             boolean locked = diagnosticDAO.hasAnyApprovedParts(c, diagnosticId)
                     || diagnosticDAO.hasApprovedWorkOrderForDiagnostic(c, diagnosticId);
 
-            Map<Integer, List<DiagnosticPart>> map = diagnosticDAO
-                    .getPartsForDiagnostics(Collections.singletonList(diagnosticId));
+            Map<Integer, List<DiagnosticPart>> map = diagnosticDAO.getPartsForDiagnostics(Collections.singletonList(diagnosticId));
             List<DiagnosticPart> parts = map.getOrDefault(diagnosticId, Collections.emptyList());
 
             // TÍNH TỔNG PARTS
@@ -241,7 +245,7 @@ public class VehicleDiagnosticService {
                 partsSum = partsSum.add(line);
             }
 
-            // TÍNH NGƯỢC LABOR = estimateCost - partsSum
+            //TÍNH NGƯỢC LABOR = estimateCost - partsSum
             BigDecimal totalEstimate = vd.getEstimateCost() == null ? BigDecimal.ZERO : vd.getEstimateCost();
             BigDecimal laborCost = totalEstimate.subtract(partsSum);
 
@@ -250,7 +254,7 @@ public class VehicleDiagnosticService {
                 laborCost = BigDecimal.ZERO;
             }
 
-            // SET VÀO FIELD RIÊNG
+            //SET VÀO FIELD RIÊNG
             vd.setLaborCostCalculated(laborCost);
 
             EditDiagnosticVM vm = new EditDiagnosticVM();
@@ -271,21 +275,22 @@ public class VehicleDiagnosticService {
             int diagnosticId,
             String issueFound,
             BigDecimal laborCost,
-            List<DiagnosticPart> newParts) {
-        try (Connection c = DbContext.getConnection(false)) {
+            List<DiagnosticPart> newParts
+    ){
+        try (Connection c = DbContext.getConnection(false)){
             VehicleDiagnostic vd = diagnosticDAO.getDiagnosticWithFullInfo(c, diagnosticId);
-            if (vd == null || vd.isRejected()) {
+            if(vd == null){
                 return ServiceResult.error(MessageConstants.ERR002);
             }
 
-            if (!diagnosticDAO.canTechnicianAccessDiagnostic(c, diagnosticId, technicianId)) {
+            if(!diagnosticDAO.canTechnicianAccessDiagnostic(c, diagnosticId, technicianId)){
                 return ServiceResult.error(MessageConstants.AUTH001);
             }
 
             boolean locked = diagnosticDAO.hasAnyApprovedParts(c, diagnosticId)
                     || diagnosticDAO.hasApprovedWorkOrderForDiagnostic(c, diagnosticId);
 
-            if (locked) {
+            if(locked){
                 return ServiceResult.error(MessageConstants.AUTH001);
             }
 
@@ -296,6 +301,7 @@ public class VehicleDiagnosticService {
             if (laborCost == null || laborCost.compareTo(BigDecimal.ZERO) < 0) {
                 laborCost = BigDecimal.ZERO;
             }
+
 
             String updateSQL = "UPDATE VehicleDiagnostic SET IssueFound = ? WHERE VehicleDiagnosticID = ?";
             try (PreparedStatement ps = c.prepareStatement(updateSQL)) {
@@ -312,10 +318,10 @@ public class VehicleDiagnosticService {
 
             // TÍNH TỔNG PARTS MỚI
             BigDecimal partsSum = BigDecimal.ZERO;
-            if (newParts != null) {
-                for (DiagnosticPart p : newParts) {
+            if(newParts != null){
+                for (DiagnosticPart p : newParts){
                     ServiceResult pr = partService.getPartDetailById(p.getPartDetailID());
-                    if (pr.isError() || pr.getData() == null) {
+                    if(pr.isError() || pr.getData() == null){
                         DbContext.rollback(c);
                         return ServiceResult.error(pr.getMessage());
                     }
@@ -340,6 +346,7 @@ public class VehicleDiagnosticService {
                 }
             }
 
+
             BigDecimal totalEstimate = laborCost.add(partsSum);
             diagnosticDAO.updateEstimateCost(c, diagnosticId, totalEstimate);
 
@@ -349,5 +356,6 @@ public class VehicleDiagnosticService {
             throw new RuntimeException(e);
         }
     }
+
 
 }
