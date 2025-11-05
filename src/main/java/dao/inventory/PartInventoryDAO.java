@@ -3,6 +3,7 @@ package dao.inventory;
 import common.DbContext;
 import model.inventory.CharacteristicValue;
 import model.inventory.PartDetail;
+import model.inventory.WorkOrderPart;
 import org.checkerframework.checker.units.qual.A;
 
 import java.sql.Connection;
@@ -12,27 +13,30 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static common.DbContext.getConnection;
+
 public class PartInventoryDAO {
 
     public List<PartDetail> searchAvailableParts(String keyword) throws SQLException {
-        String sql =
-                "SELECT pd.PartDetailID, pd.PartID, pd.SKU, pd.Quantity, pd.MinStock, pd.UnitPrice, pd.Location, " +
-                        "       p.PartCode, p.PartName, p.Category, u.name AS UnitName " +
-                        "FROM PartDetail pd " +
-                        "JOIN Part p ON p.PartID = pd.PartID " +
-                        "JOIN Unit u ON u.unit_id = p.base_unit_id " +
-                        "WHERE pd.Quantity > 0 AND (" +
-                        "      LOWER(p.PartName) LIKE LOWER(CONCAT('%', ?, '%')) OR " +
-                        "      LOWER(pd.SKU)     LIKE LOWER(CONCAT('%', ?, '%')) OR " +
-                        "      LOWER(p.Category) LIKE LOWER(CONCAT('%', ?, '%')) OR " +
-                        "      LOWER(p.Description) LIKE LOWER(CONCAT('%', ?, '%'))" +
-                        ") " +
-                        "ORDER BY p.PartName ASC";
+        String sql = "SELECT pd.PartDetailID, pd.PartID, pd.SKU, pd.Quantity, pd.MinStock, pd.UnitPrice, pd.Location, "
+                +
+                "       p.PartCode, p.PartName, p.Category, u.name AS UnitName " +
+                "FROM PartDetail pd " +
+                "JOIN Part p ON p.PartID = pd.PartID " +
+                "JOIN Unit u ON u.unit_id = p.base_unit_id " +
+                "WHERE pd.Quantity > 0 AND (" +
+                "      LOWER(p.PartName) LIKE LOWER(CONCAT('%', ?, '%')) OR " +
+                "      LOWER(pd.SKU)     LIKE LOWER(CONCAT('%', ?, '%')) OR " +
+                "      LOWER(p.Category) LIKE LOWER(CONCAT('%', ?, '%')) OR " +
+                "      LOWER(p.Description) LIKE LOWER(CONCAT('%', ?, '%'))" +
+                ") " +
+                "ORDER BY p.PartName ASC";
 
         List<PartDetail> out = new ArrayList<>();
         try (Connection c = DbContext.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            for (int i = 1; i <= 4; i++) ps.setString(i, keyword == null ? "" : keyword.trim());
+                PreparedStatement ps = c.prepareStatement(sql)) {
+            for (int i = 1; i <= 4; i++)
+                ps.setString(i, keyword == null ? "" : keyword.trim());
             try (ResultSet rs = ps.executeQuery()) {
 
                 while (rs.next()) {
@@ -51,8 +55,7 @@ public class PartInventoryDAO {
                     out.add(d);
                 }
 
-
-            }catch (SQLException e) {
+            } catch (SQLException e) {
                 e.printStackTrace();
             }
 
@@ -355,8 +358,43 @@ public class PartInventoryDAO {
         return parts;
     }
 
+    public List<WorkOrderPart> getPartsByWorkOrderId(int workOrderId) {
+        List<WorkOrderPart> parts = new ArrayList<>();
+        // We JOIN WorkOrderPart (aliased 'p') with WorkOrderDetail (aliased 'd')
+        // to find all parts associated with the target WorkOrderID.
+        String sql = "SELECT p.* " +
+                "FROM WorkOrderPart p " +
+                "JOIN WorkOrderDetail d ON p.DetailID = d.DetailID " +
+                "WHERE d.WorkOrderID = ?";
 
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
+            ps.setInt(1, workOrderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    parts.add(mapResultSetToWorkOrderPart(rs));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error getting WorkOrderParts by WorkOrderID: " + e.getMessage());
+        }
+        return parts;
+    }
+
+    private WorkOrderPart mapResultSetToWorkOrderPart(ResultSet rs) throws SQLException {
+        WorkOrderPart part = new WorkOrderPart();
+        part.setWorkOrderPartId(rs.getInt("WorkOrderPartID"));
+        part.setDetailID(rs.getInt("DetailID"));
+        part.setPartDetailID(rs.getInt("PartDetailID"));
+        part.setRequestByID(rs.getInt("RequestedByID"));
+        part.setQuantityUsed(rs.getInt("QuantityUsed"));
+        part.setUnitPrice(rs.getBigDecimal("UnitPrice"));
+        part.setRequestStatus(rs.getString("request_status"));
+        part.setRequestedAt(rs.getTimestamp("requested_at").toLocalDateTime());
+        return part;
+    }
 
     private PartDetail mapResultSetToPartDetail(ResultSet rs) throws SQLException {
         PartDetail part = new PartDetail();

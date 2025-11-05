@@ -91,6 +91,7 @@ public class VehicleDAO {
 //            throw new RuntimeException("Lỗi khi lấy VehicleID theo biển số xe", e);
 //        }
 //    }
+
     private Vehicle extractVehicleFromResultSet(ResultSet rs) throws SQLException {
         Vehicle v = new Vehicle();
         v.setVehicleID(rs.getInt("VehicleID"));
@@ -142,18 +143,6 @@ public class VehicleDAO {
             return st.executeUpdate() > 0;
         }
     }
-//    public List<String> getAllLicensePlates() throws SQLException {
-//        List<String> plates = new ArrayList<>();
-//        String sql = "SELECT LicensePlate FROM Vehicle";
-//        try (Connection conn = DbContext.getConnection();
-//             PreparedStatement st = conn.prepareStatement(sql);
-//             ResultSet rs = st.executeQuery()) {
-//            while (rs.next()) {
-//                plates.add(rs.getString("LicensePlate"));
-//            }
-//        }
-//        return plates;
-//    }
     public List<String> getAllLicensePlates() throws SQLException {
         List<String> plates = new ArrayList<>();
         String sql = "SELECT LicensePlate FROM Vehicle";
@@ -277,6 +266,26 @@ public class VehicleDAO {
         }
         return vehicles;
     }
+
+//    public List<String> getAllLicensePlates() throws SQLException {
+//        List<String> plates = new ArrayList<>();
+//        String sql = "SELECT LicensePlate FROM Vehicle";
+//        try (Connection conn = DbContext.getConnection();
+//             PreparedStatement st = conn.prepareStatement(sql);
+//             ResultSet rs = st.executeQuery()) {
+//            while (rs.next()) {
+//                plates.add(rs.getString("LicensePlate"));
+//            }
+//        }
+//        return plates;
+//    }
+
+
+
+
+
+
+
 
     public List<Vehicle> searchVehicles(String keyword, int customerId, int limit, int offset) throws SQLException {
         List<Vehicle> list = new ArrayList<>();
