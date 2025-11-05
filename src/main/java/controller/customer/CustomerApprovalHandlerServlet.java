@@ -17,9 +17,9 @@ import java.sql.SQLException;
 
 /**
  * Customer Approval Handler Servlet - Phase 3 & 4
- * 
+ *
  * Handles customer approval/rejection of diagnostic quotes (VehicleDiagnostic).
- * 
+ *
  * Workflow:
  * 1. Customer views diagnostic quote (from email/notification link)
  * 2. Customer approves or rejects the quote
@@ -30,7 +30,7 @@ import java.sql.SQLException;
  * 4. If REJECTED:
  * - Update VehicleDiagnostic.Status = 'REJECTED'
  * - Tech Manager can see this in rejected-tasks page
- * 
+ *
  * @version 1.0
  * @since 2025-11-04
  */
@@ -70,7 +70,7 @@ public class CustomerApprovalHandlerServlet extends HttpServlet {
             }
 
             // Check if already approved/rejected
-            if (diagnostic.getStatus() != VehicleDiagnostic.Status.SUBMITTED) {
+            if (diagnostic.getStatus() != VehicleDiagnostic.DiagnosticStatus.SUBMITTED) {
                 request.setAttribute("alreadyProcessed", true);
                 request.setAttribute("status", diagnostic.getStatus().name());
             }
@@ -123,7 +123,7 @@ public class CustomerApprovalHandlerServlet extends HttpServlet {
                 }
 
                 // Check if already processed
-                if (diagnostic.getStatus() != VehicleDiagnostic.Status.SUBMITTED) {
+                if (diagnostic.getStatus() != VehicleDiagnostic.DiagnosticStatus.SUBMITTED) {
                     response.sendRedirect(request.getContextPath() +
                             "/customer/approve-quote?diagnosticId=" + diagnosticId +
                             "&message=This quote has already been " + diagnostic.getStatus().name().toLowerCase());
@@ -134,7 +134,7 @@ public class CustomerApprovalHandlerServlet extends HttpServlet {
                     // ===== APPROVE DIAGNOSIS =====
 
                     // Update VehicleDiagnostic status
-                    diagnostic.setStatus(VehicleDiagnostic.Status.APPROVED);
+                    diagnostic.setStatus(VehicleDiagnostic.DiagnosticStatus.APPROVED);
                     diagnosticDAO.update(conn, diagnostic);
 
                     // ===== PHASE 4: AUTO-CREATE WorkOrderDetail =====
@@ -153,7 +153,7 @@ public class CustomerApprovalHandlerServlet extends HttpServlet {
                 } else if ("reject".equals(action)) {
                     // ===== REJECT DIAGNOSIS =====
 
-                    diagnostic.setStatus(VehicleDiagnostic.Status.REJECTED);
+                    diagnostic.setStatus(VehicleDiagnostic.DiagnosticStatus.REJECTED);
 
                     // Store rejection reason in IssueFound or a Notes field
                     if (rejectionReason != null && !rejectionReason.trim().isEmpty()) {

@@ -1,15 +1,15 @@
 package controller.employee.customerservice;
 
 import model.servicetype.Service;
-import dao.carservice.ServiceDAO;
+import dao.carservice.CarServiceDAO;
 
-import dao.carservice.ServiceRequestDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 @WebServlet("/customerservice/service-types")
 public class ServiceTypeController extends HttpServlet {
 
-    private ServiceDAO serviceDAO;
+    private CarServiceDAO carServiceDAO;
 
     @Override
     public void init() throws ServletException {
-        serviceDAO = new ServiceDAO();
+        carServiceDAO = new CarServiceDAO();
     }
 
     @Override
@@ -97,7 +97,7 @@ public class ServiceTypeController extends HttpServlet {
         }
 
         // Lấy tất cả service types
-        List<Service> allServices = serviceDAO.getAllServices();
+        List<Service> allServices = carServiceDAO.getAllServices();
 
         // Áp dụng tìm kiếm
         if (searchQuery != null && !searchQuery.trim().isEmpty()) {
@@ -146,12 +146,10 @@ public class ServiceTypeController extends HttpServlet {
         int startIndex = (page - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, totalServices);
 
-        List<Service> paginatedServices = allServices.subList(startIndex, endIndex);
+        List<Service> paginatedServices = totalServices > 0 ? allServices.subList(startIndex, endIndex) : new ArrayList<>();
 
         // Lấy tất cả categories duy nhất cho dropdown filter
-        Set<String> categories = serviceDAO.getAllServices().stream()
-                .map(Service::getCategory)
-                .collect(Collectors.toSet());
+        List<String> categories = carServiceDAO.getAllCategories();
 
         // Set attributes
         request.setAttribute("services", paginatedServices);
@@ -169,7 +167,7 @@ public class ServiceTypeController extends HttpServlet {
             throws ServletException, IOException {
 
         int id = Integer.parseInt(request.getParameter("id"));
-        Service service = serviceDAO.getServiceById(id);
+        Service service = carServiceDAO.getServiceById(id);
 
         // Lấy các tham số filter hiện tại
         String searchQuery = request.getParameter("search");
@@ -191,7 +189,7 @@ public class ServiceTypeController extends HttpServlet {
         }
 
         // Lấy tất cả service types và áp dụng filters
-        List<Service> allServices = serviceDAO.getAllServices();
+        List<Service> allServices = carServiceDAO.getAllServices();
 
         if (searchQuery != null && !searchQuery.trim().isEmpty()) {
             final String search = searchQuery.toLowerCase().trim();
@@ -234,11 +232,9 @@ public class ServiceTypeController extends HttpServlet {
         int startIndex = (page - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, totalServices);
 
-        List<Service> paginatedServices = allServices.subList(startIndex, endIndex);
+        List<Service> paginatedServices = totalServices > 0 ? allServices.subList(startIndex, endIndex) : new ArrayList<>();
 
-        Set<String> categories = serviceDAO.getAllServices().stream()
-                .map(Service::getCategory)
-                .collect(Collectors.toSet());
+        List<String> categories = carServiceDAO.getAllCategories();
 
         request.setAttribute("services", paginatedServices);
         request.setAttribute("categories", categories);
@@ -266,7 +262,7 @@ public class ServiceTypeController extends HttpServlet {
         service.setCategory(category);
         service.setPrice(price);
 
-        boolean success = serviceDAO.addService(service);
+        boolean success = carServiceDAO.addService(service);
 
         if (success) {
             request.getSession().setAttribute("message", "Service type added successfully!");
@@ -298,7 +294,7 @@ public class ServiceTypeController extends HttpServlet {
         service.setCategory(category);
         service.setPrice(price);
 
-        boolean success = serviceDAO.updateService(service);
+        boolean success = carServiceDAO.updateService(service);
 
         if (success) {
             request.getSession().setAttribute("message", "Service type updated successfully!");
@@ -318,7 +314,7 @@ public class ServiceTypeController extends HttpServlet {
             throws ServletException, IOException {
 
         int id = Integer.parseInt(request.getParameter("id"));
-        boolean success = serviceDAO.deleteService(id);
+        boolean success = carServiceDAO.deleteService(id);
 
         if (success) {
             request.getSession().setAttribute("message", "Service type deleted successfully!");
