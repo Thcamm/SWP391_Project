@@ -59,16 +59,17 @@ public class ServiceRequestService {
             conn = common.DbContext.getConnection();
             conn.setAutoCommit(false);
 
-            // Step 1: Check if ServiceRequest is PENDING
-            ServiceRequest serviceRequest = dao.getServiceRequestForUpdate(conn, requestId);
-            if (serviceRequest == null || !serviceRequest.getStatus().equals("PENDING")) {
+            // Step 1: Lock and check ServiceRequest status
+            ServiceRequest sr = dao.getServiceRequestForUpdate(conn, requestId);
+
+            if (sr == null) {
                 conn.rollback();
                 return -2; // Not in PENDING status
             }
 
             // Step 2: Update ServiceRequest status to APPROVE
-            boolean statusUpdated = dao.updateServiceRequestStatus(conn, requestId, "APPROVE");
-            if (!statusUpdated) {
+            boolean updated = dao.updateServiceRequestStatus(conn, requestId, "APPROVE");
+            if (!updated) {
                 conn.rollback();
                 return -1;
             }

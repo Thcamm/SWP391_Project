@@ -12,47 +12,58 @@
 
 <body>
 
-<jsp:include page="/common/employee/component/header.jsp" />
-<div class="layout-wrapper layout-content-navbar">
-    <div class="layout-container">
-        <jsp:include page="/common/employee/component/sidebar.jsp" />
 
-        <div class="layout-page">
-            <jsp:include page="/common/employee/component/navbar.jsp" />
+<jsp:include page="header.jsp"/>
 
-            <div class="content-wrapper">
-                <div class="container-fluid flex-grow-1 container-p-y">
+<div class="container-fluid p-0">
+    <div class="row g-0">
+        <div class="col-auto" style="width: 280px;">
+            <jsp:include page="sidebar.jsp"/>
+        </div>
 
+        <!-- Main Content Column -->
+        <div class="col">
+            <main class="main" style="padding: 1.25rem; padding-bottom: 0;">
+                <div class="content-card"
+                     style="background: white;
+                      border: 1px solid #e5e7eb;
+                       border-radius: 12px;
+                        padding: 2.5rem;
+                         min-height: calc(100vh - 64px - 1.25rem);
+                          display: flex; flex-direction: column;
+                           <%--align-items: center; justify-content: center;--%>
+                           ">
+                    <!-- Nội dung trang home của bạn ở đây -->
                     <div class="main-container">
                         <!-- Page Header -->
                         <div class="page-header">
-                            <h3 class="page-title">Tạo Service Order</h3>
+                            <h3 class="page-title">Create Service Order</h3>
                         </div>
 
                         <!-- Customer Information Card -->
                         <div class="customer-info-card">
-                            <h5 class="customer-info-title">Thông Tin Khách Hàng</h5>
+                            <h5 class="customer-info-title">Customer Information</h5>
 
                             <div class="customer-info-row">
                                 <div class="customer-info-item">
-                                    <span class="customer-info-label">Họ và Tên</span>
+                                    <span class="customer-info-label">Full Name</span>
                                     <span class="customer-info-value">
-                        <c:out value="${customer.fullName}" />
-                    </span>
+                                        <c:out value="${customer.fullName}" />
+                                    </span>
                                 </div>
 
                                 <div class="customer-info-item">
                                     <span class="customer-info-label">Email</span>
                                     <span class="customer-info-value">
-                        <c:out value="${customer.email}" />
-                    </span>
+                                        <c:out value="${customer.email}" />
+                                    </span>
                                 </div>
 
                                 <div class="customer-info-item">
-                                    <span class="customer-info-label">Số Điện Thoại</span>
+                                    <span class="customer-info-label">Phone Number</span>
                                     <span class="customer-info-value">
-                        <c:out value="${customer.phoneNumber}" />
-                    </span>
+                                        <c:out value="${customer.phoneNumber}" />
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -76,12 +87,12 @@
                                     <!-- Vehicle Selection -->
                                     <div class="form-group position-relative">
                                         <label class="form-label">
-                                            Chọn Xe <span class="required-mark">*</span>
+                                            Select Vehicle <span class="required-mark">*</span>
                                         </label>
                                         <input type="hidden" name="vehicleIds[0]" class="vehicle-id" required/>
                                         <input type="text"
                                                class="form-control vehicle-input"
-                                               placeholder="Tìm xe theo biển số hoặc model..."
+                                               placeholder="Find a car by license plate or model..."
                                                autocomplete="off"
                                                required/>
                                     </div>
@@ -89,20 +100,21 @@
                                     <!-- Services Selection -->
                                     <div class="form-group position-relative">
                                         <label class="form-label form-label-service">
-                                            Chọn Dịch Vụ <span class="required-mark">*</span>
+                                            Select Service <span class="required-mark">*</span>
                                         </label>
                                         <input type="text"
                                                class="form-control service-input"
-                                               placeholder="Tìm dịch vụ..."
+                                               placeholder="Find service..."
                                                autocomplete="off" />
 
                                         <!-- Selected Services Table -->
                                         <div class="service-table-wrapper">
-                                            <div class="service-table-header">Dịch vụ đã chọn</div>
+                                            <div class="service-table-header">Selected service</div>
                                             <table class="service-table selected-services">
                                                 <tbody>
                                                 <tr class="no-service">
-                                                    <td colspan="3">Chưa có dịch vụ nào được chọn</td>
+                                                    <td colspan="3">
+                                                        No services have been selected yet</td>
                                                 </tr>
                                                 </tbody>
                                             </table>
@@ -111,11 +123,11 @@
 
                                     <!-- Notes -->
                                     <div class="form-group">
-                                        <label class="form-label form-label-note">Ghi Chú</label>
+                                        <label class="form-label form-label-note">Note</label>
                                         <textarea class="form-control"
                                                   name="note"
                                                   rows="3"
-                                                  placeholder="Nhập ghi chú hoặc yêu cầu đặc biệt..."></textarea>
+                                                  placeholder="Enter any notes or special requests..."></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -123,56 +135,31 @@
                             <!-- Action Buttons -->
                             <div class="btn-group">
                                 <button type="button" class="btn btn-add" id="addOrderBtn">
-                                    ➕ Thêm Service Order
+                                    Add
                                 </button>
                                 <button type="submit" class="btn btn-submit">
-                                    ✓ Tạo Yêu Cầu
+                                    Create
                                 </button>
                             </div>
                         </form>
-                        <!-- Modal Add Vehicle -->
-                        <div class="modal fade" id="addVehicleModal" tabindex="-1" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="addVehicleModalLabel">Thêm xe mới</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-                                    </div>
-
-                                    <form id="addVehicleForm" action="${pageContext.request.contextPath}/customerservice/addVehicle" method="post">
-                                        <div class="modal-body">
-                                            <jsp:include page="/view/customerservice/add-vehicle.jsp"/>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                            <button type="submit" class="btn btn-primary">Lưu xe</button>
-                                        </div>
-                                    </form>
+                        <jsp:include page="/view/customerservice/add-vehicle.jsp" />
 
 
-                                </div>
-                            </div>
-                        </div>
 
                     </div>
-
                 </div>
-                <jsp:include page="/common/employee/component/footer.jsp" />
-
-                <div class="content-backdrop fade"></div>
-            </div>
+            </main>
         </div>
     </div>
-    <div class="layout-overlay layout-menu-toggle"></div>
 </div>
-<jsp:include page="/common/employee/component/script.jsp" />
-
-
+<jsp:include page="footer.jsp"/>
 <script>
     const contextPath = "${pageContext.request.contextPath}";
     const customerId = "${customer.customerId}";
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script src="${pageContext.request.contextPath}/assets/js/customerservice/create-service-request.js"></script>
+
 </body>
 </html>
