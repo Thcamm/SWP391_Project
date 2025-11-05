@@ -140,12 +140,77 @@ public class SupportDAO extends DbContext {
             ps.executeUpdate();
         }
     }
+    public int countSupportRequests() throws SQLException {
+        String sql = "SELECT COUNT(*) AS total FROM SupportRequest";
+        try (PreparedStatement ps = getConnection().prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("total");
+            }
+        }
+        return 0;
+    }
+    public int countFilteredSupportRequests(
+            Integer categoryId,
+            String[] statuses,
+            String fromDate,
+            String toDate
+    ) throws SQLException {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(*) AS total FROM SupportRequest WHERE 1=1 "
+        );
+
+        if (categoryId != null) {
+            sql.append(" AND CategoryID = ? ");
+        }
+        if (statuses != null && statuses.length > 0) {
+            sql.append(" AND Status IN (");
+            for (int i = 0; i < statuses.length; i++) {
+                sql.append("?");
+                if (i < statuses.length - 1) sql.append(",");
+            }
+            sql.append(")");
+        }
+        if (fromDate != null && !fromDate.isEmpty()) {
+            sql.append(" AND CreatedAt >= ? ");
+        }
+        if (toDate != null && !toDate.isEmpty()) {
+            sql.append(" AND CreatedAt <= ? ");
+        }
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql.toString())) {
+            int index = 1;
+            if (categoryId != null) {
+                ps.setInt(index++, categoryId);
+            }
+            if (statuses != null && statuses.length > 0) {
+                for (String s : statuses) {
+                    ps.setString(index++, s);
+                }
+            }
+            if (fromDate != null && !fromDate.isEmpty()) {
+                ps.setString(index++, fromDate + " 00:00:00");
+            }
+            if (toDate != null && !toDate.isEmpty()) {
+                ps.setString(index++, toDate + " 23:59:59");
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total");
+                }
+            }
+        }
+        return 0;
+    }
     public List<SupportRequest> getFilteredSupportRequests(
             Integer categoryId,
             String[] statuses,
             String fromDate,
             String toDate,
-            String sortOrder
+            String sortOrder,
+            int limit,
+            int offset
     ) throws SQLException {
 
         List<SupportRequest> list = new ArrayList<>();
@@ -176,7 +241,7 @@ public class SupportDAO extends DbContext {
         } else {
             sql.append(" ORDER BY CreatedAt DESC");
         }
-
+        sql.append(" LIMIT ? OFFSET ?");
         try (PreparedStatement ps = getConnection().prepareStatement(sql.toString())) {
             int index = 1;
             if (categoryId != null) {
@@ -193,6 +258,8 @@ public class SupportDAO extends DbContext {
             if (toDate != null && !toDate.isEmpty()) {
                 ps.setString(index++, toDate + " 23:59:59");
             }
+            ps.setInt(index++, limit);
+            ps.setInt(index, offset);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -210,19 +277,25 @@ public class SupportDAO extends DbContext {
         return list;
     }
 
-    public List<SupportRequest> getAllSupportRequests() throws SQLException {
+    public List<SupportRequest> getAllSupportRequestsWithLimit(int limit,int offset) throws SQLException {
         List<SupportRequest> list = new ArrayList<>();
-        String sql = "SELECT * FROM SupportRequest order by createdAt desc ";
+        String sql = "SELECT * FROM SupportRequest order by createdAt desc LIMIT ? OFFSET ?";
         try (PreparedStatement ps = getConnection().prepareStatement(sql);
-        ResultSet rs = ps.executeQuery()){
+        ){
+            ps.setInt(1, limit);
+            ps.setInt(2, offset);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 SupportRequest sr = new SupportRequest();
                 sr.setRequestId(rs.getInt("RequestID"));
                 sr.setCustomerId(rs.getInt("CustomerID"));
                 sr.setCategoryId(rs.getInt("CategoryID"));
                 sr.setStatus(rs.getString("Status"));
-                sr.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
-                sr.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
+                Timestamp createdAt = rs.getTimestamp("CreatedAt");
+                Timestamp updatedAt = rs.getTimestamp("UpdatedAt");
+
+                sr.setCreatedAt(createdAt != null ? createdAt.toLocalDateTime() : null);
+                sr.setUpdatedAt(updatedAt != null ? updatedAt.toLocalDateTime() : null);
 
                 list.add(sr);
             }
@@ -273,8 +346,12 @@ public class SupportDAO extends DbContext {
                     sr.setDescription(rs.getString("Description"));
                     sr.setAttachmentPath(rs.getString("AttachmentPath"));
                     sr.setStatus(rs.getString("Status"));
-                    sr.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
-                    sr.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
+                    Timestamp createdAt = rs.getTimestamp("CreatedAt");
+                    Timestamp updatedAt = rs.getTimestamp("UpdatedAt");
+
+                    sr.setCreatedAt(createdAt != null ? createdAt.toLocalDateTime() : null);
+                    sr.setUpdatedAt(updatedAt != null ? updatedAt.toLocalDateTime() : null);
+
 
                     return sr;
                 }

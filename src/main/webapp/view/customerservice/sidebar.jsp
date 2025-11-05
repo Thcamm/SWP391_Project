@@ -86,7 +86,7 @@
     <aside class="sidebar">
         <div class="sidebar-brand">
             <i class="bi bi-calculator"></i>
-            <span>Accountant Panel</span>
+            <span>Customer Service Panel</span>
         </div>
 
         <nav class="flex-grow-1">
@@ -94,61 +94,71 @@
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link ${fn:contains(currentURI, '/home') ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/accountant/home">
+                       href="${pageContext.request.contextPath}/customerservice/home">
                         <i class="bi bi-house-door"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link ${fn:contains(currentURI, '/invoice') ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/accountant/invoice">
-                        <i class="bi bi-receipt"></i>
-                        <span>Invoices</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link ${fn:contains(currentURI, '/payment') ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/accountant/payment">
-                        <i class="bi bi-cash-coin"></i>
-                        <span>Payments</span>
-                    </a>
-                </li>
+<%--                <li class="nav-item">--%>
+<%--                    <a class="nav-link ${fn:contains(currentURI, '/search-customer') ? 'active' : ''}"--%>
+<%--                       href="${pageContext.request.contextPath}/customerservice/search-customer">--%>
+<%--                        <i class="bi bi-receipt"></i>--%>
+<%--                        <span>Customers</span>--%>
+<%--                    </a>--%>
+<%--                </li>--%>
+<%--                <li class="nav-item">--%>
+<%--                    <a class="nav-link ${fn:contains(currentURI, '/appointment-list') ? 'active' : ''}"--%>
+<%--                       href="${pageContext.request.contextPath}/customerservice/appointment-list">--%>
+<%--                        <i class="bi bi-cash-coin"></i>--%>
+<%--                        <span>Appointments</span>--%>
+<%--                    </a>--%>
+<%--                </li>--%>
             </ul>
 
-            <div class="menu-title">Analytics</div>
+            <div class="menu-title">Customer</div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link ${fn:contains(currentURI, '/report') ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/accountant/report">
+                    <a class="nav-link ${fn:contains(currentURI, '/search-customer') ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/customerservice/search-customer">
                         <i class="bi bi-graph-up"></i>
-                        <span>Financial Reports</span>
+                        <span>Customer List</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link ${fn:contains(currentURI, '/statistics') ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/accountant/statistics">
+                    <a class="nav-link ${fn:contains(currentURI, '/create-customer') ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/customerservice/create-customer">
                         <i class="bi bi-bar-chart"></i>
-                        <span>Statistics</span>
+                        <span>Create Customer</span>
                     </a>
                 </li>
             </ul>
-
-            <div class="menu-title">Quick Links</div>
+            <div class="menu-title">Appointments</div>
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link"
-                       href="${pageContext.request.contextPath}/accountant/invoice?action=overdue">
+                       href="${pageContext.request.contextPath}/customerservice/appointment-list">
                         <i class="bi bi-clock-history text-danger"></i>
-                        <span>Overdue Invoices</span>
+                        <span>Appointment List</span>
                     </a>
                 </li>
+            </ul>
+            <div class="menu-title">Support Request</div>
+
+            <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link"
-                       href="${pageContext.request.contextPath}/accountant/invoice?action=create">
-                        <i class="bi bi-plus-circle text-success"></i>
-                        <span>Create Invoice</span>
+                    <a class="nav-link ${fn:contains(currentURI, '/view-support-request') ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/customerservice/view-support-request">
+                        <i class="bi bi-clock-history "></i>
+                        <span>Support Requests</span>
                     </a>
                 </li>
+<%--                <li class="nav-item">--%>
+<%--                    <a class="nav-link"--%>
+<%--                       href="${pageContext.request.contextPath}/accountant/invoice?action=create">--%>
+<%--                        <i class="bi bi-plus-circle text-success"></i>--%>
+<%--                        <span>Create Invoice</span>--%>
+<%--                    </a>--%>
+<%--                </li>--%>
             </ul>
         </nav>
 

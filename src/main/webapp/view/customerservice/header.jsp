@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accountant Dashboard - Garage Management</title>
+    <title>Customer Service Dashboard - Garage Management</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -105,7 +105,7 @@
 <header class="header">
     <div class="d-flex align-items-center justify-content-between position-relative">
         <!-- Logo bên trái -->
-        <a href="${pageContext.request.contextPath}/accountant/home" class="logo">
+        <a href="${pageContext.request.contextPath}/customerservice/home" class="logo">
             <i class="bi bi-tools"></i>
             <span>Garage Management</span>
         </a>
@@ -114,25 +114,25 @@
         <nav class="main-nav d-none d-lg-block">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/accountant/home"
+                    <a href="${pageContext.request.contextPath}/customerservice/home"
                        class="nav-link ${pageContext.request.requestURI.contains('/home') ? 'active' : ''}">
                         <i class="bi bi-house-door me-1"></i>Home
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/accountant/invoice"
-                       class="nav-link ${pageContext.request.requestURI.contains('/invoice') ? 'active' : ''}">
-                        <i class="bi bi-receipt me-1"></i>Invoices
+                    <a href="${pageContext.request.contextPath}/customerservice/search-customer"
+                       class="nav-link ${pageContext.request.requestURI.contains('/search-customer') ? 'active' : ''}">
+                        <i class="bi bi-receipt me-1"></i>Customer List
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/accountant/payment"
-                       class="nav-link ${pageContext.request.requestURI.contains('/payment') ? 'active' : ''}">
-                        <i class="bi bi-cash-coin me-1"></i>Payments
+                    <a href="${pageContext.request.contextPath}/customerservice/appointment-list"
+                       class="nav-link ${pageContext.request.requestURI.contains('/appointment-list') ? 'active' : ''}">
+                        <i class="bi bi-cash-coin me-1"></i>Appointment List
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/accountant/report"
+                    <a href="${pageContext.request.contextPath}/customerservice/"
                        class="nav-link ${pageContext.request.requestURI.contains('/report') ? 'active' : ''}">
                         <i class="bi bi-graph-up me-1"></i>Reports
                     </a>
@@ -144,7 +144,7 @@
         <div class="d-flex align-items-center gap-3">
             <!-- Notification Bell -->
             <div class="dropdown">
-                <a class="nav-link position-relative"  role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.5rem;">
+                <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.5rem;">
                     <i class="bi bi-bell" style="font-size: 20px; color: #6b7280;"></i>
                     <!-- Uncomment nếu có notifications -->
                     <%-- <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">
@@ -166,6 +166,7 @@
             <!-- User Dropdown -->
             <div class="dropdown">
                 <a class="d-flex align-items-center text-decoration-none dropdown-toggle-custom"
+                   href="#"
                    role="button"
                    data-bs-toggle="dropdown"
                    aria-expanded="false"
@@ -173,7 +174,7 @@
                     <div class="text-end">
                         <div style="font-size: 12px; color: #6b7280; margin-bottom: 2px;">Welcome back,</div>
                         <div style="font-weight: 600; color: #111827; line-height: 1.2;">${sessionScope.userName != null ? sessionScope.userName : 'User'}</div>
-                        <div style="font-size: 12px; color: #6b7280; margin-top: 2px;">${sessionScope.roleName != null ? sessionScope.roleName : 'Accountant'}</div>
+                        <div style="font-size: 12px; color: #6b7280; margin-top: 2px;">${sessionScope.roleName != null ? sessionScope.roleName : 'Customer Service'}</div>
                     </div>
                     <i class="bi bi-chevron-down ms-2" style="font-size: 12px; color: #6b7280;"></i>
                 </a>

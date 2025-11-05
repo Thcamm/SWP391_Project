@@ -247,7 +247,7 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             const totalOrders = document.querySelectorAll(".service-order").length;
             if (totalOrders <= 1) {
-                showAlert("Phải có ít nhất 1 Service Order", "warning");
+                showAlert("Must have at least 1 Service Order", "warning");
                 return;
             }
 
@@ -309,7 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const data = await res.json();
 
                 const mapped = data.length === 0
-                    ? [{ label: "Không tìm thấy xe – Thêm xe", value: null, addNew: true }]
+                    ? [{ label: "\n" +"No car found – Add car", value: null, addNew: true }]
                     : data.map(v => ({
                         label: `${v.licensePlate} | ${v.brand} ${v.model}`,
                         value: v.vehicleID,
@@ -374,7 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             } catch (e) {
                 console.error("Error fetching vehicles:", e);
-                showAlert("Lỗi khi tải danh sách xe", "error");
+                showAlert("Error fetching vehicles", "error");
             }
         }
 
@@ -466,7 +466,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             } catch (e) {
                 console.error("Error fetching services:", e);
-                showAlert("Lỗi khi tải danh sách dịch vụ", "error");
+                showAlert("Error fetching services", "error");
             }
         }
     }
@@ -529,7 +529,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (data.length === 0) {
             const div = document.createElement("div");
             div.className = "dropdown-item disabled";
-            div.textContent = "Không tìm thấy dịch vụ";
+            div.textContent = "Cannot find services";
             dropdown.appendChild(div);
         } else {
             data.forEach((item, idx) => {
@@ -603,7 +603,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const serviceInput = order.querySelector(".service-input");
                 serviceInput.classList.add("error");
                 setTimeout(() => serviceInput.classList.remove("error"), 500);
-                showAlert(`Service Order #${idx + 1} phải chọn ít nhất 1 dịch vụ`, "warning");
+                showAlert(`Service Order #${idx + 1} have to select at least 1 service`, "warning");
             }
 
             // Check vehicle
@@ -612,7 +612,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const vehicleInput = order.querySelector(".vehicle-input");
                 vehicleInput.classList.add("error");
                 setTimeout(() => vehicleInput.classList.remove("error"), 500);
-                showAlert(`Service Order #${idx + 1} chưa chọn xe`, "warning");
+                showAlert(`Service Order #${idx + 1} not select vehicle`, "warning");
             }
         });
 
@@ -626,141 +626,4 @@ document.addEventListener("DOMContentLoaded", () => {
         submitBtn.classList.add("loading");
         submitBtn.disabled = true;
     });
-});
-
-// ===== ADD VEHICLE FORM HANDLER =====
-window.addEventListener('DOMContentLoaded', function() {
-    const addVehicleForm = document.getElementById("addVehicleForm");
-
-    if (addVehicleForm) {
-        addVehicleForm.addEventListener("submit", function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            // Lấy giá trị trực tiếp từ các input elements
-            const brandId = document.getElementById("brandId").value;
-            const modelName = document.getElementById("modelName").value;
-            const licensePlate = document.getElementById("licensePlate").value;
-            const yearManufacture = document.getElementById("yearManufacture").value;
-            let customerIdValue = document.getElementById("modalCustomerId").value;
-
-            // Debug: Kiểm tra data trước khi gửi
-            console.log("=== Form Data Debug (Manual) ===");
-            console.log("brandId:", brandId);
-            console.log("modelName:", modelName);
-            console.log("licensePlate:", licensePlate);
-            console.log("yearManufacture:", yearManufacture);
-            console.log("customerId:", customerIdValue);
-
-            // Kiểm tra từng trường
-            const missingFields = [];
-            if (!brandId || brandId === "") missingFields.push("Hãng xe");
-            if (!modelName || modelName === "") missingFields.push("Model");
-            if (!licensePlate || licensePlate === "") missingFields.push("Biển số");
-            if (!yearManufacture || yearManufacture === "") missingFields.push("Năm sản xuất");
-
-            if (missingFields.length > 0) {
-                showAlert("Vui lòng điền đầy đủ thông tin: " + missingFields.join(", "), "error");
-                return false;
-            }
-
-            // Đảm bảo customerId được gửi đi
-            if (!customerIdValue || customerIdValue === "") {
-                if (typeof customerId !== 'undefined' && customerId !== "") {
-                    customerIdValue = customerId;
-                    console.log("Set customerId from global:", customerId);
-                } else {
-                    showAlert("Không tìm thấy thông tin khách hàng", "error");
-                    return false;
-                }
-            }
-
-            // Disable submit button để tránh double click
-            const submitBtn = addVehicleForm.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.disabled = true;
-            submitBtn.textContent = "Đang lưu...";
-
-            const apiUrl = (typeof contextPath !== 'undefined' ? contextPath : '') + '/customerservice/addVehicle?action=saveVehicle';
-
-// Tạo payload URL-encoded
-            const payload = new URLSearchParams();
-            payload.append('customerId', customerIdValue);
-            payload.append('brandId', brandId);
-            payload.append('modelName', modelName);
-            payload.append('yearManufacture', yearManufacture);
-            payload.append('licensePlate', licensePlate);
-
-            console.log("=== Payload Contents ===");
-            for (let [key, value] of payload.entries()) {
-                console.log(key + ": " + value);
-            }
-
-            console.log("Sending to:", apiUrl);
-
-            fetch(apiUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-                },
-                body: payload.toString()
-            })
-                .then(res => {
-                    console.log("Response status:", res.status);
-                    console.log("Response headers:", res.headers.get("content-type"));
-
-                    const contentType = res.headers.get("content-type");
-                    if (!contentType || !contentType.includes("application/json")) {
-                        return res.text().then(text => {
-                            console.error("Non-JSON response:", text);
-                            throw new Error('Server không trả về JSON');
-                        });
-                    }
-                    if (!res.ok) {
-                        throw new Error('HTTP error! status: ' + res.status);
-                    }
-                    return res.json();
-                })
-                .then(data => {
-                    console.log("Response data:", data);
-
-                    if (data.success) {
-                        // 1. Đóng modal
-                        const modalEl = document.getElementById("addVehicleModal");
-                        const modal = bootstrap.Modal.getInstance(modalEl);
-                        if (modal) {
-                            modal.hide();
-                        }
-
-                        // 2. Reset form
-                        addVehicleForm.reset();
-                        const modelSelect = document.getElementById("modelName");
-                        if (modelSelect) {
-                            modelSelect.disabled = true;
-                            modelSelect.innerHTML = "<option value=''>-- Chọn hãng trước --</option>";
-                        }
-
-                        // 3. Cập nhật xe vào order hiện tại
-                        updateVehicleInActiveOrder(data);
-
-                        // 4. Hiện thông báo thành công
-                        showAlert("✓ Thêm xe thành công!", "success");
-                    } else {
-                        showAlert("✗ " + (data.message || "Có lỗi xảy ra khi thêm xe"), "error");
-                    }
-                })
-                .catch(err => {
-                    console.error('Error:', err);
-                    showAlert("✗ Lỗi: " + err.message, "error");
-                })
-                .finally(() => {
-                    // Re-enable submit button
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = originalText;
-                });
-
-            return false;
-
-        });
-    }
 });

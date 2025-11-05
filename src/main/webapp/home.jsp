@@ -28,8 +28,8 @@ uri="http://java.sun.com/jsp/jstl/core" %>
 
     <style>
       :root {
-        --primary-color: #ffffff;
-        --secondary-color: #adb5bd;
+        --primary-color: #3a3a3c;
+        --secondary-color: #dfdfdf;
         --dark-bg: #111111;
         --brand-red: #dc3545;
       }
@@ -113,7 +113,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
 
   <body>
     <!-- ✅ HEADER -->
-    <%@ include file="/common/customer/header.jsp" %>
+    <%@ include file="/common/header.jsp" %>
 
     <!-- ✅ MAIN CONTENT -->
     <main class="hero-section">
@@ -144,7 +144,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
     </div>
 
     <!-- ✅ FOOTER -->
-    <%@ include file="/common/customer/footer.jsp" %>
+    <%@ include file="/common/footer.jsp" %>
 
     <!-- JS -->
     <script src="${pageContext.request.contextPath}/assets/js/user/chatbot.js"></script>
