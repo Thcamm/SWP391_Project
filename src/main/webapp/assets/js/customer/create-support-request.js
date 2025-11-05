@@ -1,78 +1,254 @@
-// ===== SUPPORT REQUEST PAGE - SCOPED JS =====
+// ===== SUPPORT REQUEST PAGE - ENHANCED MULTI-UPLOAD =====
 // Wrap trong IIFE để tránh conflict với JS khác
 (function() {
     'use strict';
 
     // ==============================
-    // PHẦN 1: XỬ LÝ FILE UPLOAD ĐƠN (attachment chính)
+    // CONSTANTS & CONFIGURATION
     // ==============================
-    const attachmentInput = document.getElementById('attachment');
+    const MAX_FILES = 4;
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'];
+    const ALLOWED_MIME = {
+        'image/png': 'PNG',
+        'image/jpeg': 'JPG',
+        'image/jpg': 'JPG',
+        'application/pdf': 'PDF'
+    };
+
+    // ==============================
+    // STATE MANAGEMENT
+    // ==============================
+    let selectedFiles = [];
+
+    // ==============================
+    // DOM ELEMENTS
+    // ==============================
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('attachment');
+    const previewContainer = document.getElementById('imagePreviewContainer');
     const fileError = document.getElementById('fileError');
-    const previewImage = document.getElementById('previewImage');
-    const form = document.querySelector('main.support-request-main form');
+    const fileCounter = document.getElementById('fileCounter');
+    const form = document.getElementById('supportForm');
+    const textarea = document.querySelector('textarea[name="description"]');
 
-    if (attachmentInput && fileError && previewImage) {
-        attachmentInput.addEventListener('change', function() {
-            // Reset error và preview
-            fileError.textContent = '';
-            previewImage.style.display = 'none';
+    // ==============================
+    // PHẦN 1: MULTIPLE FILE UPLOAD HANDLERS
+    // ==============================
 
-            const file = this.files[0];
-            if (!file) return;
+    if (uploadArea && fileInput && previewContainer) {
 
-            // Kiểm tra kích thước (5MB)
-            const maxSize = 5 * 1024 * 1024;
-            if (file.size > maxSize) {
-                fileError.textContent = "❌ File quá lớn, tối đa 5MB!";
-                this.value = ''; // reset input
+        // Click to upload - Fixed
+        uploadArea.addEventListener('click', function(e) {
+            // Ngăn click vào nút remove hoặc preview item
+            if (e.target.closest('.remove-image') || e.target.closest('.image-preview-item')) {
                 return;
             }
-
-            // Kiểm tra loại file
-            const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'application/pdf'];
-            if (!allowedTypes.includes(file.type)) {
-                fileError.textContent = "❌ Chỉ cho phép file PNG, JPG, GIF hoặc PDF!";
-                this.value = ''; // reset input
-                return;
-            }
-
-            // Nếu là hình ảnh thì preview
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    previewImage.src = e.target.result;
-                    previewImage.style.display = 'block';
-                }
-                reader.onerror = function() {
-                    fileError.textContent = "❌ Không thể đọc file!";
-                };
-                reader.readAsDataURL(file);
-            } else if (file.type === 'application/pdf') {
-                // Hiển thị thông báo cho PDF
-                fileError.textContent = "✅ File PDF đã được chọn: " + file.name;
-                fileError.style.color = '#28a745';
-            }
+            fileInput.click();
         });
+
+        // File selection via input
+        fileInput.addEventListener('change', function(e) {
+            handleFiles(e.target.files);
+        });
+
+        // Drag and drop events
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadArea.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        // Handle files function
+        function handleFiles(files) {
+            clearError();
+
+            if (!files || files.length === 0) return;
+
+            // Convert FileList to Array
+            const filesArray = Array.from(files);
+
+            // Check total number of files
+            const remainingSlots = MAX_FILES - selectedFiles.length;
+            if (filesArray.length > remainingSlots) {
+                showError(`Bạn chỉ có thể upload thêm ${remainingSlots} file nữa! (Tối đa ${MAX_FILES} file)`);
+                return;
+            }
+
+            // Validate and add files
+            let hasError = false;
+            for (let file of filesArray) {
+                // Check file size
+                if (file.size > MAX_FILE_SIZE) {
+                    showError(` File "${file.name}" quá lớn. Tối đa 5MB mỗi file.`);
+                    hasError = true;
+                    continue;
+                }
+
+                // Check file type
+                if (!ALLOWED_TYPES.includes(file.type)) {
+                    showError(` File "${file.name}" không được hỗ trợ. Chỉ chấp nhận PNG, JPG, PDF.`);
+                    hasError = true;
+                    continue;
+                }
+
+                // Check for duplicates
+                const isDuplicate = selectedFiles.some(f =>
+                    f.name === file.name && f.size === file.size
+                );
+                if (isDuplicate) {
+                    showError(`⚠️ File "${file.name}" đã được chọn rồi.`);
+                    hasError = true;
+                    continue;
+                }
+
+                // Add to selected files
+                selectedFiles.push(file);
+            }
+
+            // Update preview and counter
+            if (selectedFiles.length > 0) {
+                updatePreview();
+                updateCounter();
+            }
+
+            // Reset input to allow selecting the same file again
+            fileInput.value = '';
+        }
+
+        // Update preview display
+        function updatePreview() {
+            previewContainer.innerHTML = '';
+
+            selectedFiles.forEach((file, index) => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'image-preview-item';
+                previewItem.setAttribute('data-index', index);
+
+                // Create preview based on file type
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    const objectUrl = URL.createObjectURL(file);
+                    img.src = objectUrl;
+                    img.alt = file.name;
+
+                    // Clean up object URL after image loads
+                    img.onload = function() {
+                        URL.revokeObjectURL(objectUrl);
+                    };
+
+                    previewItem.appendChild(img);
+                } else if (file.type === 'application/pdf') {
+                    const pdfIcon = document.createElement('div');
+                    pdfIcon.className = 'pdf-preview';
+                    pdfIcon.innerHTML = `
+                        <i class="fas fa-file-pdf"></i>
+                        <div class="pdf-name">${truncateFileName(file.name, 15)}</div>
+                    `;
+                    previewItem.appendChild(pdfIcon);
+                }
+
+                // Add file info overlay
+                const fileInfo = document.createElement('div');
+                fileInfo.className = 'file-info-overlay';
+                fileInfo.innerHTML = `
+                    <small>${formatFileSize(file.size)}</small>
+                `;
+                previewItem.appendChild(fileInfo);
+
+                // Remove button
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'remove-image';
+                removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                removeBtn.title = 'Remove file';
+                removeBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    removeFile(index);
+                };
+
+                previewItem.appendChild(removeBtn);
+                previewContainer.appendChild(previewItem);
+            });
+        }
+
+        // Remove file
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updatePreview();
+            updateCounter();
+            clearError();
+        }
+
+        // Update counter
+        function updateCounter() {
+            if (selectedFiles.length > 0) {
+                const counterClass = selectedFiles.length >= MAX_FILES ? 'file-counter file-counter-full' : 'file-counter';
+                fileCounter.innerHTML = `<span class="${counterClass}">
+                    <i class="fas fa-paperclip"></i> ${selectedFiles.length} / ${MAX_FILES} file đã chọn
+                </span>`;
+            } else {
+                fileCounter.innerHTML = '';
+            }
+        }
+
+        // Error handling
+        function showError(message) {
+            if (fileError) {
+                fileError.textContent = message;
+                fileError.style.display = 'block';
+            }
+        }
+
+        function clearError() {
+            if (fileError) {
+                fileError.textContent = '';
+                fileError.style.display = 'none';
+            }
+        }
+
+        // Helper functions
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        function truncateFileName(name, maxLength) {
+            if (name.length <= maxLength) return name;
+            const ext = name.substring(name.lastIndexOf('.'));
+            const nameWithoutExt = name.substring(0, name.lastIndexOf('.'));
+            const truncated = nameWithoutExt.substring(0, maxLength - ext.length - 3) + '...';
+            return truncated + ext;
+        }
     }
 
     // ==============================
-    // PHẦN 2: VALIDATE TRƯỚC KHI SUBMIT
+    // PHẦN 2: FORM VALIDATION & SUBMISSION
     // ==============================
+
     if (form) {
         form.addEventListener('submit', function(e) {
-            // Kiểm tra nếu có lỗi file
-            if (attachmentInput && attachmentInput.files.length > 0 &&
-                fileError && fileError.textContent.includes('❌')) {
-                e.preventDefault();
-                alert('Vui lòng chọn file hợp lệ trước khi gửi!');
-                return false;
-            }
-
             // Validate description
             const description = form.querySelector('textarea[name="description"]');
             if (description && description.value.trim().length < 10) {
                 e.preventDefault();
-                alert('Vui lòng mô tả chi tiết hơn (tối thiểu 10 ký tự)!');
+                alert(' Vui lòng mô tả chi tiết hơn (tối thiểu 10 ký tự)!');
                 description.focus();
                 return false;
             }
@@ -81,158 +257,149 @@
             const category = form.querySelector('select[name="categoryId"]');
             if (category && !category.value) {
                 e.preventDefault();
-                alert('Vui lòng chọn danh mục!');
+                alert(' Vui lòng chọn danh mục!');
                 category.focus();
                 return false;
             }
 
-            // Hiển thị loading khi submit
+            // Check if there are file errors
+            if (fileError && fileError.textContent.includes('❌')) {
+                e.preventDefault();
+                alert('⚠️ Vui lòng xử lý lỗi file trước khi gửi!');
+                return false;
+            }
+
+            // Disable original file input
+            if (fileInput) {
+                fileInput.disabled = true;
+            }
+
+            // Create hidden inputs for selected files
+            selectedFiles.forEach((file, index) => {
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'file';
+                hiddenInput.name = 'attachments';
+                hiddenInput.style.display = 'none';
+                hiddenInput.files = dataTransfer.files;
+
+                form.appendChild(hiddenInput);
+            });
+
+            // Show loading state
             const submitBtn = form.querySelector('button[type="submit"]');
             if (submitBtn) {
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang gửi...';
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang gửi yêu cầu...';
             }
+
+            return true;
         });
     }
 
     // ==============================
-    // PHẦN 3: XỬ LÝ MULTI-UPLOAD (Nếu có button "Add more attachment")
+    // PHẦN 3: TEXTAREA AUTO-RESIZE
     // ==============================
-    const addAttachmentBtn = document.getElementById('addAttachmentBtn');
-    const attachmentContainer = document.getElementById('attachmentContainer');
-    const previewContainer = document.getElementById('previewContainer');
 
-    if (addAttachmentBtn && attachmentContainer && previewContainer) {
-        let fileCount = 0;
-        const maxFiles = 5; // Giới hạn tối đa 5 files
-
-        addAttachmentBtn.addEventListener('click', function() {
-            if (fileCount >= maxFiles) {
-                alert('Chỉ được upload tối đa ' + maxFiles + ' file!');
-                return;
-            }
-
-            const inputWrapper = document.createElement('div');
-            inputWrapper.classList.add('attachment-input-wrapper');
-            inputWrapper.style.marginBottom = '10px';
-
-            const newInput = document.createElement('input');
-            newInput.type = 'file';
-            newInput.name = 'attachments'; // Server sẽ nhận array
-            newInput.accept = 'image/*,application/pdf';
-            newInput.classList.add('attachmentInput');
-            newInput.setAttribute('data-index', fileCount);
-
-            const removeBtn = document.createElement('button');
-            removeBtn.type = 'button';
-            removeBtn.innerHTML = '✖';
-            removeBtn.classList.add('remove-attachment-btn');
-            removeBtn.style.marginLeft = '10px';
-            removeBtn.style.color = 'red';
-            removeBtn.style.cursor = 'pointer';
-
-            inputWrapper.appendChild(newInput);
-            inputWrapper.appendChild(removeBtn);
-            attachmentContainer.appendChild(inputWrapper);
-
-            fileCount++;
-
-            // Xử lý remove button
-            removeBtn.addEventListener('click', function() {
-                inputWrapper.remove();
-                fileCount--;
-                // Xóa preview tương ứng nếu có
-                const relatedPreview = previewContainer.querySelector(`[data-index="${newInput.getAttribute('data-index')}"]`);
-                if (relatedPreview) {
-                    relatedPreview.remove();
-                }
-            });
-        });
-
-        // Xử lý preview cho multi-upload
-        attachmentContainer.addEventListener('change', function(e) {
-            if (e.target && e.target.classList.contains('attachmentInput')) {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const index = e.target.getAttribute('data-index');
-
-                // Giới hạn dung lượng
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('File quá lớn, tối đa 5MB!');
-                    e.target.value = '';
-                    return;
-                }
-
-                // Kiểm tra loại file
-                const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'application/pdf'];
-                if (!allowedTypes.includes(file.type)) {
-                    alert('Chỉ cho phép file ảnh hoặc PDF!');
-                    e.target.value = '';
-                    return;
-                }
-
-                // Hiển thị preview nếu là ảnh
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        // Xóa preview cũ nếu có
-                        const oldPreview = previewContainer.querySelector(`[data-index="${index}"]`);
-                        if (oldPreview) {
-                            oldPreview.remove();
-                        }
-
-                        const previewWrapper = document.createElement('div');
-                        previewWrapper.classList.add('preview-item');
-                        previewWrapper.setAttribute('data-index', index);
-                        previewWrapper.style.display = 'inline-block';
-                        previewWrapper.style.marginRight = '10px';
-                        previewWrapper.style.marginBottom = '10px';
-                        previewWrapper.style.position = 'relative';
-
-                        const img = document.createElement('img');
-                        img.src = event.target.result;
-                        img.style.maxWidth = '150px';
-                        img.style.maxHeight = '150px';
-                        img.style.border = '2px solid #ddd';
-                        img.style.borderRadius = '6px';
-                        img.style.objectFit = 'cover';
-
-                        previewWrapper.appendChild(img);
-                        previewContainer.appendChild(previewWrapper);
-                    };
-                    reader.readAsDataURL(file);
-                } else if (file.type === 'application/pdf') {
-                    // Hiển thị icon PDF
-                    const oldPreview = previewContainer.querySelector(`[data-index="${index}"]`);
-                    if (oldPreview) {
-                        oldPreview.remove();
-                    }
-
-                    const pdfIndicator = document.createElement('div');
-                    pdfIndicator.classList.add('preview-item');
-                    pdfIndicator.setAttribute('data-index', index);
-                    pdfIndicator.style.display = 'inline-block';
-                    pdfIndicator.style.marginRight = '10px';
-                    pdfIndicator.innerHTML = `
-                        <i class="fas fa-file-pdf" style="font-size: 48px; color: #dc3545;"></i>
-                        <p style="font-size: 0.8rem; margin: 5px 0;">${file.name}</p>
-                    `;
-                    previewContainer.appendChild(pdfIndicator);
-                }
-            }
-        });
-    }
-
-    // ==============================
-    // PHẦN 4: AUTO-RESIZE TEXTAREA
-    // ==============================
-    const textarea = document.querySelector('main.support-request-main textarea[name="description"]');
     if (textarea) {
+        // Set initial height
+        textarea.style.minHeight = '120px';
+
+        // Auto-resize on input
         textarea.addEventListener('input', function() {
             this.style.height = 'auto';
-            this.style.height = this.scrollHeight + 'px';
+            this.style.height = Math.max(120, this.scrollHeight) + 'px';
         });
+
+        // Character counter (optional)
+        const maxChars = 500;
+        const charCounter = document.createElement('small');
+        charCounter.className = 'char-counter text-muted';
+        charCounter.style.float = 'right';
+        charCounter.style.marginTop = '5px';
+
+        textarea.addEventListener('input', function() {
+            const remaining = maxChars - this.value.length;
+            charCounter.textContent = `${this.value.length} / ${maxChars} ký tự`;
+
+            if (remaining < 100) {
+                charCounter.style.color = '#dc3545';
+            } else {
+                charCounter.style.color = '#6c757d';
+            }
+        });
+
+        if (textarea.parentElement) {
+            textarea.parentElement.appendChild(charCounter);
+        }
     }
+
+    // ==============================
+    // PHẦN 4: ADDITIONAL ENHANCEMENTS
+    // ==============================
+
+    // Add smooth scroll to error messages
+    const messageAlert = document.querySelector('.alert-custom');
+    if (messageAlert) {
+        messageAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Auto-dismiss success messages after 5 seconds
+        if (messageAlert.classList.contains('alert-success')) {
+            setTimeout(() => {
+                messageAlert.style.transition = 'opacity 0.5s ease';
+                messageAlert.style.opacity = '0';
+                setTimeout(() => messageAlert.remove(), 500);
+            }, 5000);
+        }
+    }
+
+    // Add loading overlay style
+    const style = document.createElement('style');
+    style.textContent = `
+        .pdf-preview {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+            color: #d32f2f;
+            font-size: 48px;
+        }
+        .pdf-name {
+            font-size: 10px;
+            margin-top: 8px;
+            text-align: center;
+            padding: 0 5px;
+            word-break: break-word;
+        }
+        .file-info-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px;
+            text-align: center;
+            font-size: 10px;
+        }
+        .file-counter-full {
+            background: #dc3545 !important;
+        }
+        .char-counter {
+            display: block;
+            text-align: right;
+            font-size: 12px;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Console log for debugging
+    console.log('✅ Support Request Form - Enhanced Multi-Upload initialized');
+    console.log(`📋 Configuration: Max ${MAX_FILES} files, ${MAX_FILE_SIZE / 1024 / 1024}MB each`);
 
 })();

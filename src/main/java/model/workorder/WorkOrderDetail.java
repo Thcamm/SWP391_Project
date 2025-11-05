@@ -23,6 +23,9 @@ public class WorkOrderDetail {
     // Relationships
     private List<TaskAssignment> taskAssignments;
 
+    public void setSource(String s) {
+    }
+
     public enum Source {
         REQUEST, DIAGNOSTIC
     }

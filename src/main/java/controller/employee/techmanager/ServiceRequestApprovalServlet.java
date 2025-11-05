@@ -12,7 +12,7 @@ import dao.carservice.ServiceRequestDAO;
 import dao.employee.admin.AdminDAO;
 import dao.workorder.WorkOrderDAO;
 import dao.workorder.WorkOrderDetailDAO;
-import model.servicetype.ServiceRequestViewDTO;
+import model.dto.ServiceRequestViewDTO;
 import model.workorder.WorkOrder;
 import model.workorder.WorkOrderDetail;
 
@@ -179,7 +179,7 @@ public class ServiceRequestApprovalServlet extends HttpServlet {
                 conn.rollback();
                 response.sendRedirect(request.getContextPath() +
                         "/techmanager/service-requests?message=" +
-                        java.net.URLEncoder.encode("Failed to create WorkOrderDetail.", "UTF-8") +
+                        java.net.URLEncoder.encode("Failed to approve Service Request.", "UTF-8") +
                         "&type=error");
                 return;
             }
@@ -225,7 +225,7 @@ public class ServiceRequestApprovalServlet extends HttpServlet {
 
         try {
             int requestId = Integer.parseInt(request.getParameter("requestId"));
-            // String reason = request.getParameter("rejectionReason"); // For future use
+            String reason = request.getParameter("rejectionReason");
 
             boolean success = serviceRequestDAO.updateServiceRequestStatus(requestId, "REJECTED");
 

@@ -24,15 +24,12 @@ public class RejectedTaskDAO {
         String sql = "SELECT " +
                 "ta.AssignmentID, " +
                 "ta.task_type, " +
-                "ta.priority, " +
-                "wod.TaskDescription, " +
-                "wod.EstimateHours, " +
-                "wod.EstimateAmount, " +
+                "ta.TaskDescription, " +
                 "CONCAT(v.Brand, ' ', v.Model, ' (', v.LicensePlate, ')') as vehicleInfo, " +
-                "CONCAT(u.FirstName, ' ', u.LastName) as customerName, " +
-                "u.PhoneNumber as customerPhone, " +
-                "CONCAT(tech.FirstName, ' ', tech.LastName) as technicianName, " +
-                "tech.PhoneNumber as technicianPhone, " +
+                "cust_user.FullName as customerName, " +
+                "cust_user.PhoneNumber as customerPhone, " +
+                "tech_user.FullName as technicianName, " +
+                "tech_user.PhoneNumber as technicianPhone, " +
                 "tal.ActivityTime as rejectedAt, " +
                 "tal.Description as rejectionReason " +
                 "FROM TechnicianActivityLog tal " +
@@ -40,11 +37,11 @@ public class RejectedTaskDAO {
                 "JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID " +
                 "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
                 "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
-                "LEFT JOIN ServiceRequestDetail srd ON sr.RequestID = srd.RequestID " +
-                "LEFT JOIN Vehicle v ON srd.VehicleID = v.VehicleID " +
-                "JOIN User u ON sr.CustomerID = u.UserID " +
-                "JOIN Employee emp ON ta.AssignedToEmployeeID = emp.EmployeeID " +
-                "JOIN User tech ON emp.UserID = tech.UserID " +
+                "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
+                "JOIN Customer c ON v.CustomerID = c.CustomerID " +
+                "JOIN User cust_user ON c.UserID = cust_user.UserID " +
+                "JOIN Employee emp ON ta.AssignToTechID = emp.EmployeeID " +
+                "JOIN User tech_user ON emp.UserID = tech_user.UserID " +
                 "WHERE tal.ActivityType = 'TASK_REJECTED' " +
                 "AND ta.Status = 'ASSIGNED' " +
                 "ORDER BY tal.ActivityTime DESC";
@@ -93,15 +90,12 @@ public class RejectedTaskDAO {
         String sql = "SELECT " +
                 "ta.AssignmentID, " +
                 "ta.task_type, " +
-                "ta.priority, " +
-                "wod.TaskDescription, " +
-                "wod.EstimateHours, " +
-                "wod.EstimateAmount, " +
+                "ta.TaskDescription, " +
                 "CONCAT(v.Brand, ' ', v.Model, ' (', v.LicensePlate, ')') as vehicleInfo, " +
-                "CONCAT(u.FirstName, ' ', u.LastName) as customerName, " +
-                "u.PhoneNumber as customerPhone, " +
-                "CONCAT(tech.FirstName, ' ', tech.LastName) as technicianName, " +
-                "tech.PhoneNumber as technicianPhone, " +
+                "cust_user.FullName as customerName, " +
+                "cust_user.PhoneNumber as customerPhone, " +
+                "tech_user.FullName as technicianName, " +
+                "tech_user.PhoneNumber as technicianPhone, " +
                 "tal.ActivityTime as rejectedAt, " +
                 "tal.Description as rejectionReason " +
                 "FROM TechnicianActivityLog tal " +
@@ -109,11 +103,11 @@ public class RejectedTaskDAO {
                 "JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID " +
                 "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
                 "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
-                "LEFT JOIN ServiceRequestDetail srd ON sr.RequestID = srd.RequestID " +
-                "LEFT JOIN Vehicle v ON srd.VehicleID = v.VehicleID " +
-                "JOIN User u ON sr.CustomerID = u.UserID " +
-                "JOIN Employee emp ON ta.AssignedToEmployeeID = emp.EmployeeID " +
-                "JOIN User tech ON emp.UserID = tech.UserID " +
+                "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
+                "JOIN Customer c ON v.CustomerID = c.CustomerID " +
+                "JOIN User cust_user ON c.UserID = cust_user.UserID " +
+                "JOIN Employee emp ON ta.AssignToTechID = emp.EmployeeID " +
+                "JOIN User tech_user ON emp.UserID = tech_user.UserID " +
                 "WHERE tal.ActivityType = 'TASK_REJECTED' " +
                 "AND ta.Status = 'ASSIGNED' " +
                 "AND ta.AssignmentID = ? " +
@@ -147,10 +141,7 @@ public class RejectedTaskDAO {
         RejectedTaskDTO task = new RejectedTaskDTO();
         task.setAssignmentId(rs.getInt("AssignmentID"));
         task.setTaskType(rs.getString("task_type"));
-        task.setPriority(rs.getString("priority"));
         task.setTaskDescription(rs.getString("TaskDescription"));
-        task.setEstimateHours(rs.getBigDecimal("EstimateHours"));
-        task.setEstimateAmount(rs.getBigDecimal("EstimateAmount"));
         task.setVehicleInfo(rs.getString("vehicleInfo"));
         task.setCustomerName(rs.getString("customerName"));
         task.setCustomerPhone(rs.getString("customerPhone"));

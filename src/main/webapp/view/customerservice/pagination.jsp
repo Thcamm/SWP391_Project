@@ -1,31 +1,35 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<c:if test="${customerList.totalPages > 1}">
+<c:if test="${param.totalPages > 1}">
     <nav class="mt-4">
         <ul class="pagination justify-content-center">
 
-            <c:if test="${customerList.currentPage > 1}">
+            <!-- Nút Prev -->
+            <c:if test="${param.currentPage > 1}">
                 <li class="page-item">
                     <a class="page-link"
-                       href="${pageContext.request.contextPath}/customerservice/search-customer?page=${customerList.currentPage - 1}${param.queryString}">
+                       href="${pageContext.request.contextPath}${param.baseUrl}?page=${param.currentPage - 1}${param.queryString}">
                         &laquo; Prev
                     </a>
                 </li>
             </c:if>
 
-            <c:forEach begin="1" end="${customerList.totalPages}" var="i">
-                <li class="page-item ${i == customerList.currentPage ? 'active' : ''}">
+            <!-- Danh sách trang -->
+            <c:forEach begin="1" end="${param.totalPages}" var="i">
+                <li class="page-item ${i == param.currentPage ? 'active' : ''}">
                     <a class="page-link"
-                       href="${pageContext.request.contextPath}/customerservice/search-customer?page=${i}${param.queryString}">
+                       href="${pageContext.request.contextPath}${param.baseUrl}?page=${i}${param.queryString}">
                             ${i}
                     </a>
                 </li>
             </c:forEach>
 
-            <c:if test="${customerList.currentPage < customerList.totalPages}">
+            <!-- Nút Next -->
+            <c:if test="${param.currentPage < param.totalPages}">
                 <li class="page-item">
                     <a class="page-link"
-                       href="${pageContext.request.contextPath}/customerservice/search-customer?page=${customerList.currentPage + 1}${param.queryString}">
+                       href="${pageContext.request.contextPath}${param.baseUrl}?page=${param.currentPage + 1}${param.queryString}">
                         Next &raquo;
                     </a>
                 </li>

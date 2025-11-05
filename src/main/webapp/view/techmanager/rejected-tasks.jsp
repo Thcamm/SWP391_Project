@@ -109,7 +109,9 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                         <td class="mono">${task.vehicleInfo}</td>
                         <td>
                           <div>${task.customerName}</div>
-                          <small class="text-muted">${task.customerPhone}</small>
+                          <small class="text-muted"
+                            >${task.customerPhone}</small
+                          >
                         </td>
                         <td>
                           <c:choose>
@@ -129,12 +131,17 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                             />h
                           </div>
                           <div class="text-muted">
-                            $<fmt:formatNumber value="${task.estimateAmount}" pattern="#,##0.00" />
+                            $<fmt:formatNumber
+                              value="${task.estimateAmount}"
+                              pattern="#,##0.00"
+                            />
                           </div>
                         </td>
                         <td>
                           <div>${task.technicianName}</div>
-                          <small class="text-muted">${task.technicianPhone}</small>
+                          <small class="text-muted"
+                            >${task.technicianPhone}</small
+                          >
                         </td>
                         <td>
                           <fmt:formatDate
