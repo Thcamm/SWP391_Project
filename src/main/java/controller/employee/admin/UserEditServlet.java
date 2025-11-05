@@ -98,10 +98,12 @@ public class UserEditServlet extends BaseAdminServlet {
             String fullName = request.getParameter("fullName");
             String emailParam = request.getParameter("email");
             String email = isNullOrEmpty(emailParam) ? null : emailParam.trim();
+            String phoneNumberParam = request.getParameter("phoneNumber");
+            String phoneNumber = isNullOrEmpty(phoneNumberParam) ? null : phoneNumberParam.trim();
             // The form uses 'roleId' as the select name
             String roleParam = request.getParameter("roleId");
 
-            // Validate required fields: fullName and roleId. Email is optional.
+            // Validate required fields: fullName and roleId. Email and phone are optional.
             if (isNullOrEmpty(fullName) || isNullOrEmpty(roleParam)) {
                 redirectWithMessage(response, redirectUrl, "Please fill in all required fields!", "error");
                 return;
@@ -117,26 +119,34 @@ public class UserEditServlet extends BaseAdminServlet {
             String activeParam = request.getParameter("activeStatus");
             boolean activeStatus = "true".equalsIgnoreCase(activeParam);
 
-            boolean success = adminService.updateUserBasicInfo(
-                    userId,
-                    fullName.trim(),
-                    email,
-                    newRoleId,
-                    activeStatus,
-                    currentUser);
+            try {
+                boolean success = adminService.updateUserBasicInfo(
+                        userId,
+                        fullName.trim(),
+                        email,
+                        phoneNumber,
+                        newRoleId,
+                        activeStatus,
+                        currentUser);
 
-            if (success) {
-                // Redirect back to the edit page so the user sees fresh values
-                redirectWithMessage(response, redirectUrl, "Update user information successfully!", "success");
-            } else {
-                redirectWithMessage(response, redirectUrl, "Update user failed!", "error");
+                if (success) {
+                    // Redirect back to the edit page so the user sees fresh values
+                    redirectWithMessage(response, redirectUrl, "Update user information successfully!", "success");
+                }
+            } catch (Exception e) {
+                // Catch specific error from AdminService
+                String errorMessage = e.getMessage();
+                if (errorMessage == null || errorMessage.isEmpty()) {
+                    errorMessage = "Update user failed!";
+                }
+                redirectWithMessage(response, redirectUrl, errorMessage, "error");
             }
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID");
         } catch (Exception e) {
             e.printStackTrace();
             redirectWithMessage(response, request.getContextPath() + "/admin/users",
-                    "Lỗi hệ thống: " + e.getMessage(), "error");
+                    "System error: " + e.getMessage(), "error");
         }
     }
 }

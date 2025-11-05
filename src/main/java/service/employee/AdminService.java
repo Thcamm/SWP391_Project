@@ -45,27 +45,53 @@ public class AdminService {
                     managedByEmployeeId, createdByEmployeeId);
 
         } catch (SQLException e) {
-            System.err.println("SERVICE Lỗi thăng cấp Customer -> Employee: " + e.getMessage());
+            System.err.println("SERVICE error when promoting Customer -> Employee: " + e.getMessage());
             return false;
         }
     }
 
-    public boolean updateUserBasicInfo(int userId, String fullName, String email, int roleId, boolean activeStatus, String currentUser) {
+    public boolean updateUserBasicInfo(int userId, String fullName, String email, String phoneNumber, int roleId,
+            boolean activeStatus,
+            String currentUser) throws Exception {
         try {
-            User user = userDAO.getUserById(userId);
+            // Use AdminDAO to get user including inactive users
+            User user = adminDAO.getUserById(userId);
 
-            if (user == null)
-                return false;
+            if (user == null) {
+                throw new Exception("User not found with ID: " + userId);
+            }
+
+            // Validate email if provided
+            if (email != null && !email.trim().isEmpty()) {
+                // Check if email is already in use by another user (including inactive users)
+                User existingUserWithEmail = adminDAO.getUserByEmail(email);
+                if (existingUserWithEmail != null && existingUserWithEmail.getUserId() != userId) {
+                    throw new Exception("Email already exists: " + email);
+                }
+            }
+
+            // Validate role
+            Role role = roleDao.findById(roleId);
+            if (role == null) {
+                throw new Exception("Invalid role ID: " + roleId);
+            }
 
             user.setFullName(fullName);
             user.setEmail(email);
+            user.setPhoneNumber(phoneNumber);
             user.setRoleId(roleId);
             user.setActiveStatus(activeStatus);
 
-            return adminDAO.updateUserBasicInfo(user);
+            boolean success = adminDAO.updateUserBasicInfo(user);
+            if (!success) {
+                throw new Exception("Database update failed - no rows affected");
+            }
+
+            return true;
         } catch (SQLException e) {
-            System.err.println("SERVICE Lỗi cập nhật user cơ bản: " + e.getMessage());
-            return false;
+            System.err.println("SERVICE error when updating user basic info: " + e.getMessage());
+            e.printStackTrace();
+            throw new Exception("Database error: " + e.getMessage());
         }
     }
 
@@ -163,26 +189,25 @@ public class AdminService {
         }
     }
 
-
     /**
      * Create user with optional employee details for non-customer roles
      */
     // THAY ĐỔI: Kiểu trả về là String
     public String createUser(String fullName, String userName, String email, int roleId, String gender,
-                             String currentUser, String employeeCode, Double salary) {
+            String currentUser, String employeeCode, Double salary) {
 
         // 1. Tạo mật khẩu ngẫu nhiên ngay từ đầu
         String randomPassword = PasswordUtil.generateRandomPassword(6);
 
         try {
             if (currentUser == null || currentUser.trim().isEmpty()) {
-                System.out.println("Lỗi: Không có thông tin user hiện tại!");
+                System.out.println("Error: Current user information is missing!");
                 return null;
             }
 
             User existingUser = userDAO.getUserByUserName(userName);
             if (existingUser != null) {
-                System.out.println("Username đã tồn tại: " + userName);
+                System.out.println("Username already exists: " + userName);
                 return null;
             }
 
@@ -201,7 +226,7 @@ public class AdminService {
             boolean success = adminDAO.createUser(newUser, employeeCode, salary, createdByEmployeeId);
 
             if (success) {
-                System.out.println("User " + currentUser + " đã tạo user mới: " + userName);
+                System.out.println("User " + currentUser + " has created a new user: " + userName);
 
                 if (isEmployeeRole(roleId)) {
                     System.out.println("Employee record also created for non-customer user: " + userName);

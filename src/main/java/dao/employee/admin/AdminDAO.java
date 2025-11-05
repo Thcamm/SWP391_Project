@@ -179,7 +179,8 @@ public class AdminDAO extends DbContext {
     }
 
     /**
-     * ADMIN FUNCTION: Create new user with auto Employee record creation for non-Customer roles
+     * ADMIN FUNCTION: Create new user with auto Employee record creation for
+     * non-Customer roles
      */
     public boolean createUser(User user) throws SQLException {
         return createUser(user, null, null, null);
@@ -188,7 +189,8 @@ public class AdminDAO extends DbContext {
     /**
      * ADMIN FUNCTION: Create new user with Employee details for non-Customer roles
      */
-    public boolean createUser(User user, String employeeCode, Double salary, Integer createdByEmployeeId) throws SQLException {
+    public boolean createUser(User user, String employeeCode, Double salary, Integer createdByEmployeeId)
+            throws SQLException {
         Connection conn = null;
         try {
             conn = getConnection();
@@ -229,7 +231,7 @@ public class AdminDAO extends DbContext {
             // 2. Check if we need to create Employee record (for non-Customer roles)
             if (!isCustomerRole(user.getRoleId())) {
                 String roleName = getRoleNameById(user.getRoleId());
-                
+
                 // Generate employee code if not provided
                 if (employeeCode == null || employeeCode.trim().isEmpty()) {
                     employeeCode = generateEmployeeCode(roleName, newUserId);
@@ -242,7 +244,7 @@ public class AdminDAO extends DbContext {
                 try (PreparedStatement empPs = conn.prepareStatement(empSql)) {
                     empPs.setInt(1, newUserId);
                     empPs.setString(2, employeeCode);
-                    
+
                     if (salary != null) {
                         empPs.setDouble(3, salary);
                     } else {
@@ -262,8 +264,8 @@ public class AdminDAO extends DbContext {
                         return false;
                     }
 
-                    System.out.println("ADMIN: Employee record created successfully - Code: " + employeeCode + 
-                                     " for user: " + user.getUserName());
+                    System.out.println("ADMIN: Employee record created successfully - Code: " + employeeCode +
+                            " for user: " + user.getUserName());
                 }
             }
 
@@ -279,7 +281,8 @@ public class AdminDAO extends DbContext {
                     System.err.println("Error during rollback: " + rollbackEx.getMessage());
                 }
             }
-            System.err.println("ADMIN: User creation failed for username: " + user.getUserName() + " - " + e.getMessage());
+            System.err.println(
+                    "ADMIN: User creation failed for username: " + user.getUserName() + " - " + e.getMessage());
             throw e;
         } finally {
             if (conn != null) {
@@ -320,7 +323,13 @@ public class AdminDAO extends DbContext {
     }
 
     /**
-     * ADMIN FUNCTION: Get user by ID (including inactive)
+     * ADMIN FUNCTION: Get user by ID (including inactive users)
+     * This method is specifically for admin operations and returns users
+     * regardless of their ActiveStatus.
+     * 
+     * @param userId The ID of the user to retrieve
+     * @return User object if found, null otherwise
+     * @throws SQLException if database error occurs
      */
     public User getUserById(int userId) throws SQLException {
         String sql = "SELECT * FROM User WHERE UserID = ?";
@@ -339,7 +348,32 @@ public class AdminDAO extends DbContext {
     }
 
     /**
-     * ADMIN FUNCTION: Get UserDisplay by ID with role info
+     * ADMIN FUNCTION: Get user by email (including inactive users)
+     * This method is specifically for admin operations and returns users
+     * regardless of their ActiveStatus. Used for duplicate email checking.
+     * 
+     * @param email The email address to search for
+     * @return User object if found, null otherwise
+     * @throws SQLException if database error occurs
+     */
+    public User getUserByEmail(String email) throws SQLException {
+        String sql = "SELECT * FROM User WHERE Email = ?";
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return extractUser(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * ADMIN FUNCTION: Get UserDisplay by ID with role info (including inactive
+     * users)
      */
     public UserDisplay getUserDisplayById(int userId) throws SQLException {
         String sql = "SELECT u.UserID, u.RoleID, u.FullName, u.UserName, u.Email, u.PhoneNumber, " +
@@ -518,8 +552,17 @@ public class AdminDAO extends DbContext {
     }
 
     public boolean updateUserBasicInfo(User user) throws SQLException {
-        // Chỉ cập nhật các trường được chỉnh sửa cơ bản, gồm cả ActiveStatus
-        String sql = "UPDATE User SET RoleID=?, FullName=?, Email=?, ActiveStatus=?, UpdatedAt=NOW() WHERE UserID=?";
+        // Cập nhật các trường cơ bản bao gồm PhoneNumber, Email, FullName, RoleID, và
+        // ActiveStatus
+        String sql = "UPDATE User SET RoleID=?, FullName=?, Email=?, PhoneNumber=?, ActiveStatus=?, UpdatedAt=NOW() WHERE UserID=?";
+
+        System.out.println(" AdminDAO.updateUserBasicInfo() called");
+        System.out.println("    User ID: " + user.getUserId());
+        System.out.println("    Full Name: " + user.getFullName());
+        System.out.println("    Email: " + user.getEmail());
+        System.out.println("    Phone Number: " + user.getPhoneNumber());
+        System.out.println("    Role ID: " + user.getRoleId());
+        System.out.println("    Active Status: " + user.isActiveStatus());
 
         try (Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -527,10 +570,15 @@ public class AdminDAO extends DbContext {
             ps.setInt(1, user.getRoleId());
             ps.setString(2, user.getFullName());
             ps.setString(3, user.getEmail());
-            ps.setBoolean(4, user.isActiveStatus());
-            ps.setInt(5, user.getUserId());
+            ps.setString(4, user.getPhoneNumber());
+            ps.setBoolean(5, user.isActiveStatus());
+            ps.setInt(6, user.getUserId());
 
-            return ps.executeUpdate() > 0;
+            int rowsAffected = ps.executeUpdate();
+            boolean success = rowsAffected > 0;
+
+            System.out.println(" Update result: " + rowsAffected + " rows affected, success: " + success);
+            return success;
         }
     }
 
@@ -539,10 +587,10 @@ public class AdminDAO extends DbContext {
      */
     private boolean isCustomerRole(int roleId) throws SQLException {
         String sql = "SELECT RoleName FROM RoleInfo WHERE RoleID = ?";
-        
+
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, roleId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -559,10 +607,10 @@ public class AdminDAO extends DbContext {
      */
     private String getRoleNameById(int roleId) throws SQLException {
         String sql = "SELECT RoleName FROM RoleInfo WHERE RoleID = ?";
-        
+
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, roleId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -578,7 +626,7 @@ public class AdminDAO extends DbContext {
      */
     private String generateEmployeeCode(String roleName, int userId) {
         String prefix;
-        
+
         if (roleName == null) {
             prefix = "EMP";
         } else {
@@ -604,7 +652,7 @@ public class AdminDAO extends DbContext {
                     break;
             }
         }
-        
+
         // Generate code: PREFIX + UserID padded to 4 digits
         return prefix + String.format("%04d", userId);
     }
