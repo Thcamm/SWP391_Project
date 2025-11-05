@@ -99,6 +99,13 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link ${fn:contains(currentURI, '/search-customer') ? 'active' : ''}"
+                                       href="${pageContext.request.contextPath}/customerservice/service-types">
+                                        <i class="bi bi-receipt"></i>
+                                        <span>Services</span>
+                                    </a>
+                                </li>
 <%--                <li class="nav-item">--%>
 <%--                    <a class="nav-link ${fn:contains(currentURI, '/search-customer') ? 'active' : ''}"--%>
 <%--                       href="${pageContext.request.contextPath}/customerservice/search-customer">--%>

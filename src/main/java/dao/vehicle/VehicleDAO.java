@@ -142,18 +142,6 @@ public class VehicleDAO {
             return st.executeUpdate() > 0;
         }
     }
-//    public List<String> getAllLicensePlates() throws SQLException {
-//        List<String> plates = new ArrayList<>();
-//        String sql = "SELECT LicensePlate FROM Vehicle";
-//        try (Connection conn = DbContext.getConnection();
-//             PreparedStatement st = conn.prepareStatement(sql);
-//             ResultSet rs = st.executeQuery()) {
-//            while (rs.next()) {
-//                plates.add(rs.getString("LicensePlate"));
-//            }
-//        }
-//        return plates;
-//    }
     public List<String> getAllLicensePlates() throws SQLException {
         List<String> plates = new ArrayList<>();
         String sql = "SELECT LicensePlate FROM Vehicle";
