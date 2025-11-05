@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/base.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/edit-diagnostic.css">
 
+
 <c:set var="vm" value="${requestScope.vm}"/>
 <c:set var="diag" value="${vm.diagnostic}"/>
 <c:set var="locked" value="${vm.locked}"/>
@@ -17,13 +18,13 @@
 
     <main class="main edit-diag">
         <!-- breadcrumb -->
-        <div class="breadcrumb">
-            <a href="${pageContext.request.contextPath}/technician/home">Home</a>
-            <span>/</span>
-            <a href="${pageContext.request.contextPath}/technician/diagnostics">Diagnostics</a>
-            <span>/</span>
-            <span>Edit #<c:out value="${diag.vehicleDiagnosticID}"/></span>
-        </div>
+<%--        <div class="breadcrumb">--%>
+<%--            <a href="${pageContext.request.contextPath}/technician/home">Home</a>--%>
+<%--            <span>/</span>--%>
+<%--            <a href="${pageContext.request.contextPath}/technician/diagnostics">Diagnostics</a>--%>
+<%--            <span>/</span>--%>
+<%--            <span>Edit #<c:out value="${diag.vehicleDiagnosticID}"/></span>--%>
+<%--        </div>--%>
 
         <!-- page header -->
         <div class="page-header">

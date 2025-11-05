@@ -1,0 +1,25 @@
+.footer{
+    border-top:1px solid var(--border);
+    background:var(--card);
+    color:var(--text);
+}
+
+.footer .footer-content{
+    max-width:1200px;
+    margin:0 auto;
+    padding:14px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.footer-links{ display:flex; gap:12px; flex-wrap:wrap; }
+.footer-links a{
+    color:var(--muted);
+    text-decoration:none;
+    padding:6px 8px;
+    border-radius:8px;
+}
+.footer-links a:hover{ background:#f3f4f6; color:var(--text); }

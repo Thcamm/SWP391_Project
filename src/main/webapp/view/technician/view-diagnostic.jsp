@@ -9,18 +9,19 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/view-diagnostic.css"/>
 
 
+
 <div class="layout">
     <jsp:include page="sidebar.jsp"/>
 
     <main class="main">
         <!-- Breadcrumb -->
-        <div class="breadcrumb">
-            <a href="${pageContext.request.contextPath}/technician/home">Home</a>
-            <span>/</span>
-            <a href="${pageContext.request.contextPath}/technician/diagnostics">Diagnostics</a>
-            <span>/</span>
-            <span>View #<c:out value="${diagnostic.vehicleDiagnosticID}"/></span>
-        </div>
+<%--        <div class="breadcrumb">--%>
+<%--            <a href="${pageContext.request.contextPath}/technician/home">Home</a>--%>
+<%--            <span>/</span>--%>
+<%--            --%>
+<%--            <span>/</span>--%>
+<%--            <span>View #<c:out value="${diagnostic.vehicleDiagnosticID}"/></span>--%>
+<%--        </div>--%>
 
         <!-- Header -->
         <div class="page-header d-flex align-items-center justify-content-between">

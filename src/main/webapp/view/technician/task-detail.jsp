@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/base.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/task-detail.css">
 
+
 <div class="layout">
     <jsp:include page="sidebar.jsp"/>
     <main class="main">
@@ -28,7 +29,7 @@
                         <div class="info-value">#${task.assignmentID}</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">Status</div>
+                        <div class="info-label">Status Working</div>
                         <div class="info-value">
                             <span class="status-badge ${task.status}">${task.status}</span>
                         </div>
@@ -60,12 +61,14 @@
                     <div class="info-item">
                         <div class="info-label">Progress</div>
                         <div class="info-value">
-                            <c:choose>
-                                <c:when test="${task.status == 'IN_PROGRESS'}">
-                                    ${task.progressPercentage}%
-                                </c:when>
-                                <c:otherwise>-</c:otherwise>
-                            </c:choose>
+<%--                            <c:choose>--%>
+<%--                                <c:when test="${task.status == 'IN_PROGRESS'}">--%>
+<%--                                    --%>
+<%--                                </c:when>--%>
+<%--                                <c:otherwise>-</c:otherwise>--%>
+<%--                            </c:choose>--%>
+
+                            ${task.progressPercentage}%
                         </div>
                     </div>
                 </div>

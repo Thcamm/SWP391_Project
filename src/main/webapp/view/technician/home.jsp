@@ -8,9 +8,11 @@
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/base.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/technician_home.css"/>
-<div class="layout">
+<div class="layout page-home" >
 
-    <jsp:include page="sidebar.jsp"/>
+
+        <jsp:include page="sidebar.jsp"/>
+
 
     <!-- Main content -->
     <main class="main">

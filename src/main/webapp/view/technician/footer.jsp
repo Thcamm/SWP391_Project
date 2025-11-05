@@ -12,9 +12,9 @@
     <div class="footer-content">
         <p>&copy; 2025 Garage Management System. All rights reserved.</p>
         <div class="footer-links">
-            <a href="${pageContext.request.contextPath}/help">Help</a>
-            <a href="${pageContext.request.contextPath}/contact">Contact</a>
-            <a href="${pageContext.request.contextPath}/terms">Terms</a>
+<%--            <a href="${pageContext.request.contextPath}/help">Help</a>--%>
+<%--            <a href="${pageContext.request.contextPath}/contact">Contact</a>--%>
+<%--            <a href="${pageContext.request.contextPath}/terms">Terms</a>--%>
         </div>
     </div>
 </footer>

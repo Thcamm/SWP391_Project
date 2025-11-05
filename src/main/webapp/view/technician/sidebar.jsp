@@ -9,6 +9,9 @@
     .menu-item{display:block;padding:10px 12px;border-radius:10px;margin-bottom:6px}
     .menu-item:hover{background:#f2f3f8}
     .menu-item.active{background:#111827;color:#fff}
+    .sidebar-footer{position:sticky;top:100%;padding-top:16px}
+    .btn-logout{width:100%;padding:10px 12px;border:1px solid var(--border);background:#fff;border-radius:10px;cursor:pointer}
+    .btn-logout:hover{background:#f9fafb}
 
 </style>
 <aside class="sidebar">
@@ -20,9 +23,6 @@
            href="${pageContext.request.contextPath}/technician/home">Home</a>
         <a class="menu-item ${fn:contains(uri,'/technician/tasks') ? 'active' : ''}"
            href="${pageContext.request.contextPath}/technician/tasks">Tasks</a>
-        <a class="menu-item ${fn:contains(uri,'/technician/parts') ? 'active' : ''}"
-           href="${pageContext.request.contextPath}/technician/parts">Parts</a>
-        <a class="menu-item" href="${pageContext.request.contextPath}/technician/contacts">Contacts</a>
-        <a class="menu-item" href="${pageContext.request.contextPath}/technician/settings">Settings</a>
+
     </div>
 </aside>
