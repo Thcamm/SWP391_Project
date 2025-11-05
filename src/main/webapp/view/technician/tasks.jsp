@@ -189,10 +189,16 @@
                                             </c:when>
 
                                             <c:when test="${task.status == 'IN_PROGRESS'}">
-                                                <a href="${pageContext.request.contextPath}/technician/update-progress-form?assignmentId=${task.assignmentID}&returnTo=${pageContext.request.requestURL}?${pageContext.request.queryString}"
-                                                   class="btn btn-update btn-sm">
-                                                    Update Progress
-                                                </a>
+                                                <c:set var="qs" value="${pageContext.request.queryString}" />
+
+                                                <c:url var="updUrl" value="/technician/update-progress-form">
+                                                    <c:param name="assignmentId" value="${task.assignmentID}" />
+                                                    <c:param name="returnTo"
+                                                             value="${pageContext.request.requestURI}${not empty qs ? '?' : ''}${qs}" />
+                                                </c:url>
+
+                                                <a href="${updUrl}" class="btn btn-update btn-sm">Update Progress</a>
+
 
 
                                                 <form action="${pageContext.request.contextPath}/technician/update-progress" method="post" style="display: inline">

@@ -12,8 +12,9 @@
 
 
 <jsp:include page="header.jsp"/>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/update-progress.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/base.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/update-progress.css">
+
 
 <div class="layout">
     <jsp:include page="sidebar.jsp"/>
@@ -99,10 +100,9 @@
                       method="post" class="progress-form">
                     <input type="hidden" name="assignmentId" value="${task.assignmentID}">
                     <input type="hidden" name="action" value="update">
-                    <c:set var="rt" value="${not empty returnTo ? returnTo : pageContext.request.requestURL}" />
-                    <c:if test="${not empty pageContext.request.queryString}">
-                        <c:set var="returnTo" value="${returnTo}?${pageContext.request.queryString}" />
-                    </c:if>
+                    <input type="hidden" name="returnTo"
+                           value="${pageContext.request.contextPath}/technician/update-progress-form?assignmentId=${task.assignmentID}" />
+
 
                     <input type="hidden" name="returnTo" value="${returnTo}" />
 

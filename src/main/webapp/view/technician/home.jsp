@@ -221,15 +221,6 @@
             <section class="panel card">
                 <div class="panel-head"><h3>⚡ Quick Actions</h3></div>
                 <div class="actions-grid">
-                    <a class="action-card" href="${pageContext.request.contextPath}/technician/diagnostics">
-                        <div class="action-ic">🔍</div><div>Diagnose Vehicle</div>
-                    </a>
-                    <a class="action-card" href="${pageContext.request.contextPath}/technician/parts">
-                        <div class="action-ic">🔧</div><div>Request Parts</div>
-                    </a>
-                    <a class="action-card" href="${pageContext.request.contextPath}/technician/specifications">
-                        <div class="action-ic">📋</div><div>Technical Specs</div>
-                    </a>
                     <a class="action-card" href="${pageContext.request.contextPath}/technician/tasks">
                         <div class="action-ic">📊</div><div>All Tasks</div>
                     </a>
