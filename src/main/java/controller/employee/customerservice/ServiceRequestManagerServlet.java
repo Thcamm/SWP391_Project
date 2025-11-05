@@ -21,6 +21,12 @@ public class ServiceRequestManagerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false);
+        if (session.getAttribute("message") != null) {
+            request.setAttribute("message", session.getAttribute("message"));
+            request.setAttribute("messageType", session.getAttribute("messageType"));
+            session.removeAttribute("message");
+            session.removeAttribute("messageType");
+        }
         User currentUser = (session != null) ? (User) session.getAttribute("user") : null;
 
         if (currentUser == null) {

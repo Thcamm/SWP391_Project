@@ -31,12 +31,18 @@ public class CreateDiagnosticServlet extends HttpServlet {
     private final TechnicianDiagnosticService diagnosticService = new TechnicianDiagnosticService();
     private final PartService partService = new PartService();
 
-
     private int parseIntOr(String s, int def) {
-        try { return Integer.parseInt(s); } catch (Exception ignored) { return def; }
+        try {
+            return Integer.parseInt(s);
+        } catch (Exception ignored) {
+            return def;
+        }
     }
 
-    /** Nạp list parts để hiển thị + map các part đã chọn (để option selected vẫn xuất hiện). */
+    /**
+     * Nạp list parts để hiển thị + map các part đã chọn (để option selected vẫn
+     * xuất hiện).
+     */
     private void loadPartsForDisplay(HttpServletRequest req, String partQuery, String[] partDetailIds) {
         int page = parseIntOr(req.getParameter("page"), 1);
         int size = parseIntOr(req.getParameter("size"), 20);
@@ -51,29 +57,32 @@ public class CreateDiagnosticServlet extends HttpServlet {
         req.setAttribute("partsTotalItems", pageData.getTotalItems());
         req.setAttribute("partsPageSize", pageData.getItemsPerPage());
 
-
         Map<Integer, PartDetail> selectedPartMap = new HashMap<>();
         if (partDetailIds != null) {
             for (String s : partDetailIds) {
-                if (s == null || s.isBlank()) continue;
+                if (s == null || s.isBlank())
+                    continue;
                 try {
                     int pid = Integer.parseInt(s);
                     ServiceResult pr = partService.getPartDetailById(pid);
                     if (pr.isSuccess() && pr.getData() != null) {
                         selectedPartMap.put(pid, pr.getData(PartDetail.class));
                     }
-                } catch (NumberFormatException ignored) { }
+                } catch (NumberFormatException ignored) {
+                }
             }
         }
         req.setAttribute("selectedPartMap", selectedPartMap);
     }
 
     private void forwardForm(HttpServletRequest req, HttpServletResponse resp,
-                             TaskAssignment task, Employee technician,
-                             List<String> formErrors, String successMessage)
+            TaskAssignment task, Employee technician,
+            List<String> formErrors, String successMessage)
             throws ServletException, IOException {
-        if (task != null) req.setAttribute("task", task);
-        if (technician != null) req.setAttribute("technician", technician);
+        if (task != null)
+            req.setAttribute("task", task);
+        if (technician != null)
+            req.setAttribute("technician", technician);
         if (formErrors != null && !formErrors.isEmpty()) {
             req.setAttribute("formErrors", formErrors);
         }
@@ -83,8 +92,6 @@ public class CreateDiagnosticServlet extends HttpServlet {
         }
         req.getRequestDispatcher("/view/technician/create-diagnostic.jsp").forward(req, resp);
     }
-
-
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -133,8 +140,6 @@ public class CreateDiagnosticServlet extends HttpServlet {
         }
     }
 
-
-
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -155,9 +160,9 @@ public class CreateDiagnosticServlet extends HttpServlet {
 
         // mảng parts từ form
         String[] partDetailIds = req.getParameterValues("partDetailId[]");
-        String[] quantities    = req.getParameterValues("quantity[]");
-        String[] conditions    = req.getParameterValues("condition[]");
-        String[] reasons       = req.getParameterValues("reason[]");
+        String[] quantities = req.getParameterValues("quantity[]");
+        String[] conditions = req.getParameterValues("condition[]");
+        String[] reasons = req.getParameterValues("reason[]");
 
         if (assignmentIdStr == null || assignmentIdStr.trim().isEmpty()) {
             MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
@@ -166,8 +171,9 @@ public class CreateDiagnosticServlet extends HttpServlet {
         }
 
         int assignmentId;
-        try { assignmentId = Integer.parseInt(assignmentIdStr); }
-        catch (NumberFormatException e) {
+        try {
+            assignmentId = Integer.parseInt(assignmentIdStr);
+        } catch (NumberFormatException e) {
             MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
             resp.sendRedirect(req.getContextPath() + "/technician/home");
             return;
@@ -193,7 +199,8 @@ public class CreateDiagnosticServlet extends HttpServlet {
                 try {
                     int idx = Integer.parseInt(action.replace("removePart", ""));
                     req.setAttribute("removeIndex", idx);
-                } catch (NumberFormatException ignored) {}
+                } catch (NumberFormatException ignored) {
+                }
             }
             if ("addPart".equals(action)) {
                 req.setAttribute("appendEmptyRow", true);
@@ -206,7 +213,7 @@ public class CreateDiagnosticServlet extends HttpServlet {
         }
 
         // --------- Submit thật ---------
-        String issueFound   = req.getParameter("issueFound");
+        String issueFound = req.getParameter("issueFound");
         String laborCostStr = req.getParameter("laborCost");
 
         List<String> errors = new ArrayList<>();
@@ -304,9 +311,9 @@ public class CreateDiagnosticServlet extends HttpServlet {
         VehicleDiagnostic diagnostic = new VehicleDiagnostic();
         diagnostic.setAssignmentID(assignmentId);
         diagnostic.setIssueFound(issueFound.trim());
-        diagnostic.setEstimateCost(totalEstimate);  // Total estimate
-        diagnostic.setLaborCostInput(laborCost);     // ✅ THÊM: Lưu labor cost riêng để service dùng
-        diagnostic.setStatus(true);
+        diagnostic.setEstimateCost(totalEstimate); // Total estimate
+        diagnostic.setLaborCostInput(laborCost); // ✅ THÊM: Lưu labor cost riêng để service dùng
+        diagnostic.setStatus(VehicleDiagnostic.Status.SUBMITTED); // NEW: Use Status enum
         diagnostic.setParts(parts);
 
         // call service

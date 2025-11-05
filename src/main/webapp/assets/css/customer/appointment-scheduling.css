@@ -1,0 +1,49 @@
+.appointment-section {
+    padding: 40px 0;
+    background-color: #f8f9fa;
+}
+.appointment-form {
+    background: white;
+    margin-top: 130px;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+.form-label {
+    font-weight: 600;
+    color: #333;
+}
+.required {
+    color: red;
+}
+.service-option {
+    padding: 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.service-option:hover {
+    border-color: #007bff;
+    background-color: #f8f9fa;
+}
+.service-option input[type="radio"]:checked + label {
+    color: #007bff;
+    font-weight: 600;
+}
+.btn-submit {
+    background-color: #dc3545 !important;
+    color: white !important;
+    padding: 12px 40px;
+    border: none;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.btn-submit:hover {
+    background-color: #c82333 !important;
+    color: white !important;
+}

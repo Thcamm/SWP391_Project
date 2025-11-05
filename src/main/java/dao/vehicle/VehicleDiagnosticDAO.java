@@ -5,16 +5,12 @@ import model.inventory.DiagnosticPart;
 import model.vehicle.VehicleDiagnostic;
 import model.vehicle.VehicleDiagnostic.DiagnosticTechnician;
 
-
-import javax.tools.Diagnostic;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-
 
 public class VehicleDiagnosticDAO {
 
@@ -34,7 +30,13 @@ public class VehicleDiagnosticDAO {
             ps.setInt(1, diagnostic.getAssignmentID());
             ps.setString(2, diagnostic.getIssueFound());
             ps.setBigDecimal(3, diagnostic.getEstimateCost());
-            ps.setBoolean(4, diagnostic.isStatus());
+
+            // Use Status enum
+            if (diagnostic.getStatus() != null) {
+                ps.setString(4, diagnostic.getStatus().name());
+            } else {
+                ps.setString(4, VehicleDiagnostic.Status.SUBMITTED.name());
+            }
 
             int rowsAffected = ps.executeUpdate();
 
@@ -54,7 +56,7 @@ public class VehicleDiagnosticDAO {
      * Hỗ trợ nhiều technician cùng làm một diagnostic
      */
     public boolean addTechnicianToDiagnostic(Connection conn, int diagnosticId, int technicianId,
-                                             boolean isLead, double hoursSpent) throws SQLException {
+            boolean isLead, double hoursSpent) throws SQLException {
         String sql = "INSERT INTO VehicleDiagnosticTechnician " +
                 "(VehicleDiagnosticID, TechnicianID, IsLead, HoursSpent, AddedAt) " +
                 "VALUES (?, ?, ?, ?, NOW()) " +
@@ -102,7 +104,7 @@ public class VehicleDiagnosticDAO {
      * Cập nhật issue found và estimate cost
      */
     public boolean updateDiagnostic(Connection conn, int diagnosticId,
-                                    String issueFound, BigDecimal estimateCost) throws SQLException {
+            String issueFound, BigDecimal estimateCost) throws SQLException {
         String sql = "UPDATE VehicleDiagnostic " +
                 "SET IssueFound = ?, EstimateCost = ? " +
                 "WHERE VehicleDiagnosticID = ?";
@@ -119,7 +121,7 @@ public class VehicleDiagnosticDAO {
      * Cập nhật số giờ làm việc của technician trong diagnostic
      */
     public boolean updateTechnicianHours(Connection conn, int diagnosticId, int technicianId,
-                                         double additionalHours) throws SQLException {
+            double additionalHours) throws SQLException {
         String sql = "UPDATE VehicleDiagnosticTechnician " +
                 "SET HoursSpent = HoursSpent + ? " +
                 "WHERE VehicleDiagnosticID = ? AND TechnicianID = ?";
@@ -184,43 +186,42 @@ public class VehicleDiagnosticDAO {
      */
     public VehicleDiagnostic getDiagnosticWithFullInfo(Connection conn, int diagnosticId)
             throws SQLException {
-        String sql =
-                "SELECT " +
-                        "    vd.*, " +
-                        // Vehicle info
-                        "    v.VehicleID, " +
-                        "    v.LicensePlate, " +
-                        "    v.Brand, " +
-                        "    v.Model, " +
-                        "    v.YearManufacture, " +
-                        // Customer info
-                        "    c.CustomerID, " +
-                        "    u_cust.FullName AS CustomerName, " +
-                        "    u_cust.PhoneNumber AS CustomerPhone, " +
-                        "    u_cust.Email AS CustomerEmail, " +
-                        // Task info
-                        "    ta.AssignmentID, " +
-                        "    ta.TaskDescription, " +
-                        "    ta.Status AS TaskStatus, " +
-                        // Lead Technician info
-                        "    ta.AssignToTechID, " +
-                        "    u_tech.FullName AS TechnicianName, " +
-                        "    u_tech.Email AS TechnicianEmail, " +
-                        "    e.EmployeeCode, " +
-                        // WorkOrder info
-                        "    wo.WorkOrderID, " +
-                        "    wo.Status AS WorkOrderStatus " +
-                        "FROM VehicleDiagnostic vd " +
-                        "JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID " +
-                        "JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID " +
-                        "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
-                        "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
-                        "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
-                        "JOIN Customer c ON v.CustomerID = c.CustomerID " +
-                        "LEFT JOIN User u_cust ON c.UserID = u_cust.UserID " +
-                        "JOIN Employee e ON ta.AssignToTechID = e.EmployeeID " +
-                        "JOIN User u_tech ON e.UserID = u_tech.UserID " +
-                        "WHERE vd.VehicleDiagnosticID = ?";
+        String sql = "SELECT " +
+                "    vd.*, " +
+                // Vehicle info
+                "    v.VehicleID, " +
+                "    v.LicensePlate, " +
+                "    v.Brand, " +
+                "    v.Model, " +
+                "    v.YearManufacture, " +
+                // Customer info
+                "    c.CustomerID, " +
+                "    u_cust.FullName AS CustomerName, " +
+                "    u_cust.PhoneNumber AS CustomerPhone, " +
+                "    u_cust.Email AS CustomerEmail, " +
+                // Task info
+                "    ta.AssignmentID, " +
+                "    ta.TaskDescription, " +
+                "    ta.Status AS TaskStatus, " +
+                // Lead Technician info
+                "    ta.AssignToTechID, " +
+                "    u_tech.FullName AS TechnicianName, " +
+                "    u_tech.Email AS TechnicianEmail, " +
+                "    e.EmployeeCode, " +
+                // WorkOrder info
+                "    wo.WorkOrderID, " +
+                "    wo.Status AS WorkOrderStatus " +
+                "FROM VehicleDiagnostic vd " +
+                "JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID " +
+                "JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID " +
+                "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
+                "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
+                "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
+                "JOIN Customer c ON v.CustomerID = c.CustomerID " +
+                "LEFT JOIN User u_cust ON c.UserID = u_cust.UserID " +
+                "JOIN Employee e ON ta.AssignToTechID = e.EmployeeID " +
+                "JOIN User u_tech ON e.UserID = u_tech.UserID " +
+                "WHERE vd.VehicleDiagnosticID = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, diagnosticId);
@@ -233,8 +234,7 @@ public class VehicleDiagnosticDAO {
                             rs.getString("LicensePlate"),
                             rs.getString("Brand"),
                             rs.getString("Model"),
-                            rs.getInt("YearManufacture")
-                    );
+                            rs.getInt("YearManufacture"));
                     vd.setVehicleInfo(vehicleInfo);
 
                     // Set technician info
@@ -282,21 +282,20 @@ public class VehicleDiagnosticDAO {
      */
     public List<DiagnosticTechnician> getTechniciansByDiagnostic(Connection conn, int diagnosticId)
             throws SQLException {
-        String sql =
-                "SELECT " +
-                        "    vdt.TechnicianID, " +
-                        "    vdt.IsLead, " +
-                        "    vdt.HoursSpent, " +
-                        "    vdt.AddedAt, " +
-                        "    u.FullName AS TechnicianName, " +
-                        "    u.Email, " +
-                        "    u.PhoneNumber, " +
-                        "    e.EmployeeCode " +
-                        "FROM VehicleDiagnosticTechnician vdt " +
-                        "JOIN Employee e ON vdt.TechnicianID = e.EmployeeID " +
-                        "JOIN User u ON e.UserID = u.UserID " +
-                        "WHERE vdt.VehicleDiagnosticID = ? " +
-                        "ORDER BY vdt.IsLead DESC, vdt.AddedAt";
+        String sql = "SELECT " +
+                "    vdt.TechnicianID, " +
+                "    vdt.IsLead, " +
+                "    vdt.HoursSpent, " +
+                "    vdt.AddedAt, " +
+                "    u.FullName AS TechnicianName, " +
+                "    u.Email, " +
+                "    u.PhoneNumber, " +
+                "    e.EmployeeCode " +
+                "FROM VehicleDiagnosticTechnician vdt " +
+                "JOIN Employee e ON vdt.TechnicianID = e.EmployeeID " +
+                "JOIN User u ON e.UserID = u.UserID " +
+                "WHERE vdt.VehicleDiagnosticID = ? " +
+                "ORDER BY vdt.IsLead DESC, vdt.AddedAt";
 
         List<DiagnosticTechnician> list = new ArrayList<>();
 
@@ -320,42 +319,41 @@ public class VehicleDiagnosticDAO {
      * Lấy diagnostics chờ approval (cho Manager review)
      */
     public List<VehicleDiagnostic> getPendingApprovalDiagnostics(Connection conn) throws SQLException {
-        String sql =
-                "SELECT " +
-                        "    vd.*, " +
-                        "    v.LicensePlate, " +
-                        "    v.Brand, " +
-                        "    v.Model, " +
-                        "    v.YearManufacture, " +
-                        "    u.FullName AS TechName, " +
-                        "    u.Email AS TechEmail, " +
-                        "    ta.AssignToTechID, " +
-                        "    ta.AssignedDate, " +
-                        "    wo.WorkOrderID, " +
-                        "    wo.Status AS WorkOrderStatus, " +
-                        "    u_cust.FullName AS CustomerName " +
-                        "FROM VehicleDiagnostic vd " +
-                        "JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID " +
-                        "JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID " +
-                        "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
-                        "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
-                        "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
-                        "JOIN Customer c ON v.CustomerID = c.CustomerID " +
-                        "LEFT JOIN User u_cust ON c.UserID = u_cust.UserID " +
-                        "JOIN Employee e ON ta.AssignToTechID = e.EmployeeID " +
-                        "JOIN User u ON e.UserID = u.UserID " +
-                        "WHERE vd.Status = 1 " +
-                        "  AND NOT EXISTS ( " +
-                        "      SELECT 1 FROM WorkOrderDetail wod2 " +
-                        "      WHERE wod2.diagnostic_id = vd.VehicleDiagnosticID " +
-                        "        AND wod2.approval_status = 'APPROVED' " +
-                        "  ) " +
-                        "ORDER BY vd.CreatedAt DESC";
+        String sql = "SELECT " +
+                "    vd.*, " +
+                "    v.LicensePlate, " +
+                "    v.Brand, " +
+                "    v.Model, " +
+                "    v.YearManufacture, " +
+                "    u.FullName AS TechName, " +
+                "    u.Email AS TechEmail, " +
+                "    ta.AssignToTechID, " +
+                "    ta.AssignedDate, " +
+                "    wo.WorkOrderID, " +
+                "    wo.Status AS WorkOrderStatus, " +
+                "    u_cust.FullName AS CustomerName " +
+                "FROM VehicleDiagnostic vd " +
+                "JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID " +
+                "JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID " +
+                "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
+                "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
+                "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
+                "JOIN Customer c ON v.CustomerID = c.CustomerID " +
+                "LEFT JOIN User u_cust ON c.UserID = u_cust.UserID " +
+                "JOIN Employee e ON ta.AssignToTechID = e.EmployeeID " +
+                "JOIN User u ON e.UserID = u.UserID " +
+                "WHERE vd.Status = 1 " +
+                "  AND NOT EXISTS ( " +
+                "      SELECT 1 FROM WorkOrderDetail wod2 " +
+                "      WHERE wod2.diagnostic_id = vd.VehicleDiagnosticID " +
+                "        AND wod2.approval_status = 'APPROVED' " +
+                "  ) " +
+                "ORDER BY vd.CreatedAt DESC";
 
         List<VehicleDiagnostic> list = new ArrayList<>();
 
         try (PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 VehicleDiagnostic vd = mapDiagnostic(rs);
 
@@ -364,8 +362,7 @@ public class VehicleDiagnosticDAO {
                         rs.getString("LicensePlate"),
                         rs.getString("Brand"),
                         rs.getString("Model"),
-                        rs.getInt("YearManufacture")
-                );
+                        rs.getInt("YearManufacture"));
                 vd.setVehicleInfo(vehicleInfo);
 
                 // Set technician info
@@ -382,24 +379,23 @@ public class VehicleDiagnosticDAO {
      */
     public List<VehicleDiagnostic> getDiagnosticsByTechnician(Connection conn, int technicianId, int limit)
             throws SQLException {
-        String sql =
-                "SELECT " +
-                        "    vd.*, " +
-                        "    v.LicensePlate, " +
-                        "    v.Brand, " +
-                        "    v.Model, " +
-                        "    v.YearManufacture, " +
-                        "    ta.TaskDescription, " +
-                        "    ta.Status AS TaskStatus " +
-                        "FROM VehicleDiagnostic vd " +
-                        "JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID " +
-                        "JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID " +
-                        "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
-                        "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
-                        "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
-                        "WHERE ta.AssignToTechID = ? " +
-                        "ORDER BY vd.CreatedAt DESC " +
-                        (limit > 0 ? "LIMIT ?" : "");
+        String sql = "SELECT " +
+                "    vd.*, " +
+                "    v.LicensePlate, " +
+                "    v.Brand, " +
+                "    v.Model, " +
+                "    v.YearManufacture, " +
+                "    ta.TaskDescription, " +
+                "    ta.Status AS TaskStatus " +
+                "FROM VehicleDiagnostic vd " +
+                "JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID " +
+                "JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID " +
+                "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
+                "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
+                "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
+                "WHERE ta.AssignToTechID = ? " +
+                "ORDER BY vd.CreatedAt DESC " +
+                (limit > 0 ? "LIMIT ?" : "");
 
         List<VehicleDiagnostic> list = new ArrayList<>();
 
@@ -417,8 +413,7 @@ public class VehicleDiagnosticDAO {
                             rs.getString("LicensePlate"),
                             rs.getString("Brand"),
                             rs.getString("Model"),
-                            rs.getInt("YearManufacture")
-                    );
+                            rs.getInt("YearManufacture"));
                     vd.setVehicleInfo(vehicleInfo);
 
                     list.add(vd);
@@ -432,11 +427,11 @@ public class VehicleDiagnosticDAO {
      * Tìm kiếm diagnostics theo multiple criteria
      */
     public List<VehicleDiagnostic> searchDiagnostics(Connection conn,
-                                                     String licensePlate,
-                                                     int technicianId,
-                                                     LocalDate fromDate,
-                                                     LocalDate toDate,
-                                                     Boolean status) throws SQLException {
+            String licensePlate,
+            int technicianId,
+            LocalDate fromDate,
+            LocalDate toDate,
+            Boolean status) throws SQLException {
         StringBuilder sql = new StringBuilder(
                 "SELECT " +
                         "    vd.*, " +
@@ -456,8 +451,7 @@ public class VehicleDiagnosticDAO {
                         "LEFT JOIN User u_cust ON c.UserID = u_cust.UserID " +
                         "JOIN Employee e ON ta.AssignToTechID = e.EmployeeID " +
                         "JOIN User u ON e.UserID = u.UserID " +
-                        "WHERE 1=1 "
-        );
+                        "WHERE 1=1 ");
 
         List<Object> params = new ArrayList<>();
 
@@ -508,8 +502,7 @@ public class VehicleDiagnosticDAO {
                             rs.getString("LicensePlate"),
                             rs.getString("Brand"),
                             rs.getString("Model"),
-                            rs.getInt("YearManufacture")
-                    );
+                            rs.getInt("YearManufacture"));
                     vd.setVehicleInfo(vehicleInfo);
                     vd.setTechnicianName(rs.getString("TechName"));
 
@@ -528,11 +521,10 @@ public class VehicleDiagnosticDAO {
      * Đếm số diagnostics theo technician
      */
     public int countDiagnosticsByTechnician(Connection conn, int technicianId) throws SQLException {
-        String sql =
-                "SELECT COUNT(*) AS total " +
-                        "FROM VehicleDiagnostic vd " +
-                        "JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID " +
-                        "WHERE ta.AssignToTechID = ? AND vd.Status = 1";
+        String sql = "SELECT COUNT(*) AS total " +
+                "FROM VehicleDiagnostic vd " +
+                "JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID " +
+                "WHERE ta.AssignToTechID = ? AND vd.Status = 1";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, technicianId);
@@ -547,20 +539,21 @@ public class VehicleDiagnosticDAO {
 
     public List<VehicleDiagnostic> getByAssignmentPaged(int assignmentId, int offset, int limit) throws SQLException {
         String sql = """
-        SELECT vd.*
-        FROM VehicleDiagnostic vd
-        WHERE vd.AssignmentID = ?
-        ORDER BY vd.CreatedAt DESC, vd.VehicleDiagnosticID DESC
-        LIMIT ? OFFSET ?
-    """;
+                    SELECT vd.*
+                    FROM VehicleDiagnostic vd
+                    WHERE vd.AssignmentID = ?
+                    ORDER BY vd.CreatedAt DESC, vd.VehicleDiagnosticID DESC
+                    LIMIT ? OFFSET ?
+                """;
         try (Connection c = DbContext.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+                PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, assignmentId);
             ps.setInt(2, limit);
             ps.setInt(3, offset);
             try (ResultSet rs = ps.executeQuery()) {
                 List<VehicleDiagnostic> out = new ArrayList<>();
-                while (rs.next()) out.add(mapDiagnostic(rs));
+                while (rs.next())
+                    out.add(mapDiagnostic(rs));
                 return out;
             }
         }
@@ -568,7 +561,9 @@ public class VehicleDiagnosticDAO {
 
     public Map<Integer, List<DiagnosticPart>> getPartsForDiagnostics(List<Integer> diagIds) throws SQLException {
         Map<Integer, List<DiagnosticPart>> map = new HashMap<>();
-        if(diagIds == null || diagIds.isEmpty()){return map;}
+        if (diagIds == null || diagIds.isEmpty()) {
+            return map;
+        }
 
         String placeholders = diagIds.stream().map(id -> "?").collect(Collectors.joining(", "));
         String sql = """
@@ -578,16 +573,16 @@ public class VehicleDiagnosticDAO {
                 JOIN Part p ON p.PartID = pd.PartID
                 WHERE dp.VehicleDiagnosticID IN (%s)
                 ORDER BY dp.VehicleDiagnosticID, dp.DiagnosticPartID
-                
+
                 """.formatted(placeholders);
 
         try (Connection c = DbContext.getConnection();
-        PreparedStatement ps = c.prepareStatement(sql)){
+                PreparedStatement ps = c.prepareStatement(sql)) {
             int idx = 1;
             for (Integer id : diagIds)
                 ps.setInt(idx++, id);
 
-            try (ResultSet rs = ps.executeQuery()){
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     DiagnosticPart d = new DiagnosticPart();
                     int diagId = rs.getInt("VehicleDiagnosticID");
@@ -616,7 +611,7 @@ public class VehicleDiagnosticDAO {
     public int countByAssignment(int assignmentId) throws SQLException {
         String sql = "SELECT COUNT(*) AS total FROM VehicleDiagnostic WHERE AssignmentID = ?";
         try (Connection c = DbContext.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+                PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, assignmentId);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? rs.getInt("total") : 0;
@@ -624,24 +619,21 @@ public class VehicleDiagnosticDAO {
         }
     }
 
-
-
     /**
      * Đếm diagnostics pending approval
      */
     public int countPendingApprovalDiagnostics(Connection conn) throws SQLException {
-        String sql =
-                "SELECT COUNT(*) AS total " +
-                        "FROM VehicleDiagnostic vd " +
-                        "WHERE vd.Status = 1 " +
-                        "  AND NOT EXISTS ( " +
-                        "      SELECT 1 FROM WorkOrderDetail wod " +
-                        "      WHERE wod.diagnostic_id = vd.VehicleDiagnosticID " +
-                        "        AND wod.approval_status = 'APPROVED' " +
-                        "  )";
+        String sql = "SELECT COUNT(*) AS total " +
+                "FROM VehicleDiagnostic vd " +
+                "WHERE vd.Status = 1 " +
+                "  AND NOT EXISTS ( " +
+                "      SELECT 1 FROM WorkOrderDetail wod " +
+                "      WHERE wod.diagnostic_id = vd.VehicleDiagnosticID " +
+                "        AND wod.approval_status = 'APPROVED' " +
+                "  )";
 
         try (PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 return rs.getInt("total");
             }
@@ -652,16 +644,15 @@ public class VehicleDiagnosticDAO {
     /**
      * Đếm diagnostics theo date range
      *
-
+     * 
      */
     public int countDiagnosticsByDateRange(Connection conn, LocalDate fromDate, LocalDate toDate)
             throws SQLException {
-        String sql =
-                "SELECT COUNT(*) AS total " +
-                        "FROM VehicleDiagnostic vd " +
-                        "WHERE vd.Status = 1 " +
-                        "  AND DATE(vd.CreatedAt) >= ? " +
-                        "  AND DATE(vd.CreatedAt) <= ?";
+        String sql = "SELECT COUNT(*) AS total " +
+                "FROM VehicleDiagnostic vd " +
+                "WHERE vd.Status = 1 " +
+                "  AND DATE(vd.CreatedAt) >= ? " +
+                "  AND DATE(vd.CreatedAt) <= ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDate(1, Date.valueOf(fromDate));
@@ -681,7 +672,7 @@ public class VehicleDiagnosticDAO {
 
     /**
      * Kiểm tra xem một assignment đã có diagnostic chưa
-
+     * 
      */
     public boolean hasDiagnostic(Connection conn, int assignmentId) throws SQLException {
         String sql = "SELECT COUNT(*) AS cnt " +
@@ -721,7 +712,7 @@ public class VehicleDiagnosticDAO {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, diagnosticId);
             try (ResultSet rs = ps.executeQuery()) {
-                   return rs.next();
+                return rs.next();
             }
         }
     }
@@ -737,9 +728,10 @@ public class VehicleDiagnosticDAO {
     }
 
     /** Insert 1 dòng part */
-    public int insertDiagnosticPart(Connection conn, DiagnosticPart p) throws SQLException{
+    public int insertDiagnosticPart(Connection conn, DiagnosticPart p) throws SQLException {
         String sql = "INSERT INTO DiagnosticPart " +
-                "(VehicleDiagnosticID, PartDetailID, QuantityNeeded, UnitPrice, PartCondition, ReasonForReplacement, IsApproved) " +
+                "(VehicleDiagnosticID, PartDetailID, QuantityNeeded, UnitPrice, PartCondition, ReasonForReplacement, IsApproved) "
+                +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, p.getVehicleDiagnosticID());
@@ -753,23 +745,20 @@ public class VehicleDiagnosticDAO {
         }
     }
 
-
-
     /**
      * Kiểm tra technician có quyền access diagnostic không
      */
     public boolean canTechnicianAccessDiagnostic(Connection conn, int diagnosticId, int technicianId)
             throws SQLException {
-        String sql =
+        String sql = "SELECT 1 " +
+                "FROM VehicleDiagnostic vd " +
+                "JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID " +
+                "WHERE vd.VehicleDiagnosticID = ? AND ta.AssignToTechID = ? " +
+                "UNION ALL " +
                 "SELECT 1 " +
-                        "FROM VehicleDiagnostic vd " +
-                        "JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID " +
-                        "WHERE vd.VehicleDiagnosticID = ? AND ta.AssignToTechID = ? " +
-                        "UNION ALL " +
-                        "SELECT 1 " +
-                        "FROM VehicleDiagnosticTechnician vdt " +
-                        "WHERE vdt.VehicleDiagnosticID = ? AND vdt.TechnicianID = ? " +
-                        "LIMIT 1";
+                "FROM VehicleDiagnosticTechnician vdt " +
+                "WHERE vdt.VehicleDiagnosticID = ? AND vdt.TechnicianID = ? " +
+                "LIMIT 1";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, diagnosticId);
             ps.setInt(2, technicianId);
@@ -778,6 +767,67 @@ public class VehicleDiagnosticDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
             }
+        }
+    }
+
+    // ================================================================
+    // WRAPPER METHODS (with auto connection management)
+    // ================================================================
+
+    /**
+     * Lấy diagnostic theo ID (wrapper method - tự quản lý connection)
+     */
+    public VehicleDiagnostic getById(int diagnosticId) throws SQLException {
+        try (Connection conn = DbContext.getConnection()) {
+            return getDiagnosticById(conn, diagnosticId);
+        }
+    }
+
+    /**
+     * Lấy diagnostic kèm danh sách parts (wrapper method)
+     */
+    public VehicleDiagnostic getByIdWithParts(int diagnosticId) throws SQLException {
+        try (Connection conn = DbContext.getConnection()) {
+            VehicleDiagnostic diagnostic = getDiagnosticById(conn, diagnosticId);
+            
+            if (diagnostic != null) {
+                // Load parts using getPartsForDiagnostics method
+                Map<Integer, List<DiagnosticPart>> partsMap = getPartsForDiagnostics(
+                    Collections.singletonList(diagnosticId)
+                );
+                
+                List<DiagnosticPart> parts = partsMap.get(diagnosticId);
+                if (parts != null) {
+                    diagnostic.setParts(parts);
+                }
+            }
+            
+            return diagnostic;
+        }
+    }    /**
+     * Update diagnostic (full update including Status enum)
+     */
+    public boolean update(Connection conn, VehicleDiagnostic diagnostic) throws SQLException {
+        String sql = "UPDATE VehicleDiagnostic SET " +
+                "IssueFound = ?, " +
+                "EstimateCost = ?, " +
+                "Status = ? " +
+                "WHERE VehicleDiagnosticID = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, diagnostic.getIssueFound());
+            ps.setBigDecimal(2, diagnostic.getEstimateCost());
+
+            // Convert enum to String for database
+            if (diagnostic.getStatus() != null) {
+                ps.setString(3, diagnostic.getStatus().name());
+            } else {
+                ps.setString(3, VehicleDiagnostic.Status.SUBMITTED.name());
+            }
+
+            ps.setInt(4, diagnostic.getVehicleDiagnosticID());
+
+            return ps.executeUpdate() > 0;
         }
     }
 
@@ -825,7 +875,6 @@ public class VehicleDiagnosticDAO {
     // HELPER - MAPPING METHOD
     // ================================================================
 
-
     private VehicleDiagnostic mapDiagnostic(ResultSet rs) throws SQLException {
         VehicleDiagnostic vd = new VehicleDiagnostic();
 
@@ -836,7 +885,16 @@ public class VehicleDiagnosticDAO {
         BigDecimal estimateCost = rs.getBigDecimal("EstimateCost");
         vd.setEstimateCost(estimateCost != null ? estimateCost : BigDecimal.ZERO);
 
-        vd.setStatus(rs.getBoolean("Status"));
+        // Map Status ENUM from database to Java enum
+        String statusStr = rs.getString("Status");
+        if (statusStr != null) {
+            try {
+                vd.setStatus(VehicleDiagnostic.Status.valueOf(statusStr));
+            } catch (IllegalArgumentException e) {
+                // Default to SUBMITTED if invalid value
+                vd.setStatus(VehicleDiagnostic.Status.SUBMITTED);
+            }
+        }
 
         Timestamp createdAt = rs.getTimestamp("CreatedAt");
         if (createdAt != null) {

@@ -21,7 +21,7 @@ public final class Validate implements IConstant {
     private static final Pattern USERNAME_REGEX = Pattern.compile(USERNAME_PATTERN);
     private static final Pattern EMPLOYEE_CODE_REGEX = Pattern.compile(EMPLOYEE_CODE_PATTERN);
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_FORMAT);
-    private static final List<String> VALID_GENDERS = Arrays.asList("Male", "Femail", "Other");
+    private static final List<String> VALID_GENDERS = Arrays.asList("Male", "Female", "Other");
 
     /**
      * Private constructor to prevent instantiation of this utility class.
@@ -29,7 +29,6 @@ public final class Validate implements IConstant {
     private Validate() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
-
 
     /**
      * Check whether a string is null or empty (only whitespace).
@@ -78,6 +77,7 @@ public final class Validate implements IConstant {
             return null;
         }
     }
+
     /**
      * Check whether an Integer is positive (> 0).
      */
@@ -94,6 +94,7 @@ public final class Validate implements IConstant {
 
     /**
      * Validate email format (required).
+     * 
      * @return false if empty or not matching the pattern.
      */
     public static boolean isValidEmail(String email) {
@@ -105,6 +106,7 @@ public final class Validate implements IConstant {
 
     /**
      * Validate username format (required).
+     * 
      * @return false if empty or does not match the regex.
      */
     public static boolean isValidUsername(String username) {
@@ -116,6 +118,7 @@ public final class Validate implements IConstant {
 
     /**
      * Validate phone number (optional).
+     * 
      * @return true if empty OR matches the phone pattern.
      */
     public static boolean isValidPhoneNumber(String phoneNumber) {
@@ -127,6 +130,7 @@ public final class Validate implements IConstant {
 
     /**
      * Validate employee code (optional).
+     * 
      * @return true if empty OR matches the employee code pattern.
      */
     public static boolean isValidEmployeeCode(String code) {
@@ -138,6 +142,7 @@ public final class Validate implements IConstant {
 
     /**
      * Validate gender value (allows empty/optional).
+     * 
      * @return true if empty OR contained in VALID_GENDERS list.
      */
     public static boolean isValidGender(String gender) {
@@ -150,10 +155,14 @@ public final class Validate implements IConstant {
     /**
      * Validate date of birth (DOB).
      * If empty -> considered valid (optional). Otherwise the date must parse
-     * according to the configured DATE_FORMAT and must not be in the future.
+     * according to the configured DATE_FORMAT and must not be in the future
+     * and must not be more than 100 years ago.
      *
      * @param dateStr Date string (e.g. "1990-10-30").
-     * @return true if empty OR a valid date not in the future; false if parsing fails or the date is in the future.
+     * @return true if empty OR a valid date not in the future and not more than 100
+     *         years ago;
+     *         false if parsing fails or the date is in the future or more than 100
+     *         years ago.
      */
     public static boolean isValidDateOfBirth(String dateStr) {
         // Treat DOB as optional. If empty -> valid.
@@ -165,9 +174,18 @@ public final class Validate implements IConstant {
             LocalDate dob = LocalDate.parse(dateStr, DATE_FORMATTER);
 
             LocalDate today = LocalDate.now();
+
+            // Check if date is in the future
             if (dob.isAfter(today)) {
                 return false;
             }
+
+            // Check if date is more than 100 years ago
+            LocalDate minDate = today.minusYears(100);
+            if (dob.isBefore(minDate)) {
+                return false;
+            }
+
             return true;
 
         } catch (DateTimeParseException e) {

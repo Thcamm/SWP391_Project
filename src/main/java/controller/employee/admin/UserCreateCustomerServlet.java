@@ -1,4 +1,5 @@
 package controller.employee.admin;
+
 import util.Validate;
 import common.constant.IConstant;
 
@@ -20,7 +21,8 @@ import java.io.PrintWriter;
  * * Placeholders to be replaced automatically by the IDE:
  * - controller.employee.admin: The package name of the Servlet.
  * - UserCreateCustomerServlet: The class name of the Servlet.
- * * The @WebServlet annotation maps this Servlet to the URL patterns /UserCreateCustomerServlet and /UserCreateCustomerServlet/*.
+ * * The @WebServlet annotation maps this Servlet to the URL patterns
+ * /UserCreateCustomerServlet and /UserCreateCustomerServlet/*.
  */
 @WebServlet("/admin/users/create-customer")
 public class UserCreateCustomerServlet extends BaseAdminServlet {
@@ -31,6 +33,7 @@ public class UserCreateCustomerServlet extends BaseAdminServlet {
     public void init() throws ServletException {
         this.adminService = new AdminService();
     }
+
     /**
      * Handles HTTP GET requests.
      * Typically used to retrieve data or display a user interface.
@@ -48,7 +51,8 @@ public class UserCreateCustomerServlet extends BaseAdminServlet {
 
     /**
      * Handles HTTP POST requests.
-     * Typically used to receive form data and execute business logic (e.g., saving to a database).
+     * Typically used to receive form data and execute business logic (e.g., saving
+     * to a database).
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -64,42 +68,60 @@ public class UserCreateCustomerServlet extends BaseAdminServlet {
         String redirectUrl = request.getContextPath() + "/admin/users/create-customer";
 
         if (Validate.isNullOrEmpty(fullName) || Validate.isNullOrEmpty(userName) || Validate.isNullOrEmpty(email)) {
-            redirectWithMessage(response, redirectUrl, "Vui lòng điền đầy đủ Tên, Username và Email!", "error");
+            redirectWithMessage(response, redirectUrl, "Please enter full name, username, and email.", "error");
             return;
         }
         if (!Validate.isValidUsername(userName)) {
-            redirectWithMessage(response, redirectUrl, "Username phải từ 3-20 ký tự, không chứa ký tự đặc biệt hoặc khoảng trắng!", "error");
+            redirectWithMessage(response, redirectUrl,
+                    "Username must be 3-20 characters long, without special characters or spaces!", "error");
             return;
         }
 
         if (!Validate.isValidEmail(email)) {
-            redirectWithMessage(response, redirectUrl, "Định dạng email không hợp lệ!", "error");
+            redirectWithMessage(response, redirectUrl, "Invalid email format!", "error");
             return;
         }
         if (!Validate.isValidPhoneNumber(phoneNumber)) {
-            redirectWithMessage(response, redirectUrl, "Định dạng số điện thoại không hợp lệ!", "error");
+            redirectWithMessage(response, redirectUrl, "Invalid phone number format!", "error");
             return;
         }
 
         if (!Validate.isValidGender(gender)) {
-            redirectWithMessage(response, redirectUrl, "Giá trị giới tính không hợp lệ!", "error");
+            redirectWithMessage(response, redirectUrl, "Invalid gender value!", "error");
             return;
         }
 
         if (!Validate.isValidDateOfBirth(dobStr)) {
-            redirectWithMessage(response, redirectUrl, "Ngày sinh không hợp lệ (không được ở tương lai và phải đúng định dạng " + IConstant.DATE_FORMAT + ")!", "error");
+            redirectWithMessage(response, redirectUrl,
+                    "Birth date must be in the format " + IConstant.DATE_FORMAT
+                            + " and cannot be in the future or more than 100 years ago!",
+                    "error");
             return;
         }
 
         if (!Validate.isLengthValid(fullName, IConstant.MAX_FULLNAME_LENGTH)) {
-            redirectWithMessage(response, redirectUrl, "Tên đầy đủ không được vượt quá " + IConstant.MAX_FULLNAME_LENGTH + " ký tự!", "error");
+            redirectWithMessage(response, redirectUrl,
+                    "Full name must not exceed " + IConstant.MAX_FULLNAME_LENGTH + " characters!", "error");
             return;
         }
 
         try {
+            // Check duplicate username
+            if (adminService.isUsernameExists(userName.trim())) {
+                redirectWithMessage(response, redirectUrl,
+                        "Username '" + userName + "' already exists! Please choose another username.", "error");
+                return;
+            }
+
+            // Check duplicate email
+            if (adminService.isEmailExists(email.trim())) {
+                redirectWithMessage(response, redirectUrl,
+                        "Email '" + email + "' is already registered! Please use another email.", "error");
+                return;
+            }
+
             int customerRoleId = 7;
             String currentUser = getCurrentUser(request);
-
 
             String generatedPassword = adminService.createUser(
                     fullName.trim(),
@@ -110,19 +132,21 @@ public class UserCreateCustomerServlet extends BaseAdminServlet {
                     currentUser,
                     null,
                     null
-                    // dobStr,
-                    // phoneNumber
+            // dobStr,
+            // phoneNumber
             );
 
             if (generatedPassword != null) {
-                String message = "Đã tạo Customer thành công! Username: " + userName + ", Mật khẩu: " + generatedPassword;
+                String message = "Create Customer successfully! Username: " + userName + ", Password: "
+                        + generatedPassword;
                 redirectWithMessage(response, request.getContextPath() + "/admin/users", message, "success");
             } else {
-                redirectWithMessage(response, redirectUrl, "Tạo Customer thất bại! Username hoặc Email có thể đã tồn tại.", "error");
+                redirectWithMessage(response, redirectUrl,
+                        "Create Customer failed! Username or Email may already exist.", "error");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            redirectWithMessage(response, redirectUrl, "Lỗi hệ thống: " + e.getMessage(), "error");
+            redirectWithMessage(response, redirectUrl, "System error: " + e.getMessage(), "error");
         }
     }
 }

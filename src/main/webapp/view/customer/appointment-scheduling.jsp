@@ -1,3 +1,4 @@
+<%@ page import="model.user.User" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -7,57 +8,7 @@
     <title>Schedule Appointment</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .appointment-section {
-            padding: 40px 0;
-            background-color: #f8f9fa;
-        }
-        .appointment-form {
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-        .form-label {
-            font-weight: 600;
-            color: #333;
-        }
-        .required {
-            color: red;
-        }
-        .service-option {
-            padding: 15px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .service-option:hover {
-            border-color: #007bff;
-            background-color: #f8f9fa;
-        }
-        .service-option input[type="radio"]:checked + label {
-            color: #007bff;
-            font-weight: 600;
-        }
-        .btn-submit {
-            background-color: #dc3545 !important;
-            color: white !important;
-            padding: 12px 40px;
-            border: none;
-            border-radius: 5px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out;
-        }
-
-        .btn-submit:hover {
-            background-color: #c82333 !important;
-            color: white !important;
-        }
-
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/customer/appointment-scheduling.css">
 </head>
 <body>
 <jsp:include page="/common/customer/header.jsp" />

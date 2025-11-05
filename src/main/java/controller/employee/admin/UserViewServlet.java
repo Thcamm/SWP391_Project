@@ -16,7 +16,8 @@ import java.io.IOException;
  * * Placeholders to be replaced automatically by the IDE:
  * - controller: The package name of the Servlet.
  * - UserViewServlet: The class name of the Servlet.
- * * The @WebServlet annotation maps this Servlet to the URL patterns /UserViewServlet and /UserViewServlet/*.
+ * * The @WebServlet annotation maps this Servlet to the URL patterns
+ * /UserViewServlet and /UserViewServlet/*.
  */
 @WebServlet("/admin/users/view/*")
 public class UserViewServlet extends BaseAdminServlet {
@@ -58,13 +59,14 @@ public class UserViewServlet extends BaseAdminServlet {
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid user ID format");
         } catch (Exception e) {
-            handleError(request, response, "Lỗi khi xem chi tiết user: " + e.getMessage());
+            handleError(request, response, "Error viewing user: " + e.getMessage());
         }
     }
 
     /**
      * Handles HTTP POST requests.
-     * Typically used to receive form data and execute business logic (e.g., saving to a database).
+     * Typically used to receive form data and execute business logic (e.g., saving
+     * to a database).
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
