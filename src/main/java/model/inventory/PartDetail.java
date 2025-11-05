@@ -12,6 +12,24 @@ public class PartDetail {
     private Integer minStock;
     private BigDecimal unitPrice;
     private String location;
+    private String manufacturer;
+    private String description;
+
+    public String getManufacturer() {
+        return manufacturer;
+    }
+
+    public void setManufacturer(String manufacturer) {
+        this.manufacturer = manufacturer;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     // Thông tin JOIN (không lưu DB)
     private String partCode;
@@ -27,7 +45,7 @@ public class PartDetail {
     }
 
     public PartDetail(Integer partDetailId, Integer partId, String sku,
-                      Integer quantity, Integer minStock, BigDecimal unitPrice, String location) {
+                      Integer quantity, Integer minStock, BigDecimal unitPrice, String location, String manufacturer) {
         this.partDetailId = partDetailId;
         this.partId = partId;
         this.sku = sku;
@@ -35,11 +53,34 @@ public class PartDetail {
         this.minStock = minStock;
         this.unitPrice = unitPrice;
         this.location = location;
+        this.manufacturer = manufacturer;
+    }
+
+    public PartDetail(Integer partDetailId, Integer partId, String sku,
+                      Integer quantity, Integer minStock, BigDecimal unitPrice,
+                      String location, String manufacturer, String description) {
+        this.partDetailId = partDetailId;
+        this.partId = partId;
+        this.sku = sku;
+        this.quantity = quantity;
+        this.minStock = minStock;
+        this.unitPrice = unitPrice;
+        this.location = location;
+        this.manufacturer = manufacturer;
+        this.description = description;
     }
 
     // Getters and Setters
-    public Integer getPartDetailId() { return partDetailId; }
-    public void setPartDetailId(Integer partDetailId) { this.partDetailId = partDetailId; }
+    public Integer getPartDetailId() {
+        return partDetailId;
+    }
+
+    public void setPartDetailId(Integer partDetailId) {
+        this.partDetailId = partDetailId;
+    }
+
+
+
 
     public Integer getPartId() { return partId; }
     public void setPartId(Integer partId) { this.partId = partId; }
@@ -88,9 +129,12 @@ public class PartDetail {
 
     public String getStockStatusLabel() {
         switch (getStockStatus()) {
-            case "OUT_OF_STOCK": return "Hết hàng";
-            case "LOW_STOCK": return "Sắp hết";
-            default: return "Đủ";
+            case "OUT_OF_STOCK":
+                return " Hết hàng";
+            case "LOW_STOCK":
+                return " Sắp hết";
+            default:
+                return " Đủ";
         }
     }
 

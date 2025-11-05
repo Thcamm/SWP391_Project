@@ -21,6 +21,9 @@ public class ResetPasswordService {
         this.mailService = mailService;
     }
 
+    public ResetPasswordService() {
+    }
+
     /**
      * Tạo mã OTP ngẫu nhiên 6 chữ số
      */
