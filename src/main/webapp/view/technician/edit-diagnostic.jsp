@@ -73,10 +73,14 @@
                                 </c:choose>
                             </p>
                             <p class="mb-2"><strong>Status:</strong>
-                                <span class="badge ${diag.status ? 'badge-primary' : 'badge-secondary'}">
-                        <c:out value="${diag.status ? 'ACTIVE' : 'INACTIVE'}"/>
-                    </span>
+                                <span class="badge
+        ${diag.statusString == 'SUBMITTED' ? 'badge-warning' :
+          diag.statusString == 'APPROVED'  ? 'badge-success' :
+          diag.statusString == 'REJECTED'  ? 'badge-danger'  : 'badge-secondary'}">
+                                    ${diag.statusString}
+                                </span>
                             </p>
+
                         </div>
                     </div>
                 </div>

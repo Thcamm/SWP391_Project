@@ -223,6 +223,12 @@ public class MessageConstants {
             "Diagnostic updated failed",
             "Diagnostic report updated failed!"
     );
+    public static final SystemMessage DIAG005 = new SystemMessage(
+            "DIAG005",
+            MessageType.ERROR,
+            "Diagnostic updated failed",
+            "Diagnostic is aprroved not updated!"
+    );
 
     public static final SystemMessage ERR001 = new SystemMessage(
             "ERR001",

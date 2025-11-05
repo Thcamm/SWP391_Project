@@ -154,7 +154,7 @@
                                     <td>${st.count}</td>
                                     <td class="mono">${task.vehicleInfo}</td>
                                     <td>${task.serviceInfo}</td>
-                                    <td><td>${task.startAtFormatted}</td></td>
+                                    <td>${empty task.startAtFormatted ? '-' : task.startAtFormatted}</td>
                                     <td>
                                         <div class="progress">
                                             <div class="progress-fill" style="width:${task.progressPercentage}%;"></div>

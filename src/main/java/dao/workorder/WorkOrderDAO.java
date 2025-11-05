@@ -172,4 +172,34 @@ public class WorkOrderDAO extends DbContext {
         workOrder.setCreatedAt(rs.getTimestamp("CreatedAt"));
         return workOrder;
     }
+
+    private void maybeCloseWorkOrder(Connection c, int detailId) throws SQLException {
+        Integer woId = null;
+        try (PreparedStatement ps = c.prepareStatement(
+                "SELECT WorkOrderID FROM WorkOrderDetail WHERE DetailID = ?")) {
+            ps.setInt(1, detailId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) woId = rs.getInt(1);
+            }
+        }
+        if (woId == null) return;
+
+        // còn WOD nào chưa complete?
+        boolean anyNotComplete;
+        try (PreparedStatement ps = c.prepareStatement(
+                "SELECT 1 FROM WorkOrderDetail WHERE WorkOrderID = ? AND (detail_status IS NULL OR detail_status <> 'COMPLETE') LIMIT 1")) {
+            ps.setInt(1, woId);
+            try (ResultSet rs = ps.executeQuery()) {
+                anyNotComplete = rs.next();
+            }
+        }
+        if (!anyNotComplete) {
+            try (PreparedStatement ps = c.prepareStatement(
+                    "UPDATE WorkOrder SET Status = 'COMPLETE' WHERE WorkOrderID = ?")) {
+                ps.setInt(1, woId);
+                ps.executeUpdate();
+            }
+        }
+    }
+
 }

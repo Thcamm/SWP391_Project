@@ -10,6 +10,10 @@
     color: #6b7280;
     margin-bottom: 12px;
 }
+.parts-table { table-layout: fixed; width: 100%; }
+.parts-table th, .parts-table td { vertical-align: middle; white-space: nowrap; }
+.parts-table .part-cell { white-space: normal; }        /* chỉ cột Part được wrap */
+.parts-table .text-end { text-align: right !important; } /* đảm bảo canh phải */
 
 .page-header {
     display: flex;

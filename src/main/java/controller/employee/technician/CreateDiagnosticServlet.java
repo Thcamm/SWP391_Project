@@ -166,8 +166,9 @@ public class CreateDiagnosticServlet extends HttpServlet {
         }
 
         int assignmentId;
-        try { assignmentId = Integer.parseInt(assignmentIdStr); }
-        catch (NumberFormatException e) {
+        try {
+            assignmentId = Integer.parseInt(assignmentIdStr);
+        } catch (NumberFormatException e) {
             MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
             resp.sendRedirect(req.getContextPath() + "/technician/home");
             return;
@@ -278,9 +279,14 @@ public class CreateDiagnosticServlet extends HttpServlet {
                 row.setPartDetailID(partDetailId);
                 row.setQuantityNeeded(qty);
                 row.setUnitPrice(pd.getUnitPrice());
-                row.setPartCondition((conditions != null && i < conditions.length) ? conditions[i] : null);
+
+                // CHANGED: parse PartCondition an toàn sang enum
+                String condRaw = (conditions != null && i < conditions.length) ? conditions[i] : null;
+                DiagnosticPart.PartCondition condEnum = parseConditionOrDefault(condRaw, DiagnosticPart.PartCondition.REQUIRED); // CHANGED
+                row.setPartCondition(condEnum);
+
                 row.setReasonForReplacement((reasons != null && i < reasons.length) ? reasons[i] : null);
-                row.setApproved(false);
+                row.setApproved(false); // KH chưa duyệt
                 parts.add(row);
             }
         }
@@ -290,6 +296,7 @@ public class CreateDiagnosticServlet extends HttpServlet {
             forwardForm(req, resp, task, technician, errors, null);
             return;
         }
+
         // TÍNH TOTAL PARTS
         BigDecimal partsSum = BigDecimal.ZERO;
         for (DiagnosticPart p : parts) {
@@ -304,10 +311,12 @@ public class CreateDiagnosticServlet extends HttpServlet {
         VehicleDiagnostic diagnostic = new VehicleDiagnostic();
         diagnostic.setAssignmentID(assignmentId);
         diagnostic.setIssueFound(issueFound.trim());
-        diagnostic.setEstimateCost(totalEstimate);  // Total estimate
-        diagnostic.setLaborCostInput(laborCost);     // ✅ THÊM: Lưu labor cost riêng để service dùng
-        diagnostic.setStatus(true);
+        diagnostic.setEstimateCost(totalEstimate);   // tổng (labor + parts)
+        diagnostic.setLaborCostInput(laborCost);
         diagnostic.setParts(parts);
+
+        // CHANGED: Status mặc định SUBMITTED (pending approval)
+        diagnostic.setStatus(VehicleDiagnostic.DiagnosticStatus.SUBMITTED);     // nếu bạn dùng enum field
 
         // call service
         ServiceResult result = diagnosticService.createDiagnosticWithParts(
@@ -322,4 +331,15 @@ public class CreateDiagnosticServlet extends HttpServlet {
             forwardForm(req, resp, task, technician, null, null);
         }
     }
+
+    /** CHANGED: helper parse PartCondition từ string form */
+    private DiagnosticPart.PartCondition parseConditionOrDefault(String raw, DiagnosticPart.PartCondition def) {
+        if (raw == null || raw.isBlank()) return def;
+        try {
+            return DiagnosticPart.PartCondition.valueOf(raw.trim().toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            return def;
+        }
+    }
+
 }

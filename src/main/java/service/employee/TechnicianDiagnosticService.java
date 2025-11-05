@@ -86,7 +86,7 @@ public class TechnicianDiagnosticService {
 
             if (!techAdded) {
                 conn.rollback();
-                return ServiceResult.error(MessageConstants.ERR001);
+                return ServiceResult.error(MessageConstants.ERR002);
             }
 
             // ADD PARTS (IF ANY)
@@ -98,7 +98,7 @@ public class TechnicianDiagnosticService {
                     int partId = partDAO.addPartToDiagnostic(conn, part);
                     if (partId <= 0) {
                         conn.rollback();
-                        return ServiceResult.error(MessageConstants.ERR001,
+                        return ServiceResult.error(MessageConstants.ERR003,
                                 "Failed to add part: " + part.getPartName());
                     }
                 }
@@ -116,7 +116,7 @@ public class TechnicianDiagnosticService {
         } catch (Exception e) {
             DbContext.rollback(conn);
             e.printStackTrace();
-            return ServiceResult.error(MessageConstants.ERR001);
+            return ServiceResult.error(MessageConstants.DIAG001);
         } finally {
             DbContext.close(conn);
         }

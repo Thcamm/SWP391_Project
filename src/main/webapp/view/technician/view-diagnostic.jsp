@@ -56,10 +56,23 @@
                             </c:choose>
                         </p>
                         <p class="mb-2"><strong>Status:</strong>
-                            <span class="badge ${diagnostic.status ? 'badge-primary' : 'badge-secondary'}">
-                <c:out value="${diagnostic.status ? 'ACTIVE' : 'INACTIVE'}"/>
-              </span>
+                            <c:set var="st" value="${diagnostic.statusString}" />
+                            <c:choose>
+                                <c:when test="${st == 'APPROVED'}">
+                                    <span class="badge badge-success">APPROVED</span>
+                                </c:when>
+                                <c:when test="${st == 'REJECTED'}">
+                                    <span class="badge badge-danger">REJECTED</span>
+                                </c:when>
+                                <c:when test="${st == 'SUBMITTED'}">
+                                    <span class="badge badge-primary">SUBMITTED</span>
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="badge badge-secondary">UNKNOWN</span>
+                                </c:otherwise>
+                            </c:choose>
                         </p>
+
                     </div>
                 </div>
             </div>
@@ -90,17 +103,27 @@
                     </c:when>
                     <c:otherwise>
                         <div class="table-responsive">
-                            <table class="table table-striped align-middle mb-0">
+                            <table class="table table-striped align-middle mb-0 parts-table">
+                                <colgroup>
+                                    <col style="width:80px">    <!-- # -->
+                                    <col>                       <!-- Part (flex) -->
+                                    <col style="width:140px">   <!-- SKU -->
+                                    <col style="width:90px">    <!-- Qty -->
+                                    <col style="width:140px">   <!-- Unit Price -->
+                                    <col style="width:160px">   <!-- Line -->
+                                    <col style="width:140px">   <!-- Condition -->
+                                    <col style="width:130px">   <!-- Approval -->
+                                </colgroup>
                                 <thead>
                                 <tr>
-                                    <th style="width:80px;">#</th>
+                                    <th>#</th>
                                     <th>Part</th>
-                                    <th style="width:140px;">SKU</th>
-                                    <th class="text-end" style="width:90px;">Qty</th>
-                                    <th class="text-end" style="width:140px;">Unit Price</th>
-                                    <th class="text-end" style="width:160px;">Line</th>
-                                    <th style="width:140px;">Condition</th>
-                                    <th style="width:130px;">Approval</th>
+                                    <th>SKU</th>
+                                    <th class="text-end">Qty</th>
+                                    <th class="text-end">Unit Price</th>
+                                    <th class="text-end">Line</th>
+                                    <th>Condition</th>
+                                    <th>Approval</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -112,8 +135,8 @@
                                     <tr>
                                         <td>#<c:out value="${st.index+1}"/></td>
                                         <td>
-                                            <div><c:out value="${p.partName}"/></div>
-                                            <small class="text-muted"><c:out value="${p.partCode}"/></small>
+                                            <div class="part-cell"><c:out value="${p.partName}"/></div>
+                                            <small class="text-muted part-cell"><c:out value="${p.partCode}"/></small>
                                         </td>
                                         <td><c:out value="${p.sku}"/></td>
                                         <td class="text-end"><c:out value="${p.quantityNeeded}"/></td>
