@@ -195,6 +195,12 @@
     </div>
 </div>
 
-<script src="${pageContext.request.contextPath}/assets/js/accountant/report.js"></script>
+<script>
+    function viewCustomerDetail(customerID) {
+        // TODO: Implement customer detail view
+        alert('View customer details #' + customerID);
+// window.location.href = '${pageContext.request.contextPath}/accountant/customer?id=' + customerID;
+    }
+</script>
 
 <jsp:include page="footer.jsp"/>

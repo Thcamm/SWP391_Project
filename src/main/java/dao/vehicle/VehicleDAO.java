@@ -180,7 +180,7 @@ public class VehicleDAO {
     public List<String> getAllBrands() throws SQLException {
         String sql = "SELECT DISTINCT Brand FROM Vehicle ORDER BY Brand";
         List<String> brands = new ArrayList<>();
-        try (Connection conn = getConnection();
+        try (Connection conn = DbContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -199,7 +199,7 @@ public class VehicleDAO {
             sql.append(" AND Brand = ?");
         }
 
-        try (Connection conn = getConnection();
+        try (Connection conn = DbContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             int idx = 1;
             ps.setInt(idx++, customerId);
@@ -228,7 +228,7 @@ public class VehicleDAO {
         sql.append(" ORDER BY VehicleID DESC LIMIT ? OFFSET ?");
 
         List<Vehicle> list = new ArrayList<>();
-        try (Connection conn = getConnection();
+        try (Connection conn = DbContext.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             int idx = 1;
             ps.setInt(idx++, customerId);

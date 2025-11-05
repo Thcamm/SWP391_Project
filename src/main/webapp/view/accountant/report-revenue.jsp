@@ -183,6 +183,89 @@
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="${pageContext.request.contextPath}/assets/js/accountant/report.js"></script>
+<script>
+    // Revenue Detail Chart
+    const ctx = document.getElementById('revenueDetailChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [
+                <c:forEach var="revenue" items="${revenueByMonth}" varStatus="status">
+                '${revenue.month}/${revenue.year}'${!status.last ? ',' : ''}
+                </c:forEach>
+            ],
+            datasets: [
+                {
+                    label: 'Total Invoiced',
+                    data: [
+                        <c:forEach var="revenue" items="${revenueByMonth}" varStatus="status">
+                        ${revenue.totalInvoiced}${!status.last ? ',' : ''}
+                        </c:forEach>
+                    ],
+                    borderColor: 'rgba(102, 126, 234, 1)',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Collected',
+                    data: [
+                        <c:forEach var="revenue" items="${revenueByMonth}" varStatus="status">
+                        ${revenue.totalPaid}${!status.last ? ',' : ''}
+                        </c:forEach>
+                    ],
+                    borderColor: 'rgba(5, 150, 105, 1)',
+                    backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += context.parsed.y.toLocaleString('en-US') + ' VND';
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return (value / 1000000).toFixed(1) + 'M đ';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    // Export to Excel function
+    function exportToExcel() {
+        alert('Excel export feature is under development!');
+        // TODO: Implement Excel export functionality
+    }
+</script>
+
 
 <jsp:include page="footer.jsp"/>

@@ -71,7 +71,7 @@
                                                        name="amount"
                                                        min="1"
                                                        max="${invoice.balanceAmount}"
-                                                       step="1000"
+                                                       step="1"
                                                        required
                                                        placeholder="Enter amount..."
                                                        style="border-radius: 8px 0 0 8px; font-size: 1.25rem; font-weight: 600;">
@@ -219,9 +219,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Right Column - Invoice Summary (keep as is) -->
-                        <!-- ... -->
                     </div>
 
                 </div>
@@ -229,7 +226,45 @@
         </div>
     </div>
 </div>
+<script>
 
-<script src="${pageContext.request.contextPath}/assets/js/accountant/payment.js"></script>
+    function validatePaymentForm() {
+        const amount = parseFloat(document.getElementById('amount').value);
+        const maxAmount = parseFloat(document.getElementById('balanceAmount').value);
+        if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid amount!');
+            return false;
+        }
+
+        if (amount > maxAmount) {
+            alert('Payment amount must not exceed remaining balance: ' + maxAmount.toLocaleString('en-US') + ' VND');
+            return false;
+        }
+
+        return confirm('Confirm payment of ' + amount.toLocaleString('en-US') + ' VND?');
+    }
+
+    function setAmount(value) {
+        document.getElementById('amount').value = Math.round(value);
+    }
+
+    // Highlight selected payment method
+    document.querySelectorAll('input[name="method"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.querySelectorAll('.form-check-label').forEach(label => {
+                label.style.borderColor = '#e5e7eb';
+                label.style.backgroundColor = 'white';
+            });
+
+            if (this.checked) {
+                this.nextElementSibling.style.borderColor = '#667eea';
+                this.nextElementSibling.style.backgroundColor = '#f0f4ff';
+            }
+        });
+    });
+
+    // Trigger initial selection
+    document.getElementById('methodOnline').dispatchEvent(new Event('change'));
+</script>
 
 <jsp:include page="footer.jsp"/>

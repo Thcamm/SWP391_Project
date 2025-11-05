@@ -125,7 +125,18 @@
         </div>
     </div>
 </div>
+<script>
+    function sendReminders() {
+        if (confirm('Confirm send reminder emails to all customers with overdue invoices?')) {
+            alert('Feature is under development!');
+            // TODO: Implement send reminder emails
+        }
+    }
 
-<script src="${pageContext.request.contextPath}/assets/js/accountant/report.js"></script>
+    function exportOverdueReport() {
+        alert('Report export feature is under development!');
+        // TODO: Implement export functionality
+    }
+</script>
 
 <jsp:include page="footer.jsp"/>

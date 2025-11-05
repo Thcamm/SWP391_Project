@@ -83,7 +83,7 @@ public class ReportServlet extends HttpServlet {
         List<ReportDTO> revenueByMonth = reportService.getRevenueByMonth(6);
         List<ReportDTO> invoiceByStatus = reportService.getInvoiceByStatus(startDate, endDate);
         List<ReportDTO> paymentByMethod = reportService.getPaymentByMethod(startDate, endDate);
-        List<ReportDTO> topCustomers = reportService.getTopPayingCustomers(5, startDate, endDate);
+        List<ReportDTO> topCustomers = reportService.getTopPayingCustomers(5, null, null);
         List<ReportDTO> overdueReport = reportService.getOverdueInvoicesReport();
 
         // Set attributes

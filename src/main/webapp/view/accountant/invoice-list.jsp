@@ -295,6 +295,15 @@
     </div>
 </div>
 
-<script src="${pageContext.request.contextPath}/assets/js/accountant/invoice.js"></script>
+<script>
+    function filterByStatus(status) {
+        window.location.href = '${pageContext.request.contextPath}/accountant/invoice?status=' + status;
+    }
+    function deleteInvoice(invoiceId) {
+        if (confirm('This invoice has errors. Do you want to delete it?')) {
+            window.location.href = '${pageContext.request.contextPath}/accountant/invoice?action=delete&id=' + invoiceId;
+        }
+    }
+</script>
 
 <jsp:include page="footer.jsp"/>

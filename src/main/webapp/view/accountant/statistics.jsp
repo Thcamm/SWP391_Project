@@ -343,22 +343,264 @@
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script>
-    const thisYear = new Array(12).fill(0);
-    const lastYear = new Array(12).fill(0);
-    const currentFullYear = new Date().getFullYear();
 
-    // Dùng JSTL để lặp qua dữ liệu từ server và đổ vào 2 mảng JS
+<!-- Initialize Chart Data from JSP -->
+<script>
+    /**
+     * Dashboard Charts Data Initialization
+     * Author: Thcamm
+     * Date: 2025-11-04
+     */
+
+// ==========================================
+// 1. WEEKLY REVENUE DATA
+// ==========================================
+    const weeklyRevenueData = {
+        labels: [
+            <c:forEach var="week" items="${revenueByWeek}" varStatus="status">
+            '${week.label}'${!status.last ? ',' : ''}
+            </c:forEach>
+        ],
+        values: [
+            <c:forEach var="week" items="${revenueByWeek}" varStatus="status">
+            ${week.totalPaid}${!status.last ? ',' : ''}
+            </c:forEach>
+        ]
+    };
+
+    // ==========================================
+    // 2. NEW CUSTOMERS DATA
+    // ==========================================
+    const newCustomersData = {
+        labels: [
+            <c:forEach var="nc" items="${newCustomers}" varStatus="status">
+            'M${nc.month}/${nc.year}'${!status.last ? ',' : ''}
+            </c:forEach>
+        ],
+        values: [
+            <c:forEach var="nc" items="${newCustomers}" varStatus="status">
+            ${nc.count}${!status.last ? ',' : ''}
+            </c:forEach>
+        ]
+    };
+
+    // ==========================================
+    // 3. YEAR COMPARISON DATA
+    // ==========================================
+    const currentFullYear = new Date().getFullYear();
+    const thisYearData = new Array(12).fill(0);
+    const lastYearData = new Array(12).fill(0);
+
     <c:forEach var="yc" items="${yearComparison}">
+    <c:choose>
+    <c:when test="${yc.year == null}">
+    console.warn('Year is null for entry:', ${yc});
+    </c:when>
+    <c:otherwise>
     <c:if test="${yc.year == currentFullYear}">
-    // ${yc.month - 1} để lấy đúng index (từ 0-11)
-    thisYear[${yc.month - 1}] = ${yc.totalPaid};
+    thisYearData[${yc.month - 1}] = ${yc.totalPaid};
     </c:if>
     <c:if test="${yc.year == currentFullYear - 1}">
-    lastYear[${yc.month - 1}] = ${yc.totalPaid};
+    lastYearData[${yc.month - 1}] = ${yc.totalPaid};
     </c:if>
+    </c:otherwise>
+    </c:choose>
     </c:forEach>
+
+    console.log('📊 Chart Data Initialized:');
+    console.log('Weekly Revenue:', weeklyRevenueData);
+    console.log('New Customers:', newCustomersData);
+    console.log('This Year:', thisYearData);
+    console.log('Last Year:', lastYearData);
 </script>
-<script src="${pageContext.request.contextPath}/assets/js/accountant/statistics.js"></script>
+
+<!-- Render Charts -->
+<script>
+    /**
+     * Render All Charts
+     */
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // ==========================================
+        // 1. WEEKLY REVENUE CHART (Bar Chart)
+        // ==========================================
+        const weeklyCtx = document.getElementById('weeklyRevenueChart');
+        if (weeklyCtx) {
+            new Chart(weeklyCtx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: weeklyRevenueData.labels,
+                    datasets: [{
+                        label: 'Revenue (VND)',
+                        data: weeklyRevenueData.values,
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderColor: 'rgba(102, 126, 234, 1)',
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Revenue: ' + (context.parsed.y / 1000000).toFixed(2) + 'M VND';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return (value / 1000000).toFixed(1) + 'M';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // 2. NEW CUSTOMERS CHART (Doughnut Chart)
+        // ==========================================
+        const customersCtx = document.getElementById('newCustomersChart');
+        if (customersCtx) {
+            new Chart(customersCtx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: newCustomersData.labels,
+                    datasets: [{
+                        data: newCustomersData.values,
+                        backgroundColor: [
+                            'rgba(79, 172, 254, 0.8)',
+                            'rgba(102, 126, 234, 0.8)',
+                            'rgba(240, 147, 251, 0.8)',
+                            'rgba(67, 233, 123, 0.8)',
+                            'rgba(245, 87, 108, 0.8)',
+                            'rgba(56, 249, 215, 0.8)'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed + ' customers';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ==========================================
+        // 3. YEAR COMPARISON CHART (Line Chart)
+        // ==========================================
+        const yearCtx = document.getElementById('yearComparisonChart');
+        if (yearCtx) {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            new Chart(yearCtx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'This Year (' + currentFullYear + ')',
+                            data: thisYearData,
+                            borderColor: 'rgba(102, 126, 234, 1)',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
+                        },
+                        {
+                            label: 'Last Year (' + (currentFullYear - 1) + ')',
+                            data: lastYearData,
+                            borderColor: 'rgba(245, 87, 108, 1)',
+                            backgroundColor: 'rgba(245, 87, 108, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointHoverRadius: 7,
+                            pointBackgroundColor: 'rgba(245, 87, 108, 1)',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                padding: 15,
+                                font: {
+                                    size: 12,
+                                    weight: '600'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + (context.parsed.y / 1000000).toFixed(2) + 'M VND';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return (value / 1000000).toFixed(1) + 'M';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        console.log('All charts rendered successfully');
+    });
+</script>
 
 <jsp:include page="footer.jsp"/>

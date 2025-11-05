@@ -94,7 +94,7 @@ public class ReportDTO {
     }
 
     public BigDecimal getTotalPaid() {
-        return totalPaid;
+        return this.totalSpent;
     }
 
     public void setTotalPaid(BigDecimal totalPaid) {
