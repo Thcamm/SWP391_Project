@@ -172,6 +172,13 @@ public class MessageConstants {
             "You dont have permission to create diagnostic for this task. "
     );
 
+    public static final SystemMessage TASK012 = new SystemMessage(
+            "TASK012",
+            MessageType.VALIDATION,
+            "Task status required",
+            "Task is waiting for customer response"
+    );
+
     public static final SystemMessage PART001 = new SystemMessage(
             "PART001",
             MessageType.SUCCESS,
