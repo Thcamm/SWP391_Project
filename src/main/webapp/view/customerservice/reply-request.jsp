@@ -22,7 +22,7 @@
             border: 1px solid #e0e0e0;
             padding: 2rem 2.5rem;
             margin: 2rem auto;
-            max-width: 850px;
+            /*max-width: ;*/
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 

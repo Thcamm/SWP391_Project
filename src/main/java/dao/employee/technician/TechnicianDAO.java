@@ -20,7 +20,7 @@ public class TechnicianDAO {
                 "WHERE e.UserID = ?";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -76,7 +76,7 @@ public class TechnicianDAO {
                 "WHERE ta.AssignToTechID = ?";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, technicianId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -102,7 +102,7 @@ public class TechnicianDAO {
                 "WHERE wop.RequestedByID = ? AND wop.request_status = 'PENDING'";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, technicianId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -144,7 +144,7 @@ public class TechnicianDAO {
                 "ORDER BY ta.priority DESC, ta.AssignedDate DESC";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, technicianId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -182,7 +182,7 @@ public class TechnicianDAO {
                 "GROUP BY ta.AssignmentID";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, assignmentId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -251,7 +251,7 @@ public class TechnicianDAO {
 
         List<TaskAssignment> tasks = new ArrayList<>();
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+                PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
@@ -309,7 +309,7 @@ public class TechnicianDAO {
         }
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+                PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
@@ -377,7 +377,7 @@ public class TechnicianDAO {
 
         List<TaskAssignment> tasks = new ArrayList<>();
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+                PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
@@ -406,7 +406,7 @@ public class TechnicianDAO {
                 "FROM TaskAssignment ta " +
                 "WHERE ta.AssignToTechID = ?";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, technicianId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -446,7 +446,7 @@ public class TechnicianDAO {
                 "ORDER BY ta.StartAt ASC";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, technicianId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -467,7 +467,6 @@ public class TechnicianDAO {
     private TaskAssignment mapResultSetToTask(ResultSet rs) throws SQLException {
         TaskAssignment task = new TaskAssignment();
 
-        // --- core fields from TaskAssignment ---
         task.setAssignmentID(rs.getInt("AssignmentID"));
         task.setDetailID(rs.getInt("DetailID"));
         task.setAssignToTechID(rs.getInt("AssignToTechID"));
@@ -508,8 +507,6 @@ public class TechnicianDAO {
         task.setTaskType(rs.getString("task_type"));   // dùng fromString bên trong model
         task.setPriority(rs.getString("priority"));
         task.setStatus(rs.getString("Status"));
-
-        // progress & notes
         task.setProgressPercentage(rs.getInt("progress_percentage"));
         task.setNotes(rs.getString("notes"));
 
@@ -581,7 +578,7 @@ public class TechnicianDAO {
                 "progress_percentage = 100, notes = ? WHERE AssignmentID = ?";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
             ps.setString(2, notes);
             ps.setInt(3, assignmentId);
@@ -597,11 +594,11 @@ public class TechnicianDAO {
 
     // Activity log
     public boolean logActivity(int technicianId, TechnicianActivity.ActivityType activityType,
-                               Integer taskAssignmentId, String description) {
+            Integer taskAssignmentId, String description) {
         String sql = "INSERT INTO TechnicianActivityLog (TechnicianID, ActivityType, TaskAssignmentID, Description) " +
                 "VALUES (?, ?, ?, ?)";
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, technicianId);
             ps.setString(2, activityType.name());
             if (taskAssignmentId != null) {
@@ -637,7 +634,7 @@ public class TechnicianDAO {
                 "LIMIT ?";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, technicianId);
             ps.setInt(2, limit);
 
@@ -696,8 +693,8 @@ public class TechnicianDAO {
                 "ORDER BY u.FullName ASC";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 technicians.add(mapResultSetToEmployee(rs));
@@ -719,7 +716,7 @@ public class TechnicianDAO {
                 "WHERE e.EmployeeID = ?";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, employeeId);
 
             try (ResultSet rs = ps.executeQuery()) {

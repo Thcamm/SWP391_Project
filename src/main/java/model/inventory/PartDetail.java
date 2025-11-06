@@ -119,10 +119,8 @@ public class PartDetail {
 
     // Business Methods
     public String getStockStatus() {
-        int q = quantity == null ? 0 : quantity;
-        int m = minStock == null ? 0 : minStock;
-        if (q == 0) return "OUT_OF_STOCK";
-        if (q <= m) return "LOW_STOCK";
+        if (quantity == 0) return "OUT_OF_STOCK";
+        if (quantity <= minStock) return "LOW_STOCK";
         return "IN_STOCK";
     }
 
@@ -139,8 +137,7 @@ public class PartDetail {
     }
 
     public BigDecimal getTotalValue() {
-        return unitPrice != null ? unitPrice.multiply(new BigDecimal(quantity != null ? quantity : 0))
-                : BigDecimal.ZERO;
+        return unitPrice.multiply(new BigDecimal(quantity));
     }
 
     public String getCharacteristicsText() {

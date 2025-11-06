@@ -17,9 +17,9 @@ import java.sql.SQLException;
 
 /**
  * Customer Approval Handler Servlet - Phase 3 & 4
- * 
+ *
  * Handles customer approval/rejection of diagnostic quotes (VehicleDiagnostic).
- * 
+ *
  * Workflow:
  * 1. Customer views diagnostic quote (from email/notification link)
  * 2. Customer approves or rejects the quote
@@ -30,7 +30,7 @@ import java.sql.SQLException;
  * 4. If REJECTED:
  * - Update VehicleDiagnostic.Status = 'REJECTED'
  * - Tech Manager can see this in rejected-tasks page
- * 
+ *
  * @version 1.0
  * @since 2025-11-04
  */
