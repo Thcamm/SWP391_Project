@@ -28,7 +28,6 @@ public class UserLoginService {
     }
 
     public boolean verifyPassword(String rawPassword, String passwordHash) {
-        // For demo: compare plain text. Replace with hash check in production.
         return rawPassword != null && passwordHash != null && rawPassword.equals(passwordHash);
     }
 

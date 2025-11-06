@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import model.user.User;
-import common.DbContext;
+
 
 public class UserDAO extends DbContext {
 
@@ -111,7 +111,8 @@ public class UserDAO extends DbContext {
     }
 
     public boolean updateUser(User user) throws SQLException {
-        String sql = "UPDATE User SET RoleID=?, FullName=?, UserName=?, Email=?, PhoneNumber=?, Gender=?, BirthDate=?, Address=?, PasswordHash=?, ActiveStatus=? WHERE UserID=?";
+        String sql = "UPDATE User SET RoleID=?, FullName=?, UserName=?, Email=?, PhoneNumber=?," +
+                " Gender=?, BirthDate=?, Address=?, PasswordHash=?, ActiveStatus=? WHERE UserID=?";
         try (Connection conn = DbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, user.getRoleId());
