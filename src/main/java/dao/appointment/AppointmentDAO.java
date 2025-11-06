@@ -80,7 +80,7 @@ public class AppointmentDAO extends DbContext {
         List<String> statuses = new ArrayList<>();
         String sql = "SHOW COLUMNS FROM Appointment LIKE 'Status'";
         try (PreparedStatement ps = getConnection().prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+             ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 String type = rs.getString("Type"); // enum('Pending','InProgress',...)
                 type = type.replaceAll("^enum\\('", "")

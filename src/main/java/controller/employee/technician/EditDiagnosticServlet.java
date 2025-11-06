@@ -52,6 +52,7 @@ public class EditDiagnosticServlet extends HttpServlet {
 
         ServiceResult rs = service.loadForEdit(tech.getEmployeeId(), diagnosticId);
         if (rs.isError()) {
+            System.out.println("Loi tai day");
             MessageHelper.setErrorMessage(ss, rs.getMessage());
             resp.sendRedirect(req.getContextPath()+"/technician/home");
             return;
@@ -147,6 +148,7 @@ public class EditDiagnosticServlet extends HttpServlet {
 
 
         }else {
+            System.out.println("Loi o day");
             MessageHelper.setErrorMessage(ss, rs.getMessage());
             resp.sendRedirect(req.getContextPath()+"/technician/diagnostic/edit?diagnosticId="+diagnosticId);
         }

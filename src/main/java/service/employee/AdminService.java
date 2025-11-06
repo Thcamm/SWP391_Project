@@ -362,5 +362,39 @@ public class AdminService {
         }
     }
 
+    // ===== DUPLICATE CHECK METHODS =====
+
+    /**
+     * Check if username already exists in database
+     * 
+     * @param username Username to check
+     * @return true if username exists, false otherwise
+     */
+    public boolean isUsernameExists(String username) {
+        try {
+            User existingUser = userDAO.getUserByUserName(username);
+            return existingUser != null;
+        } catch (SQLException e) {
+            System.err.println("Error checking username duplicate: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Check if email already exists in database
+     * 
+     * @param email Email to check
+     * @return true if email exists, false otherwise
+     */
+    public boolean isEmailExists(String email) {
+        try {
+            User existingUser = userDAO.getUserByEmail(email);
+            return existingUser != null;
+        } catch (SQLException e) {
+            System.err.println("Error checking email duplicate: " + e.getMessage());
+            return false;
+        }
+    }
+
     // ===== HELPER METHODS =====
 }

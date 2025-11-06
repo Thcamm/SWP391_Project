@@ -15,9 +15,11 @@ public class SearchServiceType extends HttpServlet {
 
     private CarServiceDAO serviceDAO = new CarServiceDAO();
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         String query = request.getParameter("query");
-        if (query == null) query = "";
+        if (query == null)
+            query = "";
 
         int limit = 20;
         int offset = 0;

@@ -63,7 +63,7 @@
                         <select name="status" id="status" class="filter-control">
                             <option value="">All Status</option>
                             <option value="ASSIGNED" ${param.status == 'ASSIGNED' ? 'selected' : ''}>Assigned</option>
-                            <option value="IN_PROGRESS" ${param.status == 'IN_PROGRESS' ? 'selected' : ''}>IN PROGRESS</option>
+                            <option value="IN_PROGRESS" ${param.status == 'IN_PROGRESS' ? 'selected' : ''}>In Progress</option>
                             <option value="COMPLETE" ${param.status == 'COMPLETE' ? 'selected' : ''}>Completed</option>
                         </select>
                     </div>
@@ -75,6 +75,7 @@
                             <option value="LOW" ${param.priority == 'LOW' ? 'selected' : ''}>Low</option>
                             <option value="MEDIUM" ${param.priority == 'MEDIUM' ? 'selected' : ''}>Medium</option>
                             <option value="HIGH" ${param.priority == 'HIGH' ? 'selected' : ''}>High</option>
+                            <option value="URGENT" ${param.priority == 'URGENT' ? 'selected' : ''}>Urgent</option>
                         </select>
 
                     </div>
@@ -131,9 +132,9 @@
                                 <tr>
                                     <td>#${task.assignmentID}</td>
                                     <td>
-                            <span class="priority-badge ${fn:toLowerCase(task.priority)}">
-                                    ${task.priority}
-                            </span>
+                                     <span class="priority-badge ${fn:toLowerCase(task.priority)}">
+                                                ${task.priority}
+                                     </span>
                                     </td>
                                     <td>${task.status}</td>
 
@@ -144,12 +145,14 @@
                                     <td>${task.customerName}</td>
                                     <td>${task.serviceInfo}</td>
                                     <td>
-                                        <c:if test="${task.status == 'IN_PROGRESS'}">
-                                            ${task.progressPercentage}%
-                                        </c:if>
-                                        <c:if test="${task.status != 'IN_PROGRESS'}">
-                                            -
-                                        </c:if>
+<%--                                        <c:if test="${task.status == 'IN_PROGRESS'}">--%>
+<%--                                            --%>
+<%--                                        </c:if>--%>
+<%--                                        <c:if test="${task.status != 'IN_PROGRESS'}">--%>
+<%--                                            ---%>
+<%--                                        </c:if>--%>
+
+                             ${task.progressPercentage}%
                                     </td>
 
                                     <td>
@@ -186,10 +189,16 @@
                                             </c:when>
 
                                             <c:when test="${task.status == 'IN_PROGRESS'}">
-                                                <a href="${pageContext.request.contextPath}/technician/update-progress-form?assignmentId=${task.assignmentID}&returnTo=${pageContext.request.requestURL}?${pageContext.request.queryString}"
-                                                   class="btn btn-update btn-sm">
-                                                    Update Progress
-                                                </a>
+                                                <c:set var="qs" value="${pageContext.request.queryString}" />
+
+                                                <c:url var="updUrl" value="/technician/update-progress-form">
+                                                    <c:param name="assignmentId" value="${task.assignmentID}" />
+                                                    <c:param name="returnTo"
+                                                             value="${pageContext.request.requestURI}${not empty qs ? '?' : ''}${qs}" />
+                                                </c:url>
+
+                                                <a href="${updUrl}" class="btn btn-update btn-sm">Update Progress</a>
+
 
 
                                                 <form action="${pageContext.request.contextPath}/technician/update-progress" method="post" style="display: inline">

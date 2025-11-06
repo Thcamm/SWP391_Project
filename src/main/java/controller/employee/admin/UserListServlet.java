@@ -90,7 +90,7 @@ public class UserListServlet extends BaseAdminServlet {
         } catch (Exception e) {
             System.err.println("Error in UserListServlet GET: " + e.getMessage());
             e.printStackTrace();
-            handleError(request, response, "Lỗi khi tải danh sách user: " + e.getMessage());
+            handleError(request, response, "Error when loading user list: " + e.getMessage());
         }
     }
 

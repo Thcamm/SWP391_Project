@@ -219,12 +219,16 @@ public class VehicleDiagnosticService {
         try (Connection c = DbContext.getConnection()){
             VehicleDiagnostic vd = diagnosticDAO.getDiagnosticWithFullInfo(c, diagnosticId);
 
-            if(vd == null || !vd.isStatus()){
+            if(vd == null){
                 return ServiceResult.error(MessageConstants.ERR002);
             }
 
             if(!diagnosticDAO.canTechnicianAccessDiagnostic(c, diagnosticId, technicianId)){
                 return ServiceResult.error(MessageConstants.AUTH001);
+            }
+
+            if (vd.isApproved()) {
+                return ServiceResult.error(MessageConstants.DIAG005 /* "Diagnostic is approved and cannot be edited." */);
             }
 
             boolean locked = diagnosticDAO.hasAnyApprovedParts(c, diagnosticId)
@@ -275,7 +279,7 @@ public class VehicleDiagnosticService {
     ){
         try (Connection c = DbContext.getConnection(false)){
             VehicleDiagnostic vd = diagnosticDAO.getDiagnosticWithFullInfo(c, diagnosticId);
-            if(vd == null || !vd.isStatus()){
+            if(vd == null){
                 return ServiceResult.error(MessageConstants.ERR002);
             }
 

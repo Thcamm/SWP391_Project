@@ -7,10 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tạo mới khách hàng</title>
 
-<%--    <link--%>
-<%--            rel="stylesheet"--%>
-<%--            href="${pageContext.request.contextPath}/assets/css/customerservice/create-customer.css"--%>
-<%--    />--%>
+    <%--    <link--%>
+    <%--            rel="stylesheet"--%>
+    <%--            href="${pageContext.request.contextPath}/assets/css/customerservice/create-customer.css"--%>
+    <%--    />--%>
     <style>
         * {
             margin: 0;

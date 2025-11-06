@@ -17,9 +17,13 @@ import java.io.IOException;
 @WebServlet("/technician/update-progress")
 public class TaskProgressServlet extends HttpServlet {
 
+
+
+
     private final TechnicianService technicianService = new TechnicianService();
 
     public TaskProgressServlet() { super(); }
+
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -56,7 +60,9 @@ public class TaskProgressServlet extends HttpServlet {
 
         if (assignmentIdStr == null || action == null) {
             MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
-            redirectBack(req, resp, returnTo, req.getContextPath() + "/technician/home");
+            redirectBack(req, resp, returnTo,
+                    req.getContextPath() + "/technician/update-progress-form?assignmentId=" + assignmentIdStr);
+
             return;
         }
 
@@ -113,7 +119,7 @@ public class TaskProgressServlet extends HttpServlet {
         }
 
 
-        redirectBack(req, resp, returnTo, req.getContextPath() + "/technician/home");
+        redirectBack(req, resp, returnTo, req.getContextPath() + "/technician/tasks");
     }
 
     private void redirectBack(HttpServletRequest req, HttpServletResponse resp,

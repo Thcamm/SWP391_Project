@@ -81,6 +81,11 @@
     border-bottom: 2px solid #f3f4f6;
 }
 
+.status-badge.SUBMITTED { background:#fff3cd; color:#856404; }  /* vàng nhạt */
+.status-badge.APPROVED  { background:#d4edda; color:#155724; }  /* xanh lá */
+.status-badge.REJECTED  { background:#f8d7da; color:#721c24; }  /* đỏ nhạt */
+
+
 /* Info Grid */
 .info-grid {
     display: grid;

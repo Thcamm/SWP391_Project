@@ -55,7 +55,7 @@ public class UpdateProgressFormServlet extends HttpServlet {
 
             TaskAssignment task = taskResult.getData(TaskAssignment.class);
 
-            if (!"IN_PROGRESS".equals(task.getStatus())) {
+            if (task.getStatus() != TaskAssignment.TaskStatus.IN_PROGRESS) {
                 MessageHelper.setErrorMessage(session, MessageConstants.TASK010); // Task not in progress
                 resp.sendRedirect(req.getContextPath() + "/technician/home");
                 return;

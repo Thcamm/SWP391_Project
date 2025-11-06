@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/base.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/task-detail.css">
 
+
 <div class="layout">
     <jsp:include page="sidebar.jsp"/>
     <main class="main">
@@ -28,7 +29,7 @@
                         <div class="info-value">#${task.assignmentID}</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">Status</div>
+                        <div class="info-label">Status Working</div>
                         <div class="info-value">
                             <span class="status-badge ${task.status}">${task.status}</span>
                         </div>
@@ -60,12 +61,14 @@
                     <div class="info-item">
                         <div class="info-label">Progress</div>
                         <div class="info-value">
-                            <c:choose>
-                                <c:when test="${task.status == 'IN_PROGRESS'}">
-                                    ${task.progressPercentage}%
-                                </c:when>
-                                <c:otherwise>-</c:otherwise>
-                            </c:choose>
+<%--                            <c:choose>--%>
+<%--                                <c:when test="${task.status == 'IN_PROGRESS'}">--%>
+<%--                                    --%>
+<%--                                </c:when>--%>
+<%--                                <c:otherwise>-</c:otherwise>--%>
+<%--                            </c:choose>--%>
+
+                            ${task.progressPercentage}%
                         </div>
                     </div>
                 </div>
@@ -129,24 +132,30 @@
                                 <fmt:formatNumber value="${vm.grandTotal[diag.vehicleDiagnosticID]}" type="currency"
                                                   currencySymbol="$"/>
                             </td>
+
                             <td>
                                 <c:choose>
-                                    <c:when test="${diag.status}">
-                                        <span class="status-badge COMPLETE">Submitted</span>
+                                    <c:when test="${diag.statusString == 'SUBMITTED'}">
+                                        <span class="status-badge SUBMITTED">Submitted</span>
+                                    </c:when>
+                                    <c:when test="${diag.statusString == 'APPROVED'}">
+                                        <span class="status-badge APPROVED">Approved</span>
+                                    </c:when>
+                                    <c:when test="${diag.statusString == 'REJECTED'}">
+                                        <span class="status-badge REJECTED">Rejected</span>
                                     </c:when>
                                     <c:otherwise>
-                                        <span class="status-badge ASSIGNED">Draft</span>
+                                        <span class="status-badge DRAFT">Draft</span>
                                     </c:otherwise>
                                 </c:choose>
                             </td>
                             <td>
                                 <c:out value="${diag.createdAtFormatted}"/>
                             </td>
-                            <td>
+
+                            <td class="actions">
                                 <a href="${pageContext.request.contextPath}/technician/diagnostic/view?diagnosticId=${diag.vehicleDiagnosticID}"
-                                   class="btn-sm btn-view">
-                                    👀 View
-                                </a>
+                                   class="btn-sm btn-view">👀 View</a>
 
                                 <c:set var="approvedCnt"
                                        value="${vm.approvedCount[diag.vehicleDiagnosticID] != null ? vm.approvedCount[diag.vehicleDiagnosticID] : 0}"/>
@@ -157,11 +166,11 @@
                                         🐙 Edit
                                     </a>
                                 </c:if>
-                                <c:if test="${approvedCnt > 0}">
-                            <span class="text-muted" style="font-size:12px;"
-                                  title="This diagnostic has approved parts and cannot be edited.">(locked)</span>
-                                </c:if>
 
+                                <c:if test="${approvedCnt > 0}">
+            <span class="text-muted" style="font-size:12px;"
+                  title="This diagnostic has approved parts and cannot be edited.">(locked)</span>
+                                </c:if>
                             </td>
                         </tr>
                     </c:forEach>

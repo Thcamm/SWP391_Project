@@ -3,21 +3,21 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
-<jsp:include page="header.jsp"/>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/technician-diagnostic.css"/>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/base.css"/>
+<jsp:include page="header.jsp"/>
 
 <div class="layout">
     <jsp:include page="sidebar.jsp"/>
     <main class="main">
         <!-- Breadcrumb -->
-        <div class="breadcrumb">
-            <a href="${pageContext.request.contextPath}/technician/home">Home</a>
-            <span>/</span>
-            <a href="${pageContext.request.contextPath}/technician/diagnostics">Diagnostics</a>
-            <span>/</span>
-            <span>Create</span>
-        </div>
+<%--        <div class="breadcrumb">--%>
+<%--            <a href="${pageContext.request.contextPath}/technician/home">Home</a>--%>
+<%--            <span>/</span>--%>
+<%--            --%>
+<%--            <span>/</span>--%>
+<%--            <span>Create</span>--%>
+<%--        </div>--%>
 
         <!-- Header -->
         <div class="page-header">

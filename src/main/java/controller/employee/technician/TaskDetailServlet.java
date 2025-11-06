@@ -30,8 +30,7 @@ public class TaskDetailServlet extends HttpServlet {
 
         String assignmentIdStr = req.getParameter("assignmentId");
         if(assignmentIdStr == null || assignmentIdStr.trim().isEmpty()) {
-            MessageHelper.setErrorMessage(session, "Assignment ID is required.");
-            resp.sendRedirect(req.getContextPath() + "/technician/tasks");
+            resp.sendRedirect(req.getContextPath() + "/technician/home");
             return;
         }
 
@@ -40,14 +39,14 @@ public class TaskDetailServlet extends HttpServlet {
             assignmentId = Integer.parseInt(assignmentIdStr);
         } catch (NumberFormatException e) {
             MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
-            resp.sendRedirect(req.getContextPath() + "/technician/tasks");
+            resp.sendRedirect(req.getContextPath() + "/technician/home");
             return;
         }
 
         ServiceResult me = technicianService.getTechnicianByUserId(userId);
         if(me.isError()){
             MessageHelper.setErrorMessage(session,me.getMessage());
-            resp.sendRedirect(req.getContextPath() + "/technician/tasks");
+            resp.sendRedirect(req.getContextPath() + "/technician/home");
             return;
         }
 
@@ -56,7 +55,7 @@ public class TaskDetailServlet extends HttpServlet {
         ServiceResult taskRs = technicianService.getTaskById(tech.getEmployeeId(), assignmentId);
         if(taskRs.isError()){
             MessageHelper.setErrorMessage(session, taskRs.getMessage());
-            resp.sendRedirect(req.getContextPath() + "/technician/tasks");
+            resp.sendRedirect(req.getContextPath() + "/technician/home");
             return;
         }
 
@@ -73,12 +72,7 @@ public class TaskDetailServlet extends HttpServlet {
         ServiceResult rs = diagnosticService.getDiagnosticsWithPartsPaged(assignmentId, page,size);
         if(rs.isError()){
             MessageHelper.setErrorMessage(session, rs.getMessage());
-            // Vẫn tiếp tục hiển thị trang nhưng không có diagnostics
-            VehicleDiagnosticService.DiagnosticPageView emptyVm = new VehicleDiagnosticService.DiagnosticPageView();
-            req.setAttribute("task", task);
-            req.setAttribute("vm", emptyVm);
-            req.setAttribute("returnTo", req.getContextPath() + "/technician/tasks");
-            req.getRequestDispatcher("/view/technician/task-detail.jsp").forward(req, resp);
+            resp.sendRedirect(req.getContextPath() + "/technician/home");
             return;
         }
 

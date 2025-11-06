@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/base.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/edit-diagnostic.css">
 
+
 <c:set var="vm" value="${requestScope.vm}"/>
 <c:set var="diag" value="${vm.diagnostic}"/>
 <c:set var="locked" value="${vm.locked}"/>
@@ -17,13 +18,13 @@
 
     <main class="main edit-diag">
         <!-- breadcrumb -->
-        <div class="breadcrumb">
-            <a href="${pageContext.request.contextPath}/technician/home">Home</a>
-            <span>/</span>
-            <a href="${pageContext.request.contextPath}/technician/diagnostics">Diagnostics</a>
-            <span>/</span>
-            <span>Edit #<c:out value="${diag.vehicleDiagnosticID}"/></span>
-        </div>
+<%--        <div class="breadcrumb">--%>
+<%--            <a href="${pageContext.request.contextPath}/technician/home">Home</a>--%>
+<%--            <span>/</span>--%>
+<%--            <a href="${pageContext.request.contextPath}/technician/diagnostics">Diagnostics</a>--%>
+<%--            <span>/</span>--%>
+<%--            <span>Edit #<c:out value="${diag.vehicleDiagnosticID}"/></span>--%>
+<%--        </div>--%>
 
         <!-- page header -->
         <div class="page-header">
@@ -73,10 +74,14 @@
                                 </c:choose>
                             </p>
                             <p class="mb-2"><strong>Status:</strong>
-                                <span class="badge ${diag.status ? 'badge-primary' : 'badge-secondary'}">
-                        <c:out value="${diag.status ? 'ACTIVE' : 'INACTIVE'}"/>
-                    </span>
+                                <span class="badge
+        ${diag.statusString == 'SUBMITTED' ? 'badge-warning' :
+          diag.statusString == 'APPROVED'  ? 'badge-success' :
+          diag.statusString == 'REJECTED'  ? 'badge-danger'  : 'badge-secondary'}">
+                                    ${diag.statusString}
+                                </span>
                             </p>
+
                         </div>
                     </div>
                 </div>

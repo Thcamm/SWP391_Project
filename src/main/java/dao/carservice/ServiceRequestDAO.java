@@ -1,8 +1,8 @@
 package dao.carservice;
 
 import common.DbContext;
-import model.servicetype.ServiceHistoryDTO;
-import model.servicetype.ServiceRequestViewDTO;
+import model.dto.ServiceHistoryDTO;
+import model.dto.ServiceRequestViewDTO;
 import model.workorder.ServiceRequest;
 
 import java.sql.*;
@@ -111,7 +111,7 @@ public class ServiceRequestDAO extends DbContext {
     }
 
     // ========== TRANSACTIONAL METHODS (for TechManager approval flow) ==========
-    
+
     /**
      * Get ServiceRequest by ID with FOR UPDATE lock (use within transaction)
      * Returns the current status of the request, or null if not found

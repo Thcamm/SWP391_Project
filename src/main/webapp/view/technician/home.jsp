@@ -8,9 +8,11 @@
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/base.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/technician_home.css"/>
-<div class="layout">
+<div class="layout page-home" >
 
-    <jsp:include page="sidebar.jsp"/>
+
+        <jsp:include page="sidebar.jsp"/>
+
 
     <!-- Main content -->
     <main class="main">
@@ -154,7 +156,7 @@
                                     <td>${st.count}</td>
                                     <td class="mono">${task.vehicleInfo}</td>
                                     <td>${task.serviceInfo}</td>
-                                    <td><td>${task.startAtFormatted}</td></td>
+                                    <td>${empty task.startAtFormatted ? '-' : task.startAtFormatted}</td>
                                     <td>
                                         <div class="progress">
                                             <div class="progress-fill" style="width:${task.progressPercentage}%;"></div>
@@ -219,15 +221,6 @@
             <section class="panel card">
                 <div class="panel-head"><h3>⚡ Quick Actions</h3></div>
                 <div class="actions-grid">
-                    <a class="action-card" href="${pageContext.request.contextPath}/technician/diagnostics">
-                        <div class="action-ic">🔍</div><div>Diagnose Vehicle</div>
-                    </a>
-                    <a class="action-card" href="${pageContext.request.contextPath}/technician/parts">
-                        <div class="action-ic">🔧</div><div>Request Parts</div>
-                    </a>
-                    <a class="action-card" href="${pageContext.request.contextPath}/technician/specifications">
-                        <div class="action-ic">📋</div><div>Technical Specs</div>
-                    </a>
                     <a class="action-card" href="${pageContext.request.contextPath}/technician/tasks">
                         <div class="action-ic">📊</div><div>All Tasks</div>
                     </a>

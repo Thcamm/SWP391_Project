@@ -70,7 +70,8 @@ public class TechnicianDAO {
                 "COUNT(*) as total_tasks, " +
                 "SUM(CASE WHEN ta.Status = 'ASSIGNED' THEN 1 ELSE 0 END) as new_tasks, " +
                 "SUM(CASE WHEN ta.Status = 'IN_PROGRESS' THEN 1 ELSE 0 END) as in_progress, " +
-                "SUM(CASE WHEN ta.Status = 'COMPLETE' AND DATE(ta.CompleteAt) = CURDATE() THEN 1 ELSE 0 END) as completed_today " +
+                "SUM(CASE WHEN ta.Status = 'COMPLETE' AND DATE(ta.CompleteAt) = CURDATE() THEN 1 ELSE 0 END) as completed_today "
+                +
                 "FROM TaskAssignment ta " +
                 "WHERE ta.AssignToTechID = ?";
 
@@ -116,8 +117,10 @@ public class TechnicianDAO {
     }
 
     /**
-     * NOTE: adjusted to join ServiceRequestDetail (srd) because ServiceRequest no longer has ServiceID
-     * and a request may have multiple services. We GROUP_CONCAT service names and GROUP BY ta.AssignmentID.
+     * NOTE: adjusted to join ServiceRequestDetail (srd) because ServiceRequest no
+     * longer has ServiceID
+     * and a request may have multiple services. We GROUP_CONCAT service names and
+     * GROUP BY ta.AssignmentID.
      */
     public List<TaskAssignment> getNewAssignedTasks(int technicianId) {
         List<TaskAssignment> tasks = new ArrayList<>();
@@ -201,8 +204,7 @@ public class TechnicianDAO {
             int technicianId,
             String status,
             String priority,
-            String search
-    ) {
+            String search) {
         StringBuilder sql = new StringBuilder(
                 "SELECT ta.*, " +
                         "wd.TaskDescription AS WorkOrderDetailDesc,  " +
@@ -218,9 +220,8 @@ public class TechnicianDAO {
                         "LEFT JOIN Service_Type st ON srd.ServiceID = st.ServiceID " +
                         "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
                         "JOIN Customer c ON v.CustomerID = c.CustomerID " +
-                        "JOIN `User` u ON c.UserID = u.UserID " +
-                        "WHERE ta.AssignToTechID = ? "
-        );
+                        "JOIN User u ON c.UserID = u.UserID " +
+                        "WHERE ta.AssignToTechID = ? ");
 
         List<Object> params = new ArrayList<>();
         params.add(technicianId);
@@ -235,7 +236,8 @@ public class TechnicianDAO {
         }
 
         if (search != null && !search.trim().isEmpty()) {
-            sql.append("AND (v.LicensePlate LIKE ? OR v.Brand LIKE ? OR v.Model LIKE ? OR u.FullName LIKE ? OR st.ServiceName LIKE ?) ");
+            sql.append(
+                    "AND (v.LicensePlate LIKE ? OR v.Brand LIKE ? OR v.Model LIKE ? OR u.FullName LIKE ? OR st.ServiceName LIKE ?) ");
             String searchPattern = "%" + search + "%";
             params.add(searchPattern);
             params.add(searchPattern);
@@ -273,8 +275,7 @@ public class TechnicianDAO {
             int technicianId,
             String status,
             String priority,
-            String search
-    ) {
+            String search) {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(DISTINCT ta.AssignmentID) AS total " +
                         "FROM TaskAssignment ta " +
@@ -286,8 +287,7 @@ public class TechnicianDAO {
                         "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
                         "JOIN Customer c ON v.CustomerID = c.CustomerID " +
                         "JOIN `User` u ON c.UserID = u.UserID " +
-                        "WHERE ta.AssignToTechID = ? "
-        );
+                        "WHERE ta.AssignToTechID = ? ");
 
         List<Object> params = new ArrayList<>();
         params.add(technicianId);
@@ -301,9 +301,11 @@ public class TechnicianDAO {
             params.add(priority);
         }
         if (search != null && !search.trim().isEmpty()) {
-            sql.append("AND (v.LicensePlate LIKE ? OR v.Brand LIKE ? OR v.Model LIKE ? OR u.FullName LIKE ? OR st.ServiceName LIKE ?) ");
+            sql.append(
+                    "AND (v.LicensePlate LIKE ? OR v.Brand LIKE ? OR v.Model LIKE ? OR u.FullName LIKE ? OR st.ServiceName LIKE ?) ");
             String pattern = "%" + search + "%";
-            for (int i = 0; i < 5; i++) params.add(pattern);
+            for (int i = 0; i < 5; i++)
+                params.add(pattern);
         }
 
         try (Connection conn = DbContext.getConnection();
@@ -328,8 +330,7 @@ public class TechnicianDAO {
             String priority,
             String search,
             int offset,
-            int limit
-    ) {
+            int limit) {
         StringBuilder sql = new StringBuilder(
                 "SELECT ta.*, " +
                         "wd.TaskDescription AS WorkOrderDetailDesc, " +
@@ -346,8 +347,7 @@ public class TechnicianDAO {
                         "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
                         "JOIN Customer c ON v.CustomerID = c.CustomerID " +
                         "JOIN `User` u ON c.UserID = u.UserID " +
-                        "WHERE ta.AssignToTechID = ? "
-        );
+                        "WHERE ta.AssignToTechID = ? ");
 
         List<Object> params = new ArrayList<>();
         params.add(technicianId);
@@ -361,9 +361,11 @@ public class TechnicianDAO {
             params.add(priority);
         }
         if (search != null && !search.trim().isEmpty()) {
-            sql.append("AND (v.LicensePlate LIKE ? OR v.Brand LIKE ? OR v.Model LIKE ? OR u.FullName LIKE ? OR st.ServiceName LIKE ?) ");
+            sql.append(
+                    "AND (v.LicensePlate LIKE ? OR v.Brand LIKE ? OR v.Model LIKE ? OR u.FullName LIKE ? OR st.ServiceName LIKE ?) ");
             String pattern = "%" + search + "%";
-            for (int i = 0; i < 5; i++) params.add(pattern);
+            for (int i = 0; i < 5; i++)
+                params.add(pattern);
         }
 
         sql.append("GROUP BY ta.AssignmentID ");
@@ -393,7 +395,6 @@ public class TechnicianDAO {
 
         return tasks;
     }
-
 
     public TaskStatistics getAllTasksStatistics(int technicianId) {
         TaskStatistics stats = new TaskStatistics();
@@ -646,6 +647,58 @@ public class TechnicianDAO {
         activity.setTaskInfo(rs.getString("ServiceNames"));
 
         return activity;
+    }
+
+    /**
+     * Get all Technicians for TechManager to assign tasks
+     * Used in diagnosis/repair assignment screens
+     */
+    public List<Employee> getAllTechnicians() {
+        List<Employee> technicians = new ArrayList<>();
+        String sql = "SELECT e.*, u.FullName, u.UserName, u.Email, u.PhoneNumber, u.Gender " +
+                "FROM Employee e " +
+                "JOIN User u ON e.UserID = u.UserID " +
+                "JOIN RoleInfo r ON u.RoleID = r.RoleID " +
+                "WHERE r.RoleName = 'Technician' " +
+                "AND u.ActiveStatus = 1 " +
+                "ORDER BY u.FullName ASC";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                technicians.add(mapResultSetToEmployee(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return technicians;
+    }
+
+    /**
+     * Get Technician by EmployeeID
+     * Used when creating notifications or fetching specific technician info
+     */
+    public Employee getTechnicianById(int employeeId) {
+        String sql = "SELECT e.*, u.FullName, u.UserName, u.Email, u.PhoneNumber, u.Gender " +
+                "FROM Employee e " +
+                "JOIN User u ON e.UserID = u.UserID " +
+                "WHERE e.EmployeeID = ?";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, employeeId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToEmployee(rs);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

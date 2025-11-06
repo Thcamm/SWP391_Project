@@ -9,7 +9,7 @@
 
 <header class="header">
     <div class="header-left">
-        <div class="logo"><h1>🐣Garage Management</h1></div>
+        <div class="logo"><h1>Garage Management</h1></div>
     </div>
 
     <nav class="main-nav">
