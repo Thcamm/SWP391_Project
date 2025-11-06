@@ -1,0 +1,182 @@
+/* ===========================
+   Tech Manager Header Styles - Match Admin Style
+   =========================== */
+
+.techmanager-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Header Left */
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-left .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #111827;
+  text-decoration: none;
+}
+
+.header-left .logo i {
+  font-size: 1.5rem;
+  color: #2563eb;
+}
+
+.header-left .logo h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: #111827;
+  letter-spacing: -0.025em;
+}
+
+/* Main Navigation */
+.main-nav {
+  flex: 1;
+  max-width: 600px;
+}
+
+.main-nav ul {
+  display: flex;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.main-nav .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 8px 12px;
+  color: #374151;
+  text-decoration: none;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.main-nav .nav-link i {
+  font-size: 1rem;
+}
+
+.main-nav .nav-link:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.main-nav .nav-link.active {
+  background: #111827;
+  color: #fff;
+  border-color: #111827;
+  font-weight: 600;
+}
+
+/* Header Right */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.4;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+.user-role {
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 8px 16px;
+  background: #ffffff;
+  color: #374151;
+  text-decoration: none;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid #e5e7eb;
+  transition: all 0.15s ease;
+}
+
+.logout-btn i {
+  font-size: 1rem;
+}
+
+.logout-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  color: #111827;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .techmanager-header {
+    flex-wrap: wrap;
+    padding: 1rem;
+  }
+
+  .main-nav {
+    order: 3;
+    width: 100%;
+    max-width: none;
+  }
+
+  .main-nav ul {
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-left .logo h1 {
+    font-size: 1.25rem;
+  }
+
+  .main-nav .nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .user-info {
+    display: none;
+  }
+
+  .logout-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+}

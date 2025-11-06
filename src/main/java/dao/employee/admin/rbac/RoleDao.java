@@ -42,6 +42,7 @@ public class RoleDao {
         return null;
     }
 
+
     public String findRoleNameById(int roleId) throws SQLException {
         String sql = "SELECT RoleName FROM RoleInfo WHERE RoleID = ? LIMIT 1";
         try (Connection c = DbContext.getConnection();

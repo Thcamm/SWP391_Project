@@ -1,23 +1,25 @@
 package model.support;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class SupportRequest {
-    private int requestId;
-    private int customerId;
+    private Integer requestId;
+    private Integer customerId;
     private Integer workOrderId;
     private Integer appointmentId;
-    private int categoryId;
+    private Integer categoryId;
     private String description;
     private String attachmentPath;
     private String status;
-    private Date createdAt;
-    private Date updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public SupportRequest() {
     }
 
-    public SupportRequest(int requestId, int customerId, Integer appointmentId, Integer workOrderId, int categoryId, String description, String status, String attachmentPath, Date createdAt, Date updatedAt) {
+    public SupportRequest(Integer requestId, Integer customerId, Integer appointmentId, Integer workOrderId, Integer categoryId, String description, String status, String attachmentPath,LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.requestId = requestId;
         this.customerId = customerId;
         this.appointmentId = appointmentId;
@@ -30,7 +32,7 @@ public class SupportRequest {
         this.updatedAt = updatedAt;
     }
 
-    public int getRequestId() {
+    public Integer getRequestId() {
         return requestId;
     }
 
@@ -38,7 +40,7 @@ public class SupportRequest {
         this.requestId = requestId;
     }
 
-    public int getCustomerId() {
+    public Integer getCustomerId() {
         return customerId;
     }
 
@@ -54,7 +56,7 @@ public class SupportRequest {
         this.workOrderId = workOrderId;
     }
 
-    public int getCategoryId() {
+    public Integer getCategoryId() {
         return categoryId;
     }
 
@@ -94,20 +96,31 @@ public class SupportRequest {
         this.status = status;
     }
 
-    public Date getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public Date getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(Date updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof SupportRequest that)) return false;
+        return Objects.equals(requestId, that.requestId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(requestId);
     }
 
     @Override

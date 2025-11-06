@@ -18,7 +18,8 @@ import java.io.PrintWriter;
  * * Placeholders to be replaced automatically by the IDE:
  * - controller.employee.admin: The package name of the Servlet.
  * - UserToggleStatus: The class name of the Servlet.
- * * The @WebServlet annotation maps this Servlet to the URL patterns /UserToggleStatus and /UserToggleStatus/*.
+ * * The @WebServlet annotation maps this Servlet to the URL patterns
+ * /UserToggleStatus and /UserToggleStatus/*.
  */
 @WebServlet("/admin/users/toggle/*")
 public class UserToggleStatus extends BaseAdminServlet {
@@ -28,6 +29,7 @@ public class UserToggleStatus extends BaseAdminServlet {
     public void init() throws ServletException {
         this.adminService = new AdminService();
     }
+
     /**
      * Handles HTTP GET requests.
      * Typically used to retrieve data or display a user interface.
@@ -40,7 +42,8 @@ public class UserToggleStatus extends BaseAdminServlet {
 
     /**
      * Handles HTTP POST requests.
-     * Typically used to receive form data and execute business logic (e.g., saving to a database).
+     * Typically used to receive form data and execute business logic (e.g., saving
+     * to a database).
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -55,7 +58,7 @@ public class UserToggleStatus extends BaseAdminServlet {
         }
 
         try {
-            String userIdStr = pathInfo.substring(1); // Bỏ dấu "/"
+            String userIdStr = pathInfo.substring(1);
             int userId = Integer.parseInt(userIdStr);
             String currentUser = getCurrentUser(request);
 
@@ -67,9 +70,14 @@ public class UserToggleStatus extends BaseAdminServlet {
             }
 
             boolean newStatus = !user.isActiveStatus(); // Đảo ngược trạng thái
+            if (currentUser != null && currentUser.equals(user.getUserName()) && !newStatus) {
+                redirectWithMessage(response, redirectUrl, "Không thể vô hiệu hóa chính mình", "error");
+                return;
+            }
+
             boolean success = adminService.toggleUserStatus(userId, newStatus, currentUser);
 
-            String message = success ? "Đã thay đổi trạng thái user" : "Không thể thay đổi trạng thái user";
+            String message = success ? "Changed user status successfully" : "Cannot change user status";
             String messageType = success ? "success" : "error";
             redirectWithMessage(response, redirectUrl, message, messageType);
 
@@ -77,7 +85,7 @@ public class UserToggleStatus extends BaseAdminServlet {
             redirectWithMessage(response, redirectUrl, "Invalid user ID", "error");
         } catch (Exception e) {
             e.printStackTrace();
-            redirectWithMessage(response, redirectUrl, "Lỗi hệ thống: " + e.getMessage(), "error");
+            redirectWithMessage(response, redirectUrl, "System error: " + e.getMessage(), "error");
         }
     }
 }

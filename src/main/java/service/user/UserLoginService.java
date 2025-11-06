@@ -1,6 +1,7 @@
 package service.user;
 
 import dao.user.UserDAO;
+import model.employee.Employee;
 import model.user.User;
 import java.sql.SQLException;
 
@@ -39,5 +40,9 @@ public class UserLoginService {
             // Log error or handle as needed
             return null;
         }
+    }
+
+    public Employee findEmployeeByUserName(String userName) {
+        return userDAO.getEmployeeByUserName(userName);
     }
 }

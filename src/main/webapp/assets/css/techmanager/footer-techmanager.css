@@ -1,0 +1,81 @@
+/* ===========================
+   Tech Manager Footer Styles - Match Admin Style
+   =========================== */
+
+.footer.techmanager-footer {
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 24px;
+}
+
+.footer.techmanager-footer .footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.footer.techmanager-footer .footer-col {
+  text-align: center;
+}
+
+.footer.techmanager-footer .footer-title-sm {
+  margin: 0 0 8px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  text-align: center;
+}
+
+.footer.techmanager-footer .footer-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.footer.techmanager-footer .footer-links a {
+  color: #374151;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: all 0.15s ease;
+}
+
+.footer.techmanager-footer .footer-links a:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.footer.techmanager-footer .footer-bottom {
+  border-top: 1px solid #e5e7eb;
+  text-align: center;
+  color: #6b7280;
+  padding: 10px 16px;
+}
+
+.footer.techmanager-footer .footer-bottom small {
+  font-size: 0.75rem;
+}
+
+.footer.techmanager-footer .ver {
+  margin-left: 8px;
+  padding: 0.125rem 0.5rem;
+  background: rgba(37, 99, 235, 0.1);
+  border-radius: 9999px;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .footer.techmanager-footer .ver {
+    display: block;
+    margin: 0.5rem 0 0 0;
+  }
+}

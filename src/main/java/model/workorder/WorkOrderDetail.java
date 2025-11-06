@@ -1,5 +1,7 @@
 package model.workorder;
 
+import model.employee.technician.TaskAssignment;
+
 import java.sql.Timestamp;
 import java.math.BigDecimal;
 import java.util.List;
@@ -20,6 +22,9 @@ public class WorkOrderDetail {
 
     // Relationships
     private List<TaskAssignment> taskAssignments;
+
+    public void setSource(String s) {
+    }
 
     public enum Source {
         REQUEST, DIAGNOSTIC

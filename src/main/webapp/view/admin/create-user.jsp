@@ -8,7 +8,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tạo User Mới - Admin</title>
+    <title>Create New User - Admin</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -26,260 +26,266 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
     <!-- Header -->
     <%@ include file="header.jsp" %>
 
-    <div class="container mt-4">
-      <!-- Breadcrumb -->
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item">
-            <a
-              href="${pageContext.request.contextPath}/admin/users"
-              class="text-decoration-none"
-            >
-              User Management
-            </a>
-          </li>
-          <li class="breadcrumb-item active">Create User</li>
-        </ol>
-      </nav>
+    <div class="layout">
+        <jsp:include page="sidebar.jsp"/>
+        <main class="main">
+            <div class="container mt-4">
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a
+                                    href="${pageContext.request.contextPath}/admin/users"
+                                    class="text-decoration-none"
+                            >
+                                User Management
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active">Create User</li>
+                    </ol>
+                </nav>
 
-      <!-- Alert Messages -->
-      <c:if test="${not empty message}">
-        <c:choose>
-          <c:when test="${messageType == 'success'}">
-            <div class="alert alert-success alert-dismissible fade show">
-              ${message}
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert"
-              ></button>
-            </div>
-          </c:when>
-          <c:otherwise>
-            <div class="alert alert-danger alert-dismissible fade show">
-              ${message}
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert"
-              ></button>
-            </div>
-          </c:otherwise>
-        </c:choose>
-      </c:if>
+                <!-- Alert Messages -->
+                <c:if test="${not empty message}">
+                    <c:choose>
+                        <c:when test="${messageType == 'success'}">
+                            <div class="alert alert-success alert-dismissible fade show">
+                                    ${message}
+                                <button
+                                        type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="alert"
+                                ></button>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                    ${message}
+                                <button
+                                        type="button"
+                                        class="btn-close"
+                                        data-bs-dismiss="alert"
+                                ></button>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
+                </c:if>
 
-      <!-- Main Form -->
-      <div class="row justify-content-center">
-        <div class="col-lg-8">
-          <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-              <h4 class="mb-0">Tạo User Mới</h4>
-              <small>Điền thông tin để tạo user mới trong hệ thống</small>
-            </div>
+                <!-- Main Form -->
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="card shadow">
+                            <div class="card-header bg-primary text-white">
+                                <h4 class="mb-0">Create New User</h4>
+                                <small>Fill in information to create a new user in the system</small>
+                            </div>
 
-            <div class="card-body">
-              <form
-                method="POST"
-                action="${pageContext.request.contextPath}/admin/users/create"
-              >
-                <div class="row">
-                  <!-- Left Column -->
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="fullName" class="form-label">
-                        <span class="text-danger">*</span> Họ và Tên
-                      </label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="fullName"
-                        name="fullName"
-                        placeholder="Nhập họ và tên đầy đủ"
-                        required
-                      />
+                            <div class="card-body">
+                                <form
+                                        method="POST"
+                                        action="${pageContext.request.contextPath}/admin/users/create"
+                                >
+                                    <div class="row">
+                                        <!-- Left Column -->
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="fullName" class="form-label">
+                                                    <span class="text-danger">*</span> Full Name
+                                                </label>
+                                                <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        id="fullName"
+                                                        name="fullName"
+                                                        placeholder="Enter full name"
+                                                        required
+                                                />
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="userName" class="form-label">
+                                                    <span class="text-danger">*</span> Username
+                                                </label>
+                                                <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        id="userName"
+                                                        name="userName"
+                                                        placeholder="Nhập username"
+                                                        required
+                                                />
+                                                <div class="form-text">
+                                                    Username sẽ được sử dụng để đăng nhập
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label for="email" class="form-label">
+                                                    <span class="text-danger">*</span> Email
+                                                </label>
+                                                <input
+                                                        type="email"
+                                                        class="form-control"
+                                                        id="email"
+                                                        name="email"
+                                                        placeholder="Nhập địa chỉ email"
+                                                        required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <!-- Right Column -->
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="role" class="form-label">
+                                                    <span class="text-danger">*</span> Role
+                                                </label>
+                                                <select
+                                                        class="form-select"
+                                                        id="role"
+                                                        name="role"
+                                                        required
+                                                >
+                                                    <option value="">-- Chọn Role --</option>
+                                                    <c:forEach var="roleOption" items="${availableRoles}">
+                                                        <option value="${roleOption.roleId}">
+                                                                ${roleOption.roleName}
+                                                        </option>
+                                                    </c:forEach>
+                                                </select>
+                                            </div>
+
+                                            <!-- Info Box -->
+                                            <div class="alert alert-info">
+                                                <h6 class="alert-heading">Thông tin mặc định:</h6>
+                                                <ul class="mb-0">
+                                                    <li><strong>Mật khẩu mặc định:</strong> 123456</li>
+                                                    <li><strong>Trạng thái:</strong> Active</li>
+                                                    <li>User có thể đổi mật khẩu sau khi đăng nhập</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Employee Information Section (for non-Customer roles) -->
+                                    <div class="row" id="employeeSection" style="display: none">
+                                        <div class="col-12">
+                                            <hr />
+                                            <h5 class="text-primary mb-3">
+                                                <i class="bi bi-briefcase"></i> Thông tin Nhân viên
+                                            </h5>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="employeeCode" class="form-label">
+                                                    Mã nhân viên
+                                                </label>
+                                                <input
+                                                        type="text"
+                                                        class="form-control"
+                                                        id="employeeCode"
+                                                        name="employeeCode"
+                                                        placeholder="Để trống sẽ tự động tạo"
+                                                />
+                                                <div class="form-text">
+                                                    Nếu để trống, hệ thống sẽ tự động tạo mã theo format:
+                                                    PREFIX + UserID
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="salary" class="form-label">
+                                                    Lương cơ bản (VND)
+                                                </label>
+                                                <input
+                                                        type="number"
+                                                        class="form-control"
+                                                        id="salary"
+                                                        name="salary"
+                                                        placeholder="Nhập lương cơ bản"
+                                                        min="0"
+                                                        step="1000"
+                                                />
+                                                <div class="form-text">
+                                                    Có thể để trống và cập nhật sau
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <div class="alert alert-warning">
+                                                <i class="bi bi-info-circle"></i>
+                                                <strong>Lưu ý:</strong>
+                                                Khi tạo user với role khác Customer, hệ thống sẽ tự động
+                                                tạo hồ sơ Employee tương ứng.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <hr />
+                                            <div class="d-flex justify-content-between">
+                                                <a
+                                                        href="${pageContext.request.contextPath}/admin/users"
+                                                        class="btn btn-secondary"
+                                                >
+                                                    Back to Users
+                                                </a>
+
+                                                <div class="btn-group">
+                                                    <button type="reset" class="btn btn-outline-warning">
+                                                        Reset Form
+                                                    </button>
+                                                    <button type="submit" class="btn btn-success">
+                                                        Create User
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Guidelines Card -->
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h6 class="mb-0">Hướng dẫn tạo User</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="text-success">Nên làm:</h6>
+                                        <ul class="text-success">
+                                            <li>Sử dụng username dễ nhớ và duy nhất</li>
+                                            <li>Điền email chính xác để liên lạc</li>
+                                            <li>Chọn role phù hợp với công việc</li>
+                                            <li>Kiểm tra kỹ thông tin trước khi tạo</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="text-danger">Tránh:</h6>
+                                        <ul class="text-danger">
+                                            <li>Username contains special characters or spaces</li>
+                                            <li>Email is invalid or already in use</li>
+                                            <li>Required fields (*) are left empty</li>
+                                            <li>Inappropriate role selected</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-
-                    <div class="mb-3">
-                      <label for="userName" class="form-label">
-                        <span class="text-danger">*</span> Username
-                      </label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="userName"
-                        name="userName"
-                        placeholder="Nhập username"
-                        required
-                      />
-                      <div class="form-text">
-                        Username sẽ được sử dụng để đăng nhập
-                      </div>
-                    </div>
-
-                    <div class="mb-3">
-                      <label for="email" class="form-label">
-                        <span class="text-danger">*</span> Email
-                      </label>
-                      <input
-                        type="email"
-                        class="form-control"
-                        id="email"
-                        name="email"
-                        placeholder="Nhập địa chỉ email"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <!-- Right Column -->
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="role" class="form-label">
-                        <span class="text-danger">*</span> Role
-                      </label>
-                      <select
-                        class="form-select"
-                        id="role"
-                        name="role"
-                        required
-                      >
-                        <option value="">-- Chọn Role --</option>
-                        <c:forEach var="roleOption" items="${availableRoles}">
-                          <option value="${roleOption.roleId}">
-                            ${roleOption.roleName}
-                          </option>
-                        </c:forEach>
-                      </select>
-                    </div>
-
-                    <!-- Info Box -->
-                    <div class="alert alert-info">
-                      <h6 class="alert-heading">Thông tin mặc định:</h6>
-                      <ul class="mb-0">
-                        <li><strong>Mật khẩu mặc định:</strong> 123456</li>
-                        <li><strong>Trạng thái:</strong> Active</li>
-                        <li>User có thể đổi mật khẩu sau khi đăng nhập</li>
-                      </ul>
-                    </div>
-                  </div>
                 </div>
-
-                <!-- Employee Information Section (for non-Customer roles) -->
-                <div class="row" id="employeeSection" style="display: none">
-                  <div class="col-12">
-                    <hr />
-                    <h5 class="text-primary mb-3">
-                      <i class="bi bi-briefcase"></i> Thông tin Nhân viên
-                    </h5>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="employeeCode" class="form-label">
-                        Mã nhân viên
-                      </label>
-                      <input
-                        type="text"
-                        class="form-control"
-                        id="employeeCode"
-                        name="employeeCode"
-                        placeholder="Để trống sẽ tự động tạo"
-                      />
-                      <div class="form-text">
-                        Nếu để trống, hệ thống sẽ tự động tạo mã theo format:
-                        PREFIX + UserID
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-md-6">
-                    <div class="mb-3">
-                      <label for="salary" class="form-label">
-                        Lương cơ bản (VND)
-                      </label>
-                      <input
-                        type="number"
-                        class="form-control"
-                        id="salary"
-                        name="salary"
-                        placeholder="Nhập lương cơ bản"
-                        min="0"
-                        step="1000"
-                      />
-                      <div class="form-text">
-                        Có thể để trống và cập nhật sau
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-12">
-                    <div class="alert alert-warning">
-                      <i class="bi bi-info-circle"></i>
-                      <strong>Lưu ý:</strong>
-                      Khi tạo user với role khác Customer, hệ thống sẽ tự động
-                      tạo hồ sơ Employee tương ứng.
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="row">
-                  <div class="col-12">
-                    <hr />
-                    <div class="d-flex justify-content-between">
-                      <a
-                        href="${pageContext.request.contextPath}/admin/users"
-                        class="btn btn-secondary"
-                      >
-                        Back to Users
-                      </a>
-
-                      <div class="btn-group">
-                        <button type="reset" class="btn btn-outline-warning">
-                          Reset Form
-                        </button>
-                        <button type="submit" class="btn btn-success">
-                          Create User
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </form>
             </div>
-          </div>
-
-          <!-- Guidelines Card -->
-          <div class="card mt-4">
-            <div class="card-header">
-              <h6 class="mb-0">Hướng dẫn tạo User</h6>
-            </div>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-6">
-                  <h6 class="text-success">Nên làm:</h6>
-                  <ul class="text-success">
-                    <li>Sử dụng username dễ nhớ và duy nhất</li>
-                    <li>Điền email chính xác để liên lạc</li>
-                    <li>Chọn role phù hợp với công việc</li>
-                    <li>Kiểm tra kỹ thông tin trước khi tạo</li>
-                  </ul>
-                </div>
-                <div class="col-md-6">
-                  <h6 class="text-danger">Tránh:</h6>
-                  <ul class="text-danger">
-                    <li>Username contains special characters or spaces</li>
-                    <li>Email is invalid or already in use</li>
-                    <li>Required fields (*) are left empty</li>
-                    <li>Inappropriate role selected</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        </main>
     </div>
+
 
     <!-- Footer -->
     <%@ include file="footer.jsp" %>

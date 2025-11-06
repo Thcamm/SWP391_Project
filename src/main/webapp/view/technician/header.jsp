@@ -6,6 +6,9 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/header.css"/>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/sidebar.css"/>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/footer.css"/>
 <html>
 <head>
     <title>Technician Page - Garage Management</title>
@@ -21,10 +24,7 @@
     <nav class="main-nav">
         <ul>
             <li><a href="${pageContext.request.contextPath}/technician/home" class="nav-link active">Dashboard</a></li>
-            <li><a href="#" class="nav-link">My Tasks</a></li>
-            <li><a href="#" class="nav-link">Diagnostics</a>
-            </li>
-            <li><a href="#" class="nav-link">Parts Requests</a></li>
+            <li><a href="${pageContext.request.contextPath}/technician/tasks" class="nav-link">My Tasks</a></li>
         </ul>
     </nav>
 

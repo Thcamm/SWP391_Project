@@ -4,6 +4,7 @@ import common.constant.MessageConstants;
 import common.message.ServiceResult;
 import common.utils.PaginationUtils;
 import dao.employee.technician.TechnicianDAO;
+import dao.workorder.WorkOrderDetailDAO;
 import model.employee.Employee;
 import model.employee.technician.TaskAssignment;
 import model.employee.technician.TaskStatistics;
@@ -18,6 +19,8 @@ import java.util.List;
 public class TechnicianService {
 
     private final TechnicianDAO technicianDAO;
+
+    private WorkOrderDetailDAO workOrderDetailDAO = new WorkOrderDetailDAO();
 
     public TechnicianService() {
         this.technicianDAO = new TechnicianDAO();
@@ -136,29 +139,24 @@ public class TechnicianService {
             String search,
             int page,
             int itemsPerPage
-    ){
-        if(technicianId <= 0) {
+    ) {
+        if (technicianId <= 0) {
             return createEmptyPaginationResponse(page, itemsPerPage);
         }
 
-        List<TaskAssignment> allTasks = technicianDAO.getAllTasksWithFilter(
-                technicianId,
-                status,
-                priority,
-                search
-        );
+        int totalItems = technicianDAO.countAllTasksWithFilter(technicianId, status, priority, search);
+        int totalPages = (int) Math.ceil((double) totalItems / itemsPerPage);
+        int offset = (page - 1) * itemsPerPage;
 
-        PaginationUtils.PaginationResult<TaskAssignment> result =
-                PaginationUtils.paginate(allTasks, page, itemsPerPage);
+        List<TaskAssignment> tasks = technicianDAO.getAllTasksWithFilterPaged(
+                technicianId, status, priority, search, offset, itemsPerPage
+        );
 
         return new PaginationResponse<>(
-                result.getPaginatedData(),
-                result.getCurrentPage(),
-                result.getItemsPerPage(),
-                result.getTotalItems(),
-                result.getTotalPages()
+                tasks, page, itemsPerPage, totalItems, totalPages
         );
     }
+
 
     public ServiceResult getAllTasksStatistics(int technicianId) {
         if(technicianId <= 0) {
@@ -172,26 +170,29 @@ public class TechnicianService {
         return ServiceResult.success(null, stats);
     }
 
-    public ServiceResult acceptTask (int technocianId, int assignmentId) {
-        if(technocianId <= 0 || assignmentId <= 0) {
-            return ServiceResult.error(MessageConstants.ERR003);//invalid input
+    public ServiceResult acceptTask(int technicianId, int assignmentId) {
+        if (technicianId <= 0 || assignmentId <= 0) {
+            return ServiceResult.error(MessageConstants.ERR003);
         }
 
-        boolean success = technicianDAO.updateTaskStatus(assignmentId,
-                TaskAssignment.TaskStatus.IN_PROGRESS,
-                LocalDateTime.now()
+        TaskAssignment task = technicianDAO.getTaskById(assignmentId);
+        if (task == null) return ServiceResult.error(MessageConstants.ERR002);
+        if (task.getAssignToTechID() != technicianId) return ServiceResult.error(MessageConstants.TASK009);
+        if (task.getStatus() != TaskAssignment.TaskStatus.ASSIGNED) {
+            return ServiceResult.error(MessageConstants.TASK006); // ví dụ: "Trạng thái hiện tại không cho phép thao tác này"
+        }
+
+        boolean ok = technicianDAO.updateTaskStatus(
+                assignmentId, TaskAssignment.TaskStatus.IN_PROGRESS, LocalDateTime.now()
         );
 
-        if(success) {
-            technicianDAO.logActivity(
-                    technocianId,
-                    TechnicianActivity.ActivityType.TASK_ACCEPTED,
-                    assignmentId,
-                    "Accepted task assignment ID: " + assignmentId);
-            return ServiceResult.success(MessageConstants.TASK001); // Task accepted successfully
-        }
+        if (!ok) return ServiceResult.error(MessageConstants.TASK005);
 
-        return ServiceResult.error(MessageConstants.TASK005); //faild to update task success
+        technicianDAO.logActivity(
+                technicianId, TechnicianActivity.ActivityType.TASK_ACCEPTED, assignmentId,
+                "Accepted task assignment ID: " + assignmentId
+        );
+        return ServiceResult.success(MessageConstants.TASK001);
     }
 
     public ServiceResult rejectTask (int technicianId, int assignmentId) {
@@ -214,48 +215,52 @@ public class TechnicianService {
     }
 
     //update progess cua task
-    public ServiceResult updateProgress(int techinicianId, int assignmentId, int progressPercentage, String notes) {
-        if(techinicianId <= 0 || assignmentId <= 0) {
-            return ServiceResult.error(MessageConstants.ERR003);
+    public ServiceResult updateProgress(int technicianId, int assignmentId, int progressPercentage, String notes) {
+        if (technicianId <= 0 || assignmentId <= 0) return ServiceResult.error(MessageConstants.ERR003);
+        if (progressPercentage < 0 || progressPercentage > 100) return ServiceResult.error(MessageConstants.TASK007);
+
+        TaskAssignment task = technicianDAO.getTaskById(assignmentId);
+        if (task == null) return ServiceResult.error(MessageConstants.ERR002);
+        if (task.getAssignToTechID() != technicianId) return ServiceResult.error(MessageConstants.TASK009);
+        if (task.getStatus() != TaskAssignment.TaskStatus.IN_PROGRESS) {
+            return ServiceResult.error(MessageConstants.TASK006);
         }
 
-        if(progressPercentage < 0 || progressPercentage > 100) {
-            return ServiceResult.error(MessageConstants.TASK007); //invalid input
-        }
+        boolean ok = technicianDAO.updateTaskProgress(assignmentId, progressPercentage, notes);
+        if (!ok) return ServiceResult.error(MessageConstants.TASK005);
 
-        boolean success = technicianDAO.updateTaskProgress(assignmentId, progressPercentage, notes);
-
-        if(success) {
-            technicianDAO.logActivity(
-                    techinicianId,
-                    TechnicianActivity.ActivityType.PROGRESS_UPDATED,
-                    assignmentId,
-                    "Updated progress to " + progressPercentage + "%"
-            );
-            return ServiceResult.success(MessageConstants.TASK003); // Progress updated successfully
-
-        }
-
-        return ServiceResult.error(MessageConstants.TASK005);
+        technicianDAO.logActivity(
+                technicianId, TechnicianActivity.ActivityType.PROGRESS_UPDATED, assignmentId,
+                "Updated progress to " + progressPercentage + "%"
+        );
+        return ServiceResult.success(MessageConstants.TASK003);
     }
 
     public ServiceResult completeTask(int technicianId, int assignmentId, String notes) {
-        if (technicianId <= 0 || assignmentId <= 0) {
-            return ServiceResult.error(MessageConstants.ERR003);
+        if (technicianId <= 0 || assignmentId <= 0) return ServiceResult.error(MessageConstants.ERR003);
+
+        TaskAssignment task = technicianDAO.getTaskById(assignmentId);
+        if (task == null) return ServiceResult.error(MessageConstants.ERR002);
+        if (task.getAssignToTechID() != technicianId) return ServiceResult.error(MessageConstants.TASK009);
+        if (task.getStatus() != TaskAssignment.TaskStatus.IN_PROGRESS) {
+            return ServiceResult.error(MessageConstants.TASK006);
         }
 
-        boolean success = technicianDAO.completeTask(assignmentId, notes);
-        if (success) {
+
+        boolean okStatus = technicianDAO.completeTask(assignmentId, notes); // set status COMPLETE + completedAt
+        boolean okProgress = technicianDAO.updateTaskProgress(assignmentId, 100, notes); // đảm bảo 100%
+
+        if (okStatus && okProgress) {
             technicianDAO.logActivity(
-                    technicianId,
-                    TechnicianActivity.ActivityType.TASK_COMPLETED,
-                    assignmentId,
+                    technicianId, TechnicianActivity.ActivityType.TASK_COMPLETED, assignmentId,
                     "Completed task" + (notes != null && !notes.isEmpty() ? " with notes" : "")
             );
 
-            return ServiceResult.success(MessageConstants.TASK004); // Task completed successfully
-        }
+            // Cập nhật WorkOrderDetail liên quan (tính giờ thực tế, auto complete nếu đủ)
+            workOrderDetailDAO.recomputeActualHoursAndMaybeMarkComplete(assignmentId);
 
+            return ServiceResult.success(MessageConstants.TASK004);
+        }
         return ServiceResult.error(MessageConstants.TASK005);
     }
 

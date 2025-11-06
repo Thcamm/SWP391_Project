@@ -174,6 +174,7 @@ public class PartDetail {
         return "IN_STOCK";
     }
 
+
     public String getStockStatusLabel() {
         switch (getStockStatus()) {
             case "OUT_OF_STOCK":

@@ -6,7 +6,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tạo Customer - Admin</title>
+    <title>Create Customer - Admin</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -20,6 +20,32 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
     <!-- Header -->
     <%@ include file="header.jsp" %>
 
+    <div class="layout">
+      <%@ include file="sidebar.jsp" %>
+      <main class="main">
+        <div class="container mt-4">
+          <!-- Breadcrumb -->
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item">
+                <a
+                  href="${pageContext.request.contextPath}/admin/users"
+                  class="text-decoration-none"
+                >
+                  User Management
+                </a>
+              </li>
+              <li class="breadcrumb-item">
+                <a
+                  href="${pageContext.request.contextPath}/admin/users/choose-type"
+                  class="text-decoration-none"
+                >
+                  Choose Type
+                </a>
+              </li>
+              <li class="breadcrumb-item active">Create Customer</li>
+            </ol>
+          </nav>
     <div class="container mt-4">
       <!-- Breadcrumb -->
       <nav aria-label="breadcrumb">
@@ -44,6 +70,31 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
         </ol>
       </nav>
 
+          <!-- Alert Messages -->
+          <c:if test="${not empty message}">
+            <c:choose>
+              <c:when test="${messageType == 'success'}">
+                <div class="alert alert-success alert-dismissible fade show">
+                  ${message}
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                  ></button>
+                </div>
+              </c:when>
+              <c:otherwise>
+                <div class="alert alert-danger alert-dismissible fade show">
+                  ${message}
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                  ></button>
+                </div>
+              </c:otherwise>
+            </c:choose>
+          </c:if>
       <!-- Alert Messages -->
       <c:if test="${not empty message}">
         <c:choose>
@@ -76,11 +127,18 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
           <div class="card shadow">
             <div class="card-header bg-primary text-white">
               <h4 class="mb-0">
-                <i class="bi bi-person-circle"></i> Tạo Customer User
+                <i class="bi bi-person-circle"></i> Create Customer User
               </h4>
-              <small>Tạo tài khoản khách hàng sử dụng dịch vụ garage</small>
+              <small>Create customer account to use garage services</small>
             </div>
 
+                <div class="card-body">
+                  <form
+                    method="POST"
+                    action="${pageContext.request.contextPath}/admin/users/create-customer"
+                  >
+                    <!-- Customer Role Hidden Field -->
+                    <input type="hidden" name="userType" value="customer" />
             <div class="card-body">
               <form
                 method="POST"
@@ -94,14 +152,14 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   <div class="col-md-6">
                     <div class="mb-3">
                       <label for="fullName" class="form-label">
-                        <span class="text-danger">*</span> Họ và Tên
+                        <span class="text-danger">*</span> Full Name
                       </label>
                       <input
                         type="text"
                         class="form-control"
                         id="fullName"
                         name="fullName"
-                        placeholder="Nhập họ và tên đầy đủ"
+                        placeholder="Enter full name"
                         required
                       />
                     </div>
@@ -115,11 +173,11 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                         class="form-control"
                         id="userName"
                         name="userName"
-                        placeholder="Nhập username"
+                        placeholder="Enter username"
                         required
                       />
                       <div class="form-text">
-                        Username để khách hàng đăng nhập
+                        Username for customer login
                       </div>
                     </div>
 
@@ -132,21 +190,21 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                         class="form-control"
                         id="email"
                         name="email"
-                        placeholder="Nhập địa chỉ email"
+                        placeholder="Enter email address"
                         required
                       />
                     </div>
 
                     <div class="mb-3">
                       <label for="phoneNumber" class="form-label"
-                        >Số điện thoại</label
+                        >Phone Number</label
                       >
                       <input
                         type="tel"
                         class="form-control"
                         id="phoneNumber"
                         name="phoneNumber"
-                        placeholder="Nhập số điện thoại"
+                        placeholder="Enter phone number"
                       />
                     </div>
                   </div>
@@ -194,7 +252,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                       <ul class="mb-0">
                         <li><strong>Role:</strong> Customer (tự động)</li>
                         <li><strong>Mật khẩu:</strong> 123456 (mặc định)</li>
-                        <li><strong>Loyalty Points:</strong> 0 (khởi tạo)</li>
+                        <li><strong>Loyalty Points:</strong> 0 (initialized)</li>
                         <li><strong>Trạng thái:</strong> Active</li>
                       </ul>
                     </div>
@@ -218,11 +276,11 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                               </li>
                               <li>
                                 <i class="bi bi-check-circle text-success"></i>
-                                View service history
+                                Xem lịch sử dịch vụ
                               </li>
                               <li>
                                 <i class="bi bi-check-circle text-success"></i>
-                                Track vehicle status
+                                Theo dõi trạng thái xe
                               </li>
                             </ul>
                           </div>
@@ -265,7 +323,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                           <i class="bi bi-arrow-clockwise"></i> Reset Form
                         </button>
                         <button type="submit" class="btn btn-primary">
-                          <i class="bi bi-person-plus"></i> Tạo Customer
+                          <i class="bi bi-person-plus"></i> Create Customer
                         </button>
                       </div>
                     </div>
@@ -280,5 +338,8 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
 
     <!-- Footer -->
     <%@ include file="footer.jsp" %>
+
+    <!-- Birth Date Validation Script -->
+    <script src="${pageContext.request.contextPath}/assets/js/admin/birthdate-validation.js"></script>
   </body>
 </html>

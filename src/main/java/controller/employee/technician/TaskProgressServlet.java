@@ -17,25 +17,33 @@ import java.io.IOException;
 @WebServlet("/technician/update-progress")
 public class TaskProgressServlet extends HttpServlet {
 
+
+
+
     private final TechnicianService technicianService = new TechnicianService();
 
-    public TaskProgressServlet() {
-        super();
-    }
+    public TaskProgressServlet() { super(); }
+
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doGet(req, resp);
-    }
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession(false);
+        if (session == null) {
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
 
         Integer userId = (Integer) session.getAttribute("userId");
-        ServiceResult techResult = technicianService.getTechnicianByUserId(userId);
+        if (userId == null) {
+            MessageHelper.setErrorMessage(session, MessageConstants.AUTH001);
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
 
-        if(techResult.isError()) {
+        ServiceResult techResult = technicianService.getTechnicianByUserId(userId);
+        if (techResult.isError()) {
             MessageHelper.setErrorMessage(session, techResult.getMessage());
             resp.sendRedirect(req.getContextPath() + "/technician/home");
             return;
@@ -43,63 +51,83 @@ public class TaskProgressServlet extends HttpServlet {
 
         Employee technician = techResult.getData(Employee.class);
 
-        String assigmentIdStr = req.getParameter("assignmentId");
+
+        String assignmentIdStr = req.getParameter("assignmentId");
         String action = req.getParameter("action");
         String progressStr = req.getParameter("progressPercentage");
         String notes = req.getParameter("notes");
+        String returnTo = req.getParameter("returnTo");
 
-        if(assigmentIdStr == null || action == null) {
+        if (assignmentIdStr == null || action == null) {
             MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
-            resp.sendRedirect(req.getContextPath() + "/technician/home");
+            redirectBack(req, resp, returnTo,
+                    req.getContextPath() + "/technician/update-progress-form?assignmentId=" + assignmentIdStr);
+
             return;
         }
 
         try {
-            int assignmentId = Integer.parseInt(assigmentIdStr);
-            ServiceResult result ;
+            int assignmentId = Integer.parseInt(assignmentIdStr);
+            ServiceResult result;
 
-            if("complete".equals(action)) {
+            if ("complete".equalsIgnoreCase(action)) {
                 result = technicianService.completeTask(
-                        technician.getEmployeeId(),
-                        assignmentId,
-                        notes
+                        technician.getEmployeeId(), assignmentId, notes
                 );
 
-            }else if ("update".equals(action)) {
-                if(progressStr == null) {
+            } else if ("update".equalsIgnoreCase(action)) {
+                if (progressStr == null) {
                     MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
-                    resp.sendRedirect(req.getContextPath() + "/technician/home");
+                    redirectBack(req, resp, returnTo, req.getContextPath() + "/technician/home");
                     return;
                 }
 
-                int progressPercentage = Integer.parseInt(progressStr);
-                result = technicianService.updateProgress(
-                        technician.getEmployeeId(),
-                        assignmentId,
-                        progressPercentage,
-                        notes
+                int progressPercentage;
+                try {
+                    progressPercentage = Integer.parseInt(progressStr.trim());
+                } catch (NumberFormatException ex) {
+                    MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
+                    redirectBack(req, resp, returnTo, req.getContextPath() + "/technician/home");
+                    return;
+                }
 
+                // Validate 0..100
+                if (progressPercentage < 0 || progressPercentage > 100) {
+                    MessageHelper.setErrorMessage(session, "Progress must be between 0 and 100.");
+                    redirectBack(req, resp, returnTo, req.getContextPath() + "/technician/home");
+                    return;
+                }
+
+                result = technicianService.updateProgress(
+                        technician.getEmployeeId(), assignmentId, progressPercentage, notes
                 );
 
-
-            }else {
+            } else {
                 MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
-                resp.sendRedirect(req.getContextPath() + "/technician/home");
+                redirectBack(req, resp, returnTo, req.getContextPath() + "/technician/home");
                 return;
             }
 
-            if(result.isSuccess()) {
+            if (result.isSuccess()) {
                 MessageHelper.setSuccessMessage(session, result.getMessage());
-
-            }else {
+            } else {
                 MessageHelper.setErrorMessage(session, result.getMessage());
             }
-        }catch (NumberFormatException e) {
-            MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
 
+        } catch (NumberFormatException e) {
+            MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
         }
 
-        resp.sendRedirect(req.getContextPath() + "/technician/home");
 
+        redirectBack(req, resp, returnTo, req.getContextPath() + "/technician/tasks");
+    }
+
+    private void redirectBack(HttpServletRequest req, HttpServletResponse resp,
+                              String returnTo, String fallback) throws IOException {
+        if (returnTo != null && !returnTo.isBlank()) {
+            resp.sendRedirect(returnTo);
+        } else {
+            resp.sendRedirect(fallback);
+        }
     }
 }
