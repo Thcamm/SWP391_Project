@@ -142,6 +142,16 @@
                     </a>
                 </li>
             </ul>
+            <div class="menu-title">Feedback</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link"
+                       href="${pageContext.request.contextPath}/customerservice/reply-feedback">
+                        <i class="bi bi-clock-history text-danger"></i>
+                        <span>Feedback Reply</span>
+                    </a>
+                </li>
+            </ul>
             <div class="menu-title">Support Request</div>
 
             <ul class="nav flex-column">

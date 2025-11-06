@@ -46,7 +46,7 @@ public class AppointmentService {
         String currentStatus = apm.getStatus();
 
         // 1️⃣ Nếu đã hoàn tất hoặc đã huỷ thì không được đổi
-        if (currentStatus.equals("COMPLETED") || currentStatus.equals("CANCELLED")) {
+        if (currentStatus.equals("ACCEPTED") || currentStatus.equals("CANCELLED")) {
             throw new Exception("Không thể thay đổi trạng thái của cuộc hẹn đã " + currentStatus.toLowerCase());
         }
 

@@ -286,6 +286,9 @@
         <a href="${pageContext.request.contextPath}/customer/workorder-list" class="menu-item">
             <span>WORK ORDER LIST</span>
         </a>
+        <a href="${pageContext.request.contextPath}/view/user/view-feedback-list.jsp" class="menu-item">
+            <span>Feedback About Us</span>
+        </a>
         <a href="${pageContext.request.contextPath}/customer/garage" class="menu-item">
             <span>Vehicle Management (My Garage)</span>
         </a>

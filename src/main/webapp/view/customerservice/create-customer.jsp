@@ -512,7 +512,7 @@
                                                 </svg>
                                                 Date Of Birth
                                             </label>
-                                            <input type="date" id="dateOfBirth" name="dateOfBirth" class="input">
+                                            <input type="date" id="birthDate" name="birthDate" class="input">
                                         </div>
                                     </div>
                                     <div class="grid-2">
