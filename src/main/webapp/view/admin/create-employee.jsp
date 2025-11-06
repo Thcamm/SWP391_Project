@@ -225,7 +225,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                             class="form-control"
                             id="employeeCode"
                             name="employeeCode"
-                            placeholder="Automatically generated if left blank"
+                            placeholder="Automatically generated"
                             readonly
                           />
                           <div class="form-text"></div>

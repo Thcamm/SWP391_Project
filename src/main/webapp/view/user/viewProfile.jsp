@@ -39,7 +39,7 @@
                 <c:set var="homeLink" value="${pageContext.request.contextPath}/admin/users" />
             </c:when>
             <c:when test="${sessionScope.roleCode == 'TECHMANAGER'}">
-                <c:set var="homeLink" value="${pageContext.request.contextPath}/techmanager/home" />
+                <c:set var="homeLink" value="${pageContext.request.contextPath}/techmanager/dashboard"/>
             </c:when>
             <c:when test="${sessionScope.roleCode == 'TECHNICAL'}">
                 <c:set var="homeLink" value="${pageContext.request.contextPath}/technician/home" />

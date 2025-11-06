@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import dao.workorder.RepairAssignmentDAO;
@@ -17,6 +18,8 @@ import model.employee.techmanager.TechnicianDTO;
  * Phase 3: Repair Assignment
  * - Show approved Repair (customer approved)
  * - Assign repair tasks to technicians
+ * 
+ * NEW: Supports task scheduling with planned_start and planned_end times
  */
 @WebServlet("/techmanager/assign-repair")
 public class RepairAssignmentServlet extends HttpServlet {
@@ -65,6 +68,8 @@ public class RepairAssignmentServlet extends HttpServlet {
 
         String detailIdStr = request.getParameter("detailId");
         String technicianIdStr = request.getParameter("technicianId");
+        String plannedStartStr = request.getParameter("plannedStart");
+        String plannedEndStr = request.getParameter("plannedEnd");
 
         if (detailIdStr == null || technicianIdStr == null) {
             response.sendRedirect(request.getContextPath() +
@@ -76,6 +81,39 @@ public class RepairAssignmentServlet extends HttpServlet {
             int detailId = Integer.parseInt(detailIdStr);
             int technicianId = Integer.parseInt(technicianIdStr);
 
+            // NEW: Parse scheduling times
+            LocalDateTime plannedStart = null;
+            LocalDateTime plannedEnd = null;
+
+            if (plannedStartStr != null && !plannedStartStr.trim().isEmpty()) {
+                try {
+                    plannedStart = LocalDateTime.parse(plannedStartStr);
+                } catch (Exception e) {
+                    response.sendRedirect(request.getContextPath() +
+                            "/techmanager/assign-repair?message=Invalid planned start time format&type=error");
+                    return;
+                }
+            }
+
+            if (plannedEndStr != null && !plannedEndStr.trim().isEmpty()) {
+                try {
+                    plannedEnd = LocalDateTime.parse(plannedEndStr);
+                } catch (Exception e) {
+                    response.sendRedirect(request.getContextPath() +
+                            "/techmanager/assign-repair?message=Invalid planned end time format&type=error");
+                    return;
+                }
+            }
+
+            // Validate: planned_end must be after planned_start
+            if (plannedStart != null && plannedEnd != null) {
+                if (!plannedEnd.isAfter(plannedStart)) {
+                    response.sendRedirect(request.getContextPath() +
+                            "/techmanager/assign-repair?message=Planned end time must be after planned start time&type=error");
+                    return;
+                }
+            }
+
             // Check if already assigned
             if (repairAssignmentDAO.hasRepairTaskAssigned(detailId)) {
                 response.sendRedirect(request.getContextPath() +
@@ -83,8 +121,8 @@ public class RepairAssignmentServlet extends HttpServlet {
                 return;
             }
 
-            // Create repair task assignment
-            boolean success = repairAssignmentDAO.createRepairTask(detailId, technicianId);
+            // Create repair task assignment with scheduling
+            boolean success = repairAssignmentDAO.createRepairTask(detailId, technicianId, plannedStart, plannedEnd);
 
             if (success) {
                 response.sendRedirect(request.getContextPath() +

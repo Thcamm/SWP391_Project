@@ -31,9 +31,9 @@ public class TaskAssignmentDAO extends DbContext {
      * @return Generated AssignmentID, or -1 if failed
      */
     public int createTaskAssignment(TaskAssignment task) throws SQLException {
-        String sql = "INSERT INTO TaskAssignment (DetailID, AssignToTechID, AssignedDate, TaskDescription, task_type, Status, priority, notes) "
+        String sql = "INSERT INTO TaskAssignment (DetailID, AssignToTechID, AssignedDate, TaskDescription, task_type, Status, priority, notes, planned_start, planned_end) "
                 +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -60,6 +60,19 @@ public class TaskAssignmentDAO extends DbContext {
             }
 
             ps.setString(8, task.getNotes());
+
+            // NEW: Scheduling fields (nullable)
+            if (task.getPlannedStart() != null) {
+                ps.setTimestamp(9, Timestamp.valueOf(task.getPlannedStart()));
+            } else {
+                ps.setNull(9, java.sql.Types.TIMESTAMP);
+            }
+
+            if (task.getPlannedEnd() != null) {
+                ps.setTimestamp(10, Timestamp.valueOf(task.getPlannedEnd()));
+            } else {
+                ps.setNull(10, java.sql.Types.TIMESTAMP);
+            }
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {

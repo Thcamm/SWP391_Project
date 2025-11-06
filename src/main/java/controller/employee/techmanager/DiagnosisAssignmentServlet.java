@@ -22,8 +22,10 @@ import java.util.List;
 
 /**
  * GIAI ĐOẠN 1: TechManager assigns DIAGNOSIS tasks to Technicians
- * After approving ServiceRequest and creating WorkOrder, 
+ * After approving ServiceRequest and creating WorkOrder,
  * TechManager uses this servlet to assign diagnosis task to a Technician
+ * 
+ * NEW: Supports task scheduling with planned_start and planned_end times
  */
 @WebServlet("/techmanager/assign-diagnosis")
 public class DiagnosisAssignmentServlet extends HttpServlet {
@@ -67,8 +69,8 @@ public class DiagnosisAssignmentServlet extends HttpServlet {
             }
 
             // Get WorkOrderDetails that need diagnosis assignment
-            List<TaskAssignmentDAO.WorkOrderDetailWithInfo> pendingDetails = 
-                taskAssignmentDAO.getWorkOrderDetailsNeedingDiagnosisAssignment(techManagerEmployeeId);
+            List<TaskAssignmentDAO.WorkOrderDetailWithInfo> pendingDetails = taskAssignmentDAO
+                    .getWorkOrderDetailsNeedingDiagnosisAssignment(techManagerEmployeeId);
 
             // Get list of available Technicians
             List<Employee> technicians = technicianDAO.getAllTechnicians();
@@ -106,6 +108,50 @@ public class DiagnosisAssignmentServlet extends HttpServlet {
             String priority = request.getParameter("priority");
             String notes = request.getParameter("notes");
 
+            // NEW: Get scheduling parameters
+            String plannedStartStr = request.getParameter("plannedStart");
+            String plannedEndStr = request.getParameter("plannedEnd");
+
+            // Parse scheduling times (format: yyyy-MM-dd'T'HH:mm from HTML5 datetime-local
+            // input)
+            LocalDateTime plannedStart = null;
+            LocalDateTime plannedEnd = null;
+
+            if (plannedStartStr != null && !plannedStartStr.trim().isEmpty()) {
+                try {
+                    plannedStart = LocalDateTime.parse(plannedStartStr);
+                } catch (Exception e) {
+                    response.sendRedirect(request.getContextPath() +
+                            "/techmanager/assign-diagnosis?message=" +
+                            java.net.URLEncoder.encode("Invalid planned start time format.", "UTF-8") +
+                            "&type=error");
+                    return;
+                }
+            }
+
+            if (plannedEndStr != null && !plannedEndStr.trim().isEmpty()) {
+                try {
+                    plannedEnd = LocalDateTime.parse(plannedEndStr);
+                } catch (Exception e) {
+                    response.sendRedirect(request.getContextPath() +
+                            "/techmanager/assign-diagnosis?message=" +
+                            java.net.URLEncoder.encode("Invalid planned end time format.", "UTF-8") +
+                            "&type=error");
+                    return;
+                }
+            }
+
+            // Validate: planned_end must be after planned_start
+            if (plannedStart != null && plannedEnd != null) {
+                if (!plannedEnd.isAfter(plannedStart)) {
+                    response.sendRedirect(request.getContextPath() +
+                            "/techmanager/assign-diagnosis?message=" +
+                            java.net.URLEncoder.encode("Planned end time must be after planned start time.", "UTF-8") +
+                            "&type=error");
+                    return;
+                }
+            }
+
             // Create TaskAssignment
             TaskAssignment task = new TaskAssignment();
             task.setDetailID(detailId);
@@ -114,15 +160,19 @@ public class DiagnosisAssignmentServlet extends HttpServlet {
             task.setTaskDescription("Chẩn đoán tình trạng xe và xác định vấn đề");
             task.setTaskType(TaskAssignment.TaskType.DIAGNOSIS);
             task.setStatus(TaskAssignment.TaskStatus.ASSIGNED);
-            
+
             // Set priority
             if (priority != null && !priority.trim().isEmpty()) {
                 task.setPriority(TaskAssignment.Priority.valueOf(priority.toUpperCase()));
             } else {
                 task.setPriority(TaskAssignment.Priority.MEDIUM);
             }
-            
+
             task.setNotes(notes);
+
+            // NEW: Set scheduling times
+            task.setPlannedStart(plannedStart);
+            task.setPlannedEnd(plannedEnd);
 
             // Save to database
             int assignmentId = taskAssignmentDAO.createTaskAssignment(task);
@@ -132,7 +182,7 @@ public class DiagnosisAssignmentServlet extends HttpServlet {
                 Employee technician = technicianDAO.getTechnicianById(technicianId);
                 if (technician != null) {
                     Notification notif = new Notification();
-                    notif.setUserId(technician.getUserId());  // Employee extends User, so getUserId() is available
+                    notif.setUserId(technician.getUserId()); // Employee extends User, so getUserId() is available
                     notif.setTitle("New Diagnosis Task Assigned");
                     notif.setBody("You have been assigned a diagnosis task. Priority: " + task.getPriority());
                     notif.setEntityType("WORK_ORDER");

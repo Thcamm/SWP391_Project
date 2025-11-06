@@ -104,18 +104,49 @@ public class RepairAssignmentDAO {
     }
 
     /**
-     * Create repair task assignment
+     * Create repair task assignment (without scheduling)
+     * 
+     * @deprecated Use createRepairTask(int, int, LocalDateTime, LocalDateTime) for
+     *             new workflow
      */
+    @Deprecated
     public boolean createRepairTask(int detailId, int technicianId) throws SQLException {
+        return createRepairTask(detailId, technicianId, null, null);
+    }
+
+    /**
+     * Create repair task assignment with scheduling support
+     * 
+     * @param detailId     WorkOrderDetail ID
+     * @param technicianId Technician Employee ID
+     * @param plannedStart Scheduled start time (optional)
+     * @param plannedEnd   Scheduled end time (optional)
+     */
+    public boolean createRepairTask(int detailId, int technicianId,
+            java.time.LocalDateTime plannedStart,
+            java.time.LocalDateTime plannedEnd) throws SQLException {
         String sql = "INSERT INTO TaskAssignment " +
-                "(DetailID, AssignToTechID, task_type, Status, AssignedDate) " +
-                "VALUES (?, ?, 'REPAIR', 'ASSIGNED', NOW())";
+                "(DetailID, AssignToTechID, task_type, Status, AssignedDate, planned_start, planned_end) " +
+                "VALUES (?, ?, 'REPAIR', 'ASSIGNED', NOW(), ?, ?)";
 
         try (Connection conn = DbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, detailId);
             ps.setInt(2, technicianId);
+
+            // Set scheduling times (nullable)
+            if (plannedStart != null) {
+                ps.setObject(3, plannedStart);
+            } else {
+                ps.setNull(3, java.sql.Types.TIMESTAMP);
+            }
+
+            if (plannedEnd != null) {
+                ps.setObject(4, plannedEnd);
+            } else {
+                ps.setNull(4, java.sql.Types.TIMESTAMP);
+            }
 
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;
