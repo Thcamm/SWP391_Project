@@ -687,4 +687,26 @@ public class VehicleDiagnosticDAO {
         }
     }
 
+    public boolean hasSubmittedWithPendingParts(int assignmentId) {
+        final String sql =
+                "SELECT 1 " +
+                        "FROM VehicleDiagnostic vd " +
+                        "LEFT JOIN DiagnosticPart dp ON dp.VehicleDiagnosticID = vd.VehicleDiagnosticID " +
+                        "WHERE vd.AssignmentID = ? " +
+                        "  AND vd.Status = 'SUBMITTED' " +                   // đã submit cho khách
+                        "  AND (dp.IsApproved = 0 OR dp.IsApproved IS NULL) " + // còn pending
+                        "LIMIT 1";
+
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, assignmentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+            return true;
+        }
+    }
 }

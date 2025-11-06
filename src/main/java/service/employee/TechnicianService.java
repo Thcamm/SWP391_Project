@@ -4,6 +4,7 @@ import common.constant.MessageConstants;
 import common.message.ServiceResult;
 import common.utils.PaginationUtils;
 import dao.employee.technician.TechnicianDAO;
+import dao.vehicle.VehicleDiagnosticDAO;
 import dao.workorder.WorkOrderDetailDAO;
 import model.employee.Employee;
 import model.employee.technician.TaskAssignment;
@@ -21,6 +22,8 @@ public class TechnicianService {
     private final TechnicianDAO technicianDAO;
 
     private WorkOrderDetailDAO workOrderDetailDAO = new WorkOrderDetailDAO();
+
+    private VehicleDiagnosticDAO vehicleDiagnosticDAO = new VehicleDiagnosticDAO();
 
     public TechnicianService() {
         this.technicianDAO = new TechnicianDAO();
@@ -236,6 +239,7 @@ public class TechnicianService {
         return ServiceResult.success(MessageConstants.TASK003);
     }
 
+
     public ServiceResult completeTask(int technicianId, int assignmentId, String notes) {
         if (technicianId <= 0 || assignmentId <= 0) return ServiceResult.error(MessageConstants.ERR003);
 
@@ -246,23 +250,34 @@ public class TechnicianService {
             return ServiceResult.error(MessageConstants.TASK006);
         }
 
+        // chặn khi còn chẩn đoán SUBMITTED nhưng parts chưa approved
+        if (vehicleDiagnosticDAO.hasSubmittedWithPendingParts(assignmentId)) {
+            return ServiceResult.error(MessageConstants.TASK012);
+        }
 
-        boolean okStatus = technicianDAO.completeTask(assignmentId, notes); // set status COMPLETE + completedAt
-        boolean okProgress = technicianDAO.updateTaskProgress(assignmentId, 100, notes); // đảm bảo 100%
 
-        if (okStatus && okProgress) {
+
+
+//        if (workOrderDetailDAO.hasPendingApprovalOrOpenWorkOrder(assignmentId)) {
+//            return ServiceResult.error(MessageConstants.WO_PENDING);
+//        }
+
+
+        boolean ok = technicianDAO.completeTask(assignmentId, notes);
+        if (ok) {
             technicianDAO.logActivity(
                     technicianId, TechnicianActivity.ActivityType.TASK_COMPLETED, assignmentId,
                     "Completed task" + (notes != null && !notes.isEmpty() ? " with notes" : "")
             );
 
-            // Cập nhật WorkOrderDetail liên quan (tính giờ thực tế, auto complete nếu đủ)
+
             workOrderDetailDAO.recomputeActualHoursAndMaybeMarkComplete(assignmentId);
 
             return ServiceResult.success(MessageConstants.TASK004);
         }
         return ServiceResult.error(MessageConstants.TASK005);
     }
+
 
     public PaginationResponse<TechnicianActivity> getRecentActivities(int technicianId, int page, int itemsPerPage) {
         if(technicianId <= 0) {
