@@ -20,7 +20,7 @@ public class TechnicianDAO {
                 "WHERE e.UserID = ?";
 
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -76,7 +76,7 @@ public class TechnicianDAO {
                 "WHERE ta.AssignToTechID = ?";
 
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, technicianId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -102,7 +102,7 @@ public class TechnicianDAO {
                 "WHERE wop.RequestedByID = ? AND wop.request_status = 'PENDING'";
 
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, technicianId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -144,7 +144,7 @@ public class TechnicianDAO {
                 "ORDER BY ta.priority DESC, ta.AssignedDate DESC";
 
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, technicianId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -182,7 +182,7 @@ public class TechnicianDAO {
                 "GROUP BY ta.AssignmentID";
 
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, assignmentId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -251,7 +251,7 @@ public class TechnicianDAO {
 
         List<TaskAssignment> tasks = new ArrayList<>();
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
@@ -309,7 +309,7 @@ public class TechnicianDAO {
         }
 
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
@@ -377,7 +377,7 @@ public class TechnicianDAO {
 
         List<TaskAssignment> tasks = new ArrayList<>();
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 ps.setObject(i + 1, params.get(i));
             }
@@ -406,7 +406,7 @@ public class TechnicianDAO {
                 "FROM TaskAssignment ta " +
                 "WHERE ta.AssignToTechID = ?";
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, technicianId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -446,7 +446,7 @@ public class TechnicianDAO {
                 "ORDER BY ta.StartAt ASC";
 
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, technicianId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -467,46 +467,78 @@ public class TechnicianDAO {
     private TaskAssignment mapResultSetToTask(ResultSet rs) throws SQLException {
         TaskAssignment task = new TaskAssignment();
 
+        // --- core fields from TaskAssignment ---
         task.setAssignmentID(rs.getInt("AssignmentID"));
         task.setDetailID(rs.getInt("DetailID"));
         task.setAssignToTechID(rs.getInt("AssignToTechID"));
 
-        Timestamp assignedDate = rs.getTimestamp("AssignedDate");
-        if (assignedDate != null) {
-            task.setAssignedDate(assignedDate.toLocalDateTime());
-        }
+        Timestamp ts;
 
-        Timestamp startAtTs = rs.getTimestamp("StartAt");
-        if (startAtTs != null) {
-            task.setStartAt(startAtTs.toLocalDateTime());
-        }
+        ts = rs.getTimestamp("AssignedDate");
+        if (ts != null) task.setAssignedDate(ts.toLocalDateTime());
 
-        Timestamp completeAtTs = rs.getTimestamp("CompleteAt");
-        if (completeAtTs != null) {
-            task.setCompleteAt(completeAtTs.toLocalDateTime());
-        }
+        ts = rs.getTimestamp("StartAt");
+        if (ts != null) task.setStartAt(ts.toLocalDateTime());
 
+        ts = rs.getTimestamp("CompleteAt");
+        if (ts != null) task.setCompleteAt(ts.toLocalDateTime());
+
+        try {
+            ts = rs.getTimestamp("planned_start");
+            if (ts != null) task.setPlannedStart(ts.toLocalDateTime());
+        } catch (SQLException ignore) { /* column not selected in some queries */ }
+
+        try {
+            ts = rs.getTimestamp("planned_end");
+            if (ts != null) task.setPlannedEnd(ts.toLocalDateTime());
+        } catch (SQLException ignore) {}
+
+        try {
+            ts = rs.getTimestamp("declined_at");
+            if (ts != null) task.setDeclinedAt(ts.toLocalDateTime());
+        } catch (SQLException ignore) {}
+
+        try {
+            String declineReason = rs.getString("decline_reason");
+            if (declineReason != null) task.setDeclineReason(declineReason);
+        } catch (SQLException ignore) {}
+
+        // description & enums
         task.setTaskDescription(rs.getString("TaskDescription"));
-        task.setTaskType(rs.getString("task_type"));
+        task.setTaskType(rs.getString("task_type"));   // dùng fromString bên trong model
         task.setPriority(rs.getString("priority"));
         task.setStatus(rs.getString("Status"));
+
+        // progress & notes
         task.setProgressPercentage(rs.getInt("progress_percentage"));
         task.setNotes(rs.getString("notes"));
 
-        // Additional display info
-        task.setVehicleInfo(rs.getString("VehicleInfo"));
-        // ServiceInfo is aggregated into ServiceNames alias
-        task.setServiceInfo(rs.getString("ServiceNames"));
-        task.setCustomerName(rs.getString("CustomerName"));
-        task.setEstimateHours(rs.getDouble("EstimateHours"));
+        // --- optional display fields from JOIN/aggregates ---
+        // các alias này chỉ có khi SELECT có JOIN + alias tương ứng
+        try {
+            task.setVehicleInfo(rs.getString("VehicleInfo"));
+        } catch (SQLException ignore) {}
+
+        try {
+            task.setServiceInfo(rs.getString("ServiceNames")); // GROUP_CONCAT alias
+        } catch (SQLException ignore) {}
+
+        try {
+            task.setCustomerName(rs.getString("CustomerName"));
+        } catch (SQLException ignore) {}
+
+        try {
+            task.setEstimateHours(rs.getDouble("EstimateHours"));
+        } catch (SQLException ignore) {}
 
         return task;
     }
 
+
     public boolean updateTaskStatus(int assignmentId, TaskAssignment.TaskStatus status, LocalDateTime startTime) {
         String sql = "UPDATE TaskAssignment SET Status = ?, StartAt = ? WHERE AssignmentID = ? ";
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status.name());
 
             if (startTime != null) {
@@ -530,7 +562,7 @@ public class TechnicianDAO {
         String sql = "UPDATE TaskAssignment SET progress_percentage = ?, notes = ? WHERE AssignmentID = ?";
 
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, progressPercentage);
             ps.setString(2, notes);
             ps.setInt(3, assignmentId);
@@ -549,7 +581,7 @@ public class TechnicianDAO {
                 "progress_percentage = 100, notes = ? WHERE AssignmentID = ?";
 
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
             ps.setString(2, notes);
             ps.setInt(3, assignmentId);
@@ -565,11 +597,11 @@ public class TechnicianDAO {
 
     // Activity log
     public boolean logActivity(int technicianId, TechnicianActivity.ActivityType activityType,
-            Integer taskAssignmentId, String description) {
+                               Integer taskAssignmentId, String description) {
         String sql = "INSERT INTO TechnicianActivityLog (TechnicianID, ActivityType, TaskAssignmentID, Description) " +
                 "VALUES (?, ?, ?, ?)";
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, technicianId);
             ps.setString(2, activityType.name());
             if (taskAssignmentId != null) {
@@ -605,7 +637,7 @@ public class TechnicianDAO {
                 "LIMIT ?";
 
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, technicianId);
             ps.setInt(2, limit);
 
@@ -664,8 +696,8 @@ public class TechnicianDAO {
                 "ORDER BY u.FullName ASC";
 
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 technicians.add(mapResultSetToEmployee(rs));
@@ -687,7 +719,7 @@ public class TechnicianDAO {
                 "WHERE e.EmployeeID = ?";
 
         try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, employeeId);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -699,6 +731,140 @@ public class TechnicianDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public TaskAssignment getTaskForUpdate(Connection conn, int assignmentId) throws SQLException {
+        final String sql =
+                "SELECT ta.*, " +
+                        "       wd.TaskDescription AS WorkOrderDetailDesc, " +
+                        "       wd.EstimateHours, " +
+                        "       CONCAT(v.LicensePlate, ' - ', v.Brand, ' ', v.Model) AS VehicleInfo, " +
+                        "       GROUP_CONCAT(DISTINCT st.ServiceName SEPARATOR ', ') AS ServiceNames, " +
+                        "       u.FullName AS CustomerName " +
+                        "FROM TaskAssignment ta " +
+                        "JOIN WorkOrderDetail wd ON ta.DetailID = wd.DetailID " +
+                        "JOIN WorkOrder wo ON wd.WorkOrderID = wo.WorkOrderID " +
+                        "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
+                        "LEFT JOIN ServiceRequestDetail srd ON srd.RequestID = sr.RequestID " +
+                        "LEFT JOIN Service_Type st ON srd.ServiceID = st.ServiceID " +
+                        "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
+                        "JOIN Customer c ON v.CustomerID = c.CustomerID " +
+                        "JOIN `User` u ON c.UserID = u.UserID " +
+                        "WHERE ta.AssignmentID = ? " +
+                        "GROUP BY ta.AssignmentID " +
+                        "FOR UPDATE";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, assignmentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToTask(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean hasOverlapAssignments(Connection conn,
+                                         int techId,
+                                         LocalDateTime start,
+                                         LocalDateTime end,
+                                         Integer excludeAssignmentId) throws SQLException {
+        final String sql =
+                "SELECT COUNT(*) " +
+                        "FROM TaskAssignment " +
+                        "WHERE AssignToTechID = ? " +
+                        "  AND Status IN ('ASSIGNED','IN_PROGRESS') " +
+                        "  AND planned_start IS NOT NULL AND planned_end IS NOT NULL " +
+                        "  AND planned_start < ? " +   // start < other_end
+                        "  AND planned_end   > ? " +   // end   > other_start
+                        (excludeAssignmentId != null ? " AND AssignmentID <> ? " : "");
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            int i = 1;
+            ps.setInt(i++, techId);
+            ps.setTimestamp(i++, Timestamp.valueOf(end));
+            ps.setTimestamp(i++, Timestamp.valueOf(start));
+            if (excludeAssignmentId != null) ps.setInt(i++, excludeAssignmentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                rs.next();
+                return rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    public boolean updateTaskStatusWithStartTime(Connection conn,
+                                                 int assignmentId,
+                                                 TaskAssignment.TaskStatus expectedStatus,
+                                                 TaskAssignment.TaskStatus newStatus,
+                                                 LocalDateTime startTime) throws SQLException {
+        final String sql =
+                "UPDATE TaskAssignment " +
+                        "SET Status = ?, StartAt = ? " +
+                        "WHERE AssignmentID = ? AND Status = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newStatus.name());
+            ps.setTimestamp(2, startTime == null ? null : Timestamp.valueOf(startTime));
+            ps.setInt(3, assignmentId);
+            ps.setString(4, expectedStatus.name());
+            return ps.executeUpdate() == 1;
+        }
+    }
+
+    public boolean logActivity(Connection conn,
+                               int technicianId,
+                               TechnicianActivity.ActivityType activityType,
+                               Integer taskAssignmentId,
+                               String description) throws SQLException {
+        final String sql =
+                "INSERT INTO TechnicianActivityLog (TechnicianID, ActivityType, TaskAssignmentID, Description) " +
+                        "VALUES (?, ?, ?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, technicianId);
+            ps.setString(2, activityType.name());
+            if (taskAssignmentId != null) ps.setInt(3, taskAssignmentId);
+            else ps.setNull(3, Types.INTEGER);
+            ps.setString(4, description);
+            return ps.executeUpdate() == 1;
+        }
+
+
+    }
+
+    public int cancelExpiredAssignments(Connection conn, int graceMinutes) throws SQLException {
+        final String sql =
+                "UPDATE TaskAssignment " +
+                        "SET Status = 'CANCELLED', " +
+                        "    declined_at = NOW(), " +
+                        "    decline_reason = CONCAT('Auto-cancel: no response within ', ?, ' minutes of planned_start') " +
+                        "WHERE Status = 'ASSIGNED' " +
+                        "  AND StartAt IS NULL " +
+                        "  AND planned_start IS NOT NULL " +
+                        "  AND NOW() >= DATE_ADD(planned_start, INTERVAL ? MINUTE)";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, graceMinutes);
+            ps.setInt(2, graceMinutes);
+            return ps.executeUpdate();
+        }
+    }
+
+    public int logAutoCancelledAssignments(Connection conn, int lookbackMinutes) throws SQLException {
+        final String sql =
+                "INSERT INTO TechnicianActivityLog (TechnicianID, ActivityType, TaskAssignmentID, Description) " +
+                        "SELECT ta.AssignToTechID, 'TASK_REJECTED', ta.AssignmentID, " +
+                        "       CONCAT('Auto-cancelled due to no response within accept window (', ?, 'm)') " +
+                        "FROM TaskAssignment ta " +
+                        "WHERE ta.Status = 'CANCELLED' " +
+                        "  AND ta.decline_reason LIKE 'Auto-cancel:%' " +
+                        "  AND ta.declined_at >= NOW() - INTERVAL ? MINUTE";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, lookbackMinutes);
+            ps.setInt(2, lookbackMinutes);
+            return ps.executeUpdate();
+        }
     }
 
 }

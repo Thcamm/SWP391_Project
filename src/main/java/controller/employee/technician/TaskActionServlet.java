@@ -67,7 +67,7 @@ public class TaskActionServlet extends HttpServlet {
             ServiceResult result;
             switch (normalized) {
                 case "accept":
-                    result = technicianService.acceptTask(technician.getEmployeeId(), assignmentId);
+                    result = technicianService.acceptTaskTx(technician.getEmployeeId(), assignmentId);
                     break;
                 case "reject":
                     result = technicianService.rejectTask(technician.getEmployeeId(), assignmentId);

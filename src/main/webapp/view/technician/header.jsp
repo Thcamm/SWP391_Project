@@ -126,67 +126,74 @@
                 </ul>
             </nav>
 
-            <!-- User info bên phải -->
-            <div class="d-flex align-items-center gap-3">
-                <!-- Notification Bell -->
-                <div class="dropdown">
-                    <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.5rem;">
-                        <i class="bi bi-bell" style="font-size: 20px; color: #6b7280;"></i>
-                        <!-- Uncomment nếu có notifications -->
-                        <%-- <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">
-                            ${notificationCount}
-                        </span> --%>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" style="min-width: 280px;">
-                        <li><h6 class="dropdown-header">Notifications</h6></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li class="px-3 py-2 text-center text-muted">
-                            <i class="bi bi-inbox" style="font-size: 2rem;"></i>
-                            <p class="mb-0 mt-2">No new notifications</p>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-center small" href="${pageContext.request.contextPath}/accountant/notifications">View all notifications</a></li>
-                    </ul>
-                </div>
 
-                <!-- User Dropdown -->
-                <div class="dropdown">
-                    <a class="d-flex align-items-center text-decoration-none dropdown-toggle-custom"
-                       href="#"
-                       role="button"
-                       data-bs-toggle="dropdown"
-                       aria-expanded="false"
-                       style="padding: 0.5rem 0.75rem; border-radius: 10px; transition: background-color 0.2s;">
-                        <div class="text-end">
-                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 2px;">Welcome back,</div>
-                            <div style="font-weight: 600; color: #111827; line-height: 1.2;">${sessionScope.userName != null ? sessionScope.userName : 'User'}</div>
-                            <div style="font-size: 12px; color: #6b7280; margin-top: 2px;">${sessionScope.roleName != null ? sessionScope.roleName : 'Technician'}</div>
-                        </div>
-                        <i class="bi bi-chevron-down ms-2" style="font-size: 12px; color: #6b7280;"></i>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" style="min-width: 200px;">
-                        <li>
-                            <a class="dropdown-item" href="${pageContext.request.contextPath}/user/profile">
-                                <i class="bi bi-person me-2"></i>
-                                <span>My Profile</span>
-                            </a>
-                        </li>
-<%--                        <li>--%>
-<%--                            <a class="dropdown-item" href="${pageContext.request.contextPath}/user/settings">--%>
-<%--                                <i class="bi bi-gear me-2"></i>--%>
-<%--                                <span>Settings</span>--%>
-<%--                            </a>--%>
+            <a class="dropdown-item" href="${pageContext.request.contextPath}/user/profile">
+                <i class="bi bi-person me-2"></i>
+                <span>My Profile</span>
+            </a>
+
+
+            <a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/Home?action=logout">
+                <i class="bi bi-box-arrow-right me-2"></i>
+                <span>Log Out</span>
+            </a>
+
+
+<%--            <!-- User info bên phải -->--%>
+<%--            <div class="d-flex align-items-center gap-3">--%>
+<%--                <!-- Notification Bell -->--%>
+<%--                <div class="dropdown">--%>
+<%--                    <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.5rem;">--%>
+<%--                        <i class="bi bi-bell" style="font-size: 20px; color: #6b7280;"></i>--%>
+<%--                        <!-- Uncomment nếu có notifications -->--%>
+<%--                        &lt;%&ndash; <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">--%>
+<%--                            ${notificationCount}--%>
+<%--                        </span> &ndash;%&gt;--%>
+<%--                    </a>--%>
+<%--                    <ul class="dropdown-menu dropdown-menu-end" style="min-width: 280px;">--%>
+<%--                        <li><h6 class="dropdown-header">Notifications</h6></li>--%>
+<%--                        <li><hr class="dropdown-divider"></li>--%>
+<%--                        <li class="px-3 py-2 text-center text-muted">--%>
+<%--                            <i class="bi bi-inbox" style="font-size: 2rem;"></i>--%>
+<%--                            <p class="mb-0 mt-2">No new notifications</p>--%>
 <%--                        </li>--%>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/Home?action=logout">
-                                <i class="bi bi-box-arrow-right me-2"></i>
-                                <span>Log Out</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+<%--                        <li><hr class="dropdown-divider"></li>--%>
+<%--                        <li><a class="dropdown-item text-center small" href="${pageContext.request.contextPath}/accountant/notifications">View all notifications</a></li>--%>
+<%--                    </ul>--%>
+<%--                </div>--%>
+
+<%--                <!-- User Dropdown -->--%>
+<%--                <div class="dropdown">--%>
+<%--                    <a class="d-flex align-items-center text-decoration-none dropdown-toggle-custom"--%>
+<%--                       href="#"--%>
+<%--                       role="button"--%>
+<%--                       data-bs-toggle="dropdown"--%>
+<%--                       aria-expanded="false"--%>
+<%--                       style="padding: 0.5rem 0.75rem; border-radius: 10px; transition: background-color 0.2s;">--%>
+<%--                        <div class="text-end">--%>
+<%--                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 2px;">Welcome back,</div>--%>
+<%--                            <div style="font-weight: 600; color: #111827; line-height: 1.2;">${sessionScope.userName != null ? sessionScope.userName : 'User'}</div>--%>
+<%--                            <div style="font-size: 12px; color: #6b7280; margin-top: 2px;">${sessionScope.roleName != null ? sessionScope.roleName : 'Technician'}</div>--%>
+<%--                        </div>--%>
+<%--                        <i class="bi bi-chevron-down ms-2" style="font-size: 12px; color: #6b7280;"></i>--%>
+<%--                    </a>--%>
+<%--                    <ul class="dropdown-menu dropdown-menu-end" style="min-width: 200px;">--%>
+<%--                        <li>--%>
+<%--                            --%>
+<%--                        </li>--%>
+<%--&lt;%&ndash;                        <li>&ndash;%&gt;--%>
+<%--&lt;%&ndash;                            <a class="dropdown-item" href="${pageContext.request.contextPath}/user/settings">&ndash;%&gt;--%>
+<%--&lt;%&ndash;                                <i class="bi bi-gear me-2"></i>&ndash;%&gt;--%>
+<%--&lt;%&ndash;                                <span>Settings</span>&ndash;%&gt;--%>
+<%--&lt;%&ndash;                            </a>&ndash;%&gt;--%>
+<%--&lt;%&ndash;                        </li>&ndash;%&gt;--%>
+<%--                        <li><hr class="dropdown-divider"></li>--%>
+<%--                        <li>--%>
+<%--                           --%>
+<%--                        </li>--%>
+<%--                    </ul>--%>
+<%--                </div>--%>
+<%--            </div>--%>
         </div>
     </header>
 

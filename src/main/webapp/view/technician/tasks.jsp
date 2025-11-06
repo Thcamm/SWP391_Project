@@ -1,3 +1,4 @@
+
 <%--
   Created by IntelliJ IDEA.
   User: ADMIN
@@ -11,6 +12,21 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/technician/tasks.css"/>
+
+<c:url var="returnTo" value="/technician/tasks">
+    <c:if test="${not empty param.status}">
+        <c:param name="status" value="${param.status}" />
+    </c:if>
+    <c:if test="${not empty param.priority}">
+        <c:param name="priority" value="${param.priority}" />
+    </c:if>
+    <c:if test="${not empty param.search}">
+        <c:param name="search" value="${param.search}" />
+    </c:if>
+    <c:if test="${not empty param.page}">
+        <c:param name="page" value="${param.page}" />
+    </c:if>
+</c:url>
 
 
 <jsp:include page="header.jsp"/>
@@ -181,11 +197,10 @@
                                                               method="post" style="display: inline;">
                                                             <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
                                                             <input type="hidden" name="action" value="accept">
-                                                            <input type="hidden" name="returnTo" value="${pageContext.request.requestURL}?${pageContext.request.queryString}"/>
-                                                            <button type="submit" class="btn btn-accept btn-sm">
-                                                                Accept🐣
-                                                            </button>
+                                                            <input type="hidden" name="returnTo" value="${returnTo}"/>
+                                                            <button type="submit" class="btn btn-accept btn-sm">Accept🐣</button>
                                                         </form>
+
 
 
                                                         <button type="button" class="btn btn-sm btn-secondary" disabled

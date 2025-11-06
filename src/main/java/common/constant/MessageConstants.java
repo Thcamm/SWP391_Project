@@ -179,6 +179,20 @@ public class MessageConstants {
             "Task is waiting for customer response"
     );
 
+    public static final SystemMessage TASK013 = new SystemMessage(
+            "TASK013",
+            MessageType.VALIDATION,
+            "Task status required",
+            "You haved task in this time. It will be overlap with another task."
+    );
+
+    public static final SystemMessage TASK014 = new SystemMessage(
+            "TASK013",
+            MessageType.INFO,
+            "Data field required",
+            "Data field is null. Required"
+    );
+
     public static final SystemMessage PART001 = new SystemMessage(
             "PART001",
             MessageType.SUCCESS,

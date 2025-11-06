@@ -1,5 +1,6 @@
 package service.employee;
 
+import common.DbContext;
 import common.constant.MessageConstants;
 import common.message.ServiceResult;
 import common.utils.PaginationUtils;
@@ -14,6 +15,8 @@ import model.pagination.PaginationResponse;
 import model.servicetype.Service;
 
 import javax.swing.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -36,6 +39,7 @@ public class TechnicianService {
 
         Employee technician = technicianDAO.getTechnicianByUserId(userId);
         if(technician == null) {
+
             return ServiceResult.error(MessageConstants.ERR002); //data not found
         }
 
@@ -173,30 +177,96 @@ public class TechnicianService {
         return ServiceResult.success(null, stats);
     }
 
-    public ServiceResult acceptTask(int technicianId, int assignmentId) {
+
+    public ServiceResult acceptTaskTx(int technicianId, int assignmentId) {
         if (technicianId <= 0 || assignmentId <= 0) {
             return ServiceResult.error(MessageConstants.ERR003);
         }
 
-        TaskAssignment task = technicianDAO.getTaskById(assignmentId);
-        if (task == null) return ServiceResult.error(MessageConstants.ERR002);
-        if (task.getAssignToTechID() != technicianId) return ServiceResult.error(MessageConstants.TASK009);
-        if (task.getStatus() != TaskAssignment.TaskStatus.ASSIGNED) {
-            return ServiceResult.error(MessageConstants.TASK006); // ví dụ: "Trạng thái hiện tại không cho phép thao tác này"
+        try (Connection conn = DbContext.getConnection()) {
+            // Transaction bắt đầu
+            boolean oldAuto = conn.getAutoCommit();
+            try {
+                conn.setAutoCommit(false);
+                conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+
+                // 1) Khóa hàng assignment + join đầy đủ để map UI
+                TaskAssignment task = technicianDAO.getTaskForUpdate(conn, assignmentId);
+                if (task == null) {
+                    conn.rollback();
+                    return ServiceResult.error(MessageConstants.ERR002);
+                }
+                if (task.getAssignToTechID() != technicianId) {
+                    conn.rollback();
+                    return ServiceResult.error(MessageConstants.TASK009);
+                }
+                if (task.getStatus() != TaskAssignment.TaskStatus.ASSIGNED) {
+                    conn.rollback();
+                    return ServiceResult.error(MessageConstants.TASK006);
+                }
+
+                // 2) Validate planned window
+                LocalDateTime ps = task.getPlannedStart();
+                LocalDateTime pe = task.getPlannedEnd();
+                if (ps == null || pe == null || !pe.isAfter(ps)) {
+                    conn.rollback();
+                    return ServiceResult.error(MessageConstants.TASK014);
+                }
+
+                // 3) Check overlap tại thời điểm accept
+                boolean hasOverlap = technicianDAO.hasOverlapAssignments(conn, technicianId, ps, pe, assignmentId);
+                if (hasOverlap) {
+                    conn.rollback();
+                    return ServiceResult.error(MessageConstants.TASK013);
+                }
+
+                // 4) Check deadline accept (<= 10 phút sau planned_start)
+                final int GRACE_MINUTES = 10;
+                if (LocalDateTime.now().isAfter(ps.plusMinutes(GRACE_MINUTES))) {
+                    conn.rollback();
+                    return ServiceResult.error(MessageConstants.TASK012);
+                }
+
+                // 5) Update trạng thái có điều kiện (WHERE Status='ASSIGNED')
+                LocalDateTime now = LocalDateTime.now();
+                boolean ok = technicianDAO.updateTaskStatusWithStartTime(
+                        conn,
+                        assignmentId,
+                        TaskAssignment.TaskStatus.ASSIGNED,
+                        TaskAssignment.TaskStatus.IN_PROGRESS,
+                        now
+                );
+                if (!ok) {
+                    // có thể do race → đọc lại trạng thái
+                    TaskAssignment latest = technicianDAO.getTaskForUpdate(conn, assignmentId);
+                    conn.rollback();
+                    if (latest != null && latest.getStatus() == TaskAssignment.TaskStatus.IN_PROGRESS) {
+                        return ServiceResult.success(MessageConstants.TASK001);
+                    }
+                    return ServiceResult.error(MessageConstants.TASK005);
+                }
+
+                // 6) Log activity cùng transaction
+                technicianDAO.logActivity(conn, technicianId, TechnicianActivity.ActivityType.TASK_ACCEPTED,
+                        assignmentId, "Accepted task assignment ID: " + assignmentId);
+
+                conn.commit();
+                conn.setAutoCommit(oldAuto);
+                return ServiceResult.success(MessageConstants.TASK001);
+
+            } catch (SQLException ex) {
+                try { conn.rollback(); } catch (SQLException ignore) {}
+                return ServiceResult.error(MessageConstants.TASK005);
+            } finally {
+                try { conn.setAutoCommit(true); } catch (SQLException ignore) {}
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return ServiceResult.error(MessageConstants.TASK005);
         }
-
-        boolean ok = technicianDAO.updateTaskStatus(
-                assignmentId, TaskAssignment.TaskStatus.IN_PROGRESS, LocalDateTime.now()
-        );
-
-        if (!ok) return ServiceResult.error(MessageConstants.TASK005);
-
-        technicianDAO.logActivity(
-                technicianId, TechnicianActivity.ActivityType.TASK_ACCEPTED, assignmentId,
-                "Accepted task assignment ID: " + assignmentId
-        );
-        return ServiceResult.success(MessageConstants.TASK001);
     }
+
+
 
     public ServiceResult rejectTask (int technicianId, int assignmentId) {
         if (technicianId <= 0 || assignmentId <= 0) {

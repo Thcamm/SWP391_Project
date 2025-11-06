@@ -107,7 +107,7 @@
                                             <th>Description</th>
                                             <th>Est.</th>
                                             <th>Assigned</th>
-                                            <th class="text-end">Actions</th>
+
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -129,22 +129,22 @@
                                                 </td>
                                                 <td>${task.estimateHours}h</td>
                                                 <td>${task.assignedDateFormatted}</td>
-                                                <td>
-                                                    <div class="d-flex justify-content-end gap-2">
-                                                        <form action="${pageContext.request.contextPath}/technician/tasks-action" method="post" class="m-0">
-                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
-                                                            <input type="hidden" name="action" value="accept"/>
-                                                            <button class="btn btn-success btn-sm"
-                                                                    onclick="return confirm('Accept this task?')">Accept</button>
-                                                        </form>
-                                                        <form action="${pageContext.request.contextPath}/technician/tasks-action" method="post" class="m-0">
-                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
-                                                            <input type="hidden" name="action" value="reject"/>
-                                                            <button class="btn btn-outline-danger btn-sm"
-                                                                    onclick="return confirm('Reject this task?')">Reject</button>
-                                                        </form>
-                                                    </div>
-                                                </td>
+<%--                                                <td>--%>
+<%--                                                    <div class="d-flex justify-content-end gap-2">--%>
+<%--                                                        <form action="${pageContext.request.contextPath}/technician/tasks-action" method="post" class="m-0">--%>
+<%--                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>--%>
+<%--                                                            <input type="hidden" name="action" value="accept"/>--%>
+<%--                                                            <button class="btn btn-success btn-sm"--%>
+<%--                                                                    onclick="return confirm('Accept this task?')">Accept</button>--%>
+<%--                                                        </form>--%>
+<%--                                                        <form action="${pageContext.request.contextPath}/technician/tasks-action" method="post" class="m-0">--%>
+<%--                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>--%>
+<%--                                                            <input type="hidden" name="action" value="reject"/>--%>
+<%--                                                            <button class="btn btn-outline-danger btn-sm"--%>
+<%--                                                                    onclick="return confirm('Reject this task?')">Reject</button>--%>
+<%--                                                        </form>--%>
+<%--                                                    </div>--%>
+<%--                                                </td>--%>
                                             </tr>
                                         </c:forEach>
                                         </tbody>
@@ -191,7 +191,7 @@
                                             <th>Started</th>
                                             <th style="min-width: 200px;">Progress</th>
                                             <th>Notes</th>
-                                            <th class="text-end">Actions</th>
+
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -211,19 +211,19 @@
                                                 <td class="text-truncate" style="max-width: 220px;">
                                                         ${fn:substring(task.notes, 0, 30)}<c:if test="${fn:length(task.notes) > 30}">…</c:if>
                                                 </td>
-                                                <td>
-                                                    <div class="d-flex justify-content-end gap-2">
-                                                        <a class="btn btn-primary btn-sm"
-                                                           href="${pageContext.request.contextPath}/technician/update-progress-form?assignmentId=${task.assignmentID}">
-                                                            Update
-                                                        </a>
-                                                        <form action="${pageContext.request.contextPath}/technician/update-progress" method="post" class="m-0">
-                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
-                                                            <input type="hidden" name="action" value="complete"/>
-                                                            <button class="btn btn-success btn-sm">Complete</button>
-                                                        </form>
-                                                    </div>
-                                                </td>
+<%--                                                <td>--%>
+<%--                                                    <div class="d-flex justify-content-end gap-2">--%>
+<%--                                                        <a class="btn btn-primary btn-sm"--%>
+<%--                                                           href="${pageContext.request.contextPath}/technician/update-progress-form?assignmentId=${task.assignmentID}">--%>
+<%--                                                            Update--%>
+<%--                                                        </a>--%>
+<%--                                                        <form action="${pageContext.request.contextPath}/technician/update-progress" method="post" class="m-0">--%>
+<%--                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>--%>
+<%--                                                            <input type="hidden" name="action" value="complete"/>--%>
+<%--                                                            <button class="btn btn-success btn-sm">Complete</button>--%>
+<%--                                                        </form>--%>
+<%--                                                    </div>--%>
+<%--                                                </td>--%>
                                             </tr>
                                         </c:forEach>
                                         </tbody>
