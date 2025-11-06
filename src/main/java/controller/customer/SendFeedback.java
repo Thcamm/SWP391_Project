@@ -10,6 +10,7 @@ import model.user.User;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @WebServlet("/customer/send-feedback")
 public class SendFeedback extends HttpServlet {
@@ -23,7 +24,6 @@ public class SendFeedback extends HttpServlet {
         // Hiển thị form gửi feedback
         request.getRequestDispatcher("/view/customer/feedback-form.jsp").forward(request, response);
     }
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -39,20 +39,15 @@ public class SendFeedback extends HttpServlet {
             }
 
             int customerID = customerDAO.getCustomerIdByUserId(user.getUserId());
-            if (customerID == -1) {
-                throw new Exception("Không tìm thấy khách hàng tương ứng với tài khoản này.");
-            }
+            if (customerID == -1) throw new Exception("Không tìm thấy khách hàng.");
 
             int workOrderID = Integer.parseInt(request.getParameter("workOrderID"));
             String feedbackText = request.getParameter("feedbackText");
-            String ratingStr = request.getParameter("rating");
-
             Integer rating = null;
-            if (ratingStr != null && !ratingStr.isEmpty()) {
-                rating = Integer.parseInt(ratingStr);
-            }
+            String ratingStr = request.getParameter("rating");
+            if (ratingStr != null && !ratingStr.isEmpty()) rating = Integer.parseInt(ratingStr);
 
-            boolean isAnonymous = request.getParameter("isAnonymous") != null; // ✅ true nếu tick, false nếu không
+            boolean isAnonymous = request.getParameter("isAnonymous") != null;
 
             Feedback fb = new Feedback();
             fb.setCustomerID(customerID);
@@ -62,22 +57,24 @@ public class SendFeedback extends HttpServlet {
             fb.setAnonymous(isAnonymous);
             fb.setFeedbackDate(LocalDateTime.now());
 
-            boolean success = feedbackDAO.insertFeedback(fb);
+            // ✅ Insert và lấy feedbackID vừa tạo
+            int newFeedbackID = feedbackDAO.insertFeedbackReturnId(fb);
+            if (newFeedbackID == -1) throw new Exception("Lỗi khi lưu feedback.");
 
-            if (success) {
-                request.setAttribute("message", "Cảm ơn bạn đã gửi đánh giá!");
-                request.setAttribute("messageType", "success");
-            } else {
-                request.setAttribute("message", "❌ Lỗi khi gửi đánh giá. Vui lòng thử lại.");
-                request.setAttribute("messageType", "error");
-            }
+            // ✅ Load feedback vừa tạo để hiển thị
+            Feedback newFeedback = feedbackDAO.getFeedbackById(newFeedbackID);
+            request.setAttribute("feedbacks", List.of(newFeedback));
+            request.setAttribute("newFeedbackID", newFeedbackID);
+
+            // ✅ Forward sang view-feedback.jsp
+            request.getRequestDispatcher("/view/customer/view-feedback.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("message", "❌ Lỗi: " + e.getMessage());
             request.setAttribute("messageType", "error");
+            request.getRequestDispatcher("/view/customer/view-feedback.jsp").forward(request, response);
         }
-
-        request.getRequestDispatcher("/view/customer/view-feedback.jsp").forward(request, response);
     }
+
 }
