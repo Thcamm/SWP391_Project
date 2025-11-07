@@ -20,7 +20,7 @@ public class WorkOrder {
     // available)
 
     public enum Status {
-        PENDING, IN_PROCESS, COMPLETE
+        PENDING, IN_PROCESS, IN_PROGRESS, COMPLETE
     }
 
     public WorkOrder() {

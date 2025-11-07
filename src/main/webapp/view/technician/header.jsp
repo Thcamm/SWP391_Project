@@ -102,7 +102,6 @@
             }
         </style>
     </head>
-    <body>
 
     <header class="header">
         <div class="d-flex align-items-center justify-content-between position-relative">
