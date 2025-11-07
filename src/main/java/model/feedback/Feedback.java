@@ -10,27 +10,30 @@ public class Feedback {
     private Integer rating;
     private String feedbackText;
     private LocalDateTime feedbackDate;
-    private boolean isAnonymous;
+    private boolean anonymous;
     private String replyText;
     private LocalDateTime replyDate;
     private Integer replyBy;
+    private String Status;
 
     public Feedback() {
     }
 
     public Feedback(Integer feedbackID, Integer customerID, Integer workOrderID,
                     Integer rating, String feedbackText, LocalDateTime feedbackDate,
-                    boolean isAnonymous, String replyText, LocalDateTime replyDate, Integer replyBy) {
+                    boolean anonymous, String replyText, LocalDateTime replyDate, Integer replyBy,String Status) {
         this.feedbackID = feedbackID;
         this.customerID = customerID;
         this.workOrderID = workOrderID;
         this.rating = rating;
         this.feedbackText = feedbackText;
         this.feedbackDate = feedbackDate;
-        this.isAnonymous = isAnonymous;
+        this.anonymous = anonymous;
         this.replyText = replyText;
         this.replyDate = replyDate;
         this.replyBy = replyBy;
+        this.Status = Status;
+
     }
 
     public Integer getFeedbackID() {
@@ -82,11 +85,11 @@ public class Feedback {
     }
 
     public boolean isAnonymous() {
-        return isAnonymous;
+        return anonymous;
     }
 
     public void setAnonymous(boolean anonymous) {
-        isAnonymous = anonymous;
+        this.anonymous = anonymous;
     }
 
     public String getReplyText() {
@@ -113,6 +116,14 @@ public class Feedback {
         this.replyBy = replyBy;
     }
 
+    public String getStatus() {
+        return Status;
+    }
+
+    public void setStatus(String status) {
+        Status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -132,7 +143,7 @@ public class Feedback {
                 ", customerID=" + customerID +
                 ", workOrderID=" + workOrderID +
                 ", rating=" + rating +
-                ", isAnonymous=" + isAnonymous +
+                ", isAnonymous=" + anonymous +
                 ", feedbackText='" + feedbackText + '\'' +
                 ", replyText='" + replyText + '\'' +
                 '}';

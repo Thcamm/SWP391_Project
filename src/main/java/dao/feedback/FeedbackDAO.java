@@ -2,11 +2,15 @@ package dao.feedback;
 
 import common.DbContext;
 import model.feedback.Feedback;
+import model.invoice.Invoice;
+import model.workorder.WorkOrder;
 
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FeedbackDAO extends DbContext {
 
@@ -112,5 +116,135 @@ public class FeedbackDAO extends DbContext {
             }
         }
         return list;
+    }
+    public int countPaidWorkOrdersByCustomer(int customerId) throws SQLException {
+        String sql =
+                "SELECT COUNT(*) " +
+                        "FROM WorkOrder wo " +
+                        "INNER JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
+                        "INNER JOIN Invoice i ON wo.WorkOrderID = i.WorkOrderID " +
+                        "WHERE sr.CustomerID = ? AND i.PaymentStatus = 'PAID'";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, customerId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+    public boolean replyFeedback(int feedbackID, String replyText, int repliedBy) throws SQLException {
+        String sql = "UPDATE feedback SET ReplyText = ?, ReplyDate = NOW(), RepliedBy = ?, Status = 'REPLIED' WHERE FeedbackID = ?";
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setString(1, replyText);
+            ps.setInt(2, repliedBy);
+            ps.setInt(3, feedbackID);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    public List<Map<String, Object>> getPaidWorkOrdersWithFeedback(int customerId, int limit, int offset) throws SQLException {
+        String sql = """
+            SELECT 
+                wo.WorkOrderID, wo.TechManagerID, wo.RequestID,
+                wo.EstimateAmount, wo.Status AS WOStatus, wo.CreatedAt AS WOCreatedAt,
+
+                i.InvoiceID, i.InvoiceNumber, i.InvoiceDate, i.PaymentStatus,
+                i.CreatedAt AS InvCreatedAt, i.UpdatedAt AS InvUpdatedAt,
+
+                f.FeedbackID, f.Rating, f.FeedbackText, f.FeedbackDate,
+                f.ReplyText, f.ReplyDate, f.Status AS FeedbackStatus
+
+            FROM WorkOrder wo
+            INNER JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID
+            INNER JOIN Invoice i ON wo.WorkOrderID = i.WorkOrderID
+            LEFT JOIN Feedback f ON wo.WorkOrderID = f.WorkOrderID
+            WHERE sr.CustomerID = ? AND i.PaymentStatus = 'PAID'
+            ORDER BY i.UpdatedAt DESC
+            LIMIT ? OFFSET ?
+        """;
+
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, customerId);
+            ps.setInt(2, limit);
+            ps.setInt(3, offset);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> record = new HashMap<>();
+                    record.put("workOrder", extractWorkOrder(rs));
+                    record.put("invoice", extractInvoice(rs));
+                    record.put("feedback", extractFeedback(rs));
+                    list.add(record);
+                }
+            }
+        }
+
+        return list;
+    }
+
+    // ================= HELPER METHODS =================
+
+    private WorkOrder extractWorkOrder(ResultSet rs) throws SQLException {
+        WorkOrder wo = new WorkOrder();
+        wo.setWorkOrderId(rs.getInt("WorkOrderID"));
+        wo.setTechManagerId(rs.getInt("TechManagerID"));
+        wo.setRequestId(rs.getInt("RequestID"));
+        wo.setEstimateAmount(rs.getBigDecimal("EstimateAmount"));
+
+        // Chuyển string status -> enum WorkOrder.Status
+        String statusStr = rs.getString("WOStatus");
+        if (statusStr != null) {
+            try {
+                wo.setStatus(WorkOrder.Status.valueOf(statusStr.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                wo.setStatus(WorkOrder.Status.PENDING);
+            }
+        }
+
+        wo.setCreatedAt(rs.getTimestamp("WOCreatedAt"));
+        return wo;
+    }
+
+    private Invoice extractInvoice(ResultSet rs) throws SQLException {
+        int id = rs.getInt("InvoiceID");
+        if (rs.wasNull()) return null;
+
+        Invoice inv = new Invoice();
+        inv.setInvoiceID(id);
+        inv.setInvoiceNumber(rs.getString("InvoiceNumber"));
+        inv.setInvoiceDate(rs.getDate("InvoiceDate"));
+        inv.setPaymentStatus(rs.getString("PaymentStatus"));
+        inv.setCreatedAt(rs.getTimestamp("InvCreatedAt"));
+        inv.setUpdatedAt(rs.getTimestamp("InvUpdatedAt"));
+        return inv;
+    }
+
+    private Feedback extractFeedback(ResultSet rs) throws SQLException {
+        int id = rs.getInt("FeedbackID");
+        if (rs.wasNull()) return null;
+
+        Feedback fb = new Feedback();
+        fb.setFeedbackID(id);
+        fb.setRating(rs.getInt("Rating"));
+        fb.setFeedbackText(rs.getString("FeedbackText"));
+        fb.setFeedbackDate(toLocalDateTime(rs.getTimestamp("FeedbackDate")));
+        fb.setReplyText(rs.getString("ReplyText"));
+        fb.setReplyDate(toLocalDateTime(rs.getTimestamp("ReplyDate")));
+        fb.setStatus(rs.getString("FeedbackStatus"));
+        return fb;
+    }
+
+    private java.time.LocalDateTime toLocalDateTime(Timestamp ts) {
+        return ts != null ? ts.toLocalDateTime() : null;
     }
 }

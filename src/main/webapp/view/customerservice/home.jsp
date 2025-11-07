@@ -21,10 +21,7 @@
                            align-items: center; justify-content: center;
                             text-align: center;">
                     <!-- Nội dung trang home của bạn ở đây -->
-                    <div style="max-width: 800px; width: 100%;">
-                        <h2 style="margin-bottom: 1rem; font-size: 32px; font-weight: 700; color: #111827;">Dashboard</h2>
-                        <p style="color: #6b7280; font-size: 16px;">Welcome to Customer Service Dashboard</p>
-                    </div>
+z
                 </div>
             </main>
         </div>

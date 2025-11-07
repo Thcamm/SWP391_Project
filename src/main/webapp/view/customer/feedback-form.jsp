@@ -3,7 +3,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Gửi đánh giá dịch vụ</title>
+    <title>Submit service review</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -34,9 +34,10 @@
     </style>
 </head>
 <body>
+<jsp:include page="/common/header.jsp" />
 <jsp:include page="/view/customerservice/result.jsp" />
 <div class="feedback-card">
-    <h3 class="text-center mb-4">💬 Gửi đánh giá dịch vụ</h3>
+    <h3 class="text-center mb-4" style="color: #5a6268">Submit service review</h3>
 
     <c:if test="${not empty message}">
         <div class="alert alert-info text-center">${message}</div>
@@ -47,7 +48,7 @@
 
         <!-- Rating -->
         <div class="mb-3 text-center">
-            <label class="form-label d-block">Đánh giá chất lượng:</label>
+            <label class="form-label d-block">Quality assessment:</label>
             <div class="star-rating">
                 <input type="hidden" name="rating" id="rating" value="0">
                 <i class="fa fa-star" data-value="1"></i>
@@ -60,18 +61,18 @@
 
         <!-- Nội dung -->
         <div class="mb-3">
-            <label for="feedbackText" class="form-label">Nhận xét của bạn:</label>
+            <label for="feedbackText" class="form-label">Your feedback:</label>
             <textarea class="form-control" id="feedbackText" name="feedbackText" rows="4"
-                      placeholder="Chia sẻ cảm nhận của bạn về dịch vụ..."></textarea>
+                      placeholder="Share your thoughts about the service..."></textarea>
         </div>
 
         <!-- Ẩn danh -->
-        <div class="form-check mb-3">
+        <div class="form-check mb-3" style="color: #5a6268">
             <input class="form-check-input" type="checkbox" id="isAnonymous" name="isAnonymous">
-            <label class="form-check-label" for="isAnonymous">Gửi ẩn danh</label>
+            <label class="form-check-label" for="isAnonymous">Send Anonymous</label>
         </div>
 
-        <button type="submit" class="btn btn-dark w-100">Gửi đánh giá</button>
+        <button type="submit" class="btn btn-dark w-100">Send Feedback</button>
     </form>
 </div>
 
@@ -87,6 +88,6 @@
         });
     });
 </script>
-
+<jsp:include page="/common/footer.jsp" />
 </body>
 </html>

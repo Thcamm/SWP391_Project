@@ -63,20 +63,15 @@ public class SendFeedback extends HttpServlet {
             // Lưu và lấy feedbackID vừa tạo
             int newFeedbackID = feedbackDAO.insertFeedbackReturnId(fb);
             if (newFeedbackID == -1) throw new Exception("Lỗi khi lưu feedback.");
-
-            // Lấy feedback vừa tạo
-            Feedback newFeedback = feedbackDAO.getFeedbackById(newFeedbackID);
-            request.setAttribute("feedbacks", List.of(newFeedback));
-            request.setAttribute("newFeedbackID", newFeedbackID);
+            response.sendRedirect(request.getContextPath() + "/customer/view-feedback?feedbackId=" + newFeedbackID);
+            return;
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("message", " Lỗi: " + e.getMessage());
+            // Nếu lỗi thì quay về form feedback
+            request.setAttribute("message", "Lỗi: " + e.getMessage());
             request.setAttribute("messageType", "error");
-            request.setAttribute("feedbacks", null);
+            request.getRequestDispatcher("/view/customer/feedback-form.jsp").forward(request, response);
         }
-
-        // Forward sang view-feedback.jsp
-        request.getRequestDispatcher("/view/customer/view-feedback.jsp").forward(request, response);
     }
 }

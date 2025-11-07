@@ -151,7 +151,7 @@
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link"
-                       href="${pageContext.request.contextPath}/customerservice/reply-feedback">
+                       href="${pageContext.request.contextPath}/view/customerservice/reply-feedback.jsp">
                         <i class="bi bi-clock-history text-danger"></i>
                         <span>Feedback Reply</span>
                     </a>

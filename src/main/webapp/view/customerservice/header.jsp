@@ -119,24 +119,7 @@
                         <i class="bi bi-house-door me-1"></i>Home
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/customerservice/search-customer"
-                       class="nav-link ${pageContext.request.requestURI.contains('/search-customer') ? 'active' : ''}">
-                        <i class="bi bi-receipt me-1"></i>Customer List
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/customerservice/appointment-list"
-                       class="nav-link ${pageContext.request.requestURI.contains('/appointment-list') ? 'active' : ''}">
-                        <i class="bi bi-cash-coin me-1"></i>Appointment List
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/customerservice/"
-                       class="nav-link ${pageContext.request.requestURI.contains('/report') ? 'active' : ''}">
-                        <i class="bi bi-graph-up me-1"></i>Reports
-                    </a>
-                </li>
+
             </ul>
         </nav>
 
