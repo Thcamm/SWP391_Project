@@ -25,7 +25,7 @@ public class DbContext {
 
     private static final String JDBC_URL = ENV_URL + JDBC_PARAMS;
     private static final String JDBC_USER = getEnvOrDefault("DB_USER", "root");
-    private static final String JDBC_PASS = getEnvOrDefault("DB_PASS", "1234");
+    private static final String JDBC_PASS = getEnvOrDefault("DB_PASS", "admin");
 
     static {
         try {
@@ -119,8 +119,6 @@ public class DbContext {
             }
         }
     }
-
-
 
     /* ========= INSTANCE ALIASES (dùng khi extends) ========= */
 

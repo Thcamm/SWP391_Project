@@ -6,6 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="context-path" content="${pageContext.request.contextPath}">
     <title>Assign Diagnosis - Tech Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/techmanager/base-techmanager.css">
@@ -181,7 +182,7 @@
 
                         <div class="mb-3">
                             <label for="technicianId" class="form-label">Select Technician <span class="text-danger">*</span></label>
-                            <select class="form-select" name="technicianId" id="technicianId" required>
+                            <select class="form-select" name="technicianId" id="technicianId" required onchange="loadTechnicianSchedule()">
                                 <option value="">-- Choose Technician --</option>
                                 <c:forEach items="${technicians}" var="tech">
                                     <option value="${tech.employeeId}">
@@ -189,6 +190,36 @@
                                     </option>
                                 </c:forEach>
                             </select>
+                        </div>
+
+                        <!-- NEW: Scheduling Section -->
+                        <div class="card mb-3 border-info">
+                            <div class="card-header bg-info text-white">
+                                <i class="bi bi-calendar-check"></i> Task Scheduling (Optional)
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="plannedStart" class="form-label">Planned Start Time</label>
+                                        <input type="datetime-local" class="form-control" name="plannedStart" id="plannedStart">
+                                        <small class="form-text text-muted">When technician should start</small>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="plannedEnd" class="form-label">Planned End Time</label>
+                                        <input type="datetime-local" class="form-control" name="plannedEnd" id="plannedEnd">
+                                        <small class="form-text text-muted">Expected completion time</small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Technician Schedule Preview -->
+                                <div id="schedulePreview" class="alert alert-light d-none">
+                                    <strong><i class="bi bi-clock-history"></i> Technician's Schedule:</strong>
+                                    <div id="scheduleContent" class="mt-2"></div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="refreshSchedule()">
+                                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mb-3">
@@ -219,28 +250,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function prepareAssignment(button) {
-            const detailId = button.getAttribute('data-detail-id');
-            const workOrderId = button.getAttribute('data-wo-id');
-            const vehicleInfo = button.getAttribute('data-vehicle');
-            const taskDesc = button.getAttribute('data-task');
-            
-            document.getElementById('modalDetailId').value = detailId;
-            document.getElementById('modalWorkOrderInfo').textContent = 'WorkOrder #' + workOrderId;
-            document.getElementById('modalVehicleInfo').textContent = vehicleInfo;
-            document.getElementById('modalTaskDesc').textContent = taskDesc;
-        }
-
-        // Auto-dismiss alerts after 5 seconds
-        setTimeout(function() {
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            });
-        }, 5000);
-    </script>
+    <script src="${pageContext.request.contextPath}/assets/js/techmanager/assign-diagnosis.js"></script>
     
     <%@ include file="footer-techmanager.jsp" %>
 </body>

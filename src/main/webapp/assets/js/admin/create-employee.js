@@ -8,9 +8,9 @@ document.getElementById("roleId").addEventListener("change", function () {
     const timestamp = new Date().getTime().toString().slice(-4);
     const suggestedCode = rolePrefix + timestamp;
 
-    employeeCodeField.placeholder = `Suggestion: ${suggestedCode}`;
+    employeeCodeField.placeholder = `${suggestedCode}`;
   } else {
-    employeeCodeField.placeholder = "Automatically generated if left blank";
+    employeeCodeField.placeholder = "Automatically generated";
   }
 });
 

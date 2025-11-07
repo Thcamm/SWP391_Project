@@ -38,7 +38,47 @@ public class TaskAssignment {
     private static final DateTimeFormatter D_HM = DateTimeFormatter.ofPattern("dd/MM HH:mm");
     private static final DateTimeFormatter D_M_Y_HM = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    // ===== Enums =====
+    public String getAssignedDateFormatted() {
+        if (assignedDateFormatted != null && !assignedDateFormatted.isEmpty())
+            return assignedDateFormatted;
+        return assignedDate != null ? assignedDate.format(D_HM) : "-";
+    }
+
+    public void setAssignedDateFormatted(String assignedDateFormatted) {
+        this.assignedDateFormatted = assignedDateFormatted;
+    }
+
+    public String getStartAtFormatted() {
+        return startAt != null ? startAt.format(D_HM) : "-";
+    }
+
+    public String getCompleteAtFormatted() {
+        return completeAt != null ? completeAt.format(D_M_Y_HM) : "-";
+    }
+
+    public String getPlannedStartFormatted() {
+        return plannedStart != null ? plannedStart.format(D_M_Y_HM) : "-";
+    }
+
+    public String getPlannedEndFormatted() {
+        return plannedEnd != null ? plannedEnd.format(D_M_Y_HM) : "-";
+    }
+
+    public String getDeclinedAtFormatted() {
+        return declinedAt != null ? declinedAt.format(D_M_Y_HM) : "-";
+    }
+
+    public boolean isOverdue() {
+        return status == TaskStatus.ASSIGNED
+                && startAt == null
+                && plannedStart != null
+                && LocalDateTime.now().isAfter(plannedStart);
+    }
+
+    public boolean isDeclined() {
+        return declinedAt != null && status == TaskStatus.CANCELLED;
+    }
+
     public enum TaskType {
         DIAGNOSIS, REPAIR, OTHER;
         public static TaskType fromString(String type) {
@@ -133,20 +173,25 @@ public class TaskAssignment {
     public int getAssignmentID() { return assignmentID; }
     public void setAssignmentID(int assignmentID) { this.assignmentID = assignmentID; }
 
-    public int getDetailID() { return detailID; }
-    public void setDetailID(int detailID) { this.detailID = detailID; }
+    public int getAssignToTechID() {
+        return assignToTechID;
+    }
 
-    public int getAssignToTechID() { return assignToTechID; }
-    public void setAssignToTechID(int assignToTechID) { this.assignToTechID = assignToTechID; }
+    public void setAssignToTechID(int assignToTechID) {
+        this.assignToTechID = assignToTechID;
+    }
 
-    public LocalDateTime getAssignedDate() { return assignedDate; }
-    public void setAssignedDate(LocalDateTime assignedDate) { this.assignedDate = assignedDate; }
+    public LocalDateTime getAssignedDate() {
+        return assignedDate;
+    }
 
-    public LocalDateTime getStartAt() { return startAt; }
-    public void setStartAt(LocalDateTime startAt) { this.startAt = startAt; }
+    public void setAssignedDate(LocalDateTime assignedDate) {
+        this.assignedDate = assignedDate;
+    }
 
-    public LocalDateTime getCompleteAt() { return completeAt; }
-    public void setCompleteAt(LocalDateTime completeAt) { this.completeAt = completeAt; }
+    public LocalDateTime getStartAt() {
+        return startAt;
+    }
 
     public LocalDateTime getPlannedStart() { return plannedStart; }
     public void setPlannedStart(LocalDateTime plannedStart) { this.plannedStart = plannedStart; }
@@ -163,37 +208,139 @@ public class TaskAssignment {
     public String getTaskDescription() { return taskDescription; }
     public void setTaskDescription(String taskDescription) { this.taskDescription = taskDescription; }
 
-    public TaskType getTaskType() { return taskType; }
-    public void setTaskType(TaskType taskType) { this.taskType = taskType; }
-    public void setTaskType(String taskType) { this.taskType = TaskType.fromString(taskType); }
+    public LocalDateTime getCompleteAt() {
+        return completeAt;
+    }
 
-    public Priority getPriority() { return priority; }
-    public void setPriority(Priority priority) { this.priority = priority; }
-    public void setPriority(String priority) { this.priority = Priority.fromString(priority); }
+    public void setCompleteAt(LocalDateTime completeAt) {
+        this.completeAt = completeAt;
+    }
 
-    public TaskStatus getStatus() { return status; }
-    public void setStatus(TaskStatus status) { this.status = status; }
-    public void setStatus(String status) { this.status = TaskStatus.fromString(status); }
+    public String getTaskDescription() {
+        return taskDescription;
+    }
 
-    public int getProgressPercentage() { return progressPercentage; }
+    public void setTaskDescription(String taskDescription) {
+        this.taskDescription = taskDescription;
+    }
+
+    public TaskType getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(TaskType taskType) {
+        this.taskType = taskType;
+    }
+
+    public void setTaskType(String taskType) {
+        this.taskType = TaskType.fromString(taskType);
+    }
+
+    public Priority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = Priority.fromString(priority);
+    }
+
+    public TaskStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
+
+    public void setStatus(String status) {
+        this.status = TaskStatus.fromString(status);
+    }
+
+    public int getProgressPercentage() {
+        return progressPercentage;
+    }
+
     public void setProgressPercentage(int progressPercentage) {
         this.progressPercentage = Math.min(100, Math.max(0, progressPercentage));
     }
 
-    public String getNotes() { return notes; }
-    public void setNotes(String notes) { this.notes = notes; }
+    public String getNotes() {
+        return notes;
+    }
 
-    public String getVehicleInfo() { return vehicleInfo; }
-    public void setVehicleInfo(String vehicleInfo) { this.vehicleInfo = vehicleInfo; }
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
 
-    public String getServiceInfo() { return serviceInfo; }
-    public void setServiceInfo(String serviceInfo) { this.serviceInfo = serviceInfo; }
+    public String getVehicleInfo() {
+        return vehicleInfo;
+    }
 
-    public String getCustomerName() { return customerName; }
-    public void setCustomerName(String customerName) { this.customerName = customerName; }
+    public void setVehicleInfo(String vehicleInfo) {
+        this.vehicleInfo = vehicleInfo;
+    }
 
-    public double getEstimateHours() { return estimateHours; }
-    public void setEstimateHours(double estimateHours) { this.estimateHours = estimateHours; }
+    public String getServiceInfo() {
+        return serviceInfo;
+    }
+
+    public void setServiceInfo(String serviceInfo) {
+        this.serviceInfo = serviceInfo;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public double getEstimateHours() {
+        return estimateHours;
+    }
+
+    public void setEstimateHours(double estimateHours) {
+        this.estimateHours = estimateHours;
+    }
+
+    // NEW: Scheduling getters/setters
+    public LocalDateTime getPlannedStart() {
+        return plannedStart;
+    }
+
+    public void setPlannedStart(LocalDateTime plannedStart) {
+        this.plannedStart = plannedStart;
+    }
+
+    public LocalDateTime getPlannedEnd() {
+        return plannedEnd;
+    }
+
+    public void setPlannedEnd(LocalDateTime plannedEnd) {
+        this.plannedEnd = plannedEnd;
+    }
+
+    // NEW: Decline handling getters/setters
+    public LocalDateTime getDeclinedAt() {
+        return declinedAt;
+    }
+
+    public void setDeclinedAt(LocalDateTime declinedAt) {
+        this.declinedAt = declinedAt;
+    }
+
+    public String getDeclineReason() {
+        return declineReason;
+    }
+
+    public void setDeclineReason(String declineReason) {
+        this.declineReason = declineReason;
+    }
 
     @Override
     public String toString() {

@@ -1,24 +1,14 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib
-uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> <%@ taglib
-uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
+prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard - Tech Manager</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="${pageContext.request.contextPath}/assets/css/techmanager/base-techmanager.css"
-    />
-    <link
-      rel="stylesheet"
-      href="${pageContext.request.contextPath}/assets/css/techmanager/dashboard-techmanager.css"
-    />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/techmanager/base-techmanager.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/techmanager/dashboard-techmanager.css" />
   </head>
   <body>
     <div class="main-container">
@@ -41,37 +31,87 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               </h2>
               <p class="text-muted mb-0">Overview of all service operations</p>
             </div>
-            <button
-              type="button"
-              class="btn btn-outline-secondary"
-              onclick="window.location.reload();"
-            >
-              <i class="bi bi-arrow-clockwise"></i> Refresh
+            <button type="button" class="btn btn-outline-secondary" onclick="window.location.reload();">
+              <i class="bi bi-arrow-clockwise"></i>
+              Refresh
             </button>
           </div>
         </div>
 
         <!-- Quick Stats -->
         <div class="row mb-4">
-          <!-- Rejected Tasks Alert (if any) -->
+          <!-- ALERT 1: Tasks Need Reassignment (Overdue + Declined) -->
+          <c:if test="${stats.tasksNeedReassignment > 0}">
+            <div class="col-md-12 mb-3">
+              <div class="alert alert-danger d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill me-3"></i>
+                <div class="flex-grow-1">
+                  <strong>⚠️ ${stats.tasksNeedReassignment} Task(s) Need Reassignment</strong>
+                  <p class="mb-0">
+                    <c:if test="${stats.overdueTasks > 0}">
+                      <span class="badge bg-danger">${stats.overdueTasks} Overdue (SLA)</span>
+                    </c:if>
+                    <c:if test="${stats.declinedTasks > 0}">
+                      <span class="badge bg-warning text-dark ms-2">
+                        ${stats.declinedTasks} Declined by Technicians
+                      </span>
+                    </c:if>
+                  </p>
+                </div>
+                <a href="${pageContext.request.contextPath}/techmanager/tasks-need-reassignment" class="btn btn-danger">
+                  <i class="bi bi-arrow-right"></i>
+                  View & Reassign
+                </a>
+              </div>
+            </div>
+          </c:if>
+
+          <!-- ALERT 2: Overdue Tasks (SLA Violation) -->
+          <c:if test="${stats.overdueTasks > 0}">
+            <div class="col-md-12 mb-3">
+              <div class="alert alert-warning d-flex align-items-center">
+                <i class="bi bi-clock-history me-3"></i>
+                <div class="flex-grow-1">
+                  <strong>🕐 ${stats.overdueTasks} Task(s) Overdue</strong>
+                  <p class="mb-0">Technicians haven't started these tasks past the planned start time.</p>
+                </div>
+                <a href="${pageContext.request.contextPath}/techmanager/overdue-tasks" class="btn btn-warning">
+                  <i class="bi bi-arrow-right"></i>
+                  Monitor & Cancel
+                </a>
+              </div>
+            </div>
+          </c:if>
+
+          <!-- ALERT 3: Declined Tasks -->
+          <c:if test="${stats.declinedTasks > 0}">
+            <div class="col-md-12 mb-3">
+              <div class="alert alert-info d-flex align-items-center">
+                <i class="bi bi-hand-thumbs-down-fill me-3"></i>
+                <div class="flex-grow-1">
+                  <strong> ${stats.declinedTasks} Task(s) Declined by Technicians</strong>
+                  <p class="mb-0">Technicians proactively declined these tasks with reasons.</p>
+                </div>
+                <a href="${pageContext.request.contextPath}/techmanager/declined-tasks" class="btn btn-info">
+                  <i class="bi bi-arrow-right"></i>
+                  View Reasons
+                </a>
+              </div>
+            </div>
+          </c:if>
+
+          <!-- OLD ALERT: Rejected Tasks (Keep for backward compatibility) -->
           <c:if test="${stats.rejectedTasks > 0}">
             <div class="col-md-12 mb-3">
               <div class="alert alert-danger d-flex align-items-center">
                 <i class="bi bi-exclamation-triangle-fill me-3"></i>
                 <div class="flex-grow-1">
-                  <strong
-                    >⚠️ ${stats.rejectedTasks} Task(s) Rejected by
-                    Technicians</strong
-                  >
-                  <p class="mb-0">
-                    These tasks need to be reassigned to other technicians.
-                  </p>
+                  <strong>⚠️ ${stats.rejectedTasks} Task(s) Rejected by Technicians</strong>
+                  <p class="mb-0">These tasks need to be reassigned to other technicians.</p>
                 </div>
-                <a
-                  href="${pageContext.request.contextPath}/techmanager/rejected-tasks"
-                  class="btn btn-danger"
-                >
-                  <i class="bi bi-arrow-right"></i> View & Reassign
+                <a href="${pageContext.request.contextPath}/techmanager/rejected-tasks" class="btn btn-danger">
+                  <i class="bi bi-arrow-right"></i>
+                  View & Reassign
                 </a>
               </div>
             </div>
@@ -149,7 +189,8 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             <div class="card">
               <div class="card-header bg-primary text-white">
                 <h5 class="mb-0">
-                  <i class="bi bi-clipboard-check"></i> Service Requests
+                  <i class="bi bi-clipboard-check"></i>
+                  Service Requests
                 </h5>
               </div>
               <div class="card-body">
@@ -162,16 +203,14 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                             <i class="bi bi-hourglass-split"></i>
                           </div>
                           <div class="flex-grow-1">
-                            <p class="mb-0 text-muted small">
-                              Pending Service Requests
-                            </p>
+                            <p class="mb-0 text-muted small">Pending Service Requests</p>
                             <h4 class="mb-0">${stats.pendingRequests}</h4>
                           </div>
                           <a
                             href="${pageContext.request.contextPath}/techmanager/service-requests"
-                            class="btn btn-sm btn-primary"
-                          >
-                            <i class="bi bi-arrow-right"></i> View
+                            class="btn btn-sm btn-primary">
+                            <i class="bi bi-arrow-right"></i>
+                            View
                           </a>
                         </div>
                       </div>
@@ -190,9 +229,9 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                           </div>
                           <a
                             href="${pageContext.request.contextPath}/techmanager/assign-repair"
-                            class="btn btn-sm btn-success"
-                          >
-                            <i class="bi bi-arrow-right"></i> Assign
+                            class="btn btn-sm btn-success">
+                            <i class="bi bi-arrow-right"></i>
+                            Assign
                           </a>
                         </div>
                       </div>
@@ -210,7 +249,8 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             <div class="card">
               <div class="card-header bg-info text-white">
                 <h5 class="mb-0">
-                  <i class="bi bi-search"></i> Diagnosis Tasks
+                  <i class="bi bi-search"></i>
+                  Diagnosis Tasks
                 </h5>
               </div>
               <div class="card-body">
@@ -223,16 +263,14 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                             <i class="bi bi-person-plus"></i>
                           </div>
                           <div class="flex-grow-1">
-                            <p class="mb-0 text-muted small">
-                              Assigned Diagnosis
-                            </p>
+                            <p class="mb-0 text-muted small">Assigned Diagnosis</p>
                             <h4 class="mb-0">${stats.assignedDiagnosis}</h4>
                           </div>
                           <a
                             href="${pageContext.request.contextPath}/techmanager/assign-diagnosis"
-                            class="btn btn-sm btn-info"
-                          >
-                            <i class="bi bi-arrow-right"></i> Assign
+                            class="btn btn-sm btn-info">
+                            <i class="bi bi-arrow-right"></i>
+                            Assign
                           </a>
                         </div>
                       </div>
@@ -262,9 +300,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                             <i class="bi bi-file-earmark-text"></i>
                           </div>
                           <div class="flex-grow-1">
-                            <p class="mb-0 text-muted small">
-                              Pending Customer Approval
-                            </p>
+                            <p class="mb-0 text-muted small">Pending Customer Approval</p>
                             <h4 class="mb-0">${stats.pendingQuotes}</h4>
                           </div>
                           <span class="badge bg-secondary">Waiting</span>
@@ -283,7 +319,10 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           <div class="col-md-12">
             <div class="card">
               <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0"><i class="bi bi-wrench"></i> Repair Tasks</h5>
+                <h5 class="mb-0">
+                  <i class="bi bi-wrench"></i>
+                  Repair Tasks
+                </h5>
               </div>
               <div class="card-body">
                 <div class="row">
@@ -311,12 +350,10 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                             <i class="bi bi-check-circle"></i>
                           </div>
                           <div class="flex-grow-1">
-                            <p class="mb-0 text-muted small">
-                              Completed Repairs
-                            </p>
+                            <p class="mb-0 text-muted small">Completed Repairs</p>
                             <h4 class="mb-0">${stats.completedRepairs}</h4>
                           </div>
-                          <span class="badge bg-success">Done</span>
+                            <span class="badge bg-warning">In Progress</span>
                         </div>
                       </div>
                     </div>

@@ -174,7 +174,7 @@
                                             
                                             <div class="mb-3">
                                                 <label class="form-label">Select Technician <span class="text-danger">*</span></label>
-                                                <select name="technicianId" class="form-select" required>
+                                                <select name="technicianId" id="technicianId_${quote.detailId}" class="form-select" required onchange="loadSchedule('${quote.detailId}')">
                                                     <option value="">-- Select Technician --</option>
                                                     <c:forEach var="tech" items="${availableTechnicians}">
                                                         <option value="${tech.employeeId}">
@@ -186,6 +186,39 @@
                                                 <small class="text-muted">
                                                     Technicians are sorted by workload (least busy first)
                                                 </small>
+                                            </div>
+                                            
+                                            <!-- NEW: Scheduling Section -->
+                                            <div class="card mb-3 border-info">
+                                                <div class="card-header bg-info text-white">
+                                                    <i class="bi bi-calendar-check"></i> Task Scheduling (Optional)
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6 mb-3">
+                                                            <label for="plannedStart_${quote.detailId}" class="form-label">Planned Start</label>
+                                                            <input type="datetime-local" class="form-control" 
+                                                                   name="plannedStart" id="plannedStart_${quote.detailId}"
+                                                                   onchange="loadSchedule('${quote.detailId}')">
+                                                            <small class="text-muted">When to start</small>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3">
+                                                            <label for="plannedEnd_${quote.detailId}" class="form-label">Planned End</label>
+                                                            <input type="datetime-local" class="form-control" 
+                                                                   name="plannedEnd" id="plannedEnd_${quote.detailId}">
+                                                            <small class="text-muted">Expected finish</small>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Schedule Preview -->
+                                                    <div id="schedulePreview_${quote.detailId}" class="alert alert-light d-none">
+                                                        <strong><i class="bi bi-clock-history"></i> Technician's Schedule:</strong>
+                                                        <div id="scheduleContent_${quote.detailId}" class="mt-2"></div>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="refreshSchedule('${quote.detailId}')">
+                                                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                             
                                             <div class="mb-3">
@@ -226,5 +259,55 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Load technician schedule via AJAX
+        function loadSchedule(detailId) {
+            const technicianId = document.getElementById('technicianId_' + detailId).value;
+            const plannedStart = document.getElementById('plannedStart_' + detailId).value;
+            
+            if (!technicianId || !plannedStart) return;
+            
+            const date = plannedStart.split('T')[0];
+            const url = '${pageContext.request.contextPath}/techmanager/technician-schedule?technicianId=' + technicianId + '&date=' + date;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displaySchedule(detailId, data);
+                    } else {
+                        console.error('Failed to load schedule:', data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        
+        function displaySchedule(detailId, data) {
+            const schedulePreview = document.getElementById('schedulePreview_' + detailId);
+            const scheduleContent = document.getElementById('scheduleContent_' + detailId);
+            
+            if (data.totalTasks === 0) {
+                scheduleContent.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> No tasks scheduled. Technician is available!</span>';
+            } else {
+                let html = '<div class="table-responsive"><table class="table table-sm table-bordered">';
+                html += '<thead><tr><th>Time</th><th>Type</th><th>Vehicle</th><th>Status</th></tr></thead><tbody>';
+                data.tasks.forEach(task => {
+                    const statusBadge = task.isOverdue ? '<span class="badge bg-danger">Overdue</span>' : '<span class="badge bg-info">Scheduled</span>';
+                    html += '<tr><td>' + task.plannedStart + ' - ' + task.plannedEnd + '</td>';
+                    html += '<td>' + task.taskType + '</td>';
+                    html += '<td>' + task.vehicleInfo + '</td>';
+                    html += '<td>' + statusBadge + '</td></tr>';
+                });
+                html += '</tbody></table></div>';
+                scheduleContent.innerHTML = html;
+            }
+            
+            schedulePreview.classList.remove('d-none');
+        }
+        
+        function refreshSchedule(detailId) {
+            loadSchedule(detailId);
+        }
+    </script>
 </body>
 </html>

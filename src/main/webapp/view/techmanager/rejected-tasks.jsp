@@ -1,24 +1,15 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib
-uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> <%@ taglib
-uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
+prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="context-path" content="${pageContext.request.contextPath}" />
     <title>Rejected Tasks - Tech Manager</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="${pageContext.request.contextPath}/assets/css/techmanager/base-techmanager.css"
-    />
-    <link
-      rel="stylesheet"
-      href="${pageContext.request.contextPath}/assets/css/techmanager/reject-task.css"
-    />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/techmanager/base-techmanager.css" />
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/techmanager/reject-task.css" />
   </head>
   <body>
     <div class="main-container">
@@ -39,16 +30,11 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                 <i class="bi bi-x-circle text-danger"></i>
                 Rejected Tasks
               </h2>
-              <p class="text-muted mb-0">
-                Tasks rejected by technicians that need reassignment
-              </p>
+              <p class="text-muted mb-0">Tasks rejected by technicians that need reassignment</p>
             </div>
-            <button
-              type="button"
-              class="btn btn-outline-secondary"
-              onclick="window.location.reload();"
-            >
-              <i class="bi bi-arrow-clockwise"></i> Refresh
+            <button type="button" class="btn btn-outline-secondary" onclick="window.location.reload();">
+              <i class="bi bi-arrow-clockwise"></i>
+              Refresh
             </button>
           </div>
         </div>
@@ -89,82 +75,57 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                     </tr>
                   </thead>
                   <tbody>
-                    <c:forEach
-                      items="${rejectedTasks}"
-                      var="task"
-                      varStatus="st"
-                    >
+                    <c:forEach items="${rejectedTasks}" var="task" varStatus="st">
                       <tr>
                         <td>${st.count}</td>
                         <td>
-                          <span class="pill ${task.taskType}"
-                            >${task.taskType}</span
-                          >
+                          <span class="pill ${task.taskType}">${task.taskType}</span>
                         </td>
                         <td>
-                          <span class="pill ${task.priority}"
-                            >${task.priority}</span
-                          >
+                          <span class="pill ${task.priority}">${task.priority}</span>
                         </td>
                         <td class="mono">${task.vehicleInfo}</td>
                         <td>
                           <div>${task.customerName}</div>
-                          <small class="text-muted"
-                            >${task.customerPhone}</small
-                          >
+                          <small class="text-muted">${task.customerPhone}</small>
                         </td>
                         <td>
                           <c:choose>
-                            <c:when
-                              test="${task.taskDescription.length() > 60}"
-                            >
+                            <c:when test="${task.taskDescription.length() > 60}">
                               ${task.taskDescription.substring(0, 60)}...
                             </c:when>
-                            <c:otherwise> ${task.taskDescription} </c:otherwise>
+                            <c:otherwise>${task.taskDescription}</c:otherwise>
                           </c:choose>
                         </td>
                         <td>
                           <div>
-                            <fmt:formatNumber
-                              value="${task.estimateHours}"
-                              pattern="#.#"
-                            />h
+                            <fmt:formatNumber value="${task.estimateHours}" pattern="#.#" />
+                            h
                           </div>
                           <div class="text-muted">
-                            $<fmt:formatNumber
-                              value="${task.estimateAmount}"
-                              pattern="#,##0.00"
-                            />
+                            $
+                            <fmt:formatNumber value="${task.estimateAmount}" pattern="#,##0.00" />
                           </div>
                         </td>
                         <td>
                           <div>${task.technicianName}</div>
-                          <small class="text-muted"
-                            >${task.technicianPhone}</small
-                          >
+                          <small class="text-muted">${task.technicianPhone}</small>
                         </td>
                         <td>
-                          <fmt:formatDate
-                            value="${task.rejectedAt}"
-                            pattern="dd/MM HH:mm"
-                          />
+                          <fmt:formatDate value="${task.rejectedAt}" pattern="dd/MM HH:mm" />
                         </td>
                         <td>
                           <c:choose>
-                            <c:when test="${not empty task.rejectionReason}">
-                              ${task.rejectionReason}
-                            </c:when>
+                            <c:when test="${not empty task.rejectionReason}">${task.rejectionReason}</c:when>
                             <c:otherwise>
                               <span class="no-reason">No reason provided</span>
                             </c:otherwise>
                           </c:choose>
                         </td>
                         <td>
-                          <button
-                            class="btn btn-primary"
-                            onclick="reassignTask(${task.assignmentId})"
-                          >
-                            <i class="bi bi-arrow-repeat"></i> Reassign
+                          <button class="btn btn-primary" onclick="reassignTask('${task.assignmentId}')">
+                            <i class="bi bi-arrow-repeat"></i>
+                            Reassign
                           </button>
                         </td>
                       </tr>
@@ -181,15 +142,6 @@ uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
       </div>
     </div>
 
-    <script>
-      function reassignTask(assignmentId) {
-        if (confirm("Reassign this task to another technician?")) {
-          // Redirect to assign-diagnosis or assign-repair page with this assignmentId
-          window.location.href =
-            "${pageContext.request.contextPath}/techmanager/assign-diagnosis?reassign=" +
-            assignmentId;
-        }
-      }
-    </script>
+    <script src="${pageContext.request.contextPath}/assets/js/techmanager/rejected-tasks.js"></script>
   </body>
 </html>
