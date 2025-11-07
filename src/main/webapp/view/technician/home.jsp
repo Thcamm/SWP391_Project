@@ -40,6 +40,8 @@
                     </div>
                 </div>
 
+                <jsp:include page="message-display.jsp"/>
+
                 <!-- Stats -->
                 <div class="row g-3 mb-3">
                     <div class="col-12 col-sm-6 col-xl-3">
@@ -103,8 +105,11 @@
                                             <th>Vehicle</th>
                                             <th>Customer</th>
                                             <th>Service</th>
+
                                             <th>Type</th>
                                             <th>Description</th>
+                                            <th>Pl_Start</th>
+                                            <th>Pl_End</th>
                                             <th>Est.</th>
                                             <th>Assigned</th>
 
@@ -127,24 +132,26 @@
                                                 <td class="text-truncate" style="max-width: 280px;">
                                                         ${fn:substring(task.taskDescription, 0, 50)}<c:if test="${fn:length(task.taskDescription) > 50}">…</c:if>
                                                 </td>
+                                                <td><span>${task.plannedStartFormatted}</span></td>
+                                                <td><span>${task.plannedEndFormatted}</span></td>
                                                 <td>${task.estimateHours}h</td>
                                                 <td>${task.assignedDateFormatted}</td>
-<%--                                                <td>--%>
-<%--                                                    <div class="d-flex justify-content-end gap-2">--%>
-<%--                                                        <form action="${pageContext.request.contextPath}/technician/tasks-action" method="post" class="m-0">--%>
-<%--                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>--%>
-<%--                                                            <input type="hidden" name="action" value="accept"/>--%>
-<%--                                                            <button class="btn btn-success btn-sm"--%>
-<%--                                                                    onclick="return confirm('Accept this task?')">Accept</button>--%>
-<%--                                                        </form>--%>
-<%--                                                        <form action="${pageContext.request.contextPath}/technician/tasks-action" method="post" class="m-0">--%>
-<%--                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>--%>
-<%--                                                            <input type="hidden" name="action" value="reject"/>--%>
-<%--                                                            <button class="btn btn-outline-danger btn-sm"--%>
-<%--                                                                    onclick="return confirm('Reject this task?')">Reject</button>--%>
-<%--                                                        </form>--%>
-<%--                                                    </div>--%>
-<%--                                                </td>--%>
+                                                <td>
+                                                    <div class="d-flex justify-content-end gap-2">
+                                                        <form action="${pageContext.request.contextPath}/technician/tasks-action" method="post" class="m-0">
+                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
+                                                            <input type="hidden" name="action" value="accept"/>
+                                                            <button class="btn btn-success btn-sm"
+                                                                    onclick="return confirm('Accept this task?')">Accept</button>
+                                                        </form>
+                                                        <form action="${pageContext.request.contextPath}/technician/tasks-action" method="post" class="m-0">
+                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
+                                                            <input type="hidden" name="action" value="reject"/>
+                                                            <button class="btn btn-outline-danger btn-sm"
+                                                                    onclick="return confirm('Reject this task?')">Reject</button>
+                                                        </form>
+                                                    </div>
+                                                </td>
                                             </tr>
                                         </c:forEach>
                                         </tbody>

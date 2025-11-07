@@ -220,11 +220,14 @@ public class TechnicianService {
                     return ServiceResult.error(MessageConstants.TASK013);
                 }
 
+
+
                 // 4) Check deadline accept (<= 10 phút sau planned_start)
                 final int GRACE_MINUTES = 10;
                 if (LocalDateTime.now().isAfter(ps.plusMinutes(GRACE_MINUTES))) {
+                    System.out.println("loi o day qua 10 p");
                     conn.rollback();
-                    return ServiceResult.error(MessageConstants.TASK012);
+                    return ServiceResult.error(MessageConstants.TASK015);
                 }
 
                 // 5) Update trạng thái có điều kiện (WHERE Status='ASSIGNED')

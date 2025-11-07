@@ -193,6 +193,14 @@ public class MessageConstants {
             "Data field is null. Required"
     );
 
+    public static final SystemMessage TASK015 = new SystemMessage(
+            "TASK015",
+            MessageType.INFO,
+            "Time limit",
+            "Over 10 minutes to accept"
+    );
+
+
     public static final SystemMessage PART001 = new SystemMessage(
             "PART001",
             MessageType.SUCCESS,

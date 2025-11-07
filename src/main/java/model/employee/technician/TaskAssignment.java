@@ -38,35 +38,18 @@ public class TaskAssignment {
     private static final DateTimeFormatter D_HM = DateTimeFormatter.ofPattern("dd/MM HH:mm");
     private static final DateTimeFormatter D_M_Y_HM = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    public String getAssignedDateFormatted() {
-        if (assignedDateFormatted != null && !assignedDateFormatted.isEmpty())
-            return assignedDateFormatted;
-        return assignedDate != null ? assignedDate.format(D_HM) : "-";
-    }
 
-    public void setAssignedDateFormatted(String assignedDateFormatted) {
-        this.assignedDateFormatted = assignedDateFormatted;
-    }
-
-    public String getStartAtFormatted() {
-        return startAt != null ? startAt.format(D_HM) : "-";
-    }
-
-    public String getCompleteAtFormatted() {
-        return completeAt != null ? completeAt.format(D_M_Y_HM) : "-";
-    }
 
     public String getPlannedStartFormatted() {
         return plannedStart != null ? plannedStart.format(D_M_Y_HM) : "-";
     }
-
     public String getPlannedEndFormatted() {
-        return plannedEnd != null ? plannedEnd.format(D_M_Y_HM) : "-";
+        return plannedEnd != null ? plannedEnd.format(D_HM) : "-";
     }
 
-    public String getDeclinedAtFormatted() {
-        return declinedAt != null ? declinedAt.format(D_M_Y_HM) : "-";
-    }
+
+
+
 
     public boolean isOverdue() {
         return status == TaskStatus.ASSIGNED
@@ -193,20 +176,7 @@ public class TaskAssignment {
         return startAt;
     }
 
-    public LocalDateTime getPlannedStart() { return plannedStart; }
-    public void setPlannedStart(LocalDateTime plannedStart) { this.plannedStart = plannedStart; }
 
-    public LocalDateTime getPlannedEnd() { return plannedEnd; }
-    public void setPlannedEnd(LocalDateTime plannedEnd) { this.plannedEnd = plannedEnd; }
-
-    public LocalDateTime getDeclinedAt() { return declinedAt; }
-    public void setDeclinedAt(LocalDateTime declinedAt) { this.declinedAt = declinedAt; }
-
-    public String getDeclineReason() { return declineReason; }
-    public void setDeclineReason(String declineReason) { this.declineReason = declineReason; }
-
-    public String getTaskDescription() { return taskDescription; }
-    public void setTaskDescription(String taskDescription) { this.taskDescription = taskDescription; }
 
     public LocalDateTime getCompleteAt() {
         return completeAt;
@@ -266,6 +236,18 @@ public class TaskAssignment {
 
     public void setProgressPercentage(int progressPercentage) {
         this.progressPercentage = Math.min(100, Math.max(0, progressPercentage));
+    }
+
+    public int getDetailID() {
+        return detailID;
+    }
+
+    public void setDetailID(int detailID) {
+        this.detailID = detailID;
+    }
+
+    public void setStartAt(LocalDateTime startAt) {
+        this.startAt = startAt;
     }
 
     public String getNotes() {
