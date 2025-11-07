@@ -1,201 +1,98 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technician Dashboard - Garage Management</title>
 
+    <!-- Bootstrap CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
-    <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Technician Dashboard - Garage Management</title>
-        <!-- Bootstrap CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <!-- Bootstrap Icons -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-        <style>
-            :root {
-                --brand-color: #111827;
-                --bg-light: #f6f7fb;
-            }
-            body {
-                background-color: var(--bg-light);
-                font-size: 14px;
-                margin: 0;
-            }
-            .header {
-                background: white;
-                border-bottom: 1px solid #e5e7eb;
-                padding: 0.75rem 1.5rem;
-                position: sticky;
-                top: 0;
-                z-index: 1020;
-            }
-            .logo {
-                font-size: 18px;
-                margin: 0;
-                font-weight: 700;
-                color: #111827;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                text-decoration: none;
-            }
+    <style>
+        :root { --brand-color:#111827; --bg-light:#f6f7fb; }
+        body { background-color:var(--bg-light); font-size:14px; margin:0; }
 
-            /* Navigation ở giữa */
-            .main-nav {
-                position: absolute;
-                left: 50%;
-                transform: translateX(-50%);
-            }
+        /* Header = Navbar */
+        .header {
+            background:#fff;
+            border-bottom:1px solid #e5e7eb;
+            position:sticky; top:0; z-index:1020;
+        }
 
-            .main-nav .navbar-nav {
-                flex-direction: row;
-                gap: 0.5rem;
-            }
+        .navbar-brand {
+            font-weight:700; color:#111827;
+            display:flex; align-items:center; gap:.5rem;
+            text-decoration:none;
+        }
 
-            .nav-link {
-                padding: 0.5rem 0.75rem !important;
-                border-radius: 10px;
-                color: #12161c;
-                transition: all 0.2s;
-                white-space: nowrap;
-            }
-            .nav-link:hover {
-                background-color: #f3f4f6;
-                color: #12161c;
-            }
-            .nav-link.active {
-                background-color: var(--brand-color);
-                color: white !important;
-            }
+        /* Nav giữa – dùng flex-row thay vì absolute */
+        .main-nav .nav-link {
+            padding:.5rem .75rem !important;
+            border-radius:10px;
+            color:#12161c;
+            transition:.2s;
+            white-space:nowrap;
+        }
+        .main-nav .nav-link:hover { background:#f3f4f6; color:#12161c; }
+        .main-nav .nav-link.active { background:var(--brand-color); color:#fff !important; }
 
-            /* Dropdown styles */
-            .dropdown-menu {
-                border: 1px solid #e5e7eb;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-                border-radius: 10px;
-                padding: 0.5rem;
-            }
-            .dropdown-item {
-                border-radius: 8px;
-                padding: 0.5rem 0.75rem;
-                transition: all 0.2s;
-                display: flex;
-                align-items: center;
-            }
-            .dropdown-item:hover {
-                background-color: #f3f4f6;
-            }
-            .dropdown-header {
-                padding: 0.5rem 0.75rem;
-                font-weight: 600;
-                color: #111827;
-            }
-            .dropdown-divider {
-                margin: 0.5rem 0;
-            }
+        /* Dropdown & menu (nếu sau dùng) */
+        .dropdown-menu {
+            border:1px solid #e5e7eb;
+            box-shadow:0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
+            border-radius:10px; padding:.5rem;
+        }
+        .dropdown-item { border-radius:8px; padding:.5rem .75rem; transition:.2s; display:flex; align-items:center; }
+        .dropdown-item:hover { background:#f3f4f6; }
+    </style>
+</head>
+<body>
 
-            @media (max-width: 992px) {
-                .main-nav {
-                    position: static;
-                    transform: none;
-                }
-            }
-        </style>
-    </head>
-    <body>
-
-    <header class="header">
-        <div class="d-flex align-items-center justify-content-between position-relative">
-            <!-- Logo bên trái -->
-            <a href="${pageContext.request.contextPath}/technician/home" class="logo">
+<header class="header">
+    <nav class="navbar navbar-expand-lg bg-white">
+        <div class="container-fluid">
+            <!-- Trái: Logo -->
+            <a href="${pageContext.request.contextPath}/technician/home" class="navbar-brand">
                 <i class="bi bi-tools"></i>
                 <span>Garage Management</span>
             </a>
 
-            <!-- Navigation ở giữa -->
-            <nav class="main-nav d-none d-lg-block">
-                <ul class="navbar-nav">
+            <!-- Nút toggle cho mobile -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topNav"
+                    aria-controls="topNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Giữa: Navigation -->
+            <div class="collapse navbar-collapse" id="topNav">
+                <ul class="navbar-nav main-nav mx-lg-auto flex-row gap-2">
                     <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/technician/home" class="nav-link active">Dashboard</a>
-
                     </li>
                     <li class="nav-item">
                         <a href="${pageContext.request.contextPath}/technician/tasks" class="nav-link">My Tasks</a>
                     </li>
-
                 </ul>
-            </nav>
 
-
-            <a class="dropdown-item" href="${pageContext.request.contextPath}/user/profile">
-                <i class="bi bi-person me-2"></i>
-                <span>My Profile</span>
-            </a>
-
-
-            <a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/Home?action=logout">
-                <i class="bi bi-box-arrow-right me-2"></i>
-                <span>Log Out</span>
-            </a>
-
-
-<%--            <!-- User info bên phải -->--%>
-<%--            <div class="d-flex align-items-center gap-3">--%>
-<%--                <!-- Notification Bell -->--%>
-<%--                <div class="dropdown">--%>
-<%--                    <a class="nav-link position-relative" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.5rem;">--%>
-<%--                        <i class="bi bi-bell" style="font-size: 20px; color: #6b7280;"></i>--%>
-<%--                        <!-- Uncomment nếu có notifications -->--%>
-<%--                        &lt;%&ndash; <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">--%>
-<%--                            ${notificationCount}--%>
-<%--                        </span> &ndash;%&gt;--%>
-<%--                    </a>--%>
-<%--                    <ul class="dropdown-menu dropdown-menu-end" style="min-width: 280px;">--%>
-<%--                        <li><h6 class="dropdown-header">Notifications</h6></li>--%>
-<%--                        <li><hr class="dropdown-divider"></li>--%>
-<%--                        <li class="px-3 py-2 text-center text-muted">--%>
-<%--                            <i class="bi bi-inbox" style="font-size: 2rem;"></i>--%>
-<%--                            <p class="mb-0 mt-2">No new notifications</p>--%>
-<%--                        </li>--%>
-<%--                        <li><hr class="dropdown-divider"></li>--%>
-<%--                        <li><a class="dropdown-item text-center small" href="${pageContext.request.contextPath}/accountant/notifications">View all notifications</a></li>--%>
-<%--                    </ul>--%>
-<%--                </div>--%>
-
-<%--                <!-- User Dropdown -->--%>
-<%--                <div class="dropdown">--%>
-<%--                    <a class="d-flex align-items-center text-decoration-none dropdown-toggle-custom"--%>
-<%--                       href="#"--%>
-<%--                       role="button"--%>
-<%--                       data-bs-toggle="dropdown"--%>
-<%--                       aria-expanded="false"--%>
-<%--                       style="padding: 0.5rem 0.75rem; border-radius: 10px; transition: background-color 0.2s;">--%>
-<%--                        <div class="text-end">--%>
-<%--                            <div style="font-size: 12px; color: #6b7280; margin-bottom: 2px;">Welcome back,</div>--%>
-<%--                            <div style="font-weight: 600; color: #111827; line-height: 1.2;">${sessionScope.userName != null ? sessionScope.userName : 'User'}</div>--%>
-<%--                            <div style="font-size: 12px; color: #6b7280; margin-top: 2px;">${sessionScope.roleName != null ? sessionScope.roleName : 'Technician'}</div>--%>
-<%--                        </div>--%>
-<%--                        <i class="bi bi-chevron-down ms-2" style="font-size: 12px; color: #6b7280;"></i>--%>
-<%--                    </a>--%>
-<%--                    <ul class="dropdown-menu dropdown-menu-end" style="min-width: 200px;">--%>
-<%--                        <li>--%>
-<%--                            --%>
-<%--                        </li>--%>
-<%--&lt;%&ndash;                        <li>&ndash;%&gt;--%>
-<%--&lt;%&ndash;                            <a class="dropdown-item" href="${pageContext.request.contextPath}/user/settings">&ndash;%&gt;--%>
-<%--&lt;%&ndash;                                <i class="bi bi-gear me-2"></i>&ndash;%&gt;--%>
-<%--&lt;%&ndash;                                <span>Settings</span>&ndash;%&gt;--%>
-<%--&lt;%&ndash;                            </a>&ndash;%&gt;--%>
-<%--&lt;%&ndash;                        </li>&ndash;%&gt;--%>
-<%--                        <li><hr class="dropdown-divider"></li>--%>
-<%--                        <li>--%>
-<%--                           --%>
-<%--                        </li>--%>
-<%--                    </ul>--%>
-<%--                </div>--%>
-<%--            </div>--%>
+                <!-- Phải: Actions (My Profile, Log Out) -->
+                <div class="d-flex ms-lg-auto align-items-center gap-2">
+                    <a href="${pageContext.request.contextPath}/user/profile" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-person me-1"></i> My Profile
+                    </a>
+                    <a href="${pageContext.request.contextPath}/Home?action=logout" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-box-arrow-right me-1"></i> Log Out
+                    </a>
+                </div>
+            </div>
         </div>
-    </header>
+    </nav>
+</header>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Nội dung trang ở đây -->
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
