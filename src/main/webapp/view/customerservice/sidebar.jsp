@@ -1,5 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
-prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %> <%@ page
+contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
+%> <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <style>
   .sidebar-wrapper {
@@ -157,15 +159,6 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn
           <a class="nav-link" href="${pageContext.request.contextPath}/customerservice/appointment-list">
             <i class="bi bi-clock-history text-danger"></i>
             <span>Appointment List</span>
-          </a>
-        </li>
-      </ul>
-      <div class="menu-title">Feedback</div>
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="nav-link" href="${pageContext.request.contextPath}/view/customerservice/reply-feedback.jsp">
-            <i class="bi bi-clock-history text-danger"></i>
-            <span>Feedback Reply</span>
           </a>
         </li>
       </ul>

@@ -26,13 +26,13 @@
             <main class="main" style="padding: 1.25rem; padding-bottom: 0;">
                 <div class="content-card"
                      style="background: white;
-                      border: 1px solid #e5e7eb;
-                       border-radius: 12px;
-                        padding: 2.5rem;
-                         min-height: calc(100vh - 64px - 1.25rem);
-                          display: flex; flex-direction: column;
-                           <%--align-items: center; justify-content: center;--%>
-                           ">
+                             border: 1px solid #e5e7eb;
+                             border-radius: 12px;
+                             padding: 2.5rem;
+                             min-height: calc(100vh - 64px - 1.25rem);
+                             display: flex; flex-direction: column;
+                     <%--align-items: center; justify-content: center;--%>
+                             ">
                     <!-- Nội dung trang home của bạn ở đây -->
                     <div class="main-container">
                         <!-- Page Header -->

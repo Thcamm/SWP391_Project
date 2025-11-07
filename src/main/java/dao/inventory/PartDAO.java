@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PartDAO extends DbContext {
-    // Lấy tất cả PartDetail
+    // Get all PartDetails
     public List<PartDetail> getAllPartDetails() throws SQLException {
         List<PartDetail> list = new ArrayList<>();
         Connection conn = null;
@@ -37,7 +37,7 @@ public class PartDAO extends DbContext {
         return list;
     }
 
-    private List<CharacteristicValue> getCharacteristicsByPartDetailId(Integer partDetailId) throws SQLException {
+    public List<CharacteristicValue> getCharacteristicsByPartDetailId(Integer partDetailId) throws SQLException {
         List<CharacteristicValue> list = new ArrayList<>();
         Connection conn = null;
         PreparedStatement ps = null;
@@ -192,8 +192,8 @@ public class PartDAO extends DbContext {
         Connection conn = null;
         PreparedStatement ps = null;
 
-        String sql = "INSERT INTO PartDetail (PartID, SKU, Quantity, MinStock, UnitPrice, Location) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO PartDetail (PartID, SKU, Quantity, MinStock, UnitPrice, Location, Manufacturer, Description) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
             conn = getConnection();
@@ -204,6 +204,8 @@ public class PartDAO extends DbContext {
             ps.setInt(4, partDetail.getMinStock());
             ps.setBigDecimal(5, partDetail.getUnitPrice());
             ps.setString(6, partDetail.getLocation());
+            ps.setString(7, partDetail.getManufacturer());
+            ps.setString(8, partDetail.getDescription());
 
             int result = ps.executeUpdate();
 
@@ -221,23 +223,22 @@ public class PartDAO extends DbContext {
         return false;
     }
 
-    // Cập nhật
+    // Update
     public boolean update(PartDetail partDetail) throws SQLException {
         Connection conn = null;
         PreparedStatement ps = null;
 
-        String sql = "UPDATE PartDetail SET PartID=?, SKU=?, Quantity=?, MinStock=?, UnitPrice=?, Location=? " +
+        String sql = "UPDATE PartDetail SET SKU=?, Location=?, MinStock=?, UnitPrice=?, Manufacturer=?, Description=? " +
                 "WHERE PartDetailID=?";
-
         try {
             conn = getConnection();
             ps = conn.prepareStatement(sql);
-            ps.setInt(1, partDetail.getPartId());
-            ps.setString(2, partDetail.getSku());
-            ps.setInt(3, partDetail.getQuantity());
-            ps.setInt(4, partDetail.getMinStock());
-            ps.setBigDecimal(5, partDetail.getUnitPrice());
-            ps.setString(6, partDetail.getLocation());
+            ps.setString(1, partDetail.getSku());
+            ps.setString(2, partDetail.getLocation());
+            ps.setInt(3, partDetail.getMinStock());
+            ps.setBigDecimal(4, partDetail.getUnitPrice());
+            ps.setString(5, partDetail.getManufacturer());
+            ps.setString(6, partDetail.getDescription());
             ps.setInt(7, partDetail.getPartDetailId());
 
             return ps.executeUpdate() > 0;
@@ -245,6 +246,7 @@ public class PartDAO extends DbContext {
             throw new RuntimeException(e);
         }
     }
+
 
     // Cập nhật số lượng
     public boolean updateQuantity(Integer partDetailId, Integer newQuantity) throws SQLException {
@@ -312,6 +314,222 @@ public class PartDAO extends DbContext {
         return list;
     }
 
+    public List<PartDetail> getAllWithCharacteristicsByCategory(String category) throws SQLException {
+        List<PartDetail> list = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        String sql = "SELECT pd.*, p.PartCode, p.PartName, p.Category, u.name AS UnitName " +
+                "FROM PartDetail pd " +
+                "INNER JOIN Part p ON pd.PartID = p.PartID " +
+                "INNER JOIN Unit u ON p.base_unit_id = u.unit_id " +
+                "WHERE p.Category = ? " +
+                "ORDER BY p.PartName, pd.SKU";
+
+        try {
+            conn = getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, category);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                PartDetail pd = extractPartDetailFromResultSet(rs);
+                pd.setCharacteristics(getCharacteristicsByPartDetailId(pd.getPartDetailId()));
+                list.add(pd);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return list;
+    }
+
+    public List<String> getAllCategories() throws SQLException {
+        List<String> categories = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        String sql = "SELECT DISTINCT Category FROM Part ORDER BY Category";
+
+        try {
+            conn = getConnection();
+            ps = conn.prepareStatement(sql);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                categories.add(rs.getString("Category"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return categories;
+    }
+
+    public String getPartDetailBySku(String sku) throws SQLException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        String sql = "SELECT p.PartName, pd.SKU, pd.Quantity, pd.UnitPrice " +
+                "FROM PartDetail pd " +
+                "INNER JOIN Part p ON pd.PartID = p.PartID " +
+                "WHERE pd.SKU = ?";
+
+        try {
+            conn = getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, sku);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String partName = rs.getString("PartName");
+                int quantity = rs.getInt("Quantity");
+                return partName + " (SKU: " + sku + ") - Quantity: " + quantity;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return null;
+    }
+
+    //getAllCharacteristicValues
+    public List<CharacteristicValue> getAllCharacteristicValues() throws SQLException {
+        List<CharacteristicValue> list = new ArrayList<>();
+        String sql = "SELECT cv.ValueID, cv.TypeID, cv.ValueName, ct.Name " +
+                "FROM characteristicvalue cv " +
+                "JOIN characteristictype ct ON cv.TypeID = ct.TypeID " +
+                "ORDER BY ct.Name, cv.ValueName";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                CharacteristicValue cv = new CharacteristicValue(
+                        rs.getInt("ValueID"),
+                        rs.getInt("TypeID"),
+                        rs.getString("ValueName")
+                );
+                cv.setTypeName(rs.getString("Name"));
+                list.add(cv);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // Trong PartDAO.java
+    // 1. THÊM "manufacturer" VÀO DANH SÁCH THAM SỐ
+    public List<PartDetail> searchWithFilters(String keyword, String category, String location,
+                                              String stockStatus, String priceFrom, String priceTo,
+                                              String manufacturer)
+            throws SQLException {
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT pd.*, p.PartName, p.Category " +
+                        "FROM partdetail pd " +
+                        "JOIN part p ON pd.PartID = p.PartID " +
+                        "WHERE 1=1"
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        // Keyword filter
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND (LOWER(p.PartName) LIKE ? OR LOWER(pd.SKU) LIKE ?)");
+            String searchPattern = "%" + keyword.toLowerCase() + "%";
+            params.add(searchPattern);
+            params.add(searchPattern);
+        }
+
+        // Category filter
+        if (category != null && !category.isEmpty()) {
+            sql.append(" AND p.Category = ?");
+            params.add(category);
+        }
+
+        // Location filter
+        if (location != null && !location.trim().isEmpty()) {
+            sql.append(" AND LOWER(pd.Location) LIKE ?");
+            params.add("%" + location.toLowerCase() + "%");
+        }
+
+        // 2. BỔ SUNG KHỐI LỌC MANUFACTURER
+        // (Dùng tên cột 'Manufacturer' bạn vừa thêm)
+        if (manufacturer != null && !manufacturer.isEmpty()) {
+            sql.append(" AND pd.Manufacturer = ?");
+            params.add(manufacturer);
+        }
+
+        // Stock status filter
+        if (stockStatus != null && !stockStatus.isEmpty()) {
+            switch (stockStatus) {
+                case "low":
+                    sql.append(" AND pd.Quantity > 0 AND pd.Quantity <= pd.MinStock");
+                    break;
+                case "out":
+                    sql.append(" AND pd.Quantity = 0");
+                    break;
+                case "normal":
+                    sql.append(" AND pd.Quantity > pd.MinStock");
+                    break;
+            }
+        }
+
+        // Price range filter
+        if (priceFrom != null && !priceFrom.isEmpty()) {
+            sql.append(" AND pd.UnitPrice >= ?");
+            params.add(new java.math.BigDecimal(priceFrom));
+        }
+
+        if (priceTo != null && !priceTo.isEmpty()) {
+            sql.append(" AND pd.UnitPrice <= ?");
+            params.add(new java.math.BigDecimal(priceTo));
+        }
+
+        sql.append(" ORDER BY p.PartName");
+
+        List<PartDetail> results = new ArrayList<>();
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            // Set parameters
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    PartDetail pd = new PartDetail();
+
+                    pd.setPartDetailId(rs.getInt("PartDetailID"));
+                    pd.setPartId(rs.getInt("PartID"));
+                    pd.setSku(rs.getString("SKU"));
+                    pd.setQuantity(rs.getInt("Quantity"));
+                    pd.setMinStock(rs.getInt("MinStock"));
+                    pd.setLocation(rs.getString("Location"));
+                    pd.setUnitPrice(rs.getBigDecimal("UnitPrice"));
+                    pd.setPartName(rs.getString("PartName"));
+                    pd.setCategory(rs.getString("Category"));
+
+                    // 3. ĐỌC GIÁ TRỊ TỪ CỘT "Manufacturer"
+                    // (Giả sử model PartDetail của bạn đã có
+                    // trường 'manufacturer' và hàm 'setManufacturer()')
+                    pd.setManufacturer(rs.getString("Manufacturer"));
+
+                    results.add(pd);
+                }
+            }
+        }
+
+        return results;
+    }
 
     private PartDetail extractPartDetailFromResultSet(ResultSet rs) throws SQLException {
         PartDetail pd = new PartDetail();
@@ -322,10 +540,13 @@ public class PartDAO extends DbContext {
         pd.setMinStock(rs.getInt("MinStock"));
         pd.setUnitPrice(rs.getBigDecimal("UnitPrice"));
         pd.setLocation(rs.getString("Location"));
+        pd.setManufacturer(rs.getString("Manufacturer"));
+        pd.setDescription(rs.getString("Description"));
         pd.setPartCode(rs.getString("PartCode"));
         pd.setPartName(rs.getString("PartName"));
         pd.setCategory(rs.getString("Category"));
         pd.setUnitName(rs.getString("UnitName"));
         return pd;
     }
+
 }

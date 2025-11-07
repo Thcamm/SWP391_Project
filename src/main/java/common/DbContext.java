@@ -120,8 +120,6 @@ public class DbContext {
         }
     }
 
-
-
     /* ========= INSTANCE ALIASES (dùng khi extends) ========= */
 
     /** Alias instance: mở connection (autoCommit=true). */
