@@ -24,7 +24,7 @@
         <div class="page-header">
           <h1 class="h2">
             <i class="bi bi-exclamation-triangle-fill text-danger"></i>
-            Overdue Tasks - SLA Violations
+            Overdue Tasks
           </h1>
           <p class="text-muted">Tasks that missed their planned start time (SLA violation)</p>
         </div>

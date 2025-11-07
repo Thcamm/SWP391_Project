@@ -105,16 +105,17 @@ public class OverdueTasksServlet extends HttpServlet {
         String sql = "SELECT ta.AssignmentID, ta.task_type, ta.planned_start, ta.planned_end, " +
                 "ta.TaskDescription, ta.AssignedDate, " +
                 "CONCAT(v.Brand, ' ', v.Model, ' - ', v.LicensePlate) AS vehicle_info, " +
-                "CONCAT(e.FirstName, ' ', e.LastName) AS technician_name, " +
-                "u.FullName AS customer_name, " +
+                "u_tech.FullName AS technician_name, " + // FIXED: Get FullName from User table (aliased as u_tech)
+                "u_cust.FullName AS customer_name, " +   // RENAMED: Aliased customer's User table as u_cust for clarity
                 "TIMESTAMPDIFF(HOUR, ta.planned_start, NOW()) AS hours_overdue " +
                 "FROM TaskAssignment ta " +
                 "JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID " +
                 "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
                 "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
                 "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
-                "JOIN User u ON sr.CustomerID = u.UserID " +
+                "JOIN User u_cust ON sr.CustomerID = u_cust.UserID " + // RENAMED: Alias for Customer
                 "JOIN Employee e ON ta.AssignToTechID = e.EmployeeID " +
+                "JOIN User u_tech ON e.UserID = u_tech.UserID " + // NEW JOIN: Get Technician's User record
                 "WHERE ta.Status = 'ASSIGNED' " +
                 "AND ta.StartAt IS NULL " +
                 "AND ta.planned_start IS NOT NULL " +

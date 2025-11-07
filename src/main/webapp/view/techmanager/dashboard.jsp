@@ -72,7 +72,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               <div class="alert alert-warning d-flex align-items-center">
                 <i class="bi bi-clock-history me-3"></i>
                 <div class="flex-grow-1">
-                  <strong>🕐 ${stats.overdueTasks} Task(s) Overdue (SLA Violation)</strong>
+                  <strong>🕐 ${stats.overdueTasks} Task(s) Overdue</strong>
                   <p class="mb-0">Technicians haven't started these tasks past the planned start time.</p>
                 </div>
                 <a href="${pageContext.request.contextPath}/techmanager/overdue-tasks" class="btn btn-warning">
@@ -89,7 +89,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               <div class="alert alert-info d-flex align-items-center">
                 <i class="bi bi-hand-thumbs-down-fill me-3"></i>
                 <div class="flex-grow-1">
-                  <strong>👎 ${stats.declinedTasks} Task(s) Declined by Technicians</strong>
+                  <strong> ${stats.declinedTasks} Task(s) Declined by Technicians</strong>
                   <p class="mb-0">Technicians proactively declined these tasks with reasons.</p>
                 </div>
                 <a href="${pageContext.request.contextPath}/techmanager/declined-tasks" class="btn btn-info">
@@ -353,7 +353,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                             <p class="mb-0 text-muted small">Completed Repairs</p>
                             <h4 class="mb-0">${stats.completedRepairs}</h4>
                           </div>
-                          <span class="badge bg-success">Done</span>
+                            <span class="badge bg-warning">In Progress</span>
                         </div>
                       </div>
                     </div>
