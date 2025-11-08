@@ -1,7 +1,7 @@
 package controller.employee.techmanager;
 
-import dao.workorder.RejectedTaskDAO;
 import model.employee.techmanager.RejectedTaskDTO;
+import service.employee.techmanager.RejectedTaskService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,20 +12,29 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Servlet for displaying rejected tasks that need reassignment
+ * Servlet for displaying rejected tasks that need reassignment.
+ * Read-only view for monitoring workflow health.
+ * 
+ * @author SWP391 Team
+ * @version 2.0 (Refactored to 3-tier architecture)
  */
 @WebServlet("/techmanager/rejected-tasks")
 public class RejectedTasksServlet extends HttpServlet {
 
-    private final RejectedTaskDAO rejectedTaskDAO = new RejectedTaskDAO();
+    private RejectedTaskService rejectedTaskService;
+
+    @Override
+    public void init() throws ServletException {
+        this.rejectedTaskService = new RejectedTaskService();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         try {
-            // Get rejected tasks from DAO
-            List<RejectedTaskDTO> rejectedTasks = rejectedTaskDAO.getRejectedTasks();
+            // Get rejected tasks from service
+            List<RejectedTaskDTO> rejectedTasks = rejectedTaskService.getRejectedTasks();
 
             // Set attribute and forward to JSP
             request.setAttribute("rejectedTasks", rejectedTasks);

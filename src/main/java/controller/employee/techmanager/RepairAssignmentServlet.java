@@ -10,25 +10,26 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import dao.workorder.RepairAssignmentDAO;
 import model.employee.techmanager.ApprovedRepairDTO;
 import model.employee.techmanager.TechnicianDTO;
+import service.employee.techmanager.RepairAssignmentService;
 
 /**
- * Phase 3: Repair Assignment
+ * Phase 3: Repair Assignment (GĐ4)
  * - Show approved Repair (customer approved)
  * - Assign repair tasks to technicians
  * 
- * NEW: Supports task scheduling with planned_start and planned_end times
+ * @author SWP391 Team
+ * @version 2.0 (Refactored to 3-tier architecture)
  */
 @WebServlet("/techmanager/assign-repair")
 public class RepairAssignmentServlet extends HttpServlet {
 
-    private RepairAssignmentDAO repairAssignmentDAO;
+    private RepairAssignmentService repairAssignmentService;
 
     @Override
     public void init() throws ServletException {
-        this.repairAssignmentDAO = new RepairAssignmentDAO();
+        this.repairAssignmentService = new RepairAssignmentService();
     }
 
     @Override
@@ -37,10 +38,10 @@ public class RepairAssignmentServlet extends HttpServlet {
 
         try {
             // Get approved Repair waiting for repair assignment
-            List<ApprovedRepairDTO> approvedRepairs = repairAssignmentDAO.getApprovedRepairs();
+            List<ApprovedRepairDTO> approvedRepairs = repairAssignmentService.getApprovedRepairs();
 
             // Get available technicians for repair
-            List<TechnicianDTO> availableTechnicians = repairAssignmentDAO.getAvailableTechnicians();
+            List<TechnicianDTO> availableTechnicians = repairAssignmentService.getAvailableTechnicians();
 
             request.setAttribute("approvedRepair", approvedRepairs);
             request.setAttribute("availableTechnicians", availableTechnicians);
@@ -81,7 +82,7 @@ public class RepairAssignmentServlet extends HttpServlet {
             int detailId = Integer.parseInt(detailIdStr);
             int technicianId = Integer.parseInt(technicianIdStr);
 
-            // NEW: Parse scheduling times
+            // Parse scheduling times
             LocalDateTime plannedStart = null;
             LocalDateTime plannedEnd = null;
 
@@ -105,31 +106,18 @@ public class RepairAssignmentServlet extends HttpServlet {
                 }
             }
 
-            // Validate: planned_end must be after planned_start
-            if (plannedStart != null && plannedEnd != null) {
-                if (!plannedEnd.isAfter(plannedStart)) {
-                    response.sendRedirect(request.getContextPath() +
-                            "/techmanager/assign-repair?message=Planned end time must be after planned start time&type=error");
-                    return;
-                }
-            }
+            // Assign repair task via service
+            String resultMessage = repairAssignmentService.assignRepairTask(detailId, technicianId, plannedStart, plannedEnd);
 
-            // Check if already assigned
-            if (repairAssignmentDAO.hasRepairTaskAssigned(detailId)) {
+            if (resultMessage.contains("successfully")) {
                 response.sendRedirect(request.getContextPath() +
-                        "/techmanager/assign-repair?message=This task has already been assigned&type=warning");
-                return;
-            }
-
-            // Create repair task assignment with scheduling
-            boolean success = repairAssignmentDAO.createRepairTask(detailId, technicianId, plannedStart, plannedEnd);
-
-            if (success) {
+                        "/techmanager/assign-repair?message=" + resultMessage + "&type=success");
+            } else if (resultMessage.contains("already assigned")) {
                 response.sendRedirect(request.getContextPath() +
-                        "/techmanager/assign-repair?message=Repair task assigned successfully&type=success");
+                        "/techmanager/assign-repair?message=" + resultMessage + "&type=warning");
             } else {
                 response.sendRedirect(request.getContextPath() +
-                        "/techmanager/assign-repair?message=Failed to assign repair task&type=error");
+                        "/techmanager/assign-repair?message=" + resultMessage + "&type=error");
             }
 
         } catch (Exception e) {
