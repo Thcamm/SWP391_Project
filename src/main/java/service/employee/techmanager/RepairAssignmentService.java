@@ -46,15 +46,15 @@ public class RepairAssignmentService {
     /**
      * Assign repair task to technician with validation.
      * 
-     * @param detailId work order detail ID
+     * @param detailId     work order detail ID
      * @param technicianId technician ID
      * @param plannedStart planned start time (nullable)
-     * @param plannedEnd planned end time (nullable)
+     * @param plannedEnd   planned end time (nullable)
      * @return success message or error message
      * @throws SQLException if database error occurs
      */
     public String assignRepairTask(int detailId, int technicianId,
-                                    LocalDateTime plannedStart, LocalDateTime plannedEnd) throws SQLException {
+            LocalDateTime plannedStart, LocalDateTime plannedEnd) throws SQLException {
 
         // Validate time range if provided
         if (plannedStart != null && plannedEnd != null) {

@@ -29,7 +29,7 @@ public class TechnicianScheduleDAO {
      * Get scheduled tasks for a specific technician on a specific date.
      * 
      * @param technicianId technician employee ID
-     * @param targetDate target date
+     * @param targetDate   target date
      * @return list of scheduled tasks
      * @throws SQLException if database error occurs
      */
@@ -51,7 +51,7 @@ public class TechnicianScheduleDAO {
                 "ORDER BY ta.planned_start";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, technicianId);
             ps.setDate(2, java.sql.Date.valueOf(targetDate));

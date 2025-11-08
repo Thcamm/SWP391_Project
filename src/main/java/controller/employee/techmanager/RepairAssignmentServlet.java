@@ -107,7 +107,8 @@ public class RepairAssignmentServlet extends HttpServlet {
             }
 
             // Assign repair task via service
-            String resultMessage = repairAssignmentService.assignRepairTask(detailId, technicianId, plannedStart, plannedEnd);
+            String resultMessage = repairAssignmentService.assignRepairTask(detailId, technicianId, plannedStart,
+                    plannedEnd);
 
             if (resultMessage.contains("successfully")) {
                 response.sendRedirect(request.getContextPath() +

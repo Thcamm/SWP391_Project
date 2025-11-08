@@ -20,7 +20,8 @@ import java.util.List;
 
 /**
  * AJAX Endpoint: View Technician's Daily Schedule
- * Used by assignment forms to check technician availability before assigning tasks
+ * Used by assignment forms to check technician availability before assigning
+ * tasks
  * 
  * @author SWP391 Team
  * @version 2.0 (Refactored to 3-tier architecture)
@@ -69,7 +70,8 @@ public class TechnicianScheduleServlet extends HttpServlet {
                     : LocalDate.now();
 
             // Query scheduled tasks via service
-            List<ScheduledTaskDTO> scheduledTasks = technicianScheduleService.getScheduledTasks(technicianId, targetDate);
+            List<ScheduledTaskDTO> scheduledTasks = technicianScheduleService.getScheduledTasks(technicianId,
+                    targetDate);
 
             // Convert to JSON response
             JsonObject jsonResponse = new JsonObject();

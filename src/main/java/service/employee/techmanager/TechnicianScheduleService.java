@@ -27,7 +27,7 @@ public class TechnicianScheduleService {
      * Used to check technician availability before assigning new tasks.
      * 
      * @param technicianId technician employee ID
-     * @param targetDate target date
+     * @param targetDate   target date
      * @return list of scheduled tasks
      * @throws SQLException if database error occurs
      */

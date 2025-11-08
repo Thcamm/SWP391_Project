@@ -59,16 +59,16 @@ public class ServiceRequestApprovalService {
      * Approve service request and create WorkOrder with initial DIAGNOSIS detail.
      * This is a transactional operation (GĐ0 → GĐ1 transition).
      * 
-     * @param conn database connection (for transaction management)
-     * @param requestId service request ID
-     * @param taskDescription diagnosis task description
+     * @param conn                  database connection (for transaction management)
+     * @param requestId             service request ID
+     * @param taskDescription       diagnosis task description
      * @param techManagerEmployeeId TechManager's employee ID
      * @return created WorkOrder ID if successful
-     * @throws SQLException if database error occurs
+     * @throws SQLException          if database error occurs
      * @throws IllegalStateException if service request is not in PENDING status
      */
-    public int approveServiceRequest(Connection conn, int requestId, String taskDescription, 
-                                      int techManagerEmployeeId) throws SQLException {
+    public int approveServiceRequest(Connection conn, int requestId, String taskDescription,
+            int techManagerEmployeeId) throws SQLException {
 
         // Step 1: Check ServiceRequest status
         model.workorder.ServiceRequest serviceRequest = serviceRequestDAO.getServiceRequestForUpdate(conn, requestId);
@@ -122,7 +122,7 @@ public class ServiceRequestApprovalService {
      * Reject service request.
      * 
      * @param requestId service request ID
-     * @param reason rejection reason (currently unused, for future enhancement)
+     * @param reason    rejection reason (currently unused, for future enhancement)
      * @return true if successful
      * @throws SQLException if database error occurs
      */

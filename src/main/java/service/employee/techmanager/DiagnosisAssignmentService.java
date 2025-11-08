@@ -51,7 +51,8 @@ public class DiagnosisAssignmentService {
      * @return list of pending work order details
      * @throws SQLException if database error occurs
      */
-    public List<TaskAssignmentDAO.WorkOrderDetailWithInfo> getPendingDiagnosisTasks(int techManagerEmployeeId) throws SQLException {
+    public List<TaskAssignmentDAO.WorkOrderDetailWithInfo> getPendingDiagnosisTasks(int techManagerEmployeeId)
+            throws SQLException {
         return taskAssignmentDAO.getWorkOrderDetailsNeedingDiagnosisAssignment(techManagerEmployeeId);
     }
 
@@ -68,17 +69,17 @@ public class DiagnosisAssignmentService {
     /**
      * Assign diagnosis task to technician with validation.
      * 
-     * @param detailId work order detail ID
+     * @param detailId     work order detail ID
      * @param technicianId technician ID
-     * @param priority task priority
-     * @param notes task notes (nullable)
+     * @param priority     task priority
+     * @param notes        task notes (nullable)
      * @param plannedStart planned start time (nullable)
-     * @param plannedEnd planned end time (nullable)
+     * @param plannedEnd   planned end time (nullable)
      * @return assignment ID if successful, -1 if failed
      * @throws SQLException if database error occurs
      */
     public int assignDiagnosisTask(int detailId, int technicianId, String priority, String notes,
-                                    LocalDateTime plannedStart, LocalDateTime plannedEnd) throws SQLException {
+            LocalDateTime plannedStart, LocalDateTime plannedEnd) throws SQLException {
 
         // Validate time range if provided
         if (plannedStart != null && plannedEnd != null) {

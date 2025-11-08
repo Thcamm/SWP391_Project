@@ -60,8 +60,8 @@ public class DiagnosisAssignmentServlet extends HttpServlet {
             }
 
             // Get WorkOrderDetails that need diagnosis assignment
-            List<TaskAssignmentDAO.WorkOrderDetailWithInfo> pendingDetails = 
-                    diagnosisAssignmentService.getPendingDiagnosisTasks(techManagerEmployeeId);
+            List<TaskAssignmentDAO.WorkOrderDetailWithInfo> pendingDetails = diagnosisAssignmentService
+                    .getPendingDiagnosisTasks(techManagerEmployeeId);
 
             // Get list of available Technicians
             List<Employee> technicians = diagnosisAssignmentService.getAvailableTechnicians();
@@ -103,7 +103,8 @@ public class DiagnosisAssignmentServlet extends HttpServlet {
             String plannedStartStr = request.getParameter("plannedStart");
             String plannedEndStr = request.getParameter("plannedEnd");
 
-            // Parse scheduling times (format: yyyy-MM-dd'T'HH:mm from HTML5 datetime-local input)
+            // Parse scheduling times (format: yyyy-MM-dd'T'HH:mm from HTML5 datetime-local
+            // input)
             LocalDateTime plannedStart = null;
             LocalDateTime plannedEnd = null;
 
