@@ -1,18 +1,22 @@
 package dao.employee.techmanager;
 
 import common.DbContext;
+import model.dto.ActivityLogDTO;
+import model.dto.DiagnosticApprovalDTO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DAO for Tech Manager Dashboard statistics.
- * Handles database queries for dashboard metrics across 6 workflow phases.
+ * Handles database queries for dashboard metrics across 7 workflow phases.
  * 
  * @author SWP391 Team
- * @version 1.0
+ * @version 2.0 (Enhanced with activity logs & diagnostic monitoring)
  */
 public class DashboardDAO {
 
@@ -183,9 +187,8 @@ public class DashboardDAO {
     }
 
     /**
-     * Count WorkOrders where all tasks are COMPLETE but WorkOrder status is still
-     * OPEN.
-     * These are ready for TM to close.
+     * Count WorkOrders where all tasks are COMPLETE but WorkOrder status is still IN_PROCESS.
+     * These are ready for TM to close (GĐ7).
      * 
      * @return count of work orders ready for closure
      * @throws SQLException if database error occurs
@@ -193,7 +196,7 @@ public class DashboardDAO {
     public int countWorkOrdersReadyForClosure() throws SQLException {
         String sql = "SELECT COUNT(DISTINCT wo.WorkOrderID) " +
                 "FROM WorkOrder wo " +
-                "WHERE wo.Status = 'OPEN' " +
+                "WHERE wo.Status = 'IN_PROCESS' " +
                 "AND NOT EXISTS (" +
                 "    SELECT 1 FROM WorkOrderDetail wod " +
                 "    LEFT JOIN TaskAssignment ta ON wod.DetailID = ta.DetailID " +
@@ -209,14 +212,14 @@ public class DashboardDAO {
     }
 
     /**
-     * Count WorkOrders with Status = 'CLOSED' or 'COMPLETE'.
+     * Count WorkOrders with Status = 'COMPLETE'.
      * 
      * @return count of closed work orders
      * @throws SQLException if database error occurs
      */
     public int countClosedWorkOrders() throws SQLException {
         String sql = "SELECT COUNT(*) FROM WorkOrder " +
-                "WHERE Status IN ('CLOSED', 'COMPLETE')";
+                "WHERE Status = 'COMPLETE'";
 
         try (Connection conn = DbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
@@ -279,5 +282,126 @@ public class DashboardDAO {
                 ResultSet rs = ps.executeQuery()) {
             return rs.next() ? rs.getInt(1) : 0;
         }
+    }
+
+    // =========================================================================
+    // NEW: RECENT ACTIVITY LOGS (GĐ ALL)
+    // =========================================================================
+
+    /**
+     * Get recent technician activities for dashboard display.
+     * Shows last 20 activities ordered by time (most recent first).
+     * 
+     * @return list of activity log DTOs
+     * @throws SQLException if database error occurs
+     */
+    public List<ActivityLogDTO> getRecentActivities() throws SQLException {
+        String sql = "SELECT " +
+                "    tal.ActivityID, " +
+                "    u.FullName AS TechnicianName, " +
+                "    tal.ActivityType, " +
+                "    tal.Description, " +
+                "    tal.ActivityTime, " +
+                "    tal.TaskAssignmentID, " +
+                "    ta.TaskDescription, " +
+                "    CONCAT(v.Brand, ' ', v.Model, ' - ', v.LicensePlate) AS VehicleInfo " +
+                "FROM TechnicianActivityLog tal " +
+                "JOIN Employee e ON tal.TechnicianID = e.EmployeeID " +
+                "JOIN User u ON e.UserID = u.UserID " +
+                "LEFT JOIN TaskAssignment ta ON tal.TaskAssignmentID = ta.AssignmentID " +
+                "LEFT JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID " +
+                "LEFT JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
+                "LEFT JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
+                "LEFT JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
+                "ORDER BY tal.ActivityTime DESC " +
+                "LIMIT 20";
+
+        List<ActivityLogDTO> activities = new ArrayList<>();
+
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                ActivityLogDTO dto = new ActivityLogDTO();
+                dto.setActivityID(rs.getInt("ActivityID"));
+                dto.setTechnicianName(rs.getString("TechnicianName"));
+                dto.setActivityType(rs.getString("ActivityType"));
+                dto.setDescription(rs.getString("Description"));
+                dto.setActivityTime(rs.getTimestamp("ActivityTime"));
+                dto.setTaskAssignmentID(rs.getObject("TaskAssignmentID") != null 
+                    ? rs.getInt("TaskAssignmentID") : null);
+                dto.setTaskDescription(rs.getString("TaskDescription"));
+                dto.setVehicleInfo(rs.getString("VehicleInfo"));
+                activities.add(dto);
+            }
+        }
+
+        return activities;
+    }
+
+    // =========================================================================
+    // NEW: DIAGNOSTIC MONITORING (GĐ3)
+    // =========================================================================
+
+    /**
+     * Get diagnostics (quotes) pending customer approval.
+     * Ordered by days pending (oldest first).
+     * 
+     * @return list of diagnostic approval DTOs
+     * @throws SQLException if database error occurs
+     */
+    public List<DiagnosticApprovalDTO> getPendingDiagnosticApprovals() throws SQLException {
+        String sql = "SELECT " +
+                "    vd.VehicleDiagnosticID, " +
+                "    wo.WorkOrderID, " +
+                "    CONCAT(v.Brand, ' ', v.Model, ' - ', v.LicensePlate) AS VehicleInfo, " +
+                "    u_cust.FullName AS CustomerName, " +
+                "    u_cust.PhoneNumber AS CustomerPhone, " +
+                "    vd.IssueFound, " +
+                "    vd.EstimateCost, " +
+                "    vd.Status, " +
+                "    vd.CreatedAt, " +
+                "    DATEDIFF(NOW(), vd.CreatedAt) AS DaysPending, " +
+                "    u_tech.FullName AS TechnicianName, " +
+                "    e_tech.EmployeeID AS TechnicianID " +
+                "FROM VehicleDiagnostic vd " +
+                "JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID " +
+                "JOIN Employee e_tech ON ta.AssignToTechID = e_tech.EmployeeID " +
+                "JOIN User u_tech ON e_tech.UserID = u_tech.UserID " +
+                "JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID " +
+                "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
+                "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
+                "JOIN Customer c ON sr.CustomerID = c.CustomerID " +
+                "JOIN User u_cust ON c.UserID = u_cust.UserID " +
+                "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
+                "WHERE vd.Status = 'SUBMITTED' " +
+                "ORDER BY DaysPending DESC";
+
+        List<DiagnosticApprovalDTO> diagnostics = new ArrayList<>();
+
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                DiagnosticApprovalDTO dto = new DiagnosticApprovalDTO();
+                dto.setDiagnosticID(rs.getInt("VehicleDiagnosticID"));
+                dto.setWorkOrderID(rs.getInt("WorkOrderID"));
+                dto.setVehicleInfo(rs.getString("VehicleInfo"));
+                dto.setCustomerName(rs.getString("CustomerName"));
+                dto.setCustomerPhone(rs.getString("CustomerPhone"));
+                dto.setIssueFound(rs.getString("IssueFound"));
+                dto.setEstimateCost(rs.getBigDecimal("EstimateCost"));
+                dto.setStatus(rs.getString("Status"));
+                dto.setCreatedAt(rs.getTimestamp("CreatedAt"));
+                dto.setDaysPending(rs.getInt("DaysPending"));
+                dto.setTechnicianName(rs.getString("TechnicianName"));
+                dto.setTechnicianID(rs.getInt("TechnicianID"));
+                diagnostics.add(dto);
+            }
+        }
+
+        return diagnostics;
     }
 }

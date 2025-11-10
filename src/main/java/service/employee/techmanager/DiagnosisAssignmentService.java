@@ -93,7 +93,7 @@ public class DiagnosisAssignmentService {
         task.setDetailID(detailId);
         task.setAssignToTechID(technicianId);
         task.setAssignedDate(LocalDateTime.now());
-        task.setTaskDescription("Chẩn đoán tình trạng xe và xác định vấn đề");
+        task.setTaskDescription("Diagnose vehicle condition and identify issues");
         task.setTaskType(TaskAssignment.TaskType.DIAGNOSIS);
         task.setStatus(TaskAssignment.TaskStatus.ASSIGNED);
 

@@ -1,6 +1,8 @@
 package controller.employee.techmanager;
 
 import dao.workorder.RejectedTaskDAO;
+import model.dto.ActivityLogDTO;
+import model.dto.DiagnosticApprovalDTO;
 import service.employee.techmanager.DashboardService;
 import service.employee.techmanager.TechManagerService;
 import jakarta.servlet.ServletException;
@@ -11,27 +13,31 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Servlet controller for the Technical Manager Dashboard.
  * This servlet gathers and displays key performance indicators (KPIs) and
- * statistics related to the 6-phase garage workflow.
+ * statistics related to the 7-phase garage workflow.
  *
- * <p><b>NEW WORKFLOW (6 Phases):</b></p>
+ * <p><b>NEW WORKFLOW (7 Phases):</b></p>
  * <ol>
- * <li><b>Phase 1:</b> Reception & Diagnosis Assignment (TM -> KTV)</li>
- * <li><b>Phase 2:</b> KTV Diagnosis & Quote Creation (KTV creates quote)</li>
- * <li><b>Phase 3:</b> Customer Approval (Customer approves/rejects quote)</li>
- * <li><b>Phase 4:</b> System Auto-Bridge (System creates WorkOrderDetail)</li>
- * <li><b>Phase 5:</b> Repair Assignment (TM -> KTV)</li>
- * <li><b>Phase 6:</b> Repair Completion & WorkOrder Closure</li>
+ * <li><b>GĐ0:</b> ServiceRequest Creation (Customer/Receptionist)</li>
+ * <li><b>GĐ1:</b> ServiceRequest Approval & Diagnosis Assignment (TM → KTV)</li>
+ * <li><b>GĐ2:</b> KTV Diagnosis & Quote Creation (KTV creates VehicleDiagnostic)</li>
+ * <li><b>GĐ3:</b> Customer Approval (Customer approves/rejects quote)</li>
+ * <li><b>GĐ4:</b> System Auto-Bridge (Trigger creates WorkOrderDetail + WorkOrderPart)</li>
+ * <li><b>GĐ5:</b> Repair Assignment (TM → KTV)</li>
+ * <li><b>GĐ6:</b> Repair Execution (KTV performs repair)</li>
+ * <li><b>GĐ7:</b> WorkOrder Closure (TM closes WorkOrder)</li>
  * </ol>
+ * 
+ * @version 3.0 (Enhanced with activity monitoring & diagnostic tracking)
  */
 @WebServlet("/techmanager/dashboard")
 public class DashboardServlet extends HttpServlet {
 
-    // Tối ưu: Khởi tạo service một lần thay vì mỗi lần request
     private final DashboardService dashboardService = new DashboardService();
     private final TechManagerService techManagerService = new TechManagerService();
     private final RejectedTaskDAO rejectedTaskDAO = new RejectedTaskDAO();
@@ -52,28 +58,30 @@ public class DashboardServlet extends HttpServlet {
         try {
             Map<String, Integer> stats = new HashMap<>();
 
-            // ===== GĐ 1: Tiếp nhận & Phân công Chẩn đoán =====
+            // ===== GĐ0→1: Tiếp nhận & Duyệt Yêu cầu =====
             stats.put("pendingRequests", dashboardService.countPendingServiceRequests());
+
+            // ===== GĐ1: Phân công Chẩn đoán =====
             stats.put("assignedDiagnosis", dashboardService.countAssignedDiagnosis());
 
-            // ===== GĐ 2: KTV Chẩn đoán & Báo giá =====
+            // ===== GĐ2: KTV Chẩn đoán & Báo giá =====
             stats.put("inProgressDiagnosis", dashboardService.countInProgressDiagnosis());
-            stats.put("pendingQuotes", dashboardService.countPendingCustomerApproval()); // Báo giá (VD) chờ khách duyệt
+            
+            // ===== GĐ3: Chờ Khách hàng Duyệt =====
+            stats.put("pendingQuotes", dashboardService.countPendingCustomerApproval());
+            stats.put("overdueDiagnostics", dashboardService.countOverdueDiagnostics()); // NEW: Báo giá quá hạn
 
-            // ===== GĐ 3 & 4: Khách duyệt + Cầu nối Tự động =====
-            // (unassignedWorkOrderDetails là WorkOrderDetail được tạo bởi trigger nhưng chưa có TaskAssignment)
+            // ===== GĐ4→5: Cầu nối Tự động → Chờ phân công Sửa chữa =====
             stats.put("unassignedWorkOrderDetails", dashboardService.countUnassignedWorkOrderDetails());
 
-            // ===== GĐ 5: Phân công Sửa chữa =====
+            // ===== GĐ5→6: Phân công & Thực hiện Sửa chữa =====
             stats.put("assignedRepairs", dashboardService.countAssignedRepairs());
             stats.put("inProgressRepairs", dashboardService.countInProgressRepairs());
-            
-            // (Số liệu gộp)
             stats.put("activeRepairs", stats.get("assignedRepairs") + stats.get("inProgressRepairs"));
 
-            // ===== GĐ 6 & 7: Hoàn tất & Đóng lệnh =====
-            stats.put("completedRepairs", dashboardService.countCompletedRepairs()); // KTV đã làm xong
-            stats.put("workOrdersReadyForClosure", dashboardService.countWorkOrdersReadyForClosure()); // TM cần đóng
+            // ===== GĐ6→7: Hoàn tất & Đóng lệnh =====
+            stats.put("completedRepairs", dashboardService.countCompletedRepairs());
+            stats.put("workOrdersReadyForClosure", dashboardService.countWorkOrdersReadyForClosure());
             stats.put("closedWorkOrders", dashboardService.countClosedWorkOrders());
             stats.put("totalWorkOrders", dashboardService.countTotalWorkOrders());
 
@@ -82,14 +90,19 @@ public class DashboardServlet extends HttpServlet {
             stats.put("thisWeekCompleted", dashboardService.countThisWeekCompleted());
 
             // ===== Cảnh báo Quản lý (Xử lý Ngoại lệ) =====
-            stats.put("rejectedTasks", rejectedTaskDAO.countRejectedTasks()); // GĐ 6: Khách từ chối Báo giá
-            stats.put("overdueTasks", techManagerService.countOverdueTasks()); // GĐ 6: Task trễ SLA
-            stats.put("declinedTasks", techManagerService.countDeclinedTasks()); // GĐ 6: KTV từ chối Task
-            
-            // GĐ 7: Tổng số task cần gán lại
-            stats.put("tasksNeedReassignment", techManagerService.countTasksNeedReassignment()); 
+            stats.put("rejectedTasks", rejectedTaskDAO.countRejectedTasks());
+            stats.put("overdueTasks", techManagerService.countOverdueTasks());
+            stats.put("declinedTasks", techManagerService.countDeclinedTasks());
+            stats.put("tasksNeedReassignment", techManagerService.countTasksNeedReassignment());
+
+            // ===== NEW: Activity Logs & Diagnostic Details =====
+            List<ActivityLogDTO> recentActivities = dashboardService.getRecentActivities();
+            List<DiagnosticApprovalDTO> pendingDiagnostics = dashboardService.getPendingDiagnosticApprovals();
 
             request.setAttribute("stats", stats);
+            request.setAttribute("recentActivities", recentActivities);
+            request.setAttribute("pendingDiagnostics", pendingDiagnostics);
+
             request.getRequestDispatcher("/view/techmanager/dashboard.jsp").forward(request, response);
 
         } catch (Exception e) {

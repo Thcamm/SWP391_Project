@@ -1,15 +1,18 @@
 package service.employee.techmanager;
 
 import dao.employee.techmanager.DashboardDAO;
+import model.dto.ActivityLogDTO;
+import model.dto.DiagnosticApprovalDTO;
 
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Service layer for Tech Manager Dashboard operations.
- * Handles business logic for dashboard statistics across 6 workflow phases.
+ * Handles business logic for dashboard statistics across 7 workflow phases.
  * 
- * @author An
- * @version 1.0
+ * @author SWP391 Team
+ * @version 2.0 (Enhanced with activity monitoring)
  */
 public class DashboardService {
 
@@ -172,5 +175,48 @@ public class DashboardService {
      */
     public int countThisWeekCompleted() throws SQLException {
         return dashboardDAO.countThisWeekCompleted();
+    }
+
+    // =========================================================================
+    // NEW: RECENT ACTIVITY MONITORING
+    // =========================================================================
+
+    /**
+     * Get recent technician activities for dashboard display.
+     * 
+     * @return list of recent activities
+     * @throws SQLException if database error occurs
+     */
+    public List<ActivityLogDTO> getRecentActivities() throws SQLException {
+        return dashboardDAO.getRecentActivities();
+    }
+
+    // =========================================================================
+    // NEW: DIAGNOSTIC MONITORING (GĐ3)
+    // =========================================================================
+
+    /**
+     * Get diagnostics pending customer approval.
+     * These are quotes submitted by technicians waiting for customer decision.
+     * 
+     * @return list of pending diagnostics
+     * @throws SQLException if database error occurs
+     */
+    public List<DiagnosticApprovalDTO> getPendingDiagnosticApprovals() throws SQLException {
+        return dashboardDAO.getPendingDiagnosticApprovals();
+    }
+
+    /**
+     * Get count of overdue diagnostics (pending more than 2 days).
+     * This helps TM identify quotes that need customer follow-up.
+     * 
+     * @return count of overdue diagnostics
+     * @throws SQLException if database error occurs
+     */
+    public int countOverdueDiagnostics() throws SQLException {
+        List<DiagnosticApprovalDTO> pending = getPendingDiagnosticApprovals();
+        return (int) pending.stream()
+                .filter(DiagnosticApprovalDTO::isOverdue)
+                .count();
     }
 }
