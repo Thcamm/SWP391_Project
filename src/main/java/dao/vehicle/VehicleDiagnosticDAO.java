@@ -181,47 +181,74 @@ public class VehicleDiagnosticDAO {
         return null;
     }
 
-    /**
-     * Lấy diagnostic với đầy đủ thông tin (vehicle, customer, technician)
-     */
-    public VehicleDiagnostic getDiagnosticWithFullInfo(Connection conn, int diagnosticId)
-            throws SQLException {
-        String sql = "SELECT " +
-                "    vd.*, " +
-                // Vehicle info
-                "    v.VehicleID, " +
-                "    v.LicensePlate, " +
-                "    v.Brand, " +
-                "    v.Model, " +
-                "    v.YearManufacture, " +
-                // Customer info
-                "    c.CustomerID, " +
-                "    u_cust.FullName AS CustomerName, " +
-                "    u_cust.PhoneNumber AS CustomerPhone, " +
-                "    u_cust.Email AS CustomerEmail, " +
-                // Task info
-                "    ta.AssignmentID, " +
-                "    ta.TaskDescription, " +
-                "    ta.Status AS TaskStatus, " +
-                // Lead Technician info
-                "    ta.AssignToTechID, " +
-                "    u_tech.FullName AS TechnicianName, " +
-                "    u_tech.Email AS TechnicianEmail, " +
-                "    e.EmployeeCode, " +
-                // WorkOrder info
-                "    wo.WorkOrderID, " +
-                "    wo.Status AS WorkOrderStatus " +
-                "FROM VehicleDiagnostic vd " +
-                "JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID " +
-                "JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID " +
-                "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
-                "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
-                "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
-                "JOIN Customer c ON v.CustomerID = c.CustomerID " +
-                "LEFT JOIN User u_cust ON c.UserID = u_cust.UserID " +
-                "JOIN Employee e ON ta.AssignToTechID = e.EmployeeID " +
-                "JOIN User u_tech ON e.UserID = u_tech.UserID " +
-                "WHERE vd.VehicleDiagnosticID = ?";
+    public VehicleDiagnostic getByIdWithParts(int diagnosticId) throws SQLException {
+        try (Connection conn = DbContext.getConnection()) {
+            VehicleDiagnostic diagnostic = getDiagnosticById(conn, diagnosticId);
+
+            if (diagnostic != null) {
+                // Load parts using getPartsForDiagnostics method
+                Map<Integer, List<DiagnosticPart>> partsMap = getPartsForDiagnostics(
+                        Collections.singletonList(diagnosticId)
+                );
+
+                List<DiagnosticPart> parts = partsMap.get(diagnosticId);
+                if (parts != null) {
+                    diagnostic.setParts(parts);
+                }
+            }
+
+            return diagnostic;
+        }
+    }
+
+    public boolean update(Connection conn, VehicleDiagnostic diagnostic) throws SQLException {
+        String sql = "UPDATE VehicleDiagnostic SET " +
+                "IssueFound = ?, " +
+                "EstimateCost = ?, " +
+                "Status = ? " +
+                "WHERE VehicleDiagnosticID = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, diagnostic.getIssueFound());
+            ps.setBigDecimal(2, diagnostic.getEstimateCost());
+
+            // Convert enum to String for database
+            if (diagnostic.getStatus() != null) {
+                ps.setString(3, diagnostic.getStatus().name());
+            } else {
+                ps.setString(3, VehicleDiagnostic.DiagnosticStatus.SUBMITTED.name());
+            }
+
+            ps.setInt(4, diagnostic.getVehicleDiagnosticID());
+
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    public VehicleDiagnostic getById(int diagnosticId) throws SQLException {
+        try (Connection conn = DbContext.getConnection()) {
+            return getDiagnosticById(conn, diagnosticId);
+        }
+    }
+    public VehicleDiagnostic getDiagnosticWithFullInfo(Connection conn, int diagnosticId) throws SQLException {
+        String sql =
+                "SELECT vd.*, " +
+                        "       v.VehicleID, v.LicensePlate, v.Brand, v.Model, v.YearManufacture, " +
+                        "       c.CustomerID, u_cust.FullName AS CustomerName, u_cust.PhoneNumber AS CustomerPhone, u_cust.Email AS CustomerEmail, " +
+                        "       ta.AssignmentID, ta.TaskDescription, ta.Status AS TaskStatus, " +
+                        "       ta.AssignToTechID, u_tech.FullName AS TechnicianName, u_tech.Email AS TechnicianEmail, e.EmployeeCode, " +
+                        "       wo.WorkOrderID, wo.Status AS WorkOrderStatus " +
+                        "FROM VehicleDiagnostic vd " +
+                        "JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID " +
+                        "JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID " +
+                        "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
+                        "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
+                        "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
+                        "JOIN Customer c ON v.CustomerID = c.CustomerID " +
+                        "LEFT JOIN User u_cust ON c.UserID = u_cust.UserID " +
+                        "JOIN Employee e ON ta.AssignToTechID = e.EmployeeID " +
+                        "JOIN User u_tech ON e.UserID = u_tech.UserID " +
+                        "WHERE vd.VehicleDiagnosticID = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, diagnosticId);
@@ -777,59 +804,61 @@ public class VehicleDiagnosticDAO {
     /**
      * Lấy diagnostic theo ID (wrapper method - tự quản lý connection)
      */
-    public VehicleDiagnostic getById(int diagnosticId) throws SQLException {
-        try (Connection conn = DbContext.getConnection()) {
-            return getDiagnosticById(conn, diagnosticId);
-        }
-    }
+//    public VehicleDiagnostic getById(int diagnosticId) throws SQLException {
+//        try (Connection conn = DbContext.getConnection()) {
+//            return getDiagnosticById(conn, diagnosticId);
+//        }
+//    }
 
     /**
      * Lấy diagnostic kèm danh sách parts (wrapper method)
      */
-    public VehicleDiagnostic getByIdWithParts(int diagnosticId) throws SQLException {
-        try (Connection conn = DbContext.getConnection()) {
-            VehicleDiagnostic diagnostic = getDiagnosticById(conn, diagnosticId);
-
-            if (diagnostic != null) {
-                // Load parts using getPartsForDiagnostics method
-                Map<Integer, List<DiagnosticPart>> partsMap = getPartsForDiagnostics(
-                        Collections.singletonList(diagnosticId)
-                );
-
-                List<DiagnosticPart> parts = partsMap.get(diagnosticId);
-                if (parts != null) {
-                    diagnostic.setParts(parts);
-                }
-            }
-
-            return diagnostic;
-        }
-    }    /**
+//    public VehicleDiagnostic getByIdWithParts(int diagnosticId) throws SQLException {
+//        try (Connection conn = DbContext.getConnection()) {
+//            VehicleDiagnostic diagnostic = getDiagnosticById(conn, diagnosticId);
+//
+//            if (diagnostic != null) {
+//                // Load parts using getPartsForDiagnostics method
+//                Map<Integer, List<DiagnosticPart>> partsMap = getPartsForDiagnostics(
+//                        Collections.singletonList(diagnosticId)
+//                );
+//
+//                List<DiagnosticPart> parts = partsMap.get(diagnosticId);
+//                if (parts != null) {
+//                    diagnostic.setParts(parts);
+//                }
+//            }
+//
+//            return diagnostic;
+//        }
+//    }
+//
+  /**
      * Update diagnostic (full update including Status enum)
      */
-    public boolean update(Connection conn, VehicleDiagnostic diagnostic) throws SQLException {
-        String sql = "UPDATE VehicleDiagnostic SET " +
-                "IssueFound = ?, " +
-                "EstimateCost = ?, " +
-                "Status = ? " +
-                "WHERE VehicleDiagnosticID = ?";
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, diagnostic.getIssueFound());
-            ps.setBigDecimal(2, diagnostic.getEstimateCost());
-
-            // Convert enum to String for database
-            if (diagnostic.getStatus() != null) {
-                ps.setString(3, diagnostic.getStatus().name());
-            } else {
-                ps.setString(3, VehicleDiagnostic.DiagnosticStatus.SUBMITTED.name());
-            }
-
-            ps.setInt(4, diagnostic.getVehicleDiagnosticID());
-
-            return ps.executeUpdate() > 0;
-        }
-    }
+//    public boolean update(Connection conn, VehicleDiagnostic diagnostic) throws SQLException {
+//        String sql = "UPDATE VehicleDiagnostic SET " +
+//                "IssueFound = ?, " +
+//                "EstimateCost = ?, " +
+//                "Status = ? " +
+//                "WHERE VehicleDiagnosticID = ?";
+//
+//        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+//            ps.setString(1, diagnostic.getIssueFound());
+//            ps.setBigDecimal(2, diagnostic.getEstimateCost());
+//
+//            // Convert enum to String for database
+//            if (diagnostic.getStatus() != null) {
+//                ps.setString(3, diagnostic.getStatus().name());
+//            } else {
+//                ps.setString(3, VehicleDiagnostic.DiagnosticStatus.SUBMITTED.name());
+//            }
+//
+//            ps.setInt(4, diagnostic.getVehicleDiagnosticID());
+//
+//            return ps.executeUpdate() > 0;
+//        }
+//    }
 
     // ================================================================
     // DELETE OPERATIONS
@@ -902,5 +931,56 @@ public class VehicleDiagnosticDAO {
         }
 
         return vd;
+    }
+
+    private static void setStatusParam(PreparedStatement ps, int idx,
+                                       VehicleDiagnostic.DiagnosticStatus status) throws SQLException {
+        if (status == null) ps.setNull(idx, Types.VARCHAR);
+        else ps.setString(idx, status.name());
+    }
+
+    private static VehicleDiagnostic.DiagnosticStatus readStatus(ResultSet rs, String col) throws SQLException {
+        String raw = rs.getString(col);
+        if (raw == null) return null;
+        raw = raw.trim();
+        if (raw.isEmpty()) return null;
+
+        // Map legacy values
+        if ("1".equals(raw) || "true".equalsIgnoreCase(raw)) {
+            return VehicleDiagnostic.DiagnosticStatus.SUBMITTED;
+        }
+        if ("0".equals(raw) || "false".equalsIgnoreCase(raw)) {
+            return VehicleDiagnostic.DiagnosticStatus.REJECTED;
+        }
+
+
+        try {
+            return VehicleDiagnostic.DiagnosticStatus.valueOf(raw.toUpperCase());
+        } catch (IllegalArgumentException ex) {
+            return VehicleDiagnostic.DiagnosticStatus.SUBMITTED;
+        }
+    }
+
+    public boolean hasSubmittedWithPendingParts(int assignmentId) {
+        final String sql =
+                "SELECT 1 " +
+                        "FROM VehicleDiagnostic vd " +
+                        "LEFT JOIN DiagnosticPart dp ON dp.VehicleDiagnosticID = vd.VehicleDiagnosticID " +
+                        "WHERE vd.AssignmentID = ? " +
+                        "  AND vd.Status = 'SUBMITTED' " +                   // đã submit cho khách
+                        "  AND (dp.IsApproved = 0 OR dp.IsApproved IS NULL) " + // còn pending
+                        "LIMIT 1";
+
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, assignmentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+            return true;
+        }
     }
 }

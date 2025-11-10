@@ -38,6 +38,7 @@ public class Login extends HttpServlet {
         UserDAO userDAO = new UserDAO();
         UserLoginService userService = new UserLoginService(userDAO);
         User user = userService.findByUserName(username);
+
         if (user != null && PasswordUtil.checkPassword(password, user.getPasswordHash())) {
 
             String roleCode = new dao.employee.admin.rbac.RoleDao().findRoleCodeById(user.getRoleId());
@@ -96,7 +97,7 @@ public class Login extends HttpServlet {
             } else if (user.getRoleId() == 3) {
                 response.sendRedirect(request.getContextPath() + "/technician/home");
                 return;
-            } else if(user.getRoleId() == 4) {
+            } else if (user.getRoleId() == 4) {
                 response.sendRedirect(request.getContextPath() + "/inventory");
                 return;
             } else if (user.getRoleId() == 5) {

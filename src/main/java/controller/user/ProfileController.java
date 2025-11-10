@@ -32,12 +32,12 @@ public class ProfileController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         User sessionUser = (User) session.getAttribute("user");
-        String contextPath = request.getContextPath();
-
-        if (sessionUser == null) {
-            response.sendRedirect(contextPath + "/login");
-            return;
-        }
+//        String contextPath = request.getContextPath();
+//
+//        if (sessionUser == null) {
+//            response.sendRedirect(contextPath + "/login");
+//            return;
+//        }
 
         String action = request.getParameter("action");
         String idParam = request.getParameter("id");
@@ -63,10 +63,10 @@ public class ProfileController extends HttpServlet {
         User sessionUser = (User) session.getAttribute("user");
         String contextPath = request.getContextPath();
 
-        if (sessionUser == null) {
-            response.sendRedirect(contextPath + "/login");
-            return;
-        }
+//        if (sessionUser == null) {
+//            response.sendRedirect(contextPath + "/login");
+//            return;
+//        }
 
         // Lấy các tham số
         String fullName = request.getParameter("fullName");

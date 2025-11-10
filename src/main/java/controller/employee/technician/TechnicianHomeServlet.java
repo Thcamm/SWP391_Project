@@ -55,6 +55,11 @@ public class TechnicianHomeServlet extends HttpServlet {
         int inProgressPage = getPageParameter(req, "inProgressPage", DEFAULT_PAGE);
         int activitiesPage = getPageParameter(req, "activitiesPage", DEFAULT_PAGE);
 
+        // don cac task qua 10p de ko hien thi trong view
+        final int GRACE_MINUTES = 10;
+        technicianService.autoCancelExpiredAssigned(GRACE_MINUTES);
+
+        //sau do moi list du lieu
         ServiceResult statsResult = technicianService.getTaskStatistics(techinician.getEmployeeId());
         TaskStatistics statistics = statsResult.getData(TaskStatistics.class);
 

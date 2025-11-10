@@ -254,4 +254,43 @@ public class WorkOrderDetailDAO {
     }
 
 
+    public boolean hasPendingApprovalOrOpenWorkOrder(int assignmentId) {
+        // 1) có work order detail linked đến diagnostic của assignment này mà approval_status = 'PENDING'
+        final String sqlPending =
+                "SELECT 1 " +
+                        "FROM workorderdetail wod " +
+                        "JOIN vehiclediagnostic vd ON vd.VehicleDiagnosticID = wod.diagnostic_id " +
+                        "WHERE vd.AssignmentID = ? " +
+                        "  AND (wod.approval_status = 'PENDING' OR wod.approval_status IS NULL) " +
+                        "LIMIT 1";
+
+        // 2) hoặc workorder chưa completed (nếu bạn có cột status ở workorder)
+        final String sqlOpenWO =
+                "SELECT 1 " +
+                        "FROM workorderdetail wod " +
+                        "JOIN workorder wo ON wo.WorkOrderID = wod.WorkOrderID " +
+                        "JOIN vehiclediagnostic vd ON vd.VehicleDiagnosticID = wod.diagnostic_id " +
+                        "WHERE vd.AssignmentID = ? " +
+                        "  AND (wo.status IS NULL OR wo.status <> 'COMPLETED') " +
+                        "LIMIT 1";
+
+        try (Connection c = DbContext.getConnection()) {
+            try (PreparedStatement ps = c.prepareStatement(sqlPending)) {
+                ps.setInt(1, assignmentId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) return true;
+                }
+            }
+            try (PreparedStatement ps = c.prepareStatement(sqlOpenWO)) {
+                ps.setInt(1, assignmentId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) return true;
+                }
+            }
+            return false;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return true; // an toàn: lỗi -> chặn complete
+        }
+    }
 }

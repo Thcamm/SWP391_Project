@@ -15,6 +15,22 @@ public class PartDetail {
     private String manufacturer;
     private String description;
 
+    public String getManufacturer() {
+        return manufacturer;
+    }
+
+    public void setManufacturer(String manufacturer) {
+        this.manufacturer = manufacturer;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     // Thông tin JOIN (không lưu DB)
     private String partCode;
     private String partName;
@@ -63,106 +79,40 @@ public class PartDetail {
         this.partDetailId = partDetailId;
     }
 
-    public Integer getPartId() {
-        return partId;
-    }
 
-    public void setPartId(Integer partId) {
-        this.partId = partId;
-    }
 
-    public String getSku() {
-        return sku;
-    }
 
-    public void setSku(String sku) {
-        this.sku = sku;
-    }
+    public Integer getPartId() { return partId; }
+    public void setPartId(Integer partId) { this.partId = partId; }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
+    public String getSku() { return sku; }
+    public void setSku(String sku) { this.sku = sku; }
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
 
-    public Integer getMinStock() {
-        return minStock;
-    }
+    public Integer getMinStock() { return minStock; }
+    public void setMinStock(Integer minStock) { this.minStock = minStock; }
 
-    public void setMinStock(Integer minStock) {
-        this.minStock = minStock;
-    }
+    public BigDecimal getUnitPrice() { return unitPrice; }
+    public void setUnitPrice(BigDecimal unitPrice) { this.unitPrice = unitPrice; }
 
-    public BigDecimal getUnitPrice() {
-        return unitPrice;
-    }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 
-    public void setUnitPrice(BigDecimal unitPrice) {
-        this.unitPrice = unitPrice;
-    }
+    public String getPartCode() { return partCode; }
+    public void setPartCode(String partCode) { this.partCode = partCode; }
 
-    public String getLocation() {
-        return location;
-    }
+    public String getPartName() { return partName; }
+    public void setPartName(String partName) { this.partName = partName; }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
-    public String getPartCode() {
-        return partCode;
-    }
+    public String getUnitName() { return unitName; }
+    public void setUnitName(String unitName) { this.unitName = unitName; }
 
-    public void setPartCode(String partCode) {
-        this.partCode = partCode;
-    }
-
-    public String getPartName() {
-        return partName;
-    }
-
-    public void setPartName(String partName) {
-        this.partName = partName;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getUnitName() {
-        return unitName;
-    }
-
-    public void setUnitName(String unitName) {
-        this.unitName = unitName;
-    }
-
-    public String getManufacturer() {
-        return manufacturer;
-    }
-
-    public void setManufacturer(String manufacturer) {
-        this.manufacturer = manufacturer;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<CharacteristicValue> getCharacteristics() {
-        return characteristics;
-    }
-
+    public List<CharacteristicValue> getCharacteristics() { return characteristics; }
     public void setCharacteristics(List<CharacteristicValue> characteristics) {
         this.characteristics = characteristics;
     }

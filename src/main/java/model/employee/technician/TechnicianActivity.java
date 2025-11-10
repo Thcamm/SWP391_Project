@@ -25,6 +25,7 @@ public class TechnicianActivity {
     public enum ActivityType {
         TASK_ACCEPTED("accepted task"),
         TASK_REJECTED("rejected task"),
+        TASK_REJECT_REQUESTED("Request reject task"),
         TASK_STARTED("started working on"),
         TASK_COMPLETED("completed task"),
         PARTS_REQUESTED("requested parts for"),

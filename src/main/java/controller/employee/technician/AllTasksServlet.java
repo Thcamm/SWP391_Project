@@ -47,8 +47,16 @@ public class AllTasksServlet extends HttpServlet {
         String status = req.getParameter("status");
         String priority = req.getParameter("priority");
         String search = req.getParameter("search");
-
         int page = getPageParameter(req, "page", DEFAULT_PAGE);
+
+        String selfUrl = req.getContextPath() + "/technician/tasks";
+        String qs = req.getQueryString();
+        if (qs != null && !qs.isBlank()) selfUrl += "?" + qs;
+        req.setAttribute("returnTo", selfUrl);
+
+
+        final int GRACE_MINUTES = 10;
+        technicianService.autoCancelExpiredAssigned(GRACE_MINUTES);
 
         PaginationResponse<TaskAssignment> tasks = technicianService.getAllTasksWithFilter(
                 technician.getEmployeeId(),
@@ -74,6 +82,13 @@ public class AllTasksServlet extends HttpServlet {
         req.setAttribute("technician", technician);
         req.setAttribute("tasks", tasks);
         req.setAttribute("taskStats", taskStats);
+
+        req.setAttribute("status", status);
+        req.setAttribute("priority", priority);
+        req.setAttribute("search", search);
+        req.setAttribute("page", page);
+        req.setAttribute("pageSize", DEFAULT_PAGE_SIZE);
+
 
         req.getRequestDispatcher("/view/technician/tasks.jsp").forward(req, resp);
     }
