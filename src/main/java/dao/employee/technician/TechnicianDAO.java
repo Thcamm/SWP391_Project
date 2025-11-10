@@ -532,28 +532,24 @@ public class TechnicianDAO {
     }
 
 
-    public boolean updateTaskStatus(int assignmentId, TaskAssignment.TaskStatus status, LocalDateTime startTime) {
-        String sql = "UPDATE TaskAssignment SET Status = ?, StartAt = ? WHERE AssignmentID = ? ";
-        try (Connection conn = DbContext.getConnection();
+    public boolean updateStatusConditional(Connection conn,
+                                           int assignmentId,
+                                           TaskAssignment.TaskStatus fromStatus,
+                                           TaskAssignment.TaskStatus toStatus) {
+        String sql = "UPDATE TaskAssignment SET Status=? " +
+                "WHERE AssignmentID=? AND Status=?";
+        try (
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, status.name());
-
-            if (startTime != null) {
-                ps.setTimestamp(2, Timestamp.valueOf(startTime));
-            } else {
-                ps.setNull(2, Types.TIMESTAMP);
-            }
-
-            ps.setInt(3, assignmentId);
-
-            int rowsAffected = ps.executeUpdate();
-            return rowsAffected > 0;
-
+            ps.setString(1, toStatus.name());
+            ps.setInt(2, assignmentId);
+            ps.setString(3, fromStatus.name());
+            return ps.executeUpdate() == 1;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
     }
+
 
     public boolean updateTaskProgress(int assignmentId, int progressPercentage, String notes) {
         String sql = "UPDATE TaskAssignment SET progress_percentage = ?, notes = ? WHERE AssignmentID = ?";
@@ -790,24 +786,48 @@ public class TechnicianDAO {
         }
     }
 
-    public boolean updateTaskStatusWithStartTime(Connection conn,
-                                                 int assignmentId,
-                                                 TaskAssignment.TaskStatus expectedStatus,
-                                                 TaskAssignment.TaskStatus newStatus,
-                                                 LocalDateTime startTime) throws SQLException {
-        final String sql =
-                "UPDATE TaskAssignment " +
-                        "SET Status = ?, StartAt = ? " +
-                        "WHERE AssignmentID = ? AND Status = ?";
-
+    public boolean updateTaskStatusWithStartTimeWithinAssignWindow(
+            Connection conn,
+            int assignmentId,
+            TaskAssignment.TaskStatus fromStatus,
+            TaskAssignment.TaskStatus toStatus,
+            LocalDateTime startAt,
+            int graceMinutes
+    ) throws SQLException {
+        final String sql = """
+        UPDATE TaskAssignment
+        SET Status = ?, StartAt = ?
+        WHERE AssignmentID = ?
+          AND Status = ?
+          AND AssignedDate >= DATE_SUB(NOW(), INTERVAL ? MINUTE)
+    """;
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, newStatus.name());
-            ps.setTimestamp(2, startTime == null ? null : Timestamp.valueOf(startTime));
+            ps.setString(1, toStatus.name());
+            ps.setTimestamp(2, Timestamp.valueOf(startAt));
             ps.setInt(3, assignmentId);
-            ps.setString(4, expectedStatus.name());
+            ps.setString(4, fromStatus.name());
+            ps.setInt(5, graceMinutes);
             return ps.executeUpdate() == 1;
         }
     }
+
+    public int autoCancelExpiredAssigned(int graceMinutes) {
+        String sql = """
+        UPDATE TaskAssignment
+        SET Status = 'CANCELLED'
+        WHERE Status = 'ASSIGNED'
+          AND AssignedDate < DATE_SUB(NOW(), INTERVAL ? MINUTE)
+    """;
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, graceMinutes);
+            return ps.executeUpdate(); // số dòng bị hủy
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
 
     public boolean logActivity(Connection conn,
                                int technicianId,
@@ -864,4 +884,73 @@ public class TechnicianDAO {
         }
     }
 
+    public TaskAssignment findByIdForUpdate( int assignmentId) {
+        final String sql =
+                "SELECT " +
+                        "  AssignmentID, DetailID, AssignToTechID, " +
+                        "  AssignedDate, StartAt, CompleteAt, " +
+                        "  planned_start, planned_end, " +
+                        "  declined_at, decline_reason, " +
+                        "  TaskDescription, task_type, priority, Status, " +
+                        "  progress_percentage, notes " +
+                        "FROM TaskAssignment " +
+                        "WHERE AssignmentID = ? " +
+                        "FOR UPDATE";
+
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, assignmentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToTask(rs);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean hasPendingReject(int assignmentId) {
+        final String sql = """
+            SELECT 1
+            FROM TaskAssignment
+            WHERE AssignmentID = ? AND Status = 'DECLINED'
+            LIMIT 1
+        """;
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, assignmentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
+    public boolean insertPendingReject(int assignmentId, int technicianId, String reason, LocalDateTime now) {
+        final String sql = """
+            UPDATE TaskAssignment
+            SET Status = 'DECLINED',
+                declined_at = ?,
+                decline_reason = ?
+            WHERE AssignmentID = ?
+              AND AssignToTechID = ?
+              AND Status IN ('ASSIGNED','IN_PROGRESS')
+        """;
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(now));
+            ps.setString(2, reason);
+            ps.setInt(3, assignmentId);
+            ps.setInt(4, technicianId);
+            return ps.executeUpdate() == 1;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

@@ -104,8 +104,8 @@
                 <li class="nav-item">
                     <a class="nav-link ${fn:contains(uri,'/technician/tasks') ? 'active' : ''}"
                        href="${pageContext.request.contextPath}/technician/tasks">
-                        <i class="bi bi-house-door"></i>
-                        <span>Tasks</span>
+<%--                        <i class="bi bi-house-door"></i>--%>
+                        <span>🛠️ Tasks</span>
 
                     </a>
                 </li>

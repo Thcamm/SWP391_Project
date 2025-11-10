@@ -66,12 +66,37 @@ public class TaskActionServlet extends HttpServlet {
 
             ServiceResult result;
             switch (normalized) {
-                case "accept":
+                case "accept":{
                     result = technicianService.acceptTaskTx(technician.getEmployeeId(), assignmentId);
                     break;
-                case "reject":
-                    result = technicianService.rejectTask(technician.getEmployeeId(), assignmentId);
-                    break;
+            }
+                case "reject": {
+
+                    String reason = req.getParameter("reason");
+                    String stage  = req.getParameter("stage"); // "submit" khi bấm nút trên form
+
+                    if (reason == null || reason.isBlank() || !"submit".equals(stage)) {
+                        req.setAttribute("assignmentId", assignmentId);
+                        req.setAttribute("returnTo", returnTo);
+                        req.getRequestDispatcher("/view/technician/reject-form.jsp")
+                                .forward(req, resp);
+                        return;
+                    }
+                    result = technicianService.rejectTask(
+                            technician.getEmployeeId(),
+                            assignmentId,
+                            reason.trim()
+                    );
+
+                    if (result.isSuccess()) {
+                        MessageHelper.setSuccessMessage(session, result.getMessage());
+                    } else {
+                        MessageHelper.setErrorMessage(session, result.getMessage());
+                    }
+                    resp.sendRedirect(returnTo);
+                    return;
+                }
+
                 default:
                     MessageHelper.setErrorMessage(session, MessageConstants.ERR003);
                     resp.sendRedirect(returnTo);

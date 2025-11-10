@@ -58,7 +58,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                     </c:if>
                   </p>
                 </div>
-                <a href="${pageContext.request.contextPath}/techmanager/tasks-need-reassignment" class="btn btn-danger">
+                <a href="${pageContext.request.contextPath}/techmanager/reassign-tasks" class="btn btn-danger">
                   <i class="bi bi-arrow-right"></i>
                   View & Reassign
                 </a>

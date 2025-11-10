@@ -12,12 +12,12 @@
 <div class="container-fluid px-0">
     <div class="row g-0">
         <!-- Sidebar -->
-        <div class="col-auto" style="width: 280px;">
+        <div class="col-auto" style="flex:0 0 280px; width: 280px;">
             <jsp:include page="sidebar.jsp"/>
         </div>
 
         <!-- Main -->
-        <div class="col">
+        <div class="col" style="min-width:0;">
             <main class="p-3 pb-0">
                 <!-- Topbar -->
                 <div class="card border-0 shadow-sm mb-3">
@@ -112,6 +112,7 @@
                                             <th>Pl_End</th>
                                             <th>Est.</th>
                                             <th>Assigned</th>
+                                            <th>Actions</th>
 
                                         </tr>
                                         </thead>

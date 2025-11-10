@@ -224,20 +224,35 @@ public class TechnicianService {
 
                 // 4) Check deadline accept (<= 10 phút sau planned_start)
                 final int GRACE_MINUTES = 10;
-                if (LocalDateTime.now().isAfter(ps.plusMinutes(GRACE_MINUTES))) {
+                LocalDateTime assignedAt = task.getAssignedDate();
+                if (assignedAt == null) {
+                    System.out.println("Loi null asigned date time");
+                    conn.rollback();
+                    return ServiceResult.error(MessageConstants.TASK016); //
+                }
+                if (LocalDateTime.now().isAfter(assignedAt.plusMinutes(GRACE_MINUTES))) {
+                    technicianDAO.updateStatusConditional(conn,
+                            assignmentId,
+                            TaskAssignment.TaskStatus.ASSIGNED,
+                            TaskAssignment.TaskStatus.CANCELLED);
+
                     System.out.println("loi o day qua 10 p");
                     conn.rollback();
-                    return ServiceResult.error(MessageConstants.TASK015);
+                    return ServiceResult.error(MessageConstants.TASK015);// da qua 10p de accpet
                 }
 
                 // 5) Update trạng thái có điều kiện (WHERE Status='ASSIGNED')
                 LocalDateTime now = LocalDateTime.now();
-                boolean ok = technicianDAO.updateTaskStatusWithStartTime(
+                LocalDateTime startAtForWrite = (task.getPlannedStart() != null && now.isBefore(task.getPlannedStart()))
+                        ? task.getPlannedStart()
+                        : now;
+                boolean ok = technicianDAO.updateTaskStatusWithStartTimeWithinAssignWindow(
                         conn,
                         assignmentId,
                         TaskAssignment.TaskStatus.ASSIGNED,
                         TaskAssignment.TaskStatus.IN_PROGRESS,
-                        now
+                        startAtForWrite,
+                        GRACE_MINUTES
                 );
                 if (!ok) {
                     // có thể do race → đọc lại trạng thái
@@ -271,17 +286,49 @@ public class TechnicianService {
 
 
 
-    public ServiceResult rejectTask (int technicianId, int assignmentId) {
-        if (technicianId <= 0 || assignmentId <= 0) {
+    public ServiceResult rejectTask (int technicianId, int assignmentId, String reason) {
+        if (technicianId <= 0 || assignmentId <= 0 || reason == null || reason.trim().isEmpty()) {
             return ServiceResult.error(MessageConstants.ERR003);//invalid input
         }
 
+        reason = reason.trim();
+
+        if (reason.length() > 2000) {
+            return ServiceResult.error(MessageConstants.MSG010);
+        }
+
+        TaskAssignment task = technicianDAO.findByIdForUpdate(assignmentId);
+        if (task == null)
+        {
+            System.out.println("Ko tim thay task");
+            return ServiceResult.error(MessageConstants.ERR002);
+        }
+
+        if (task.getAssignToTechID() != technicianId) return ServiceResult.error(MessageConstants.TASK009);
+
+        if (task.getStatus() == TaskAssignment.TaskStatus.COMPLETE
+                || task.getStatus() == TaskAssignment.TaskStatus.CANCELLED
+                || task.getStatus() == TaskAssignment.TaskStatus.DECLINED) {
+            return ServiceResult.error(MessageConstants.ERR004);
+        }
+
+        if (technicianDAO.hasPendingReject(assignmentId)) {
+            System.out.println("Loi o day");
+            return ServiceResult.error(MessageConstants.ERR005); // task dang trong trang thai decline roi
+        }
+
+        boolean ok = technicianDAO.insertPendingReject(assignmentId, technicianId, reason, LocalDateTime.now());
+
+        if (!ok) return ServiceResult.error(MessageConstants.ERR001); // loi he thong
         boolean logged = technicianDAO.logActivity(
                 technicianId,
-                TechnicianActivity.ActivityType.TASK_REJECTED,
+                TechnicianActivity.ActivityType.TASK_REJECT_REQUESTED,
                 assignmentId,
-                "Rejected the assigned task"
+                "Requested rejection. Reason: " + reason
         );
+
+        // optional: bắn notify manager
+        // notificationService.notifyTechManagers(...)
 
         if (logged) {
             return ServiceResult.success(MessageConstants.TASK002); // Task rejected successfully
@@ -381,5 +428,15 @@ public class TechnicianService {
                 0,
                 0
         );
+    }
+
+    public void autoCancelExpiredAssigned(int graceMinutes) {
+
+        try {
+            technicianDAO.autoCancelExpiredAssigned(graceMinutes);
+        } catch (Exception e) {
+            // ghi log nếu cần nhưng đừng chặn luồng hiển thị
+            e.printStackTrace();
+        }
     }
 }

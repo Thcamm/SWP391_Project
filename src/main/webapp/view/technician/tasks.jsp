@@ -83,10 +83,12 @@
                             <div class="filter-group">
                                 <label for="status">Status</label>
                                 <select name="status" id="status" class="filter-control">
-                                    <option value="">All Status</option>
-                                    <option value="ASSIGNED" ${param.status == 'ASSIGNED' ? 'selected' : ''}>Assigned</option>
-                                    <option value="IN_PROGRESS" ${param.status == 'IN_PROGRESS' ? 'selected' : ''}>In Progress</option>
-                                    <option value="COMPLETE" ${param.status == 'COMPLETE' ? 'selected' : ''}>Completed</option>
+                                    <option value="" ${empty param.status ? 'selected' : ''}>All Status</option>
+                                    <option value="ASSIGNED"    ${param.status eq 'ASSIGNED'    ? 'selected' : ''}>Assigned</option>
+                                    <option value="IN_PROGRESS" ${param.status eq 'IN_PROGRESS' ? 'selected' : ''}>In Progress</option>
+                                    <option value="COMPLETE"    ${param.status eq 'COMPLETE'    ? 'selected' : ''}>Completed</option>
+                                    <option value="DECLINED"    ${param.status eq 'DECLINED'    ? 'selected' : ''}>Declined</option>
+                                    <option value="CANCELLED"   ${param.status eq 'CANCELLED'   ? 'selected' : ''}>Cancelled</option>
                                 </select>
                             </div>
 
@@ -182,75 +184,163 @@
 
                                             </td>
 
-                                            <td class="action-buttons">
-                                                <c:url var="detailUrl" value="/technician/task-detail">
-                                                    <c:param name="assignmentId" value="${task.assignmentID}"/>
-                                                    <c:param name="returnTo"
-                                                             value="${pageContext.request.requestURI}${empty pageContext.request.queryString ? '' : '?'.concat(pageContext.request.queryString)}"/>
-                                                </c:url>
-                                                <a href="${detailUrl}" class="btn btn-outline-primary btn-sm">
-                                                    👀 View Details
-                                                </a>
-                                                <c:choose>
-                                                    <c:when test="${task.status == 'ASSIGNED'}">
-                                                        <form action="${pageContext.request.contextPath}/technician/tasks-action"
-                                                              method="post" style="display: inline;">
-                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
-                                                            <input type="hidden" name="action" value="accept">
-                                                            <input type="hidden" name="returnTo" value="${returnTo}"/>
-                                                            <button type="submit" class="btn btn-accept btn-sm">Accept🐣</button>
-                                                        </form>
+                                            <td class="action-buttons text-end">
+                                                <c:set var="ctx" value="${pageContext.request.contextPath}" />
+                                                <c:set var="qs"  value="${pageContext.request.queryString}" />
+                                                <c:set var="back" value="${pageContext.request.requestURI}${not empty qs ? '?' : ''}${qs}" />
 
+
+                                                <c:url var="detailUrl" value="/technician/task-detail">
+                                                    <c:param name="assignmentId" value="${task.assignmentID}" />
+                                                    <c:param name="returnTo" value="${returnTo}" />
+                                                </c:url>
+                                                <a href="${detailUrl}" class="btn btn-outline-primary btn-sm">View Details</a>
+
+
+                                                <c:choose>
+                                                    <%-- ASSIGNED --%>
+                                                    <c:when test="${task.status eq 'ASSIGNED'}">
+                                                        <form action="${pageContext.request.contextPath}/technician/tasks-action" method="post" style="display:inline;">
+                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}" />
+                                                            <input type="hidden" name="action" value="accept" />
+                                                            <input type="hidden" name="returnTo" value="${returnTo}" />
+                                                            <button type="submit" class="btn btn-accept btn-sm">Accept</button>
+                                                        </form>
 
 
                                                         <button type="button" class="btn btn-sm btn-secondary" disabled
                                                                 title="Start the task first to create diagnostic">
-                                                            🩺 Create Diagnostic
+                                                            Create Diagnostic
                                                         </button>
                                                     </c:when>
 
-                                                    <c:when test="${task.status == 'IN_PROGRESS'}">
-                                                        <c:set var="qs" value="${pageContext.request.queryString}" />
-
+                                                    <%-- IN_PROGRESS --%>
+                                                    <c:when test="${task.status eq 'IN_PROGRESS'}">
                                                         <c:url var="updUrl" value="/technician/update-progress-form">
                                                             <c:param name="assignmentId" value="${task.assignmentID}" />
-                                                            <c:param name="returnTo"
-                                                                     value="${pageContext.request.requestURI}${not empty qs ? '?' : ''}${qs}" />
+                                                            <c:param name="returnTo" value="${returnTo}" />
                                                         </c:url>
-
                                                         <a href="${updUrl}" class="btn btn-update btn-sm">Update Progress</a>
 
 
-
-                                                        <form action="${pageContext.request.contextPath}/technician/update-progress" method="post" style="display: inline">
-                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
-                                                            <input type="hidden" name="action" value="complete">
+                                                        <form action="${ctx}/technician/update-progress" method="post" style="display:inline;">
+                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}" />
+                                                            <input type="hidden" name="action" value="complete" />
+                                                            <input type="hidden" name="returnTo" value="${returnTo}" />
                                                             <button type="submit" class="btn btn-complete btn-sm"
                                                                     onclick="return confirm('Mark this task as complete?');">
-                                                                Mark as Complete 🐙
+                                                                Mark as Complete
+                                                            </button>
+                                                        </form>
+
+
+                                                        <form method="get" action="${ctx}/technician/create-diagnostic" style="display:inline;">
+                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}" />
+                                                            <input type="hidden" name="returnTo" value="${returnTo}" />
+                                                            <button type="submit" class="btn btn-primary btn-sm">🩺 Create Diagnostic</button>
+                                                        </form>
+
+                                                    </c:when>
+
+                                                    <%-- COMPLETE --%>
+                                                    <c:when test="${task.status eq 'COMPLETE'}">
+                                                        <span class="btn btn-sm" style="background:#e0e0e0;color:#666;cursor:default;">DONE 🤞</span>
+                                                    </c:when>
+
+                                                    <%-- CANCELLED / DECLINED --%>
+                                                    <c:when test="${task.status eq 'DECLINED'}">
+                                                    <span class="badge text-bg-warning text-dark">DECLINED</span>
+                                                    <button type="button"
+                                                            class="btn btn-outline-secondary btn-sm ms-1"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#declineReason-${task.assignmentID}">
+                                                        View reason
+                                                    </button>
+
+
+                                                        <div class="modal fade" id="declineReason-${task.assignmentID}" tabindex="-1" aria-hidden="true">
+                                                            <div class="modal-dialog modal-dialog-centered">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h5 class="modal-title">Decline reason — #${task.assignmentID}</h5>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                    </div>
+                                                                    <div class="modal-body">
+                                                                        <p class="mb-1"><strong>Reason:</strong></p>
+                                                                        <p class="mb-2">${empty task.declineReason ? '—' : task.declineReason}</p>
+                                                                        <p class="text-muted small mb-0">
+                                                                            Declined at: ${task.declinedAtFormatted}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </c:when>
+
+                                                    <c:when test="${task.status eq 'CANCELLED'}">
+                                                        <span class="badge text-bg-danger">CANCELLED</span>
+                                                        <c:choose>
+                                                            <c:when test="${not empty task.declineReason}">
+                                                            <button type="button"
+                                                                    class="btn btn-outline-secondary btn-sm ms-1"
+                                                                    data-bs-toggle="modal"
+                                                                    data-bs-target="#cancelReason-${task.assignmentID}">
+                                                                View decline
                                                             </button>
 
 
-                                                        </form>
+                                                                <div class="modal fade" id="cancelReason-${task.assignmentID}" tabindex="-1" aria-hidden="true">
+                                                                    <div class="modal-dialog modal-dialog-centered">
+                                                                        <div class="modal-content">
+                                                                            <div class="modal-header">
+                                                                                <h5 class="modal-title">Cancelled (TM approved) — #${task.assignmentID}</h5>
+                                                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                            </div>
+                                                                            <div class="modal-body">
+                                                                                <p class="mb-1"><strong>Decline reason:</strong></p>
+                                                                                <p class="mb-2">${task.declineReason}</p>
+                                                                                <p class="text-muted small mb-0">
+                                                                                    Declined at: ${task.declinedAtFormatted}
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </c:when>
 
-                                                        <form method="get"
-                                                              action="${pageContext.request.contextPath}/technician/create-diagnostic"
-                                                              style="display:inline;">
-                                                            <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
-                                                            <button type="submit" class="btn btn-primary btn-sm">
-                                                                🩺 Create Diagnostic
-                                                            </button>
-                                                        </form>
-                                                    </c:when>
-                                                    <c:when test="${task.status == 'COMPLETE'}">
-                                    <span class="btn btn-sm" style="background: #e0e0e0; color: #666; cursor: default;">
-                                        DONE 🤞
-                                    </span>
 
+
+                                                            <c:otherwise>
+                                                                <button type="button"
+                                                                        class="btn btn-outline-secondary btn-sm ms-1"
+                                                                        data-bs-toggle="modal"
+                                                                        data-bs-target="#cancelWhy-${task.assignmentID}">
+                                                                    Why?
+                                                                </button>
+                                                                    <div class="modal fade" id="cancelWhy-${task.assignmentID}" tabindex="-1" aria-hidden="true">
+                                                                        <div class="modal-dialog modal-dialog-centered">
+                                                                            <div class="modal-content">
+                                                                                <div class="modal-header">
+                                                                                    <h5 class="modal-title">Cancelled (auto-timeout) — #${task.assignmentID}</h5>
+                                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                                                </div>
+                                                                                <div class="modal-body">
+                                                                                    <p class="mb-2">This task was auto-cancelled because it wasn’t accepted within 10 minutes of being assigned.</p>
+                                                                                    <p class="text-muted small mb-0">
+                                                                                        Assigned at: ${task.assignedDateFormatted}
+                                                                                    </p>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                     </c:when>
+
+
                                                 </c:choose>
-
                                             </td>
+
 
                                         </tr>
                                     </c:forEach>
@@ -260,14 +350,24 @@
                                 <!-- Pagination -->
                                 <c:if test="${tasks.totalPages > 0}">
                                     <div class="pagination">
-                                        <c:forEach begin="1" end="${tasks.totalPages}" var="page">
-                                            <a href="?page=${page}&status=${param.status}&priority=${param.priority}&search=${param.search}"
-                                               class="page-link ${page == tasks.currentPage ? 'active' : ''}">
-                                                    ${page}
-                                            </a>
+                                        <c:forEach begin="1" end="${tasks.totalPages}" var="p">
+                                            <c:url var="pageUrl" value="/technician/tasks">
+                                                <c:param name="page" value="${p}" />
+                                                <c:if test="${not empty param.status}">
+                                                    <c:param name="status" value="${param.status}" />
+                                                </c:if>
+                                                <c:if test="${not empty param.priority}">
+                                                    <c:param name="priority" value="${param.priority}" />
+                                                </c:if>
+                                                <c:if test="${not empty param.search}">
+                                                    <c:param name="search" value="${param.search}" />
+                                                </c:if>
+                                            </c:url>
+                                            <a href="${pageUrl}" class="page-link ${p == tasks.currentPage ? 'active' : ''}">${p}</a>
                                         </c:forEach>
                                     </div>
                                 </c:if>
+
 
                             </c:otherwise>
                         </c:choose>

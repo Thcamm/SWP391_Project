@@ -67,6 +67,13 @@ public class MessageConstants {
             "Incorrect user name or password. Please check again."
     );
 
+    public static final SystemMessage MSG010 = new SystemMessage(
+            "MSG010",
+            MessageType.INLINE,
+            "Text to long",
+            "Reason too long (max 2000 chars)."
+    );
+
     public static final SystemMessage AUTH001 = new SystemMessage(
             "AUTH001",
             MessageType.ERROR,
@@ -105,8 +112,8 @@ public class MessageConstants {
     public static final SystemMessage TASK002 = new SystemMessage(
             "TASK002",
             MessageType.SUCCESS,
-            "Task rejected successfully",
-            "Task rejected successfully."
+            "Task request rejected  successfully",
+            "Task request rejected successfully."
     );
 
     public static final SystemMessage TASK003 = new SystemMessage(
@@ -190,7 +197,7 @@ public class MessageConstants {
             "TASK013",
             MessageType.INFO,
             "Data field required",
-            "Data field is null. Required"
+            "Planned_start, planned_end is null. Required"
     );
 
     public static final SystemMessage TASK015 = new SystemMessage(
@@ -198,6 +205,13 @@ public class MessageConstants {
             MessageType.INFO,
             "Time limit",
             "Over 10 minutes to accept"
+    );
+
+    public static final SystemMessage TASK016 = new SystemMessage(
+            "TASK016",
+            MessageType.INFO,
+            "Time ",
+            "Missing assigned time."
     );
 
 
@@ -278,6 +292,20 @@ public class MessageConstants {
             MessageType.ERROR,
             "Invalid input data",
             "Invalid input. Please check your data."
+    );
+
+    public static final SystemMessage ERR004 = new SystemMessage(
+            "ERR004",
+            MessageType.ERROR,
+            "Precondition",
+            "Task already finished/cancelled."
+    );
+
+    public static final SystemMessage ERR005 = new SystemMessage(
+            "ERR005",
+            MessageType.ERROR,
+            "Precondition",
+            "Reject request is already pending for this task."
     );
 
     public static final SystemMessage VAL001 = new SystemMessage(
