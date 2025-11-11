@@ -36,7 +36,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '22'
 
       # Khởi tạo CodeQL
       - name: Initialize CodeQL
