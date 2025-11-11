@@ -36,22 +36,23 @@ public class DeclinedTaskDAO {
         String sql = "SELECT ta.AssignmentID, ta.task_type, ta.planned_start, ta.planned_end, " +
                 "ta.TaskDescription, ta.AssignedDate, ta.declined_at, ta.decline_reason, " +
                 "CONCAT(v.Brand, ' ', v.Model, ' - ', v.LicensePlate) AS vehicle_info, " +
-                "CONCAT(e.FirstName, ' ', e.LastName) AS technician_name, " +
-                "u.FullName AS customer_name " +
+                "tech_user.FullName AS technician_name, " +
+                "cust_user.FullName AS customer_name " +
                 "FROM TaskAssignment ta " +
                 "JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID " +
                 "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
                 "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
                 "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
-                "JOIN User u ON sr.CustomerID = u.UserID " +
+                "JOIN User cust_user ON sr.CustomerID = cust_user.UserID " +
                 "JOIN Employee e ON ta.AssignToTechID = e.EmployeeID " +
+                "JOIN User tech_user ON e.UserID = tech_user.UserID " +
                 "WHERE ta.declined_at IS NOT NULL " +
                 "AND ta.Status = 'CANCELLED' " +
                 "ORDER BY ta.declined_at DESC";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 DeclinedTaskDTO task = new DeclinedTaskDTO();

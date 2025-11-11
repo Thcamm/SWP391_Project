@@ -136,6 +136,34 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                       </a>
                     </div>
                   </c:if>
+                  <c:if test="${stats.overdueTasks > 0}">
+                    <div class="alert alert-danger d-flex align-items-center mb-2">
+                      <i class="bi bi-exclamation-octagon me-3 fs-4"></i>
+                      <div class="flex-grow-1">
+                        <strong>${stats.overdueTasks} Overdue Task(s) (SLA Violation)</strong>
+                        <p class="mb-0 small">Tasks have passed planned start time without being started.</p>
+                      </div>
+                      <a href="${pageContext.request.contextPath}/techmanager/overdue-tasks" class="btn btn-danger">
+                        <i class="bi bi-arrow-right"></i>
+                        View Tasks
+                      </a>
+                    </div>
+                  </c:if>
+                  <c:if test="${stats.declinedTasks > 0}">
+                    <div class="alert alert-warning d-flex align-items-center mb-2">
+                      <i class="bi bi-person-x me-3 fs-4"></i>
+                      <div class="flex-grow-1">
+                        <strong>${stats.declinedTasks} Declined Task(s)</strong>
+                        <p class="mb-0 small">
+                          Technicians have declined these assignments. Immediate reassignment needed.
+                        </p>
+                      </div>
+                      <a href="${pageContext.request.contextPath}/techmanager/declined-tasks" class="btn btn-warning">
+                        <i class="bi bi-arrow-right"></i>
+                        View Tasks
+                      </a>
+                    </div>
+                  </c:if>
                   <c:if test="${stats.overdueDiagnostics > 0}">
                     <div class="alert alert-warning d-flex align-items-center mb-0">
                       <i class="bi bi-clock-history me-3 fs-4"></i>
@@ -480,7 +508,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                             <th>Technician</th>
                             <th>Activity</th>
                             <th>Description</th>
-                            <th>Vehicle</th>
+                            <th>Brand</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -500,7 +528,16 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                                 <small>${activity.description}</small>
                               </td>
                               <td>
-                                <small class="text-muted">${activity.vehicleInfo}</small>
+                                <c:choose>
+                                  <c:when test="${not empty activity.vehicleInfo}">
+                                    <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                                      ${activity.vehicleInfo}
+                                    </span>
+                                  </c:when>
+                                  <c:otherwise>
+                                    <small class="text-muted fst-italic">—</small>
+                                  </c:otherwise>
+                                </c:choose>
                               </td>
                             </tr>
                           </c:forEach>

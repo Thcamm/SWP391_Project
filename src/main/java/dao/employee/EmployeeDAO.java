@@ -198,4 +198,105 @@ public class EmployeeDAO extends DbContext {
 
         return employee;
     }
+
+    // =========================================================================
+    // TECH MANAGER FUNCTIONALITY - UC-TM-02, UC-TM-03, UC-TM-11
+    // =========================================================================
+
+    /**
+     * Get list of ACTIVE technicians only (for task assignment).
+     * Used in UC-TM-02 (Assign Diagnosis) and UC-TM-03 (Assign Repair).
+     * 
+     * @return List of Employee objects representing active technicians with User
+     *         info
+     * @throws SQLException if database error occurs
+     */
+    public java.util.List<model.dto.TechnicianDTO> getActiveTechnicians() throws SQLException {
+        String sql = "SELECT " +
+                "    e.EmployeeID, " +
+                "    e.EmployeeCode, " +
+                "    e.UserID, " +
+                "    u.FullName, " +
+                "    u.PhoneNumber, " +
+                "    u.Email, " +
+                "    u.ActiveStatus " +
+                "FROM Employee e " +
+                "JOIN User u ON e.UserID = u.UserID " +
+                "JOIN RoleInfo r ON u.RoleID = r.RoleID " +
+                "WHERE r.RoleName = 'Technician' " +
+                "  AND u.ActiveStatus = 1 " + // ONLY ACTIVE
+                "ORDER BY u.FullName";
+
+        java.util.List<model.dto.TechnicianDTO> technicians = new java.util.ArrayList<>();
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                model.dto.TechnicianDTO dto = new model.dto.TechnicianDTO();
+                dto.setEmployeeID(rs.getInt("EmployeeID"));
+                dto.setEmployeeCode(rs.getString("EmployeeCode"));
+                dto.setUserID(rs.getInt("UserID"));
+                dto.setFullName(rs.getString("FullName"));
+                dto.setPhoneNumber(rs.getString("PhoneNumber"));
+                dto.setEmail(rs.getString("Email"));
+                dto.setActiveStatus(rs.getInt("ActiveStatus"));
+                technicians.add(dto);
+            }
+        }
+
+        return technicians;
+    }
+
+    /**
+     * Get ALL technicians (both Active and Inactive) managed by a specific Tech
+     * Manager.
+     * Used in UC-TM-11 (My Team page).
+     * 
+     * @param techManagerEmployeeID - The EmployeeID of the Tech Manager
+     * @return List of TechnicianDTO with ActiveStatus info
+     * @throws SQLException if database error occurs
+     */
+    public java.util.List<model.dto.TechnicianDTO> getAllTechniciansByManager(int techManagerEmployeeID)
+            throws SQLException {
+        String sql = "SELECT " +
+                "    e.EmployeeID, " +
+                "    e.EmployeeCode, " +
+                "    e.UserID, " +
+                "    u.FullName, " +
+                "    u.PhoneNumber, " +
+                "    u.Email, " +
+                "    u.ActiveStatus " +
+                "FROM Employee e " +
+                "JOIN User u ON e.UserID = u.UserID " +
+                "JOIN RoleInfo r ON u.RoleID = r.RoleID " +
+                "WHERE r.RoleName = 'Technician' " +
+                "  AND e.ManagedBy = ? " + // Managed by current TM
+                "ORDER BY u.ActiveStatus DESC, u.FullName"; // Active first
+
+        java.util.List<model.dto.TechnicianDTO> technicians = new java.util.ArrayList<>();
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, techManagerEmployeeID);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    model.dto.TechnicianDTO dto = new model.dto.TechnicianDTO();
+                    dto.setEmployeeID(rs.getInt("EmployeeID"));
+                    dto.setEmployeeCode(rs.getString("EmployeeCode"));
+                    dto.setUserID(rs.getInt("UserID"));
+                    dto.setFullName(rs.getString("FullName"));
+                    dto.setPhoneNumber(rs.getString("PhoneNumber"));
+                    dto.setEmail(rs.getString("Email"));
+                    dto.setActiveStatus(rs.getInt("ActiveStatus"));
+                    technicians.add(dto);
+                }
+            }
+        }
+
+        return technicians;
+    }
 }

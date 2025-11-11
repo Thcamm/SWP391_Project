@@ -304,7 +304,7 @@ public class DashboardDAO {
                 "    tal.ActivityTime, " +
                 "    tal.TaskAssignmentID, " +
                 "    ta.TaskDescription, " +
-                "    CONCAT(v.Brand, ' ', v.Model, ' - ', v.LicensePlate) AS VehicleInfo " +
+                "    v.Brand AS VehicleInfo " +
                 "FROM TechnicianActivityLog tal " +
                 "JOIN Employee e ON tal.TechnicianID = e.EmployeeID " +
                 "JOIN User u ON e.UserID = u.UserID " +

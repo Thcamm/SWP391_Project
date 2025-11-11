@@ -37,8 +37,8 @@ public class TaskReassignmentDAO {
         String sql = "SELECT ta.AssignmentID, ta.task_type, ta.planned_start, ta.planned_end, " +
                 "ta.TaskDescription, ta.AssignedDate, ta.declined_at, ta.decline_reason, " +
                 "CONCAT(v.Brand, ' ', v.Model, ' - ', v.LicensePlate) AS vehicle_info, " +
-                "CONCAT(e.FirstName, ' ', e.LastName) AS technician_name, " +
-                "u.FullName AS customer_name, " +
+                "tech_user.FullName AS technician_name, " +
+                "cust_user.FullName AS customer_name, " +
                 "CASE " +
                 "  WHEN ta.declined_at IS NOT NULL THEN 'DECLINED' " +
                 "  WHEN ta.planned_start < NOW() THEN 'OVERDUE' " +
@@ -49,8 +49,9 @@ public class TaskReassignmentDAO {
                 "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
                 "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
                 "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
-                "JOIN User u ON sr.CustomerID = u.UserID " +
+                "JOIN User cust_user ON sr.CustomerID = cust_user.UserID " +
                 "JOIN Employee e ON ta.AssignToTechID = e.EmployeeID " +
+                "JOIN User tech_user ON e.UserID = tech_user.UserID " +
                 "WHERE ta.Status = 'CANCELLED' " +
                 "AND (ta.declined_at IS NOT NULL OR " +
                 "     (ta.planned_start IS NOT NULL AND ta.planned_start < NOW())) " +

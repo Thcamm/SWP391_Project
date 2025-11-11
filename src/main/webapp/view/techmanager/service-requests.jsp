@@ -130,7 +130,7 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
                           <td>${req.serviceName}</td>
                           <td>
                             <strong class="text-success">
-                              <fmt:formatNumber value="${req.servicePrice}" type="currency" currencySymbol="$" />
+                              <fmt:formatNumber value="${req.servicePrice}" type="currency" currencySymbol="₫" />
                             </strong>
                           </td>
                           <td>
