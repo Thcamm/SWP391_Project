@@ -38,7 +38,6 @@ public class Login extends HttpServlet {
         UserDAO userDAO = new UserDAO();
         UserLoginService userService = new UserLoginService(userDAO);
         User user = userService.findByUserName(username);
-
         if (user != null && PasswordUtil.checkPassword(password, user.getPasswordHash())) {
 
             String roleCode = new dao.employee.admin.rbac.RoleDao().findRoleCodeById(user.getRoleId());

@@ -38,6 +38,12 @@ public class PaymentService {
         this.workOrderDAO = new WorkOrderDAO();
     }
 
+    public PaymentService(InvoiceDAO invoiceDAO, PaymentDAO paymentDAO, WorkOrderDAO workOrderDAO) {
+        this.invoiceDAO = invoiceDAO;
+        this.paymentDAO = paymentDAO;
+        this.workOrderDAO = workOrderDAO;
+    }
+
     public Invoice createInvoiceFromWorkOrder(int workOrderID) throws Exception {
         Connection conn = null;
         try {

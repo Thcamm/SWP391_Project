@@ -46,15 +46,15 @@
             </div>
             <div class="col-md-6 col-12">
                 <div class="footer-links d-flex justify-content-center justify-content-md-end gap-2 flex-wrap">
-                    <a href="${pageContext.request.contextPath}/help">
+                    <a href="#">
                         <i class="bi bi-question-circle"></i>
                         <span>Help</span>
                     </a>
-                    <a href="${pageContext.request.contextPath}/contact">
+                    <a href="#">
                         <i class="bi bi-envelope"></i>
                         <span>Contact</span>
                     </a>
-                    <a href="${pageContext.request.contextPath}/terms">
+                    <a href="#">
                         <i class="bi bi-file-text"></i>
                         <span>Terms</span>
                     </a>
