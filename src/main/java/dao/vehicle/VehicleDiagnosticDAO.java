@@ -147,6 +147,27 @@ public class VehicleDiagnosticDAO {
         }
     }
 
+
+    public int updatePartApproval(Connection c, int diagnosticPartId, boolean approved) throws SQLException {
+        String sql = "UPDATE DiagnosticPart SET IsApproved = ? WHERE DiagnosticPartID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setBoolean(1, approved);
+            ps.setInt(2, diagnosticPartId);
+            return ps.executeUpdate();
+        }
+    }
+
+    public int updateStatus(Connection c, int diagnosticId, String status, String reason) throws SQLException {
+        String sql = "UPDATE VehicleDiagnostic SET Status = ?, RejectReason = ? WHERE VehicleDiagnosticID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setString(2, reason);
+            ps.setInt(3, diagnosticId);
+            return ps.executeUpdate();
+        }
+    }
+
+
     // ================================================================
     // READ OPERATIONS - SINGLE RECORD
     // ================================================================
@@ -772,6 +793,27 @@ public class VehicleDiagnosticDAO {
         }
     }
 
+    public int autoRejectExpiredDiagnostics(int graceMinutes) {
+        String sql = """
+        UPDATE VehicleDiagnostic
+        SET Status = 'REJECTED',
+             RejectReason = 'Auto-rejected: Customer did not respond within 10 minutes'
+        WHERE Status = 'SUBMITTED'
+          AND TIMESTAMPDIFF(MINUTE, CreatedAt, NOW()) > ?
+    """;
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, graceMinutes);
+            int rows = ps.executeUpdate();
+            System.out.println("Auto-rejected diagnostics: " + rows);
+            return rows;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     /**
      * Kiểm tra technician có quyền access diagnostic không
      */
@@ -929,6 +971,10 @@ public class VehicleDiagnosticDAO {
         if (createdAt != null) {
             vd.setCreatedAt(createdAt.toLocalDateTime());
         }
+
+        try {
+            vd.setRejectReason(rs.getString("RejectReason"));
+        } catch (SQLException ignore) {}
 
         return vd;
     }

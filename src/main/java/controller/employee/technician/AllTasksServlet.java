@@ -11,6 +11,7 @@ import model.employee.technician.TaskAssignment;
 import model.employee.technician.TaskStatistics;
 import model.pagination.PaginationResponse;
 import service.employee.TechnicianService;
+import service.vehicle.VehicleDiagnosticService;
 
 import java.time.format.DateTimeFormatter;
 
@@ -19,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 public class AllTasksServlet extends HttpServlet {
 
     private final TechnicianService technicianService = new TechnicianService();
+    private final VehicleDiagnosticService vehicleDiagnosticService = new VehicleDiagnosticService();
 
     private static final int DEFAULT_PAGE = 1;
     private static final int DEFAULT_PAGE_SIZE = 5;
@@ -30,6 +32,7 @@ public class AllTasksServlet extends HttpServlet {
     @Override
     protected void doGet(jakarta.servlet.http.HttpServletRequest req, jakarta.servlet.http.HttpServletResponse resp)
             throws jakarta.servlet.ServletException, java.io.IOException {
+        vehicleDiagnosticService.autoRejectExpiredDiagnostics(10);
         HttpSession session = req.getSession(false);
 
         Integer userId = (Integer) session.getAttribute("userId");

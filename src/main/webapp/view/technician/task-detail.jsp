@@ -134,26 +134,65 @@
                                     </td>
                                     <td>${fn:length(vm.partsMap[diag.vehicleDiagnosticID])}</td>
                                     <td>
-                                        <fmt:formatNumber value="${vm.grandTotal[diag.vehicleDiagnosticID]}" type="currency"
+                                        <fmt:formatNumber value="${vm.grandTotal[diag.vehicleDiagnosticID]}"
+                                                          type="currency"
                                                           currencySymbol="$"/>
                                     </td>
 
                                     <td>
                                         <c:choose>
-                                            <c:when test="${diag.statusString == 'SUBMITTED'}">
+                                            <c:when test="${diag.statusString eq 'SUBMITTED'}">
                                                 <span class="status-badge SUBMITTED">Submitted</span>
                                             </c:when>
-                                            <c:when test="${diag.statusString == 'APPROVED'}">
+
+                                            <c:when test="${diag.statusString eq 'APPROVED'}">
                                                 <span class="status-badge APPROVED">Approved</span>
                                             </c:when>
-                                            <c:when test="${diag.statusString == 'REJECTED'}">
+
+                                            <c:when test="${diag.statusString eq 'REJECTED'}">
                                                 <span class="status-badge REJECTED">Rejected</span>
+
+                                                <!-- Nút xem lý do -->
+                                                <button type="button"
+                                                        class="btn btn-outline-secondary btn-sm ms-1"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#rejectReason-${diag.vehicleDiagnosticID}">
+                                                    View reason
+                                                </button>
+
+                                                <!-- Modal hiển thị lý do -->
+                                                <div class="modal fade" id="rejectReason-${diag.vehicleDiagnosticID}"
+                                                     tabindex="-1" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title">Rejected Reason —
+                                                                    #${diag.vehicleDiagnosticID}</h5>
+                                                                <button type="button" class="btn-close"
+                                                                        data-bs-dismiss="modal"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p><strong>Reason:</strong></p>
+                                                                <p class="mb-2">
+                                                                        ${empty diag.rejectReason ? 'No reason provided' : diag.rejectReason}
+                                                                </p>
+                                                                <p class="text-muted small mb-0">
+                                                                    Created at: ${diag.createdAtFormatted}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </c:when>
+
                                             <c:otherwise>
                                                 <span class="status-badge DRAFT">Draft</span>
                                             </c:otherwise>
                                         </c:choose>
                                     </td>
+
+
+
                                     <td>
                                         <c:out value="${diag.createdAtFormatted}"/>
                                     </td>
@@ -165,18 +204,46 @@
                                         <c:set var="approvedCnt"
                                                value="${vm.approvedCount[diag.vehicleDiagnosticID] != null ? vm.approvedCount[diag.vehicleDiagnosticID] : 0}"/>
 
-                                        <c:if test="${approvedCnt == 0}">
-                                            <a class="btn btn-sm btn-outline-secondary"
-                                               href="${pageContext.request.contextPath}/technician/diagnostic/edit?diagnosticId=${diag.vehicleDiagnosticID}">
-                                                🐙 Edit
-                                            </a>
-                                        </c:if>
+                                        <c:choose>
+                                            <c:when test="${diag.statusString eq 'REJECTED'}">
+                                                <button class="btn btn-sm btn-secondary" disabled
+                                                        title="Cannot edit rejected diagnostics">🐙 Edit
+                                                </button>
+                                            </c:when>
 
-                                        <c:if test="${approvedCnt > 0}">
+                                            <c:when test="${approvedCnt == 0}">
+                                                <a class="btn btn-sm btn-outline-secondary"
+                                                   href="${pageContext.request.contextPath}/technician/diagnostic/edit?diagnosticId=${diag.vehicleDiagnosticID}">
+                                                    🐙 Edit
+                                                </a>
+                                            </c:when>
+
+                                            <c:otherwise>
             <span class="text-muted" style="font-size:12px;"
                   title="This diagnostic has approved parts and cannot be edited.">(locked)</span>
-                                        </c:if>
+                                            </c:otherwise>
+                                        </c:choose>
                                     </td>
+
+<%--                                    <td class="actions">--%>
+<%--                                        <a href="${pageContext.request.contextPath}/technician/diagnostic/view?diagnosticId=${diag.vehicleDiagnosticID}"--%>
+<%--                                           class="btn-sm btn-view">👀 View</a>--%>
+
+<%--                                        <c:set var="approvedCnt"--%>
+<%--                                               value="${vm.approvedCount[diag.vehicleDiagnosticID] != null ? vm.approvedCount[diag.vehicleDiagnosticID] : 0}"/>--%>
+
+<%--                                        <c:if test="${approvedCnt == 0}">--%>
+<%--                                            <a class="btn btn-sm btn-outline-secondary"--%>
+<%--                                               href="${pageContext.request.contextPath}/technician/diagnostic/edit?diagnosticId=${diag.vehicleDiagnosticID}">--%>
+<%--                                                🐙 Edit--%>
+<%--                                            </a>--%>
+<%--                                        </c:if>--%>
+
+<%--                                        <c:if test="${approvedCnt > 0}">--%>
+<%--            <span class="text-muted" style="font-size:12px;"--%>
+<%--                  title="This diagnostic has approved parts and cannot be edited.">(locked)</span>--%>
+<%--                                        </c:if>--%>
+<%--                                    </td>--%>
                                 </tr>
                             </c:forEach>
                             </tbody>

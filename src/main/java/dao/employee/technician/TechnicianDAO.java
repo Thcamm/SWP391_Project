@@ -168,7 +168,8 @@ public class TechnicianDAO {
                 "wd.EstimateHours, " +
                 "CONCAT(v.LicensePlate, ' - ', v.Brand, ' ', v.Model) AS VehicleInfo, " +
                 "GROUP_CONCAT(DISTINCT st.ServiceName SEPARATOR ', ') AS ServiceNames, " +
-                "u.FullName as CustomerName " +
+                "u.FullName as CustomerName, " +
+                "u.Email AS CustomerEmail " +
                 "FROM TaskAssignment ta " +
                 "JOIN WorkOrderDetail wd ON ta.DetailID = wd.DetailID " +
                 "JOIN WorkOrder wo ON wd.WorkOrderID = wo.WorkOrderID " +
@@ -188,6 +189,8 @@ public class TechnicianDAO {
                 if (rs.next()) {
                     TaskAssignment task = mapResultSetToTask(rs);
                     task.setServiceInfo(rs.getString("ServiceNames"));
+                    task.setCustomerName(rs.getString("CustomerName"));
+                    task.setCustomerEmail(rs.getString("CustomerEmail"));
                     return task;
                 }
             }
@@ -510,6 +513,8 @@ public class TechnicianDAO {
         task.setProgressPercentage(rs.getInt("progress_percentage"));
         task.setNotes(rs.getString("notes"));
 
+
+
         // --- optional display fields from JOIN/aggregates ---
         // các alias này chỉ có khi SELECT có JOIN + alias tương ứng
         try {
@@ -522,6 +527,10 @@ public class TechnicianDAO {
 
         try {
             task.setCustomerName(rs.getString("CustomerName"));
+        } catch (SQLException ignore) {}
+
+        try {
+            task.setCustomerEmail(rs.getString("CustomerEmail"));
         } catch (SQLException ignore) {}
 
         try {

@@ -17,6 +17,8 @@ import model.vehicle.VehicleDiagnostic;
 import service.employee.TechnicianDiagnosticService;
 import service.employee.TechnicianService;
 import service.inventory.PartService;
+import service.vehicle.VehicleDiagnosticService;
+import util.MailService;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -30,13 +32,14 @@ public class CreateDiagnosticServlet extends HttpServlet {
     private final TechnicianService technicianService = new TechnicianService();
     private final TechnicianDiagnosticService diagnosticService = new TechnicianDiagnosticService();
     private final PartService partService = new PartService();
+    private final VehicleDiagnosticService vehicleDiagnosticService = new VehicleDiagnosticService();
 
 
     private int parseIntOr(String s, int def) {
         try { return Integer.parseInt(s); } catch (Exception ignored) { return def; }
     }
 
-    /** Nạp list parts để hiển thị + map các part đã chọn (để option selected vẫn xuất hiện). */
+    /** Nạp list parts để hiển thị + map các part đã chọn */
     private void loadPartsForDisplay(HttpServletRequest req, String partQuery, String[] partDetailIds) {
         int page = parseIntOr(req.getParameter("page"), 1);
         int size = parseIntOr(req.getParameter("size"), 20);
@@ -89,6 +92,7 @@ public class CreateDiagnosticServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        vehicleDiagnosticService.autoRejectExpiredDiagnostics(10);
         HttpSession session = req.getSession(false);
         Integer userId = (Integer) session.getAttribute("userId");
 
@@ -316,13 +320,19 @@ public class CreateDiagnosticServlet extends HttpServlet {
         diagnostic.setParts(parts);
 
         // CHANGED: Status mặc định SUBMITTED (pending approval)
-        diagnostic.setStatus(VehicleDiagnostic.DiagnosticStatus.SUBMITTED);     // nếu bạn dùng enum field
+        diagnostic.setStatus(VehicleDiagnostic.DiagnosticStatus.SUBMITTED);
 
         // call service
         ServiceResult result = diagnosticService.createDiagnosticWithParts(
                 technician.getEmployeeId(), diagnostic);
 
         if (result.isSuccess()) {
+            System.out.println(task.getCustomerEmail());
+            MailService.sendEmail(task.getCustomerEmail(), "Diagnostic Report Created — Please Review Within 10 Minutes",
+                    "A diagnostic has been created for your vehicle." +
+                            "Please review it and choose whether to Accept or Reject within 10 minutes." +
+                            "If no action is taken within 10 minutes,the system will automatically reject this diagnostic.\n" +
+                            "Garage Management System");
             loadPartsForDisplay(req, "", null);
             forwardForm(req, resp, task, technician, null, String.valueOf(result.getMessage()));
         } else {
