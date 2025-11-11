@@ -184,11 +184,13 @@
         </c:forEach>
 
         <jsp:include page="/view/customerservice/pagination.jsp">
-            <jsp:param name="totalPages" value="${totalPages}" />
-            <jsp:param name="currentPage" value="${currentPage}" />
+            <jsp:param name="totalPages" value="${vehicleTotalPages}" />
+            <jsp:param name="currentPage" value="${vehicleCurrentPage}" />
             <jsp:param name="baseUrl" value="/customerservice/customer-detail" />
-            <jsp:param name="queryString" value="&id=${customer.customerId}" />
+            <jsp:param name="paramName" value="vehiclePage" />
+            <jsp:param name="queryString" value="&id=${customer.customerId}&journeyPage=${journeyCurrentPage}" />
         </jsp:include>
+
     </div>
 </div>
 

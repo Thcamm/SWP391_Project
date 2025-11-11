@@ -388,10 +388,22 @@ public class RepairTrackerService {
     /**
      * Lấy danh sách tóm tắt cho trang List
      */
-    public List<RepairJourneySummaryDTO> getSummariesForCustomer(int customerId) throws SQLException {
-        return journeyDAO.getJourneySummaries(customerId);
+// SỬA ĐỔI phương thức này (đổi tên, thêm tham số)
+    public List<RepairJourneySummaryDTO> getPaginatedSummariesForCustomer(int customerId, int limit, int offset) throws SQLException {
+        // Gọi phương thức DAO đã được phân trang
+        return journeyDAO.getPaginatedJourneySummaries(customerId, limit, offset);
     }
-    public List<RepairJourneySummaryDTO> getAllTracker() throws SQLException {
-        return journeyDAO.getAllTracking();
+
+    // Thêm phương thức MỚI này để đếm
+    public int countSummariesForCustomer(int customerId) throws SQLException {
+        return journeyDAO.countJourneySummaries(customerId);
     }
+    public List<RepairJourneySummaryDTO> getAllTracker(int limit, int offset) throws SQLException {
+        return journeyDAO.getPaginatedTracking(limit, offset);
+    }
+
+    public int countAllTracker() throws SQLException {
+        return journeyDAO.countAllTracking();
+    }
+
 }

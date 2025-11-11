@@ -6,109 +6,146 @@ import dao.customer.CustomerDAO;
 import dao.vehicle.CarDataDAO;
 import dao.vehicle.VehicleDAO;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+import jakarta.servlet.*;
 import model.customer.Customer;
 import model.customer.PendingChange;
 import model.dto.RepairJourneySummaryDTO;
 import model.vehicle.CarBrand;
 import model.vehicle.Vehicle;
-import util.MailService;
-import model.dto.RepairJourneySummaryDTO;
 import service.tracking.RepairTrackerService;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
+import util.MailService;
+
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+
 @WebServlet(urlPatterns = {"/customerservice/customer-detail"})
 public class EditCustomer extends HttpServlet {
     private static final int VEHICLES_PER_PAGE = 5;
-    private PendingChangeDAO pendingChangeDAO = new PendingChangeDAO();
-    private CustomerDAO customerDAO = new CustomerDAO();
-    private VehicleDAO vehicleDAO = new VehicleDAO();
-    private CarDataDAO carDAO = new CarDataDAO();
-    private final RepairTrackerService repairListService = new RepairTrackerService();
+    private static final int JOURNEYS_PER_PAGE = 10;
+
+    private final PendingChangeDAO pendingChangeDAO = new PendingChangeDAO();
+    private final CustomerDAO customerDAO = new CustomerDAO();
+    private final VehicleDAO vehicleDAO = new VehicleDAO();
+    private final CarDataDAO carDAO = new CarDataDAO();
+    private final RepairTrackerService repairTrackerService = new RepairTrackerService();
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         HttpSession session = request.getSession();
+
+        // 📨 Lấy message hiển thị 1 lần
         if (session.getAttribute("message") != null) {
             request.setAttribute("message", session.getAttribute("message"));
             request.setAttribute("messageType", session.getAttribute("messageType"));
             session.removeAttribute("message");
             session.removeAttribute("messageType");
         }
-        String id = request.getParameter("id");
 
-        if (id == null || id.trim().isEmpty()) {
+        String idParam = request.getParameter("id");
+        if (idParam == null || idParam.trim().isEmpty()) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID không hợp lệ!");
             return;
         }
 
         try {
-            int currentPage = 1;
-            String pageParam = request.getParameter("page");
-            if (pageParam != null) {
-                try {
-                    currentPage = Integer.parseInt(pageParam);
-                } catch (NumberFormatException e) {
-                    currentPage = 1; // Mặc định là 1 nếu param không hợp lệ
-                }
-            }
-            int customerId = Integer.parseInt(id);
+            int customerId = Integer.parseInt(idParam);
+
+            // 🔹 Thông tin khách hàng
             Customer customer = customerDAO.getCustomerById(customerId);
+            if (customer == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "Không tìm thấy khách hàng!");
+                return;
+            }
             request.setAttribute("customer", customer);
+
+            // === PHÂN TRANG XE (VEHICLE) ===
+            int vehicleCurrentPage = 1;
+            String vehiclePageParam = request.getParameter("vehiclePage");
+            if (vehiclePageParam != null) {
+                try {
+                    vehicleCurrentPage = Math.max(1, Integer.parseInt(vehiclePageParam));
+                } catch (NumberFormatException ignored) {}
+            }
+
             int totalVehicles = vehicleDAO.getVehicleCountByCustomerId(customerId);
+            PaginationUtils.PaginationCalculation vehicleCalc =
+                    PaginationUtils.calculateParams(totalVehicles, vehicleCurrentPage, VEHICLES_PER_PAGE);
 
-            // Tính toán phân trang bằng tiện ích của bạn
-            PaginationUtils.PaginationCalculation pagination = PaginationUtils.calculateParams(
-                    totalVehicles,
-                    currentPage,
-                    VEHICLES_PER_PAGE
-            );
-
-            // Lấy danh sách xe cho trang hiện tại
             List<Vehicle> vehicles = vehicleDAO.getVehiclesByCustomerIdPaginated(
-                    customerId,
-                    VEHICLES_PER_PAGE,
-                    pagination.getOffset()
-            );
-            List<RepairJourneySummaryDTO> journeyList =
-                    repairListService.getSummariesForCustomer(customerId);
+                    customerId, VEHICLES_PER_PAGE, vehicleCalc.getOffset());
 
-            // 3. Gửi danh sách này sang JSP
-            request.setAttribute("journeyList", journeyList);
-            request.setAttribute("vehicles", vehicles); // Danh sách xe của trang này
-            request.setAttribute("totalPages", pagination.getTotalPages()); // Gửi tổng số trang
-            request.setAttribute("currentPage", pagination.getSafePage());
+            request.setAttribute("vehicles", vehicles);
+            request.setAttribute("vehicleTotalPages", vehicleCalc.getTotalPages());
+            request.setAttribute("vehicleCurrentPage", vehicleCalc.getSafePage());
+
+            // === PHÂN TRANG HÀNH TRÌNH SỬA CHỮA (JOURNEY) ===
+            int journeyCurrentPage = 1;
+            String journeyPageParam = request.getParameter("journeyPage");
+            if (journeyPageParam != null) {
+                try {
+                    journeyCurrentPage = Math.max(1, Integer.parseInt(journeyPageParam));
+                } catch (NumberFormatException ignored) {}
+            }
+
+            int totalJourneys = repairTrackerService.countSummariesForCustomer(customerId);
+            PaginationUtils.PaginationCalculation journeyCalc =
+                    PaginationUtils.calculateParams(totalJourneys, journeyCurrentPage, JOURNEYS_PER_PAGE);
+
+            int offset = journeyCalc.getOffset();
+            List<RepairJourneySummaryDTO> journeyData =
+                    repairTrackerService.getPaginatedSummariesForCustomer(customerId, JOURNEYS_PER_PAGE, offset);
+
+            PaginationUtils.PaginationResult<RepairJourneySummaryDTO> journeyResult =
+                    new PaginationUtils.PaginationResult<>(
+                            journeyData,
+                            totalJourneys,
+                            journeyCalc.getTotalPages(),
+                            journeyCalc.getSafePage(),
+                            JOURNEYS_PER_PAGE
+                    );
+
+            request.setAttribute("journeyList", journeyResult);
+            request.setAttribute("journeyTotalPages", journeyCalc.getTotalPages());
+            request.setAttribute("journeyCurrentPage", journeyCalc.getSafePage());
+
+            // === DỮ LIỆU HÃNG XE ===
             List<CarBrand> brands = carDAO.getAllBrands();
             request.setAttribute("brands", brands);
-            request.getRequestDispatcher("/view/customerservice/customer-detail.jsp").forward(request, response);
+
+            // === FORWARD ===
+            request.getRequestDispatcher("/view/customerservice/customer-detail.jsp")
+                    .forward(request, response);
+
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID phải là số!");
-            return;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new ServletException("Lỗi truy vấn dữ liệu khách hàng", e);
         }
     }
+
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         int customerId = Integer.parseInt(request.getParameter("customerId"));
         Map<String, String> changes = new HashMap<>();
 
-        // Lấy dữ liệu từ form
         String fullName = request.getParameter("FullName");
         String email = request.getParameter("Email");
         String phone = request.getParameter("PhoneNumber");
         String gender = request.getParameter("Gender");
-        String province =  request.getParameter("province");
-        String district  =  request.getParameter("district");
-        String addressDetail =  request.getParameter("addressDetail");
-
+        String province = request.getParameter("province");
+        String district = request.getParameter("district");
+        String addressDetail = request.getParameter("addressDetail");
         String newPassword = request.getParameter("NewPassword");
-        String address = addressDetail + ", " + district + ", " + province;
+
+        String address = String.join(", ",
+                Arrays.asList(addressDetail, district, province).stream()
+                        .filter(s -> s != null && !s.isBlank()).toList());
+
         if (fullName != null && !fullName.isEmpty()) changes.put("FullName", fullName);
         if (email != null && !email.isEmpty()) changes.put("Email", email);
         if (phone != null && !phone.isEmpty()) changes.put("PhoneNumber", phone);
@@ -116,53 +153,47 @@ public class EditCustomer extends HttpServlet {
         if (address != null && !address.isEmpty()) changes.put("Address", address);
         if (newPassword != null && !newPassword.isEmpty()) changes.put("NewPassword", newPassword);
 
-        if (!changes.isEmpty()) {
-            try {
-                PendingChange pending = new PendingChange();
-                pending.setCustomerId(customerId);
-                pending.setFieldsChanged(changes);
-                pending.setToken(UUID.randomUUID().toString());
-                pending.setTokenExpiry(null); // DB set +24h
-
-                pendingChangeDAO.createPendingChange(customerId, pending);
-
-                String customerEmail = customerDAO.getCustomerById(customerId).getEmail();
-                String confirmLink = request.getScheme() + "://" +
-                        request.getServerName() + ":" +
-                        request.getServerPort() +
-                        request.getContextPath() + "/verify-change?token=" + pending.getToken();
-
-                String rejectLink = request.getScheme() + "://" +
-                        request.getServerName() + ":" +
-                        request.getServerPort() +
-                        request.getContextPath() + "/reject-change?token=" + pending.getToken();
-
-                StringBuilder htmlContent = new StringBuilder("<p>CS staff đã yêu cầu cập nhật thông tin của bạn:</p><ul>");
-                changes.forEach((k,v)-> htmlContent.append("<li>").append(k).append(": ").append(v).append("</li>"));
-                htmlContent.append("</ul>");
-                htmlContent.append("<p>Xác nhận để thay đổi được áp dụng:</p>");
-                htmlContent.append("<a href='").append(confirmLink).append("'>Xác nhận</a> | ");
-                htmlContent.append("<a href='").append(rejectLink).append("'>Hủy</a>");
-                htmlContent.append("<p>Token hết hạn sau 24h nếu không xác nhận.</p>");
-
-                MailService.sendHtmlEmail(customerEmail, "Xác nhận thay đổi thông tin", htmlContent.toString());
-
-                // **Set session message để hiển thị 1 lần**
-                HttpSession session = request.getSession();
-                session.setAttribute("message", "Yêu cầu thay đổi đã gửi email xác nhận khách hàng.");
-                session.setAttribute("messageType", "success");
-
-                // **Redirect sang GET với customerId**
-                response.sendRedirect(request.getContextPath() + "/customerservice/customer-detail?id=" + customerId);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                response.getWriter().println("Lỗi khi tạo PendingChange: " + e.getMessage());
-            }
-        } else {
-            HttpSession session = request.getSession();
+        HttpSession session = request.getSession();
+        if (changes.isEmpty()) {
             session.setAttribute("message", "Không có trường nào thay đổi.");
             session.setAttribute("messageType", "warning");
+            response.sendRedirect(request.getContextPath() + "/customerservice/customer-detail?id=" + customerId);
+            return;
+        }
+
+        try {
+            PendingChange pending = new PendingChange();
+            pending.setCustomerId(customerId);
+            pending.setFieldsChanged(changes);
+            pending.setToken(UUID.randomUUID().toString());
+
+            pendingChangeDAO.createPendingChange(customerId, pending);
+
+            String customerEmail = customerDAO.getCustomerById(customerId).getEmail();
+            String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" +
+                    request.getServerPort() + request.getContextPath();
+
+            String confirmLink = baseUrl + "/verify-change?token=" + pending.getToken();
+            String rejectLink = baseUrl + "/reject-change?token=" + pending.getToken();
+
+            StringBuilder html = new StringBuilder("<p>CS staff đã yêu cầu cập nhật thông tin của bạn:</p><ul>");
+            changes.forEach((k, v) -> html.append("<li>").append(k).append(": ").append(v).append("</li>"));
+            html.append("</ul><p>Xác nhận để thay đổi được áp dụng:</p>")
+                    .append("<a href='").append(confirmLink).append("'>Xác nhận</a> | ")
+                    .append("<a href='").append(rejectLink).append("'>Hủy</a>")
+                    .append("<p>Token hết hạn sau 24h nếu không xác nhận.</p>");
+
+            MailService.sendHtmlEmail(customerEmail, "Xác nhận thay đổi thông tin", html.toString());
+
+            session.setAttribute("message", "Yêu cầu thay đổi đã gửi email xác nhận cho khách hàng.");
+            session.setAttribute("messageType", "success");
+
+            response.sendRedirect(request.getContextPath() + "/customerservice/customer-detail?id=" + customerId);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.setAttribute("message", "Lỗi khi gửi yêu cầu thay đổi: " + e.getMessage());
+            session.setAttribute("messageType", "danger");
             response.sendRedirect(request.getContextPath() + "/customerservice/customer-detail?id=" + customerId);
         }
     }

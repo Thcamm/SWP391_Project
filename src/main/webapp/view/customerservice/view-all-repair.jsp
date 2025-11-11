@@ -32,13 +32,12 @@
                         <h2 class="mb-4 text-center">Lịch Sử Sửa Chữa</h2>
 
                         <c:choose>
-                            <%-- Lấy danh sách từ Servlet --%>
-                            <c:when test="${not empty journeyList}">
+                            <c:when test="${not empty journeyList.paginatedData}">
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-hover align-middle">
                                         <thead class="table-dark text-center">
                                         <tr>
-                                            <th>ID Yêu Cầu</th>
+                                            <th>NO</th>
                                             <th>Ngày Bắt Đầu</th>
                                             <th>Loại Hình</th>
                                             <th>Giai Đoạn</th>
@@ -47,10 +46,9 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                            <%-- Dùng c:forEach để lặp qua danh sách --%>
-                                        <c:forEach var="journey" items="${journeyList}">
+                                        <c:forEach var="journey" items="${journeyList.paginatedData}" varStatus="status">
                                             <tr>
-                                                <td class="text-center">#${journey.requestID}</td>
+                                                <td class="text-center">${status.index + 1 + (journeyList.currentPage - 1) * journeyList.itemsPerPage}</td>
                                                 <td class="text-center">
                                                     <fmt:formatDate value="${journey.entryDate}" pattern="dd/MM/yyyy" />
                                                 </td>
@@ -68,14 +66,9 @@
                                                     <span class="badge bg-dark">${journey.latestStage}</span>
                                                 </td>
                                                 <td class="text-center">
-                                                        <%-- (Tùy chọn: Thêm màu mè cho status) --%>
                                                     <span class="badge bg-info">${journey.latestStatus}</span>
                                                 </td>
                                                 <td class="text-center">
-                                                        <%--
-                                                         ĐÂY LÀ LINK KẾT NỐI
-                                                         Nó trỏ đến Servlet "repair-tracker" và đính kèm ID
-                                                        --%>
                                                     <a href="${pageContext.request.contextPath}/customerservice/repair-detail?id=${journey.requestID}"
                                                        class="btn btn-primary btn-sm">
                                                         <i class="bi bi-eye"></i> Theo dõi
@@ -87,13 +80,19 @@
                                     </table>
                                 </div>
                             </c:when>
-                            <%-- Khi không có lịch sử nào --%>
                             <c:otherwise>
                                 <div class="alert alert-info text-center">
-                                    Bạn chưa có lịch sử sửa chữa nào.
+                                    Không có lịch sử sửa chữa nào.
                                 </div>
                             </c:otherwise>
                         </c:choose>
+
+                        <jsp:include page="/view/customerservice/pagination.jsp">
+                            <jsp:param name="currentPage" value="${journeyList.currentPage}" />
+                            <jsp:param name="totalPages" value="${journeyList.totalPages}" />
+                            <jsp:param name="baseUrl" value="/customerservice/view-all-repairs" />
+                        </jsp:include>
+
                     </div>
 
                 </div>

@@ -73,7 +73,10 @@
 
                 <c:forEach var="i" begin="${begin}" end="${end}">
                     <li class="page-item ${i == currentPage ? 'active' : ''}">
-                        <a class="page-link" href="${baseUrl}?page=${i}${query}">${i}</a>
+                        <c:set var="pageParam" value="${param.paramName != null ? param.paramName : 'page'}" />
+
+                        <a class="page-link" href="${baseUrl}?${pageParam}=${i}${query}">${i}</a>
+
                     </li>
                 </c:forEach>
 

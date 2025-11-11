@@ -1,16 +1,14 @@
 package controller.employee.customerservice;
 
+import common.utils.PaginationUtils;
 import dao.customer.CustomerDAO;
-import model.dto.RepairJourneySummaryDTO; // DTO tóm tắt
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import model.user.User;
+import model.dto.RepairJourneySummaryDTO;
 import service.tracking.RepairTrackerService;
-
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -26,21 +24,47 @@ public class ViewAllRepair extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
+        int currentPage = 1;
+        int itemsPerPage = 10;
+
+        // Lấy số trang hiện tại
+        String pageParam = request.getParameter("page");
+        if (pageParam != null) {
+            try {
+                currentPage = Math.max(1, Integer.parseInt(pageParam));
+            } catch (NumberFormatException ignored) {}
+        }
 
         try {
+            int totalItems = repairListService.countAllTracker();
 
-            // 2. Gọi Service để lấy danh sách tóm tắt
-            List<RepairJourneySummaryDTO> journeyList =
-                    repairListService.getAllTracker();
+            // Tính toán phân trang
+            PaginationUtils.PaginationCalculation calc =
+                    PaginationUtils.calculateParams(totalItems, currentPage, itemsPerPage);
 
-            // 3. Gửi danh sách này sang JSP
-            request.setAttribute("journeyList", journeyList);
+            int offset = calc.getOffset();
+            int safePage = calc.getSafePage();
+
+            // Lấy danh sách dữ liệu theo phân trang
+            List<RepairJourneySummaryDTO> repairJourneySummaryDTOList =
+                    repairListService.getAllTracker(itemsPerPage, offset);
+
+            // Đóng gói kết quả phân trang
+            PaginationUtils.PaginationResult<RepairJourneySummaryDTO> result =
+                    new PaginationUtils.PaginationResult<>(
+                            repairJourneySummaryDTOList,
+                            totalItems,
+                            calc.getTotalPages(),
+                            safePage,
+                            itemsPerPage
+                    );
+
+            // Gửi sang JSP
+            request.setAttribute("journeyList", result);
             request.getRequestDispatcher("/view/customerservice/view-all-repair.jsp")
                     .forward(request, response);
 
         } catch (SQLException e) {
-            e.printStackTrace();
             throw new ServletException("Lỗi truy vấn danh sách sửa chữa: " + e.getMessage(), e);
         }
     }

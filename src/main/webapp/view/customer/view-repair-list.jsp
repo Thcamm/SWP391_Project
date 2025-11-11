@@ -18,12 +18,12 @@
 
     <c:choose>
         <%-- Lấy danh sách từ Servlet --%>
-        <c:when test="${not empty journeyList}">
+        <c:when test="${not empty journeyList.paginatedData}">
             <div class="table-responsive">
                 <table class="table table-bordered table-hover align-middle">
                     <thead class="table-dark text-center">
                     <tr>
-                        <th>ID Yêu Cầu</th>
+                        <th>STT</th>
                         <th>Ngày Bắt Đầu</th>
                         <th>Loại Hình</th>
                         <th>Giai Đoạn</th>
@@ -33,9 +33,12 @@
                     </thead>
                     <tbody>
                         <%-- Dùng c:forEach để lặp qua danh sách --%>
-                    <c:forEach var="journey" items="${journeyList}">
+                    <c:forEach var="journey" items="${journeyList.paginatedData}" varStatus="status">
                         <tr>
-                            <td class="text-center">#${journey.requestID}</td>
+                            <td class="text-center">
+                                    ${status.index + 1 + (journeyList.currentPage - 1) * journeyList.itemsPerPage}
+                            </td>
+
                             <td class="text-center">
                                 <fmt:formatDate value="${journey.entryDate}" pattern="dd/MM/yyyy" />
                             </td>
@@ -79,6 +82,13 @@
             </div>
         </c:otherwise>
     </c:choose>
+    <jsp:include page="/view/customerservice/pagination.jsp">
+        <jsp:param name="currentPage" value="${journeyList.currentPage}" />
+        <jsp:param name="totalPages" value="${journeyList.totalPages}" />
+        <jsp:param name="baseUrl" value="/customer/repair-list" />
+        <jsp:param name="queryString"
+                   value="" />
+    </jsp:include>
 </div>
 
 <jsp:include page="/common/footer.jsp" />

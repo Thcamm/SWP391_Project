@@ -131,111 +131,63 @@ public class RepairJourneyDAO extends DbContext {
      * Lấy danh sách tóm tắt tất cả các hành trình sửa chữa của một khách hàng.
      * Dùng cho trang "Lịch sử sửa chữa" (trang List).
      */
-    public List<RepairJourneySummaryDTO> getJourneySummaries(int customerId) throws SQLException {
-        List<RepairJourneySummaryDTO> list = new ArrayList<>();
-
-        /*
-         * Câu SQL này dùng:
-         * 1. CASE...WHEN: Để xác định "EntryType" (Loại hình)
-         * 2. COALESCE: Để lấy ngày bắt đầu (ưu tiên ngày hẹn)
-         * 3. CASE...WHEN: Để xác định "Giai đoạn" mới nhất (check ngược từ Invoice -> WorkOrder)
-         * 4. COALESCE: Để lấy "Trạng thái" mới nhất (check ngược)
-         */
-        String sql = """
-            SELECT
-                sr.RequestID,
-                sr.VehicleID,
-
-                -- 1. Logic cho "Loại hình"
-                CASE
-                    WHEN a.AppointmentID IS NOT NULL THEN 'Appointment'
-                    ELSE 'Walk-in'
-                END AS EntryType,
-                
-                -- 2. Logic cho "Ngày bắt đầu"
-                COALESCE(a.AppointmentDate, sr.RequestDate) AS EntryDate,
-
-                -- 3. Logic cho "Giai đoạn mới nhất"
-                CASE
-                    WHEN i.InvoiceID IS NOT NULL THEN 'Invoice'
-                    WHEN wo.WorkOrderID IS NOT NULL THEN 'Work Order'
-                    ELSE 'Service Request'
-                END AS LatestStage,
-                
-                -- 4. Logic cho "Trạng thái mới nhất"
-                COALESCE(i.PaymentStatus, wo.Status, sr.Status) AS LatestStatus
-
-            FROM servicerequest sr
-            LEFT JOIN appointment a ON sr.AppointmentID = a.AppointmentID
-            LEFT JOIN workorder wo ON sr.RequestID = wo.RequestID
-            LEFT JOIN invoice i ON wo.WorkOrderID = i.WorkOrderID
-            WHERE sr.CustomerID = ?
-            ORDER BY sr.RequestDate DESC -- Hiển thị yêu cầu mới nhất lên đầu
-        """;
+// Thêm phương thức MỚI này vào JourneyDAO
+    public int countJourneySummaries(int customerId) throws SQLException {
+        // Câu SQL này chỉ cần đếm trên bảng chính (servicerequest)
+        // với cùng điều kiện WHERE
+        String sql = "SELECT COUNT(sr.RequestID) FROM servicerequest sr WHERE sr.CustomerID = ?";
+        int count = 0;
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, customerId);
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    RepairJourneySummaryDTO summary = new RepairJourneySummaryDTO();
-                    summary.setRequestID(rs.getInt("RequestID"));
-                    summary.setVehicleID(rs.getInt("VehicleID"));
-                    summary.setEntryType(rs.getString("EntryType"));
-                    summary.setEntryDate(rs.getTimestamp("EntryDate"));
-                    summary.setLatestStage(rs.getString("LatestStage"));
-                    summary.setLatestStatus(rs.getString("LatestStatus"));
-                    list.add(summary);
+                if (rs.next()) {
+                    count = rs.getInt(1);
                 }
             }
         }
-        return list; // Trả về danh sách
+        return count;
     }
 
-    public List<RepairJourneySummaryDTO> getAllTracking() throws SQLException {
+    // SỬA ĐỔI phương thức getJourneySummaries hiện tại
+// Đổi tên và thêm tham số limit, offset
+    public List<RepairJourneySummaryDTO> getPaginatedJourneySummaries(int customerId, int limit, int offset) throws SQLException {
         List<RepairJourneySummaryDTO> list = new ArrayList<>();
 
-        /*
-         * Câu SQL này dùng:
-         * 1. CASE...WHEN: Để xác định "EntryType" (Loại hình)
-         * 2. COALESCE: Để lấy ngày bắt đầu (ưu tiên ngày hẹn)
-         * 3. CASE...WHEN: Để xác định "Giai đoạn" mới nhất (check ngược từ Invoice -> WorkOrder)
-         * 4. COALESCE: Để lấy "Trạng thái" mới nhất (check ngược)
-         */
+        // SQL giữ nguyên, chỉ thêm LIMIT ? OFFSET ? ở cuối
         String sql = """
-            SELECT
-                sr.RequestID,
-                sr.VehicleID,
-
-                -- 1. Logic cho "Loại hình"
-                CASE
-                    WHEN a.AppointmentID IS NOT NULL THEN 'Appointment'
-                    ELSE 'Walk-in'
-                END AS EntryType,
-                
-                -- 2. Logic cho "Ngày bắt đầu"
-                COALESCE(a.AppointmentDate, sr.RequestDate) AS EntryDate,
-
-                -- 3. Logic cho "Giai đoạn mới nhất"
-                CASE
-                    WHEN i.InvoiceID IS NOT NULL THEN 'Invoice'
-                    WHEN wo.WorkOrderID IS NOT NULL THEN 'Work Order'
-                    ELSE 'Service Request'
-                END AS LatestStage,
-                
-                -- 4. Logic cho "Trạng thái mới nhất"
-                COALESCE(i.PaymentStatus, wo.Status, sr.Status) AS LatestStatus
-
-            FROM servicerequest sr
-            LEFT JOIN appointment a ON sr.AppointmentID = a.AppointmentID
-            LEFT JOIN workorder wo ON sr.RequestID = wo.RequestID
-            LEFT JOIN invoice i ON wo.WorkOrderID = i.WorkOrderID
-            ORDER BY sr.RequestDate DESC -- Hiển thị yêu cầu mới nhất lên đầu
-        """;
+        SELECT
+            sr.RequestID,
+            sr.VehicleID,
+            CASE
+                WHEN a.AppointmentID IS NOT NULL THEN 'Appointment'
+                ELSE 'Walk-in'
+            END AS EntryType,
+            COALESCE(a.AppointmentDate, sr.RequestDate) AS EntryDate,
+            CASE
+                WHEN i.InvoiceID IS NOT NULL THEN 'Invoice'
+                WHEN wo.WorkOrderID IS NOT NULL THEN 'Work Order'
+                ELSE 'Service Request'
+            END AS LatestStage,
+            COALESCE(i.PaymentStatus, wo.Status, sr.Status) AS LatestStatus
+        FROM servicerequest sr
+        LEFT JOIN appointment a ON sr.AppointmentID = a.AppointmentID
+        LEFT JOIN workorder wo ON sr.RequestID = wo.RequestID
+        LEFT JOIN invoice i ON wo.WorkOrderID = i.WorkOrderID
+        WHERE sr.CustomerID = ?
+        ORDER BY sr.RequestDate DESC
+        LIMIT ? OFFSET ? 
+    """; // Thêm LIMIT và OFFSET
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, customerId);
+            ps.setInt(2, limit);   // Tham số mới
+            ps.setInt(3, offset);  // Tham số mới
+
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     RepairJourneySummaryDTO summary = new RepairJourneySummaryDTO();
@@ -249,7 +201,80 @@ public class RepairJourneyDAO extends DbContext {
                 }
             }
         }
-        return list; // Trả về danh sách
+        return list;
     }
+    public int countAllTracking() throws SQLException {
+        // Câu lệnh SQL chỉ cần đếm trên bảng chính
+        String sql = "SELECT COUNT(sr.RequestID) FROM servicerequest sr";
+        int count = 0;
 
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
+            }
+        }
+        return count;
+    }
+    public List<RepairJourneySummaryDTO> getPaginatedTracking(int limit, int offset) throws SQLException {
+        List<RepairJourneySummaryDTO> list = new ArrayList<>();
+
+        // Câu SQL giữ nguyên, chỉ thêm "LIMIT ? OFFSET ?" ở cuối
+        String sql = """
+        SELECT
+            sr.RequestID,
+            sr.VehicleID,
+
+            -- 1. Logic cho "Loại hình"
+            CASE
+                WHEN a.AppointmentID IS NOT NULL THEN 'Appointment'
+                ELSE 'Walk-in'
+            END AS EntryType,
+            
+            -- 2. Logic cho "Ngày bắt đầu"
+            COALESCE(a.AppointmentDate, sr.RequestDate) AS EntryDate,
+
+            -- 3. Logic cho "Giai đoạn mới nhất"
+            CASE
+                WHEN i.InvoiceID IS NOT NULL THEN 'Invoice'
+                WHEN wo.WorkOrderID IS NOT NULL THEN 'Work Order'
+                ELSE 'Service Request'
+            END AS LatestStage,
+            
+            -- 4. Logic cho "Trạng thái mới nhất"
+            COALESCE(i.PaymentStatus, wo.Status, sr.Status) AS LatestStatus
+
+        FROM servicerequest sr
+        LEFT JOIN appointment a ON sr.AppointmentID = a.AppointmentID
+        LEFT JOIN workorder wo ON sr.RequestID = wo.RequestID
+        LEFT JOIN invoice i ON wo.WorkOrderID = i.WorkOrderID
+        ORDER BY sr.RequestDate DESC
+        LIMIT ? OFFSET ?
+    """; // Thêm LIMIT và OFFSET
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            // Set 2 tham số mới cho LIMIT và OFFSET
+            ps.setInt(1, limit);
+            ps.setInt(2, offset);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    RepairJourneySummaryDTO summary = new RepairJourneySummaryDTO();
+                    summary.setRequestID(rs.getInt("RequestID"));
+                    summary.setVehicleID(rs.getInt("VehicleID"));
+                    summary.setEntryType(rs.getString("EntryType"));
+                    summary.setEntryDate(rs.getTimestamp("EntryDate"));
+                    summary.setLatestStage(rs.getString("LatestStage"));
+                    summary.setLatestStatus(rs.getString("LatestStatus"));
+                    list.add(summary);
+                }
+            }
+        }
+        return list; // Trả về danh sách đã phân trang
+    }
 }
