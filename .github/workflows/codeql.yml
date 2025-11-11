@@ -1,0 +1,60 @@
+name: "CodeQL Analysis (thuyvu branch)"
+
+on:
+  push:
+    branches: [ "thuyvu" ]   # ✅ chỉ quét khi có thay đổi ở nhánh thuyvu
+  pull_request:
+    branches: [ "thuyvu" ]
+  workflow_dispatch:         # ✅ cho phép chạy thủ công
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+
+    permissions:
+      security-events: write
+      packages: read
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: java
+            build-mode: manual
+          - language: javascript
+            build-mode: none
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Cài đặt Java & Maven
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # Khởi tạo CodeQL
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+
+      # Build thủ công cho Java
+      - name: Run manual build steps
+        if: matrix.build-mode == 'manual'
+        shell: bash
+        run: |
+          echo "Building project..."
+          mvn clean install -DskipTests
+
+      # Phân tích bảo mật
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"
