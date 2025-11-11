@@ -57,12 +57,31 @@ public class ServiceRequestDAO extends DbContext {
     public List<ServiceHistoryDTO> getServiceHistoryByCustomerId(int customerId) throws SQLException {
         List<ServiceHistoryDTO> history = new ArrayList<>();
         String sql =
-                "SELECT sr.RequestID, st.ServiceName, sr.RequestDate, sr.Status, st.UnitPrice " +
-                        "FROM ServiceRequest sr " +
-                        "JOIN ServiceRequestDetail srd ON srd.RequestID = sr.RequestID " +
-                        "JOIN Service_Type st ON srd.ServiceID = st.ServiceID " +
-                        "WHERE sr.CustomerID = ? " +
-                        "ORDER BY sr.RequestDate DESC, sr.RequestID DESC";
+                "SELECT " +
+                        "    sr.RequestID, " +
+                        "    v.LicensePlate, " +
+                        "    sr.RequestDate, " +
+                        "    GROUP_CONCAT(DISTINCT st.ServiceName SEPARATOR ', ') AS ServiceName, " +
+                        "    COALESCE(i.PaymentStatus, wo.Status, sr.Status) AS FinalStatus, " +
+                        "    COALESCE(i.TotalAmount, wo.EstimateAmount, 0) AS FinalPrice " +
+                        "FROM " +
+                        "    ServiceRequest sr " +
+                        "JOIN " +
+                        "    Vehicle v ON sr.VehicleID = v.VehicleID " +
+                        "LEFT JOIN " +
+                        "    ServiceRequestDetail srd ON srd.RequestID = sr.RequestID " +
+                        "LEFT JOIN " +
+                        "    Service_Type st ON srd.ServiceID = st.ServiceID " +
+                        "LEFT JOIN " +
+                        "    WorkOrder wo ON sr.RequestID = wo.RequestID " +
+                        "LEFT JOIN " +
+                        "    Invoice i ON wo.WorkOrderID = i.WorkOrderID " +
+                        "WHERE " +
+                        "    sr.CustomerID = ? " +
+                        "GROUP BY " +
+                        "    sr.RequestID, v.LicensePlate, sr.RequestDate, wo.Status, i.PaymentStatus, i.TotalAmount, wo.EstimateAmount " +
+                        "ORDER BY " +
+                        "    sr.RequestDate DESC, sr.RequestID DESC";
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -74,8 +93,10 @@ public class ServiceRequestDAO extends DbContext {
                     item.setRequestId(rs.getInt("RequestID"));
                     item.setServiceName(rs.getString("ServiceName"));
                     item.setRequestDate(rs.getTimestamp("RequestDate"));
-                    item.setStatus(rs.getString("Status"));
-                    item.setPrice(rs.getDouble("UnitPrice"));
+                    item.setStatus(rs.getString("FinalStatus"));
+                    item.setPrice(rs.getDouble("FinalPrice"));
+                    item.setLicensePlate(rs.getString("LicensePlate"));
+
                     history.add(item);
                 }
             }

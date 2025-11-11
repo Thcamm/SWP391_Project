@@ -13,7 +13,7 @@ import model.user.User;
 import java.io.IOException;
 
 @WebServlet(name = "AccountantDashboardServlet", urlPatterns = {"/accountant/home"})
-public class AccountantDashboardServlet extends HttpServlet { // 2. Đổi tên class
+public class AccountantDashboardServlet extends HttpServlet {
 
     private InvoiceDAO invoiceDAO;
 
@@ -28,7 +28,7 @@ public class AccountantDashboardServlet extends HttpServlet { // 2. Đổi tên 
 
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
-        String roleCode = (String) session.getAttribute("roleCode"); // Lấy roleCode
+        String roleCode = (String) session.getAttribute("roleCode");
 
         if (currentUser == null || !"ACCOUNTANT".equals(roleCode)) {
             response.sendRedirect(request.getContextPath() + "/login");

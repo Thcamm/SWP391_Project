@@ -51,15 +51,15 @@ public class CustomerApprovalHandlerServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String diagnosticIdParam = request.getParameter("diagnosticId");
-
-        if (diagnosticIdParam == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing diagnostic ID");
-            return;
-        }
+//        String diagnosticIdParam = request.getParameter("diagnosticId");
+//
+//        if (diagnosticIdParam == null) {
+//            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing diagnostic ID");
+//            return;
+//        }
 
         try {
-            int diagnosticId = Integer.parseInt(diagnosticIdParam);
+            int diagnosticId = 2;
 
             // Load diagnostic with parts
             VehicleDiagnostic diagnostic = diagnosticDAO.getByIdWithParts(diagnosticId);
@@ -178,7 +178,7 @@ public class CustomerApprovalHandlerServlet extends HttpServlet {
                 conn.close();
             }
 
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException e) { 
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid diagnostic ID");
         } catch (SQLException e) {
             throw new ServletException("Database error during quote approval", e);

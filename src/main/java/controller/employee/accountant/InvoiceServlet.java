@@ -24,6 +24,7 @@ import java.util.List;
 public class InvoiceServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+    private static final int PAGE_SIZE = 10;
 
     private PaymentService paymentService;
     private InvoiceDAO invoiceDAO;
@@ -41,12 +42,21 @@ public class InvoiceServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        HttpSession session = request.getSession();
+        Integer roleID = (Integer) session.getAttribute("roleID");
+
+        if (roleID == null || roleID != 5) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
         String action = request.getParameter("action");
 
         try {
             if (action == null || action.trim().isEmpty()) {
                 action = "list";
             }
+
             switch (action) {
                 case "list":
                     listInvoices(request, response);
@@ -79,20 +89,27 @@ public class InvoiceServlet extends HttpServlet {
             }
 
         } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "Invalid ID format: " + e.getMessage());
+            session.setAttribute("errorMessage", "Invalid ID format: " + e.getMessage());
             request.getRequestDispatcher("/view/accountant/invoice-list.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Error: " + e.getMessage());
+            session.setAttribute("errorMessage", "Error: " + e.getMessage());
             request.getRequestDispatcher("/view/error.jsp").forward(request, response);
         }
     }
 
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        HttpSession session = request.getSession();
+        Integer roleID = (Integer) session.getAttribute("roleID");
+
+        if (roleID == null || roleID != 5) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
 
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
@@ -121,11 +138,10 @@ public class InvoiceServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Error: " + e.getMessage());
+            session.setAttribute("errorMessage", "Error: " + e.getMessage());
             request.getRequestDispatcher("/view/error.jsp").forward(request, response);
         }
     }
-
 
     private void listInvoices(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
@@ -134,9 +150,6 @@ public class InvoiceServlet extends HttpServlet {
         String pageStr = request.getParameter("page");
 
         int page = 1;
-        int pageSize = 10;
-
-        // Parse page number
         if (pageStr != null && !pageStr.isEmpty()) {
             try {
                 page = Integer.parseInt(pageStr);
@@ -149,14 +162,12 @@ public class InvoiceServlet extends HttpServlet {
         List<Invoice> invoices;
         int totalCount;
 
-        // Filter by status if provided
         if (status != null && !status.isEmpty() && !status.equals("ALL")) {
             invoices = paymentService.getInvoicesByStatus(status);
             totalCount = invoices.size();
 
-            // Apply pagination manually for filtered results
-            int fromIndex = (page - 1) * pageSize;
-            int toIndex = Math.min(fromIndex + pageSize, invoices.size());
+            int fromIndex = (page - 1) * PAGE_SIZE;
+            int toIndex = Math.min(fromIndex + PAGE_SIZE, invoices.size());
 
             if (fromIndex < invoices.size()) {
                 invoices = invoices.subList(fromIndex, toIndex);
@@ -165,13 +176,12 @@ public class InvoiceServlet extends HttpServlet {
             }
 
         } else {
-            invoices = paymentService.getInvoicesWithPagination(page, pageSize);
+            invoices = paymentService.getInvoicesWithPagination(page, PAGE_SIZE);
             totalCount = paymentService.getTotalInvoiceCount();
         }
 
-        int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+        int totalPages = (int) Math.ceil((double) totalCount / PAGE_SIZE);
 
-        // Set attributes for JSP
         request.setAttribute("invoices", invoices);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
@@ -181,14 +191,13 @@ public class InvoiceServlet extends HttpServlet {
         request.getRequestDispatcher("/view/accountant/invoice-list.jsp").forward(request, response);
     }
 
-
     private void viewInvoice(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
 
+        HttpSession session = request.getSession();
         String idStr = request.getParameter("id");
 
         if (idStr == null || idStr.trim().isEmpty()) {
-            HttpSession session = request.getSession();
             session.setAttribute("errorMessage", "Invoice ID is required");
             response.sendRedirect(request.getContextPath() + "/accountant/invoice");
             return;
@@ -196,30 +205,24 @@ public class InvoiceServlet extends HttpServlet {
 
         int invoiceID = Integer.parseInt(idStr);
 
-        // Get invoice
         Invoice invoice = paymentService.getInvoiceById(invoiceID);
 
         if (invoice == null) {
-            HttpSession session = request.getSession();
             session.setAttribute("errorMessage", "Invoice not found with ID: " + invoiceID);
             response.sendRedirect(request.getContextPath() + "/accountant/invoice");
             return;
         }
 
-        // Get payment history
         List<Payment> payments = paymentService.getPaymentsByInvoiceID(invoiceID);
-
-        // Get invoice items
         List<InvoiceItemDTO> items = paymentService.getInvoiceItems(invoiceID);
 
-        // Get customer info
         Customer customer = null;
         try {
             customer = workOrderDAO.getCustomerForWorkOrder(invoice.getWorkOrderID());
         } catch (SQLException e) {
+            e.printStackTrace();
         }
 
-        // Set attributes for JSP
         request.setAttribute("invoice", invoice);
         request.setAttribute("payments", payments);
         request.setAttribute("items", items);
@@ -228,11 +231,9 @@ public class InvoiceServlet extends HttpServlet {
         request.getRequestDispatcher("/view/accountant/invoice-detail.jsp").forward(request, response);
     }
 
-
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
 
-        // Get list of completed work orders without invoice
         List<WorkOrder> workOrders = paymentService.getCompletedWorkOrdersWithoutInvoice();
 
         request.setAttribute("workOrders", workOrders);
@@ -242,10 +243,10 @@ public class InvoiceServlet extends HttpServlet {
     private void createInvoice(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
 
+        HttpSession session = request.getSession();
         String workOrderIdStr = request.getParameter("workOrderID");
 
         if (workOrderIdStr == null || workOrderIdStr.trim().isEmpty()) {
-            HttpSession session = request.getSession();
             session.setAttribute("errorMessage", "Work Order ID is required");
             response.sendRedirect(request.getContextPath() + "/accountant/invoice?action=create");
             return;
@@ -253,25 +254,17 @@ public class InvoiceServlet extends HttpServlet {
 
         int workOrderID = Integer.parseInt(workOrderIdStr);
 
-
         try {
-            // Create invoice
             Invoice invoice = paymentService.createInvoiceFromWorkOrder(workOrderID);
 
-            // Set success message
-            HttpSession session = request.getSession();
             session.setAttribute("successMessage",
                     "Invoice created successfully! Invoice Number: " + invoice.getInvoiceNumber());
 
-            // Redirect to invoice detail page
             response.sendRedirect(request.getContextPath() +
                     "/accountant/invoice?action=view&id=" + invoice.getInvoiceID());
 
         } catch (Exception e) {
-            HttpSession session = request.getSession();
-            session.setAttribute("errorMessage",
-                    "Failed to create invoice: " + e.getMessage());
-
+            session.setAttribute("errorMessage", "Failed to create invoice: " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/accountant/invoice?action=create");
         }
     }
@@ -279,10 +272,10 @@ public class InvoiceServlet extends HttpServlet {
     private void deleteErrorInvoice(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
 
+        HttpSession session = request.getSession();
         String idStr = request.getParameter("id");
 
         if (idStr == null || idStr.trim().isEmpty()) {
-            HttpSession session = request.getSession();
             session.setAttribute("errorMessage", "Invoice ID is required");
             response.sendRedirect(request.getContextPath() + "/accountant/invoice");
             return;
@@ -294,35 +287,34 @@ public class InvoiceServlet extends HttpServlet {
             Invoice invoice = paymentService.getInvoiceById(invoiceID);
 
             if (invoice == null) {
-                HttpSession session = request.getSession();
                 session.setAttribute("errorMessage", "Invoice not found");
                 response.sendRedirect(request.getContextPath() + "/accountant/invoice");
                 return;
             }
 
-            // Only allow delete if invoice has errors (NULL values)
-            boolean hasErrors = (invoice.getTotalAmount() == null ||
-                    invoice.getBalanceAmount() == null ||
-                    invoice.getPaymentStatus() == null ||
-                    invoice.getSubtotal() == null);
-
-            if (hasErrors) {
-                // Delete the error invoice
-                invoiceDAO.delete(invoiceID);
-
-                HttpSession session = request.getSession();
-                session.setAttribute("successMessage",
-                        "Error invoice deleted successfully (ID: " + invoiceID + ")");
-            } else {
-                HttpSession session = request.getSession();
+            List<Payment> payments = paymentService.getPaymentsByInvoiceID(invoiceID);
+            if (!payments.isEmpty()) {
                 session.setAttribute("errorMessage",
-                        "Cannot delete valid invoice. Use 'Void' instead for cancellation.");
+                        "Cannot delete invoice with payment records. Use 'Void' instead.");
+                response.sendRedirect(request.getContextPath() + "/accountant/invoice");
+                return;
             }
 
+            if (invoice.getPaidAmount() != null &&
+                    invoice.getPaidAmount().compareTo(java.math.BigDecimal.ZERO) > 0) {
+                session.setAttribute("errorMessage",
+                        "Cannot delete invoice with payments. Use 'Void' instead.");
+                response.sendRedirect(request.getContextPath() + "/accountant/invoice");
+                return;
+            }
+
+            invoiceDAO.delete(invoiceID);
+
+            session.setAttribute("successMessage",
+                    "Invoice deleted successfully (ID: " + invoiceID + ")");
+
         } catch (Exception e) {
-            HttpSession session = request.getSession();
-            session.setAttribute("errorMessage",
-                    "Failed to delete invoice: " + e.getMessage());
+            session.setAttribute("errorMessage", "Failed to delete invoice: " + e.getMessage());
         }
 
         response.sendRedirect(request.getContextPath() + "/accountant/invoice");
@@ -331,11 +323,11 @@ public class InvoiceServlet extends HttpServlet {
     private void voidInvoice(HttpServletRequest request, HttpServletResponse response)
             throws Exception {
 
+        HttpSession session = request.getSession();
         String idStr = request.getParameter("invoiceID");
         String reason = request.getParameter("reason");
 
         if (idStr == null || idStr.trim().isEmpty()) {
-            HttpSession session = request.getSession();
             session.setAttribute("errorMessage", "Invoice ID is required");
             response.sendRedirect(request.getContextPath() + "/accountant/invoice");
             return;
@@ -344,7 +336,6 @@ public class InvoiceServlet extends HttpServlet {
         int invoiceID = Integer.parseInt(idStr);
 
         if (reason == null || reason.trim().isEmpty()) {
-            HttpSession session = request.getSession();
             session.setAttribute("errorMessage", "Please provide a reason for voiding the invoice");
             response.sendRedirect(request.getContextPath() + "/accountant/invoice?action=view&id=" + invoiceID);
             return;
@@ -353,20 +344,13 @@ public class InvoiceServlet extends HttpServlet {
         try {
             paymentService.voidInvoice(invoiceID, reason);
 
-            HttpSession session = request.getSession();
-            session.setAttribute("successMessage",
-                    "Invoice #" + invoiceID + " has been voided successfully");
+            session.setAttribute("successMessage", "Invoice #" + invoiceID + " has been voided successfully");
 
-            response.sendRedirect(request.getContextPath() +
-                    "/accountant/invoice?action=view&id=" + invoiceID);
+            response.sendRedirect(request.getContextPath() + "/accountant/invoice?action=view&id=" + invoiceID);
 
         } catch (Exception e) {
-            HttpSession session = request.getSession();
-            session.setAttribute("errorMessage",
-                    "Failed to void invoice: " + e.getMessage());
-
-            response.sendRedirect(request.getContextPath() +
-                    "/accountant/invoice?action=view&id=" + invoiceID);
+            session.setAttribute("errorMessage", "Failed to void invoice: " + e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/accountant/invoice?action=view&id=" + invoiceID);
         }
     }
 
@@ -388,7 +372,6 @@ public class InvoiceServlet extends HttpServlet {
 
         request.getRequestDispatcher("/view/accountant/invoice-list.jsp").forward(request, response);
     }
-
 
     private void listOverdueInvoices(HttpServletRequest request, HttpServletResponse response)
             throws Exception {

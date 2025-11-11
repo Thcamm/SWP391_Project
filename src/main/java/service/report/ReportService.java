@@ -16,92 +16,120 @@ public class ReportService {
         this.reportDAO = new ReportDAO();
     }
 
+    public ReportService(ReportDAO reportDAO) {
+        this.reportDAO = reportDAO;
+    }
+
     /**
-     * Lấy báo cáo tổng quan doanh thu theo khoảng thời gian
+     *  Get revenue summary for date range
      */
     public ReportDTO getRevenueSummary(Date startDate, Date endDate) throws Exception {
+        validateDateRange(startDate, endDate);
+
         try {
             return reportDAO.getRevenueSummary(startDate, endDate);
         } catch (SQLException e) {
-            throw new Exception("Lỗi khi lấy báo cáo doanh thu: " + e.getMessage(), e);
+            throw new Exception("Error getting revenue summary: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Lấy báo cáo doanh thu theo tháng (mặc định 12 tháng)
+     * Get revenue by month (default 12 months)
      */
     public List<ReportDTO> getRevenueByMonth() throws Exception {
         return getRevenueByMonth(12);
     }
 
     /**
-     * Lấy báo cáo doanh thu theo tháng
+     *  Get revenue by month (custom number of months)
      */
     public List<ReportDTO> getRevenueByMonth(int numberOfMonths) throws Exception {
+        if (numberOfMonths < 1 || numberOfMonths > 24) {
+            throw new Exception("Number of months must be between 1 and 24");
+        }
+
         try {
             return reportDAO.getRevenueByMonth(numberOfMonths);
         } catch (SQLException e) {
-            throw new Exception("Lỗi khi lấy báo cáo doanh thu theo tháng: " + e.getMessage(), e);
+            throw new Exception("Error getting monthly revenue: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Lấy báo cáo theo trạng thái hóa đơn
-     */
-    public List<ReportDTO> getInvoiceByStatus(Date startDate, Date endDate) throws Exception {
-        try {
-            return reportDAO.getInvoiceByStatus(startDate, endDate);
-        } catch (SQLException e) {
-            throw new Exception("Lỗi khi lấy báo cáo theo trạng thái: " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Lấy báo cáo thanh toán theo phương thức
+     * Get payment by method (ONLINE vs OFFLINE)
      */
     public List<ReportDTO> getPaymentByMethod(Date startDate, Date endDate) throws Exception {
+        validateDateRange(startDate, endDate);
+
         try {
             return reportDAO.getPaymentByMethod(startDate, endDate);
         } catch (SQLException e) {
-            throw new Exception("Lỗi khi lấy báo cáo thanh toán: " + e.getMessage(), e);
+            throw new Exception("Error getting payment method report: " + e.getMessage(), e);
         }
     }
 
+
     /**
-     * Lấy top khách hàng thanh toán nhiều nhất
+     * Get top paying customers (default top 10)
+     */
+    public List<ReportDTO> getTopPayingCustomers(Date startDate, Date endDate) throws Exception {
+        return getTopPayingCustomers(10, startDate, endDate);
+    }
+
+    /**
+     * Get top paying customers (custom limit)
      */
     public List<ReportDTO> getTopPayingCustomers(int limit, Date startDate, Date endDate) throws Exception {
+        validateDateRange(startDate, endDate);
+
+        if (limit < 1 || limit > 100) {
+            throw new Exception("Limit must be between 1 and 100");
+        }
+
         try {
             return reportDAO.getTopPayingCustomers(limit, startDate, endDate);
         } catch (SQLException e) {
-            throw new Exception("Lỗi khi lấy báo cáo khách hàng: " + e.getMessage(), e);
+            throw new Exception("Error getting top customers: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Lấy danh sách khách hàng có công nợ
+     *  Get customers with outstanding balance
      */
     public List<ReportDTO> getCustomersWithOutstanding() throws Exception {
         try {
             return reportDAO.getCustomersWithOutstanding();
         } catch (SQLException e) {
-            throw new Exception("Lỗi khi lấy danh sách công nợ: " + e.getMessage(), e);
+            throw new Exception("Error getting customers with outstanding: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Lấy báo cáo hóa đơn quá hạn
+     *  Get invoice distribution by status
      */
-    public List<ReportDTO> getOverdueInvoicesReport() throws Exception {
+    public List<ReportDTO> getInvoiceByStatus(Date startDate, Date endDate) throws Exception {
+        validateDateRange(startDate, endDate);
+
         try {
-            return reportDAO.getOverdueInvoicesReport();
+            return reportDAO.getInvoiceByStatus(startDate, endDate);
         } catch (SQLException e) {
-            throw new Exception("Lỗi khi lấy báo cáo quá hạn: " + e.getMessage(), e);
+            throw new Exception("Error getting invoice by status: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Lấy tất cả báo cáo cho dashboard (tháng hiện tại)
+     * Get overdue invoices summary
+     */
+    public ReportDTO getOverdueInvoicesSummary() throws Exception {
+        try {
+            return reportDAO.getOverdueInvoicesSummary();
+        } catch (SQLException e) {
+            throw new Exception("Error getting overdue invoices: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get all reports for dashboard (current month)
      */
     public ReportSummary getDashboardReports() throws Exception {
         LocalDate now = LocalDate.now();
@@ -111,19 +139,62 @@ public class ReportService {
         Date startDate = Date.valueOf(startOfMonth);
         Date endDate = Date.valueOf(endOfMonth);
 
+        return getDashboardReports(startDate, endDate);
+    }
+
+    /**
+     * Get all reports for dashboard (custom date range)
+     */
+    public ReportSummary getDashboardReports(Date startDate, Date endDate) throws Exception {
+        validateDateRange(startDate, endDate);
+
         ReportSummary summary = new ReportSummary();
-        summary.setRevenueSummary(getRevenueSummary(startDate, endDate));
-        summary.setRevenueByMonth(getRevenueByMonth(6)); // 6 tháng gần nhất
-        summary.setInvoiceByStatus(getInvoiceByStatus(startDate, endDate));
-        summary.setPaymentByMethod(getPaymentByMethod(startDate, endDate));
-        summary.setTopCustomers(getTopPayingCustomers(5, startDate, endDate));
-        summary.setOverdueReport(getOverdueInvoicesReport());
+
+        try {
+            summary.setRevenueSummary(getRevenueSummary(startDate, endDate));
+            summary.setRevenueByMonth(getRevenueByMonth(6));
+            summary.setInvoiceByStatus(getInvoiceByStatus(startDate, endDate));
+            summary.setPaymentByMethod(getPaymentByMethod(startDate, endDate));
+            summary.setTopCustomers(getTopPayingCustomers(5, startDate, endDate));
+            summary.setOverdueInvoices(getOverdueInvoicesSummary());
+            summary.setCustomersWithOutstanding(getCustomersWithOutstanding());
+        } catch (Exception e) {
+            throw new Exception("Error generating dashboard: " + e.getMessage(), e);
+        }
 
         return summary;
     }
 
+
     /**
-     * Inner class để gom tất cả báo cáo
+     * Validate date range
+     */
+    private void validateDateRange(Date startDate, Date endDate) throws Exception {
+        if (startDate == null || endDate == null) {
+            throw new Exception("Start date and end date are required");
+        }
+
+        if (startDate.after(endDate)) {
+            throw new Exception("Start date must be before or equal to end date");
+        }
+
+        LocalDate start = startDate.toLocalDate();
+        LocalDate end = endDate.toLocalDate();
+        LocalDate now = LocalDate.now();
+
+        if (start.isAfter(now)) {
+            throw new Exception("Start date cannot be in the future");
+        }
+
+        long daysBetween = java.time.temporal.ChronoUnit.DAYS.between(start, end);
+        if (daysBetween > 365) {
+            throw new Exception("Date range cannot exceed 1 year");
+        }
+    }
+
+
+    /**
+     * Container for all dashboard reports
      */
     public static class ReportSummary {
         private ReportDTO revenueSummary;
@@ -131,9 +202,9 @@ public class ReportService {
         private List<ReportDTO> invoiceByStatus;
         private List<ReportDTO> paymentByMethod;
         private List<ReportDTO> topCustomers;
-        private List<ReportDTO> overdueReport;
+        private ReportDTO overdueInvoices;
+        private List<ReportDTO> customersWithOutstanding;
 
-        // Getters and Setters
         public ReportDTO getRevenueSummary() {
             return revenueSummary;
         }
@@ -174,12 +245,20 @@ public class ReportService {
             this.topCustomers = topCustomers;
         }
 
-        public List<ReportDTO> getOverdueReport() {
-            return overdueReport;
+        public ReportDTO getOverdueInvoices() {
+            return overdueInvoices;
         }
 
-        public void setOverdueReport(List<ReportDTO> overdueReport) {
-            this.overdueReport = overdueReport;
+        public void setOverdueInvoices(ReportDTO overdueInvoices) {
+            this.overdueInvoices = overdueInvoices;
+        }
+
+        public List<ReportDTO> getCustomersWithOutstanding() {
+            return customersWithOutstanding;
+        }
+
+        public void setCustomersWithOutstanding(List<ReportDTO> customersWithOutstanding) {
+            this.customersWithOutstanding = customersWithOutstanding;
         }
     }
 }

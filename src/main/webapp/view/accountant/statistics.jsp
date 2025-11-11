@@ -155,7 +155,7 @@
                         </div>
                     </div>
 
-                    <!-- Performance Metrics -->
+                    <!-- Performance Metrics - Only 3 cards now -->
                     <div class="row g-3 mb-4">
                         <div class="col-md-4">
                             <div class="card" style="border: 1px solid #e5e7eb; border-radius: 12px;">
@@ -188,14 +188,14 @@
                                                     height: 80px;
                                                     background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
                                                     border-radius: 50%;">
-                                            <i class="bi bi-clock-history" style="font-size: 2rem; color: white;"></i>
+                                            <i class="bi bi-cash-coin" style="font-size: 2rem; color: white;"></i>
                                         </div>
                                     </div>
                                     <h4 class="mb-2" style="color: #111827; font-weight: 700;">
-                                        <fmt:formatNumber value="${onTimeRate}" pattern="##0.0"/>%
+                                        <fmt:formatNumber value="${collectionRate}" pattern="##0.0"/>%
                                     </h4>
-                                    <p class="text-muted mb-0">On-time Payment</p>
-                                    <small class="text-muted">(Payment Rate)</small>
+                                    <p class="text-muted mb-0">Collection Rate</p>
+                                    <small class="text-muted">(Payment Collection)</small>
                                 </div>
                             </div>
                         </div>
@@ -222,48 +222,31 @@
                         </div>
                     </div>
 
-                    <!-- Charts Row -->
+                    <!-- Top Revenue Months Chart -->
                     <div class="row g-3 mb-4">
-                        <!-- Revenue by Week -->
-                        <div class="col-md-8">
+                        <div class="col-12">
                             <div class="card" style="border: 1px solid #e5e7eb; border-radius: 12px;">
                                 <div class="card-header" style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; padding: 1.25rem;">
                                     <h5 class="mb-0" style="color: #111827; font-weight: 600;">
-                                        <i class="bi bi-graph-up me-2" style="color: #667eea;"></i>
-                                        Weekly Revenue (Last 4 Weeks)
+                                        <i class="bi bi-trophy me-2" style="color: #f59e0b;"></i>
+                                        Top 5 Revenue Months (All Time)
                                     </h5>
                                 </div>
                                 <div class="card-body" style="padding: 2rem;">
-                                    <canvas id="weeklyRevenueChart" height="80"></canvas>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- New Customers -->
-                        <div class="col-md-4">
-                            <div class="card" style="border: 1px solid #e5e7eb; border-radius: 12px;">
-                                <div class="card-header" style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; padding: 1.25rem;">
-                                    <h5 class="mb-0" style="color: #111827; font-weight: 600;">
-                                        <i class="bi bi-person-plus me-2" style="color: #4facfe;"></i>
-                                        New Customers
-                                    </h5>
-                                </div>
-                                <div class="card-body" style="padding: 2rem;">
-                                    <canvas id="newCustomersChart"></canvas>
+                                    <canvas id="topMonthsChart" height="80"></canvas>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Top Months & Year Comparison -->
+                    <!-- Top Months Table -->
                     <div class="row g-3">
-                        <!-- Top Revenue Months -->
-                        <div class="col-md-6">
+                        <div class="col-12">
                             <div class="card" style="border: 1px solid #e5e7eb; border-radius: 12px;">
                                 <div class="card-header" style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; padding: 1.25rem;">
                                     <h5 class="mb-0" style="color: #111827; font-weight: 600;">
-                                        <i class="bi bi-trophy me-2" style="color: #f59e0b;"></i>
-                                        Top 3 Revenue Months
+                                        <i class="bi bi-list-ol me-2" style="color: #667eea;"></i>
+                                        Best Performing Months
                                     </h5>
                                 </div>
                                 <div class="card-body p-0">
@@ -284,23 +267,26 @@
                                                         <c:choose>
                                                             <c:when test="${status.index == 0}">
                                                                 <span class="badge" style="background-color: #f59e0b; padding: 0.5rem 0.75rem; border-radius: 50%;">
-                                                                    <i class="bi bi-trophy-fill"></i>
+                                                                    🥇
                                                                 </span>
                                                             </c:when>
                                                             <c:when test="${status.index == 1}">
                                                                 <span class="badge" style="background-color: #94a3b8; padding: 0.5rem 0.75rem; border-radius: 50%;">
-                                                                    <i class="bi bi-trophy-fill"></i>
+                                                                    🥈
                                                                 </span>
                                                             </c:when>
                                                             <c:when test="${status.index == 2}">
                                                                 <span class="badge" style="background-color: #d97706; padding: 0.5rem 0.75rem; border-radius: 50%;">
-                                                                    <i class="bi bi-trophy-fill"></i>
+                                                                    🥉
                                                                 </span>
                                                             </c:when>
+                                                            <c:otherwise>
+                                                                <span class="badge bg-secondary">${status.index + 1}</span>
+                                                            </c:otherwise>
                                                         </c:choose>
                                                     </td>
                                                     <td style="padding: 1rem;">
-                                                        <strong>Month ${month.month}/${month.year}</strong>
+                                                        <strong>${month.yearMonth}</strong>
                                                     </td>
                                                     <td style="padding: 1rem; text-align: right;">
                                                         <strong style="color: #059669; font-size: 1.1rem;">
@@ -318,21 +304,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Year Over Year Comparison -->
-                        <div class="col-md-6">
-                            <div class="card" style="border: 1px solid #e5e7eb; border-radius: 12px;">
-                                <div class="card-header" style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; padding: 1.25rem;">
-                                    <h5 class="mb-0" style="color: #111827; font-weight: 600;">
-                                        <i class="bi bi-calendar-range me-2" style="color: #667eea;"></i>
-                                        Year-over-Year Comparison
-                                    </h5>
-                                </div>
-                                <div class="card-body" style="padding: 2rem;">
-                                    <canvas id="yearComparisonChart" height="100"></canvas>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                 </div>
@@ -344,97 +315,56 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-<!-- Initialize Chart Data from JSP -->
+<!-- Initialize Chart Data -->
 <script>
-    /**
-     * Dashboard Charts Data Initialization
-     * Author: Thcamm
-     * Date: 2025-11-04
-     */
-
-// ==========================================
-// 1. WEEKLY REVENUE DATA
-// ==========================================
-    const weeklyRevenueData = {
+    const topMonthsData = {
         labels: [
-            <c:forEach var="week" items="${revenueByWeek}" varStatus="status">
-            '${week.label}'${!status.last ? ',' : ''}
+            <c:forEach var="month" items="${topMonths}" varStatus="status">
+            '${month.yearMonth}'${!status.last ? ',' : ''}
             </c:forEach>
         ],
         values: [
-            <c:forEach var="week" items="${revenueByWeek}" varStatus="status">
-            ${week.totalPaid}${!status.last ? ',' : ''}
+            <c:forEach var="month" items="${topMonths}" varStatus="status">
+            ${month.amount}${!status.last ? ',' : ''}
+            </c:forEach>
+        ],
+        counts: [
+            <c:forEach var="month" items="${topMonths}" varStatus="status">
+            ${month.count}${!status.last ? ',' : ''}
             </c:forEach>
         ]
     };
 
-    // ==========================================
-    // 2. NEW CUSTOMERS DATA
-    // ==========================================
-    const newCustomersData = {
-        labels: [
-            <c:forEach var="nc" items="${newCustomers}" varStatus="status">
-            'M${nc.month}/${nc.year}'${!status.last ? ',' : ''}
-            </c:forEach>
-        ],
-        values: [
-            <c:forEach var="nc" items="${newCustomers}" varStatus="status">
-            ${nc.count}${!status.last ? ',' : ''}
-            </c:forEach>
-        ]
-    };
-
-    // ==========================================
-    // 3. YEAR COMPARISON DATA
-    // ==========================================
-    const currentFullYear = new Date().getFullYear();
-    const thisYearData = new Array(12).fill(0);
-    const lastYearData = new Array(12).fill(0);
-
-    <c:forEach var="yc" items="${yearComparison}">
-    <c:choose>
-    <c:when test="${yc.year == null}">
-    console.warn('Year is null for entry:', ${yc});
-    </c:when>
-    <c:otherwise>
-    <c:if test="${yc.year == currentFullYear}">
-    thisYearData[${yc.month - 1}] = ${yc.totalPaid};
-    </c:if>
-    <c:if test="${yc.year == currentFullYear - 1}">
-    lastYearData[${yc.month - 1}] = ${yc.totalPaid};
-    </c:if>
-    </c:otherwise>
-    </c:choose>
-    </c:forEach>
-
-    console.log('📊 Chart Data Initialized:');
-    console.log('Weekly Revenue:', weeklyRevenueData);
-    console.log('New Customers:', newCustomersData);
-    console.log('This Year:', thisYearData);
-    console.log('Last Year:', lastYearData);
+    console.log(' Top Months Data:', topMonthsData);
 </script>
 
-<!-- Render Charts -->
+<!-- Render Chart -->
 <script>
-    /**
-     * Render All Charts
-     */
     document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('topMonthsChart');
 
-        // ==========================================
-        // 1. WEEKLY REVENUE CHART (Bar Chart)
-        // ==========================================
-        const weeklyCtx = document.getElementById('weeklyRevenueChart');
-        if (weeklyCtx) {
-            new Chart(weeklyCtx.getContext('2d'), {
+        if (ctx && topMonthsData.labels.length > 0) {
+            new Chart(ctx.getContext('2d'), {
                 type: 'bar',
                 data: {
-                    labels: weeklyRevenueData.labels,
+                    labels: topMonthsData.labels,
                     datasets: [{
                         label: 'Revenue (VND)',
-                        data: weeklyRevenueData.values,
-                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
-                        borderColor: 'rgba(102, 126, 234, 1)',
+                        data: topMonthsData.values,
+                        backgroundColor: [
+                            'rgba(245, 158, 11, 0.8)',   // Gold
+                            'rgba(148, 163, 184, 0.8)',  // Silver
+                            'rgba(217, 119, 6, 0.8)',    // Bronze
+                            'rgba(102, 126, 234, 0.8)',  // Purple
+                            'rgba(79, 172, 254, 0.8)'    // Blue
+                        ],
+                        borderColor: [
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(148, 163, 184, 1)',
+                            'rgba(217, 119, 6, 1)',
+                            'rgba(102, 126, 234, 1)',
+                            'rgba(79, 172, 254, 1)'
+                        ],
                         borderWidth: 2,
                         borderRadius: 8
                     }]
@@ -448,8 +378,16 @@
                         },
                         tooltip: {
                             callbacks: {
+                                title: function(context) {
+                                    const index = context[0].dataIndex;
+                                    return topMonthsData.labels[index];
+                                },
                                 label: function(context) {
                                     return 'Revenue: ' + (context.parsed.y / 1000000).toFixed(2) + 'M VND';
+                                },
+                                afterLabel: function(context) {
+                                    const index = context.dataIndex;
+                                    return 'Invoices: ' + topMonthsData.counts[index];
                                 }
                             }
                         }
@@ -466,140 +404,11 @@
                     }
                 }
             });
+
+            console.log(' Top Months Chart rendered successfully');
+        } else {
+            console.warn('️ No data available for Top Months chart');
         }
-
-        // ==========================================
-        // 2. NEW CUSTOMERS CHART (Doughnut Chart)
-        // ==========================================
-        const customersCtx = document.getElementById('newCustomersChart');
-        if (customersCtx) {
-            new Chart(customersCtx.getContext('2d'), {
-                type: 'doughnut',
-                data: {
-                    labels: newCustomersData.labels,
-                    datasets: [{
-                        data: newCustomersData.values,
-                        backgroundColor: [
-                            'rgba(79, 172, 254, 0.8)',
-                            'rgba(102, 126, 234, 0.8)',
-                            'rgba(240, 147, 251, 0.8)',
-                            'rgba(67, 233, 123, 0.8)',
-                            'rgba(245, 87, 108, 0.8)',
-                            'rgba(56, 249, 215, 0.8)'
-                        ],
-                        borderWidth: 2,
-                        borderColor: '#fff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 15,
-                                font: {
-                                    size: 12
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.label + ': ' + context.parsed + ' customers';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        // ==========================================
-        // 3. YEAR COMPARISON CHART (Line Chart)
-        // ==========================================
-        const yearCtx = document.getElementById('yearComparisonChart');
-        if (yearCtx) {
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-            new Chart(yearCtx.getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: months,
-                    datasets: [
-                        {
-                            label: 'This Year (' + currentFullYear + ')',
-                            data: thisYearData,
-                            borderColor: 'rgba(102, 126, 234, 1)',
-                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointRadius: 5,
-                            pointHoverRadius: 7,
-                            pointBackgroundColor: 'rgba(102, 126, 234, 1)',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2
-                        },
-                        {
-                            label: 'Last Year (' + (currentFullYear - 1) + ')',
-                            data: lastYearData,
-                            borderColor: 'rgba(245, 87, 108, 1)',
-                            backgroundColor: 'rgba(245, 87, 108, 0.1)',
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointRadius: 5,
-                            pointHoverRadius: 7,
-                            pointBackgroundColor: 'rgba(245, 87, 108, 1)',
-                            pointBorderColor: '#fff',
-                            pointBorderWidth: 2
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                padding: 15,
-                                font: {
-                                    size: 12,
-                                    weight: '600'
-                                }
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': ' + (context.parsed.y / 1000000).toFixed(2) + 'M VND';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return (value / 1000000).toFixed(1) + 'M';
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        console.log('All charts rendered successfully');
     });
 </script>
 

@@ -1,47 +1,39 @@
 package model.dto;
 
 import java.math.BigDecimal;
-import java.sql.Date;
 
-/**
- * DTO for Financial Reports
- */
 public class ReportDTO {
-
-    // Common fields
+    // Revenue fields
     private String label;
     private BigDecimal amount;
     private int count;
-    private String period; // Khoảng thời gian (Tháng, Quý, Năm)
 
-    // Revenue specific
+    // Date fields
+    private int year;
+    private int month;
+    private String monthYear;
+
+    // Invoice fields
     private BigDecimal totalInvoiced;
     private BigDecimal totalPaid;
     private BigDecimal totalOutstanding;
-
-    // Invoice status specific
-    private String status;
     private int invoiceCount;
-    private BigDecimal invoiceValue;
+    private int totalInvoices;
 
-    // Payment method specific
-    private String paymentMethod;
-    private BigDecimal paymentAmount;
-    private int paymentCount;
-
-    // Time based
-    private Date reportDate;
-    private String monthYear; // MM/YYYY
-    private int year;
-    private int month;
-
-    // Customer specific
+    // Customer fields
     private int customerID;
     private String customerName;
     private String customerEmail;
-    private BigDecimal totalSpent;
-    private int totalInvoices;
+    private String phoneNumber;
     private BigDecimal outstandingBalance;
+
+    // Payment fields
+    private String paymentMethod;
+    private int paymentCount;
+    private BigDecimal paymentAmount;
+
+    // Status fields
+    private String status;
 
     // Constructors
     public ReportDTO() {}
@@ -53,187 +45,91 @@ public class ReportDTO {
     }
 
     // Getters and Setters
-    public String getLabel() {
-        return label;
+    public String getLabel() { return label; }
+    public void setLabel(String label) { this.label = label; }
+
+    public BigDecimal getAmount() { return amount; }
+    public void setAmount(BigDecimal amount) { this.amount = amount; }
+
+    public int getCount() { return count; }
+    public void setCount(int count) { this.count = count; }
+
+    public int getYear() { return year; }
+    public void setYear(int year) { this.year = year; }
+
+    public int getMonth() { return month; }
+    public void setMonth(int month) { this.month = month; }
+
+    public String getMonthYear() { return monthYear; }
+    public void setMonthYear(String monthYear) { this.monthYear = monthYear; }
+
+    /**
+     * Alias for getMonthYear() for JSP compatibility
+     */
+    public String getYearMonth() {
+        if (monthYear != null) {
+            return monthYear;
+        }
+        if (year > 0 && month > 0) {
+            return String.format("%d-%02d", year, month);
+        }
+        return "";
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setYearMonth(String yearMonth) {
+        this.monthYear = yearMonth;
     }
 
-    public BigDecimal getAmount() {
-        return amount;
-    }
+    public BigDecimal getTotalInvoiced() { return totalInvoiced; }
+    public void setTotalInvoiced(BigDecimal totalInvoiced) { this.totalInvoiced = totalInvoiced; }
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
+    public BigDecimal getTotalPaid() { return totalPaid; }
+    public void setTotalPaid(BigDecimal totalPaid) { this.totalPaid = totalPaid; }
 
-    public int getCount() {
-        return count;
-    }
+    public BigDecimal getTotalOutstanding() { return totalOutstanding; }
+    public void setTotalOutstanding(BigDecimal totalOutstanding) { this.totalOutstanding = totalOutstanding; }
 
-    public void setCount(int count) {
-        this.count = count;
-    }
+    public int getInvoiceCount() { return invoiceCount; }
+    public void setInvoiceCount(int invoiceCount) { this.invoiceCount = invoiceCount; }
 
-    public String getPeriod() {
-        return period;
-    }
+    public int getTotalInvoices() { return totalInvoices; }
+    public void setTotalInvoices(int totalInvoices) { this.totalInvoices = totalInvoices; }
 
-    public void setPeriod(String period) {
-        this.period = period;
-    }
+    public int getCustomerID() { return customerID; }
+    public void setCustomerID(int customerID) { this.customerID = customerID; }
 
-    public BigDecimal getTotalInvoiced() {
-        return totalInvoiced;
-    }
+    public String getCustomerName() { return customerName; }
+    public void setCustomerName(String customerName) { this.customerName = customerName; }
 
-    public void setTotalInvoiced(BigDecimal totalInvoiced) {
-        this.totalInvoiced = totalInvoiced;
-    }
+    public String getCustomerEmail() { return customerEmail; }
+    public void setCustomerEmail(String customerEmail) { this.customerEmail = customerEmail; }
 
-    public BigDecimal getTotalPaid() {
-        return this.totalSpent;
-    }
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 
-    public void setTotalPaid(BigDecimal totalPaid) {
-        this.totalPaid = totalPaid;
-    }
+    public BigDecimal getOutstandingBalance() { return outstandingBalance; }
+    public void setOutstandingBalance(BigDecimal outstandingBalance) { this.outstandingBalance = outstandingBalance; }
 
-    public BigDecimal getTotalOutstanding() {
-        return totalOutstanding;
-    }
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
 
-    public void setTotalOutstanding(BigDecimal totalOutstanding) {
-        this.totalOutstanding = totalOutstanding;
-    }
+    public int getPaymentCount() { return paymentCount; }
+    public void setPaymentCount(int paymentCount) { this.paymentCount = paymentCount; }
 
-    public String getStatus() {
-        return status;
-    }
+    public BigDecimal getPaymentAmount() { return paymentAmount; }
+    public void setPaymentAmount(BigDecimal paymentAmount) { this.paymentAmount = paymentAmount; }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public int getInvoiceCount() {
-        return invoiceCount;
-    }
-
-    public void setInvoiceCount(int invoiceCount) {
-        this.invoiceCount = invoiceCount;
-    }
-
-    public BigDecimal getInvoiceValue() {
-        return invoiceValue;
-    }
-
-    public void setInvoiceValue(BigDecimal invoiceValue) {
-        this.invoiceValue = invoiceValue;
-    }
-
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-
-    public BigDecimal getPaymentAmount() {
-        return paymentAmount;
-    }
-
-    public void setPaymentAmount(BigDecimal paymentAmount) {
-        this.paymentAmount = paymentAmount;
-    }
-
-    public int getPaymentCount() {
-        return paymentCount;
-    }
-
-    public void setPaymentCount(int paymentCount) {
-        this.paymentCount = paymentCount;
-    }
-
-    public Date getReportDate() {
-        return reportDate;
-    }
-
-    public void setReportDate(Date reportDate) {
-        this.reportDate = reportDate;
-    }
-
-    public String getMonthYear() {
-        return monthYear;
-    }
-
-    public void setMonthYear(String monthYear) {
-        this.monthYear = monthYear;
-    }
-
-    public int getYear() {
-        return year;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    public int getMonth() {
-        return month;
-    }
-
-    public void setMonth(int month) {
-        this.month = month;
-    }
-
-    public int getCustomerID() {
-        return customerID;
-    }
-
-    public void setCustomerID(int customerID) {
-        this.customerID = customerID;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public void setCustomerName(String customerName) {
-        this.customerName = customerName;
-    }
-
-    public String getCustomerEmail() {
-        return customerEmail;
-    }
-
-    public void setCustomerEmail(String customerEmail) {
-        this.customerEmail = customerEmail;
-    }
-
-    public BigDecimal getTotalSpent() {
-        return totalSpent;
-    }
-
-    public void setTotalSpent(BigDecimal totalSpent) {
-        this.totalSpent = totalSpent;
-    }
-
-    public int getTotalInvoices() {
-        return totalInvoices;
-    }
-
-    public void setTotalInvoices(int totalInvoices) {
-        this.totalInvoices = totalInvoices;
-    }
-
-    public BigDecimal getOutstandingBalance() {
-        return outstandingBalance;
-    }
-
-    public void setOutstandingBalance(BigDecimal outstandingBalance) {
-        this.outstandingBalance = outstandingBalance;
+    @Override
+    public String toString() {
+        return "ReportDTO{" +
+                "label='" + label + '\'' +
+                ", year=" + year +
+                ", month=" + month +
+                ", amount=" + amount +
+                ", count=" + count +
+                '}';
     }
 }

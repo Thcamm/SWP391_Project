@@ -32,7 +32,7 @@
                                 <i class="bi bi-graph-up-arrow me-2" style="color: #667eea;"></i>
                                 Detailed Revenue Report
                             </h2>
-                            <p class="text-muted mb-0">Monthly revenue analysis</p>
+                            <p class="text-muted mb-0">Monthly revenue analysis and trends</p>
                         </div>
 
                         <!-- Month Filter -->
@@ -40,9 +40,9 @@
                             <form method="get" action="${pageContext.request.contextPath}/accountant/report" class="d-flex gap-2">
                                 <input type="hidden" name="action" value="revenue">
                                 <select name="months" class="form-select" style="border-radius: 8px; width: 200px;">
-                                    <option value="6" ${selectedMonths == 6 ? 'selected' : ''}>6 months latest</option>
-                                    <option value="12" ${selectedMonths == 12 ? 'selected' : ''}>12 months latest</option>
-                                    <option value="24" ${selectedMonths == 24 ? 'selected' : ''}>1 year latest</option>
+                                    <option value="6" ${selectedMonths == 6 ? 'selected' : ''}>Last 6 months</option>
+                                    <option value="12" ${selectedMonths == 12 ? 'selected' : ''}>Last 12 months</option>
+                                    <option value="24" ${selectedMonths == 24 ? 'selected' : ''}>Last 24 months</option>
                                 </select>
                                 <button type="submit" class="btn btn-primary" style="border-radius: 8px;">
                                     <i class="bi bi-funnel"></i> Apply
@@ -56,7 +56,7 @@
                         <div class="card-header" style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; padding: 1.25rem;">
                             <h5 class="mb-0" style="color: #111827; font-weight: 600;">
                                 <i class="bi bi-bar-chart-line me-2" style="color: #667eea;"></i>
-                                Revenue Chart
+                                Revenue Trend Chart
                             </h5>
                         </div>
                         <div class="card-body" style="padding: 2rem;">
@@ -70,7 +70,7 @@
                             <div class="d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0" style="color: #111827; font-weight: 600;">
                                     <i class="bi bi-table me-2" style="color: #667eea;"></i>
-                                    Detailed Revenue by month
+                                    Detailed Revenue by Month
                                 </h5>
                                 <button class="btn btn-sm btn-outline-success" onclick="exportToExcel()" style="border-radius: 6px;">
                                     <i class="bi bi-file-earmark-excel"></i> Export to Excel
@@ -84,11 +84,11 @@
                                     <tr>
                                         <th style="padding: 1rem; font-weight: 600; color: #374151; border-top: none;">No</th>
                                         <th style="padding: 1rem; font-weight: 600; color: #374151; border-top: none;">Month/Year</th>
-                                        <th style="padding: 1rem; font-weight: 600; color: #374151; text-align: right; border-top: none;">Revenue Sum</th>
+                                        <th style="padding: 1rem; font-weight: 600; color: #374151; text-align: right; border-top: none;">Total Invoiced</th>
                                         <th style="padding: 1rem; font-weight: 600; color: #374151; text-align: right; border-top: none;">Collected</th>
-                                        <th style="padding: 1rem; font-weight: 600; color: #374151; text-align: right; border-top: none;">Uncollected</th>
+                                        <th style="padding: 1rem; font-weight: 600; color: #374151; text-align: right; border-top: none;">Outstanding</th>
                                         <th style="padding: 1rem; font-weight: 600; color: #374151; text-align: center; border-top: none;">Invoices</th>
-                                        <th style="padding: 1rem; font-weight: 600; color: #374151; text-align: center; border-top: none;">% Collected</th>
+                                        <th style="padding: 1rem; font-weight: 600; color: #374151; text-align: center; border-top: none;">Collection %</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -111,7 +111,7 @@
                                                 <span class="badge bg-secondary">${status.index + 1}</span>
                                             </td>
                                             <td style="padding: 1rem;">
-                                                <strong>Month ${revenue.month}/${revenue.year}</strong>
+                                                <strong>${revenue.month}/${revenue.year}</strong>
                                             </td>
                                             <td style="padding: 1rem; text-align: right;">
                                                 <strong style="color: #111827;">
@@ -129,9 +129,9 @@
                                                 </strong>
                                             </td>
                                             <td style="padding: 1rem; text-align: center;">
-                                                    <span class="badge bg-primary" style="font-size: 0.9rem; padding: 0.5rem 1rem; border-radius: 20px;">
-                                                        ${revenue.count} invoices
-                                                    </span>
+                                                <span class="badge bg-primary" style="font-size: 0.9rem; padding: 0.5rem 1rem; border-radius: 20px;">
+                                                        ${revenue.count}
+                                                </span>
                                             </td>
                                             <td style="padding: 1rem; text-align: center;">
                                                 <div class="d-flex align-items-center justify-content-center gap-2">
@@ -163,7 +163,7 @@
                                             <fmt:formatNumber value="${totalInvoiced - totalPaid}" pattern="#,###"/> VND
                                         </td>
                                         <td style="padding: 1rem; text-align: center; font-weight: 700;">
-                                            ${totalInvoiceCount} invoices
+                                            ${totalInvoiceCount}
                                         </td>
                                         <td style="padding: 1rem; text-align: center; font-weight: 700;">
                                             <fmt:formatNumber value="${totalInvoiced > 0 ? (totalPaid / totalInvoiced * 100) : 0}" pattern="##0.0"/>%
@@ -184,9 +184,8 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-    // Revenue Detail Chart
     const ctx = document.getElementById('revenueDetailChart').getContext('2d');
-    const chart = new Chart(ctx, {
+    new Chart(ctx, {
         type: 'line',
         data: {
             labels: [
@@ -206,7 +205,12 @@
                     backgroundColor: 'rgba(102, 126, 234, 0.1)',
                     borderWidth: 3,
                     fill: true,
-                    tension: 0.4
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: 'rgba(102, 126, 234, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
                 },
                 {
                     label: 'Collected',
@@ -219,20 +223,33 @@
                     backgroundColor: 'rgba(5, 150, 105, 0.1)',
                     borderWidth: 3,
                     fill: true,
-                    tension: 0.4
+                    tension: 0.4,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: 'rgba(5, 150, 105, 1)',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2
                 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: true,
+            interaction: {
+                mode: 'index',
+                intersect: false
+            },
             plugins: {
                 legend: {
                     display: true,
                     position: 'top',
                     labels: {
                         usePointStyle: true,
-                        padding: 15
+                        padding: 15,
+                        font: {
+                            size: 12,
+                            weight: '600'
+                        }
                     }
                 },
                 tooltip: {
@@ -253,19 +270,18 @@
                     beginAtZero: true,
                     ticks: {
                         callback: function(value) {
-                            return (value / 1000000).toFixed(1) + 'M đ';
+                            return (value / 1000000).toFixed(1) + 'M';
                         }
                     }
                 }
             }
         }
     });
-    // Export to Excel function
+
     function exportToExcel() {
-        alert('Excel export feature is under development!');
-        // TODO: Implement Excel export functionality
+        alert(' Export to Excel feature will be developed in the future!\n\nStay tuned for updates.');
+        console.log('Export function called - Feature under development');
     }
 </script>
-
 
 <jsp:include page="footer.jsp"/>

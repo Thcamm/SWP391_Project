@@ -10,14 +10,13 @@ import java.util.List;
 
 public class PaymentDAO {
 
-    public int insert(Payment payment) throws Exception {
-        String sql = "INSERT INTO Payment (InvoiceID, WorkOrderID, PaymentDate, Amount, " +
-                "Method, ReferenceNo, AccountantID, Note) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    public int insert(Connection conn, Payment payment) throws SQLException {
+        String sql = "INSERT INTO Payment (" +
+                "InvoiceID, WorkOrderID, PaymentDate, Amount, " +
+                "Method, ReferenceNo, AccountantID, Note" +
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, payment.getInvoiceID());
             stmt.setInt(2, payment.getWorkOrderID());
             stmt.setTimestamp(3, payment.getPaymentDate());
@@ -27,22 +26,24 @@ public class PaymentDAO {
             stmt.setInt(7, payment.getAccountantID());
             stmt.setString(8, payment.getNote());
 
-            int affectedRows = stmt.executeUpdate();
+            stmt.executeUpdate();
 
-            if (affectedRows > 0) {
-                try (ResultSet rs = stmt.getGeneratedKeys()) {
-                    if (rs.next()) {
-                        int generatedId = rs.getInt(1);
-                        payment.setPaymentID(generatedId);
-                        return generatedId;
-                    }
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
                 }
+                throw new SQLException("Failed to get generated PaymentID");
             }
-            throw new Exception("Tạo payment thất bại, không có ID được tạo.");
         }
     }
 
-    public Payment getById(int paymentID) throws Exception {
+    public int insert(Payment payment) throws SQLException {
+        try (Connection conn = DbContext.getConnection()) {
+            return insert(conn, payment);
+        }
+    }
+
+    public Payment getById(int paymentID) throws SQLException {
         String sql = "SELECT * FROM Payment WHERE PaymentID = ?";
 
         try (Connection conn = DbContext.getConnection();
@@ -59,8 +60,7 @@ public class PaymentDAO {
         return null;
     }
 
-
-    public List<Payment> getByInvoiceID(int invoiceID) throws Exception {
+    public List<Payment> getByInvoiceID(int invoiceID) throws SQLException {
         List<Payment> payments = new ArrayList<>();
         String sql = "SELECT * FROM Payment WHERE InvoiceID = ? ORDER BY PaymentDate DESC";
 
@@ -78,7 +78,25 @@ public class PaymentDAO {
         return payments;
     }
 
-    public List<Payment> getAll() throws Exception {
+    public List<Payment> getByWorkOrderID(int workOrderID) throws SQLException {
+        List<Payment> payments = new ArrayList<>();
+        String sql = "SELECT * FROM Payment WHERE WorkOrderID = ? ORDER BY PaymentDate DESC";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, workOrderID);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    payments.add(mapResultSetToPayment(rs));
+                }
+            }
+        }
+        return payments;
+    }
+
+    public List<Payment> getAll() throws SQLException {
         List<Payment> payments = new ArrayList<>();
         String sql = "SELECT * FROM Payment ORDER BY PaymentDate DESC";
 
@@ -93,8 +111,20 @@ public class PaymentDAO {
         return payments;
     }
 
+    public void delete(Connection conn, int paymentID) throws SQLException {
+        String sql = "DELETE FROM Payment WHERE PaymentID = ?";
 
-    public void delete(int paymentID) throws Exception {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, paymentID);
+            int rows = stmt.executeUpdate();
+
+            if (rows == 0) {
+                throw new SQLException("Failed to delete payment: " + paymentID);
+            }
+        }
+    }
+
+    public void delete(int paymentID) throws SQLException {
         String sql = "DELETE FROM Payment WHERE PaymentID = ?";
 
         try (Connection conn = DbContext.getConnection();
@@ -104,12 +134,29 @@ public class PaymentDAO {
             int affectedRows = stmt.executeUpdate();
 
             if (affectedRows == 0) {
-                throw new Exception("Xóa payment thất bại, không tìm thấy payment với ID: " + paymentID);
+                throw new SQLException("Delete payment failed, payment not found: " + paymentID);
             }
         }
     }
 
-    public BigDecimal getTotalRevenueByDateRange(java.sql.Date startDate, java.sql.Date endDate) throws Exception {
+    public BigDecimal getTotalPaidForInvoice(int invoiceID) throws SQLException {
+        String sql = "SELECT COALESCE(SUM(Amount), 0) FROM Payment WHERE InvoiceID = ?";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, invoiceID);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getBigDecimal(1);
+                }
+            }
+        }
+        return BigDecimal.ZERO;
+    }
+
+    public BigDecimal getTotalRevenueByDateRange(java.sql.Date startDate, java.sql.Date endDate) throws SQLException {
         String sql = "SELECT COALESCE(SUM(Amount), 0) FROM Payment " +
                 "WHERE DATE(PaymentDate) BETWEEN ? AND ?";
 
@@ -126,6 +173,27 @@ public class PaymentDAO {
             }
         }
         return BigDecimal.ZERO;
+    }
+
+    public List<Payment> getByDateRange(Date from, Date to) throws SQLException {
+        List<Payment> payments = new ArrayList<>();
+        String sql = "SELECT * FROM Payment " +
+                "WHERE DATE(PaymentDate) BETWEEN ? AND ? " +
+                "ORDER BY PaymentDate DESC";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setDate(1, from);
+            stmt.setDate(2, to);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    payments.add(mapResultSetToPayment(rs));
+                }
+            }
+        }
+        return payments;
     }
 
     private Payment mapResultSetToPayment(ResultSet rs) throws SQLException {

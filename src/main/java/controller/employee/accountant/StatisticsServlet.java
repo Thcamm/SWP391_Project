@@ -8,6 +8,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.List;
 @WebServlet(name = "StatisticsServlet", urlPatterns = {"/accountant/statistics"})
 public class StatisticsServlet extends HttpServlet {
 
+    private static final long serialVersionUID = 1L;
     private StatisticsService statisticsService;
 
     @Override
@@ -27,39 +30,32 @@ public class StatisticsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        try {
-            // Lấy tất cả dữ liệu thống kê
+        HttpSession session = request.getSession();
+        Integer roleID = (Integer) session.getAttribute("roleID");
 
-            // 1. KPI Summary
+        if (roleID == null || roleID != 5) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        try {
             ReportDTO kpiSummary = statisticsService.getKPISummary();
             int totalCustomers = statisticsService.getTotalCustomers();
-            BigDecimal onTimeRate = statisticsService.getOnTimePaymentRate();
-            BigDecimal growthRate = statisticsService.getRevenueGrowthRate();
             BigDecimal collectionRate = statisticsService.getCollectionRate();
+            BigDecimal growthRate = statisticsService.getRevenueGrowthRate();
+            List<ReportDTO> topMonths = statisticsService.getTopRevenueMonths();
 
-            // 2. Charts data
-            List<ReportDTO> revenueByWeek = statisticsService.getRevenueByWeek();
-            List<ReportDTO> yearComparison = statisticsService.getYearOverYearComparison();
-            List<ReportDTO> topMonths = statisticsService.getTopRevenueMonths(3);
-            List<ReportDTO> newCustomers = statisticsService.getNewCustomersByMonth();
-
-            // Set attributes
             request.setAttribute("kpiSummary", kpiSummary);
             request.setAttribute("totalCustomers", totalCustomers);
-            request.setAttribute("onTimeRate", onTimeRate);
-            request.setAttribute("growthRate", growthRate);
             request.setAttribute("collectionRate", collectionRate);
-
-            request.setAttribute("revenueByWeek", revenueByWeek);
-            request.setAttribute("yearComparison", yearComparison);
+            request.setAttribute("growthRate", growthRate);
             request.setAttribute("topMonths", topMonths);
-            request.setAttribute("newCustomers", newCustomers);
 
             request.getRequestDispatcher("/view/accountant/statistics.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Lỗi: " + e.getMessage());
+            session.setAttribute("errorMessage", "Error loading statistics: " + e.getMessage());
             request.getRequestDispatcher("/view/error.jsp").forward(request, response);
         }
     }

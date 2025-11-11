@@ -1,3 +1,7 @@
+/*
+ * ServiceHistoryDTO.java
+ * (Updated to include licensePlate)
+ */
 package model.dto;
 
 import java.sql.Timestamp;
@@ -8,6 +12,8 @@ public class ServiceHistoryDTO {
     private Timestamp requestDate;
     private String status;
     private double price;
+    private String licensePlate;
+
 
     public int getRequestId() {
         return requestId;
@@ -47,5 +53,12 @@ public class ServiceHistoryDTO {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+    public String getLicensePlate() {
+        return licensePlate;
+    }
+
+    public void setLicensePlate(String licensePlate) {
+        this.licensePlate = licensePlate;
     }
 }

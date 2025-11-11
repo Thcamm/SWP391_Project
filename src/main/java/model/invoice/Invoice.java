@@ -1,6 +1,7 @@
 package model.invoice;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Date;
 import java.sql.Timestamp;
 
@@ -12,9 +13,9 @@ public class Invoice {
     private Date dueDate;
     private BigDecimal subtotal;
     private BigDecimal taxAmount;
-    private BigDecimal totalAmount;      // Auto-calculated
+    private BigDecimal totalAmount;
     private BigDecimal paidAmount;
-    private BigDecimal balanceAmount;    // Auto-calculated
+    private BigDecimal balanceAmount;
     private String paymentStatus;
     private String notes;
     private Timestamp createdAt;
@@ -60,10 +61,65 @@ public class Invoice {
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
 
-    // ← ADD THESE GETTERS/SETTERS
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
 
     public Timestamp getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
+
+    /**
+     * Calculate payment percentage
+     * @return Percentage of total amount paid (0-100)
+     */
+    public BigDecimal getPaymentPercentage() {
+        if (totalAmount == null || totalAmount.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+
+        if (paidAmount == null) {
+            return BigDecimal.ZERO;
+        }
+
+        return paidAmount
+                .multiply(new BigDecimal("100"))
+                .divide(totalAmount, 2, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * Check if invoice is overdue
+     * @return true if past due date and not fully paid
+     */
+    public boolean isOverdue() {
+        if (dueDate == null) return false;
+        if ("PAID".equals(paymentStatus)) return false;
+
+        return dueDate.before(new Date(System.currentTimeMillis()));
+    }
+
+    /**
+     * Get payment status display text
+     * @return Human-readable payment status
+     */
+    public String getPaymentStatusDisplay() {
+        if (paymentStatus == null) return "Unknown";
+
+        switch (paymentStatus) {
+            case "UNPAID": return "Unpaid";
+            case "PARTIALLY_PAID": return "Partially Paid";
+            case "PAID": return "Paid";
+            case "VOID": return "Void";
+            default: return paymentStatus;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Invoice{" +
+                "invoiceID=" + invoiceID +
+                ", invoiceNumber='" + invoiceNumber + '\'' +
+                ", totalAmount=" + totalAmount +
+                ", paidAmount=" + paidAmount +
+                ", paymentStatus='" + paymentStatus + '\'' +
+                '}';
+    }
 }
