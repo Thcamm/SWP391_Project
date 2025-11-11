@@ -52,6 +52,7 @@ public class Login extends HttpServlet {
             request.getSession().setAttribute("userId", user.getUserId());
             request.getSession().setAttribute("userName", user.getUserName());
             request.getSession().setAttribute("roleName", roleName);
+            request.getSession().setAttribute("roleID", user.getRoleId());
 
             Employee employee = userService.findEmployeeByUserName(username);
 

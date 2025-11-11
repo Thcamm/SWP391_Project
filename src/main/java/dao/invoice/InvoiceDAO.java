@@ -11,15 +11,11 @@ import java.util.List;
 
 public class InvoiceDAO {
 
-    /**
-     * Tạo invoice mới
-     */
     public int insert(Invoice invoice) throws SQLException {
         String sql = "INSERT INTO Invoice (" +
                 "WorkOrderID, InvoiceNumber, InvoiceDate, DueDate, " +
-                "Subtotal, TaxAmount, PaidAmount, PaymentStatus, Notes, " +
-                "CreatedAt, UpdatedAt" +
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "Subtotal, TaxAmount, PaidAmount, PaymentStatus, Notes" +
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DbContext.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -33,8 +29,6 @@ public class InvoiceDAO {
             stmt.setBigDecimal(7, invoice.getPaidAmount());
             stmt.setString(8, invoice.getPaymentStatus());
             stmt.setString(9, invoice.getNotes());
-            stmt.setTimestamp(10, invoice.getCreatedAt());
-            stmt.setTimestamp(11, invoice.getUpdatedAt());
 
             int affectedRows = stmt.executeUpdate();
 
@@ -52,6 +46,35 @@ public class InvoiceDAO {
         }
     }
 
+    public int insert(Connection conn, Invoice invoice) throws SQLException {
+        String sql = "INSERT INTO Invoice (" +
+                "WorkOrderID, InvoiceNumber, InvoiceDate, DueDate, " +
+                "Subtotal, TaxAmount, PaidAmount, PaymentStatus, Notes" +
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            stmt.setInt(1, invoice.getWorkOrderID());
+            stmt.setString(2, invoice.getInvoiceNumber());
+            stmt.setDate(3, invoice.getInvoiceDate());
+            stmt.setDate(4, invoice.getDueDate());
+            stmt.setBigDecimal(5, invoice.getSubtotal());
+            stmt.setBigDecimal(6, invoice.getTaxAmount());
+            stmt.setBigDecimal(7, invoice.getPaidAmount());
+            stmt.setString(8, invoice.getPaymentStatus());
+            stmt.setString(9, invoice.getNotes());
+
+            stmt.executeUpdate();
+
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+                throw new SQLException("Failed to get generated InvoiceID");
+            }
+        }
+    }
+
     public void delete(int invoiceId) throws SQLException {
         String sql = "DELETE FROM Invoice WHERE InvoiceID = ?";
 
@@ -63,7 +86,7 @@ public class InvoiceDAO {
         }
     }
 
-    public void update(Invoice invoice) throws Exception {
+    public void update(Invoice invoice) throws SQLException {
         String sql = "UPDATE Invoice SET " +
                 "InvoiceDate = ?, DueDate = ?, Subtotal = ?, TaxAmount = ?, " +
                 "PaidAmount = ?, PaymentStatus = ?, Notes = ?, UpdatedAt = ? " +
@@ -84,12 +107,37 @@ public class InvoiceDAO {
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
-                throw new Exception("Cập nhật invoice thất bại, không tìm thấy invoice với ID: " + invoice.getInvoiceID());
+                throw new SQLException("Update invoice failed, invoice not found: " + invoice.getInvoiceID());
             }
         }
     }
 
-    public Invoice getById(int invoiceID) throws Exception {
+    public void updatePaymentInfo(Connection conn, int invoiceID,
+                                  BigDecimal newPaidAmount, String newStatus) throws SQLException {
+        String sql = "UPDATE Invoice SET " +
+                "PaidAmount = ?, PaymentStatus = ?, UpdatedAt = NOW() " +
+                "WHERE InvoiceID = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBigDecimal(1, newPaidAmount);
+            stmt.setString(2, newStatus);
+            stmt.setInt(3, invoiceID);
+
+            int rows = stmt.executeUpdate();
+            if (rows == 0) {
+                throw new SQLException("Invoice not found: " + invoiceID);
+            }
+        }
+    }
+
+    public void updatePaymentInfo(int invoiceID, BigDecimal newPaidAmount, String newStatus)
+            throws SQLException {
+        try (Connection conn = DbContext.getConnection()) {
+            updatePaymentInfo(conn, invoiceID, newPaidAmount, newStatus);
+        }
+    }
+
+    public Invoice getById(int invoiceID) throws SQLException {
         String sql = "SELECT * FROM Invoice WHERE InvoiceID = ?";
 
         try (Connection conn = DbContext.getConnection();
@@ -106,7 +154,24 @@ public class InvoiceDAO {
         return null;
     }
 
-    public List<Invoice> getAll() throws Exception {
+    public Invoice getByWorkOrderID(int workOrderID) throws SQLException {
+        String sql = "SELECT * FROM Invoice WHERE WorkOrderID = ?";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, workOrderID);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToInvoice(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<Invoice> getAll() throws SQLException {
         List<Invoice> invoices = new ArrayList<>();
         String sql = "SELECT * FROM Invoice ORDER BY CreatedAt DESC";
 
@@ -121,9 +186,6 @@ public class InvoiceDAO {
         return invoices;
     }
 
-    /**
-     * Check if invoice exists for a WorkOrder
-     */
     public boolean existsByWorkOrderID(int workOrderID) throws SQLException {
         String sql = "SELECT COUNT(*) as Count FROM Invoice WHERE WorkOrderID = ?";
 
@@ -138,31 +200,24 @@ public class InvoiceDAO {
                 }
             }
         }
-
         return false;
     }
 
-    public int getNextSequenceForDate(LocalDate date) throws SQLException {
-        String sql = "SELECT COUNT(*) + 1 as NextSequence " +
-                "FROM Invoice " +
-                "WHERE DATE(InvoiceDate) = ?";
+    public String generateInvoiceNumber(Connection conn) throws SQLException {
+        String sql = "SELECT CONCAT('INV-', DATE_FORMAT(NOW(), '%Y%m%d'), '-', " +
+                "LPAD((SELECT COUNT(*) + 1 FROM Invoice " +
+                "WHERE DATE(InvoiceDate) = CURDATE() FOR UPDATE), 4, '0'))";
 
-        try (Connection conn = DbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setDate(1, Date.valueOf(date));
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt("NextSequence");
-                }
+        try (PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getString(1);
             }
+            throw new SQLException("Failed to generate invoice number");
         }
-
-        return 1;
     }
 
-    public List<Invoice> getByStatus(String status) throws Exception {
+    public List<Invoice> getByStatus(String status) throws SQLException {
         List<Invoice> invoices = new ArrayList<>();
         String sql = "SELECT * FROM Invoice WHERE PaymentStatus = ? ORDER BY CreatedAt DESC";
 
@@ -180,7 +235,7 @@ public class InvoiceDAO {
         return invoices;
     }
 
-    public List<Invoice> getOverdueInvoices() throws Exception {
+    public List<Invoice> getOverdueInvoices() throws SQLException {
         List<Invoice> invoices = new ArrayList<>();
         String sql = "SELECT * FROM Invoice " +
                 "WHERE PaymentStatus IN ('UNPAID', 'PARTIALLY_PAID') " +
@@ -198,7 +253,7 @@ public class InvoiceDAO {
         return invoices;
     }
 
-    public List<Invoice> search(String keyword) throws Exception {
+    public List<Invoice> search(String keyword) throws SQLException {
         List<Invoice> invoices = new ArrayList<>();
         String sql = "SELECT i.* FROM Invoice i " +
                 "WHERE i.InvoiceNumber LIKE ? " +
@@ -221,7 +276,7 @@ public class InvoiceDAO {
         return invoices;
     }
 
-    public List<Invoice> getInvoicesWithPagination(int page, int pageSize) throws Exception {
+    public List<Invoice> getInvoicesWithPagination(int page, int pageSize) throws SQLException {
         List<Invoice> invoices = new ArrayList<>();
         int offset = (page - 1) * pageSize;
 
@@ -244,7 +299,7 @@ public class InvoiceDAO {
         return invoices;
     }
 
-    public int getTotalCount() throws Exception {
+    public int getTotalCount() throws SQLException {
         String sql = "SELECT COUNT(*) FROM Invoice";
 
         try (Connection conn = DbContext.getConnection();
