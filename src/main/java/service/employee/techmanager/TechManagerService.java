@@ -211,11 +211,12 @@ public class TechManagerService {
         task.setTaskType(TaskAssignment.TaskType.DIAGNOSIS);
         task.setStatus(TaskAssignment.TaskStatus.ASSIGNED);
         task.setNotes(instructions);
-        // Set planned_start with buffer time (2 hours from now) to avoid immediate overdue
+        // Set planned_start with buffer time (2 hours from now) to avoid immediate
+        // overdue
         task.setPlannedStart(LocalDateTime.now().plusHours(2));
 
-        System.out.println("[assignDiagnosisTask] Creating task: DetailID=" + detailId + 
-                         ", TechID=" + technicianId + ", PlannedStart=" + task.getPlannedStart());
+        System.out.println("[assignDiagnosisTask] Creating task: DetailID=" + detailId +
+                ", TechID=" + technicianId + ", PlannedStart=" + task.getPlannedStart());
 
         int taskId = taskDAO.createTaskAssignment(task);
         if (taskId <= 0) {
@@ -253,11 +254,12 @@ public class TechManagerService {
         task.setTaskType(TaskAssignment.TaskType.REPAIR);
         task.setStatus(TaskAssignment.TaskStatus.ASSIGNED);
         task.setNotes(instructions);
-        // Set planned_start with buffer time (2 hours from now) to avoid immediate overdue
+        // Set planned_start with buffer time (2 hours from now) to avoid immediate
+        // overdue
         task.setPlannedStart(LocalDateTime.now().plusHours(2));
 
-        System.out.println("[assignRepairTask] Creating task: DetailID=" + detailId + 
-                         ", TechID=" + technicianId + ", PlannedStart=" + task.getPlannedStart());
+        System.out.println("[assignRepairTask] Creating task: DetailID=" + detailId +
+                ", TechID=" + technicianId + ", PlannedStart=" + task.getPlannedStart());
 
         int taskId = taskDAO.createTaskAssignment(task);
         if (taskId <= 0) {
