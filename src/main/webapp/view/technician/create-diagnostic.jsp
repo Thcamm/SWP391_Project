@@ -29,8 +29,6 @@
                     <h1 class="page-title">🩺 Create Diagnostic Report</h1>
                 </div>
 
-
-
                 <!-- Task Info -->
                 <div class="card">
                     <div class="card-header bg-info">📋 Task Information</div>
@@ -412,7 +410,7 @@
                     <c:if test="${requestScope.showSuccessInline}">
                         <div class="alert alert-success mt-4" role="alert" style="display:flex;align-items:center;justify-content:space-between;">
                             <div>
-                                <strong></strong>
+                                ✅ <strong>Diagnostic report created successfully!</strong>
                                 <c:if test="${not empty successMessage}">
                                     <span class="ms-2"><c:out value="${successMessage}"/></span>
                                 </c:if>

@@ -34,7 +34,6 @@ public class TaskAssignment {
     private String customerName;
     private double estimateHours;
     private String assignedDateFormatted;
-    private String customerEmail;
 
     private static final DateTimeFormatter D_HM = DateTimeFormatter.ofPattern("dd/MM HH:mm");
     private static final DateTimeFormatter D_M_Y_HM = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -336,14 +335,6 @@ public class TaskAssignment {
                 ", planned=" + (plannedStart != null ? plannedStart.format(D_M_Y_HM) : "-") +
                 "→" + (plannedEnd != null ? plannedEnd.format(D_HM) : "-") +
                 '}';
-    }
-
-    public String getCustomerEmail() {
-        return customerEmail;
-    }
-
-    public void setCustomerEmail(String customerEmail) {
-        this.customerEmail = customerEmail;
     }
 
     // tiện cho sort theo plannedStart

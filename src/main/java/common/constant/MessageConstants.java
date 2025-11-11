@@ -236,20 +236,6 @@ public class MessageConstants {
             "Parts request is pending approval."
     );
 
-    public static final SystemMessage PART004 = new SystemMessage(
-            "PART004",
-            MessageType.INFO,
-            "Parts are update",
-            "Parts updated success"
-    );
-
-    public static final SystemMessage PART005 = new SystemMessage(
-            "PART005",
-            MessageType.ERROR,
-            "Parts update failed",
-            "Error updating part approval."
-    );
-
     public static final SystemMessage DIAG001 = new SystemMessage(
             "DIAG001",
             MessageType.SUCCESS,
@@ -287,13 +273,6 @@ public class MessageConstants {
             "Diagnostic is aprroved not updated!"
     );
 
-    public static final SystemMessage DIAG006 = new SystemMessage(
-            "DIAG006",
-            MessageType.ERROR,
-            "Diagnostic not loaded",
-            "Diagnostics are not loaded."
-    );
-
     public static final SystemMessage ERR001 = new SystemMessage(
             "ERR001",
             MessageType.ERROR,
@@ -327,13 +306,6 @@ public class MessageConstants {
             MessageType.ERROR,
             "Precondition",
             "Reject request is already pending for this task."
-    );
-
-    public static final SystemMessage ERR006 = new SystemMessage(
-            "ERR006",
-            MessageType.ERROR,
-            "Precondition",
-            "Invalid Action"
     );
 
     public static final SystemMessage VAL001 = new SystemMessage(

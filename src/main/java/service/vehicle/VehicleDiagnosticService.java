@@ -357,12 +357,5 @@ public class VehicleDiagnosticService {
         }
     }
 
-    public void autoRejectExpiredDiagnostics(int graceMinutes){
-        int count = diagnosticDAO.autoRejectExpiredDiagnostics(graceMinutes);
-        if(count > 0){
-            System.out.println("diagnostics were auto rejected dueto time out");
-        }
-    }
-
 
 }
