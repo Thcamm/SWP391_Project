@@ -90,7 +90,8 @@ public class DashboardServlet extends HttpServlet {
 
             // ===== GĐ2: KTV Chẩn đoán & Báo giá =====
             // FIX: Use TechManager-specific count instead of global count
-            stats.put("inProgressDiagnosis", dashboardService.countInProgressDiagnosisForManager(techManagerEmployeeId));
+            stats.put("inProgressDiagnosis",
+                    dashboardService.countInProgressDiagnosisForManager(techManagerEmployeeId));
 
             // ===== GĐ3: Chờ Khách hàng Duyệt =====
             stats.put("pendingQuotes", dashboardService.countPendingCustomerApproval());
@@ -115,7 +116,7 @@ public class DashboardServlet extends HttpServlet {
             stats.put("thisWeekCompleted", dashboardService.countThisWeekCompleted());
 
             // ===== Cảnh báo Quản lý (Xử lý Ngoại lệ) =====
-            stats.put("rejectedTasks", declinedTaskService.countDeclinedTasks());
+            stats.put("declinedTasksCount", declinedTaskService.countDeclinedTasks());
             stats.put("overdueTasks", techManagerService.countOverdueTasks());
             stats.put("declinedTasks", techManagerService.countDeclinedTasks());
             stats.put("tasksNeedReassignment", techManagerService.countTasksNeedReassignment());
