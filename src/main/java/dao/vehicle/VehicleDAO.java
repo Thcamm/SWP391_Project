@@ -12,7 +12,54 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VehicleDAO {
+    public int getVehicleCountByCustomerId(int customerId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Vehicle WHERE CustomerID = ?";
+        try (Connection conn = DbContext.getConnection(); // Thay thế bằng cách lấy connection của bạn
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
+            ps.setInt(1, customerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Lấy danh sách xe của khách hàng theo phân trang (limit/offset).
+     */
+    public List<Vehicle> getVehiclesByCustomerIdPaginated(int customerId, int limit, int offset) throws SQLException {
+        List<Vehicle> vehicles = new ArrayList<>();
+        // Lưu ý: Cú pháp LIMIT/OFFSET có thể khác nhau giữa các CSDL (Đây là cho MySQL/PostgreSQL)
+        // Nếu dùng SQL Server, bạn sẽ cần dùng OFFSET/FETCH
+        String sql = "SELECT * FROM Vehicle WHERE CustomerID = ? LIMIT ? OFFSET ?";
+
+        try (Connection conn = DbContext.getConnection(); // Thay thế bằng cách lấy connection của bạn
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, customerId);
+            ps.setInt(2, limit);
+            ps.setInt(3, offset);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    // Giả sử bạn có một hàm helper để map ResultSet
+                    // hoặc bạn map trực tiếp ở đây
+                    Vehicle vehicle = new Vehicle();
+                    vehicle.setVehicleID(rs.getInt("VehicleID"));
+                    vehicle.setLicensePlate(rs.getString("LicensePlate"));
+                    vehicle.setYearManufacture(rs.getInt("YearManufacture"));
+                    vehicle.setBrand(rs.getString("Brand"));
+                    vehicle.setModel(rs.getString("Model"));
+                    vehicle.setCustomerID(rs.getInt("CustomerID"));
+                    vehicles.add(vehicle);
+                }
+            }
+        }
+        return vehicles;
+    }
     public List<Vehicle> getVehiclesByCustomerId(int customerId) throws SQLException {
         List<Vehicle> list = new ArrayList<>();
         String sql = "SELECT VehicleID, CustomerID, LicensePlate, Brand, Model, YearManufacture FROM Vehicle WHERE CustomerID = ?";
@@ -130,6 +177,33 @@ public class VehicleDAO {
             st.setInt(5, vehicle.getVehicleID());
 
             return st.executeUpdate() > 0;
+        }
+    }
+    public boolean updateVehicleForCustomer(Vehicle vehicle) throws SQLException {
+        String sql = "UPDATE Vehicle SET CustomerID = ?, Brand = ?, Model = ?, " +
+                "YearManufacture = ?, LicensePlate = ? WHERE VehicleID = ?";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, vehicle.getCustomerID());
+            ps.setString(2, vehicle.getBrand());
+            ps.setString(3, vehicle.getModel());
+            ps.setInt(4, vehicle.getYearManufacture());
+            ps.setString(5, vehicle.getLicensePlate());
+            ps.setInt(6, vehicle.getVehicleID());
+
+            int rowsAffected = ps.executeUpdate();
+
+            System.out.println("✅ Updated vehicle ID " + vehicle.getVehicleID() +
+                    " - Rows affected: " + rowsAffected);
+
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            System.err.println("❌ Error updating vehicle: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
     }
     public boolean deleteVehicle(int vehicleId, int customerId) throws SQLException {

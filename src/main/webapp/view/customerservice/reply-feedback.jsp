@@ -74,16 +74,7 @@
                                 <h1 class="page-title text-dark mb-2">Customer Feedback Management</h1>
                                 <p class="text-muted">View and respond to customer feedback</p>
                             </div>
-                            <div id="forbiddenWordsManager" class="mb-4 p-4 border rounded shadow-sm bg-white">
-                                <h5>Manage Forbidden Words</h5>
-                                <div class="mb-2">
-                                    <input type="text" id="newForbiddenWord" class="form-control" placeholder="Enter a new forbidden word">
-                                    <button class="btn btn-primary mt-2" onclick="addForbiddenWord()">Add Word</button>
-                                </div>
-                                <ul id="forbiddenWordsList" class="list-group">
-                                    <!-- Danh sách từ cấm sẽ hiển thị ở đây -->
-                                </ul>
-                            </div>
+
 
                             <!-- Stats Cards -->
                             <div class="row g-3 mb-4">

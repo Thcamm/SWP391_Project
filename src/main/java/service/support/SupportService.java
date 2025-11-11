@@ -10,6 +10,8 @@ public class SupportService {
         this.supportDAO = new SupportDAO();
     }
 
+
+
     public boolean checkUpdateStatus(int requestID, String newStatus) throws Exception {
         SupportRequest req = supportDAO.getSupportRequestById(requestID);
         if (req == null) {

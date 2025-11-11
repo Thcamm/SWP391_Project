@@ -112,6 +112,7 @@ public class FeedbackDAO extends DbContext {
                 Timestamp replyTs = rs.getTimestamp("ReplyDate");
                 fb.setReplyDate(replyTs != null ? replyTs.toLocalDateTime() : null);
                 fb.setReplyBy(rs.getObject("RepliedBy") != null ? rs.getInt("RepliedBy") : null);
+                fb.setStatus(rs.getString("Status"));
                 list.add(fb);
             }
         }

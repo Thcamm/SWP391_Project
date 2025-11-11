@@ -1,4 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+
+<html>
+<head>
+    <title>Title</title>
+</head>
+<body>
 
 <jsp:include page="header.jsp"/>
 
@@ -21,7 +29,7 @@
                            align-items: center; justify-content: center;
                             text-align: center;">
                     <div class="container py-5">
-                        <h2 class="mb-4 text-center">Lịch Sử Sửa Chữa Của Bạn</h2>
+                        <h2 class="mb-4 text-center">Lịch Sử Sửa Chữa</h2>
 
                         <c:choose>
                             <%-- Lấy danh sách từ Servlet --%>
@@ -94,3 +102,5 @@
     </div>
 </div>
 <jsp:include page="footer.jsp"/>
+</body>
+</html>

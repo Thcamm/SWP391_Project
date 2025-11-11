@@ -14,14 +14,14 @@ public class Feedback {
     private String replyText;
     private LocalDateTime replyDate;
     private Integer replyBy;
-    private String Status;
+    private String status;
 
     public Feedback() {
     }
 
     public Feedback(Integer feedbackID, Integer customerID, Integer workOrderID,
                     Integer rating, String feedbackText, LocalDateTime feedbackDate,
-                    boolean anonymous, String replyText, LocalDateTime replyDate, Integer replyBy,String Status) {
+                    boolean anonymous, String replyText, LocalDateTime replyDate, Integer replyBy,String status) {
         this.feedbackID = feedbackID;
         this.customerID = customerID;
         this.workOrderID = workOrderID;
@@ -32,7 +32,7 @@ public class Feedback {
         this.replyText = replyText;
         this.replyDate = replyDate;
         this.replyBy = replyBy;
-        this.Status = Status;
+        this.status = status;
 
     }
 
@@ -117,11 +117,11 @@ public class Feedback {
     }
 
     public String getStatus() {
-        return Status;
+        return status;
     }
 
     public void setStatus(String status) {
-        Status = status;
+        this.status = status;
     }
 
     @Override

@@ -185,11 +185,25 @@ public class AppointmentDAO extends DbContext {
             throw new RuntimeException(e);
         }
     }
-
-    public List<Appointment> getAppointmentsByCustomerId(int customerID) {
-        String sql = "SELECT * FROM Appointment WHERE CustomerID = ? ORDER BY CreatedAt DESC";
+    public int countAppointmentsByCustomerId(int customerID) {
+        String sql = "SELECT COUNT(*) FROM Appointment WHERE CustomerID = ?";
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
             st.setInt(1, customerID);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Lỗi khi đếm cuộc hẹn theo ID khách hàng", e);
+        }
+        return 0;
+    }
+    public List<Appointment> getAppointmentsByCustomerId(int customerID, int limit, int offset) {
+        String sql = "SELECT * FROM Appointment WHERE CustomerID = ? ORDER BY CreatedAt DESC LIMIT ? OFFSET ?";
+        try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
+            st.setInt(1, customerID);
+            st.setInt(2, limit);
+            st.setInt(3, offset);
             ResultSet rs = st.executeQuery();
             List<Appointment> appointments = new ArrayList<>();
             while (rs.next()) {
@@ -222,9 +236,47 @@ public class AppointmentDAO extends DbContext {
             throw new RuntimeException("Lỗi khi lấy danh sách cuộc hẹn theo ID khách hàng", e);
         }
     }
-
-    public List<Appointment> getAppointmentByFilter(
+    public int countAppointmentsByFilter(
             int customerId, String fromDate, String toDate, String status, String sortOrder) {
+
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM Appointment WHERE 1=1");
+
+        if (customerId > 0)
+            sql.append(" AND CustomerID = ?");
+        if (fromDate != null && !fromDate.isEmpty())
+            sql.append(" AND CreatedAt >= ?");
+        if (toDate != null && !toDate.isEmpty())
+            sql.append(" AND CreatedAt <= ?");
+        if (status != null && !status.isEmpty())
+            sql.append(" AND Status = ?");
+        if ("oldest".equalsIgnoreCase(sortOrder)) {
+            sql.append(" ORDER BY CreatedAt ASC");
+        } else {
+            sql.append(" ORDER BY CreatedAt DESC");
+        }
+
+        try (PreparedStatement st = getConnection().prepareStatement(sql.toString())) {
+            int index = 1;
+            if (customerId > 0)
+                st.setInt(index++, customerId);
+            if (fromDate != null && !fromDate.isEmpty())
+                st.setString(index++, fromDate);
+            if (toDate != null && !toDate.isEmpty())
+                st.setString(index++, toDate);
+            if (status != null && !status.isEmpty())
+                st.setString(index, status);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return 0;
+    }
+    public List<Appointment> getAppointmentByFilter(
+            int customerId, String fromDate, String toDate, String status, String sortOrder, int limit, int offset) {
 
         StringBuilder sql = new StringBuilder("SELECT * FROM Appointment WHERE 1=1");
         List<Appointment> appointments = new ArrayList<>();
@@ -240,6 +292,7 @@ public class AppointmentDAO extends DbContext {
 
         sql.append(" ORDER BY CreatedAt ")
                 .append("oldest".equalsIgnoreCase(sortOrder) ? "ASC" : "DESC");
+        sql.append(" LIMIT ? OFFSET ?");
 
         try (PreparedStatement st = getConnection().prepareStatement(sql.toString())) {
             int index = 1;
@@ -251,7 +304,8 @@ public class AppointmentDAO extends DbContext {
                 st.setString(index++, toDate);
             if (status != null && !status.isEmpty())
                 st.setString(index++, status);
-
+            st.setInt(index++, limit);
+            st.setInt(index, offset);
             ResultSet rs = st.executeQuery();
             while (rs.next()) {
 
@@ -307,9 +361,9 @@ public class AppointmentDAO extends DbContext {
         if (customerName != null && !customerName.isEmpty())
             sql.append("AND u.FullName LIKE ? ");
         if (fromDate != null && !fromDate.isEmpty())
-            sql.append("AND a.Date >= ? ");
+            sql.append("AND a.AppointmentDate >= ? ");
         if (toDate != null && !toDate.isEmpty())
-            sql.append("AND a.Date <= ? ");
+            sql.append("AND a.AppointmentDate <= ? ");
         if (statusList != null && statusList.length > 0) {
             sql.append("AND a.Status IN (");
             for (int i = 0; i < statusList.length; i++) {
@@ -347,7 +401,7 @@ public class AppointmentDAO extends DbContext {
         List<Map<String, Object>> resultList = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder(
-                "SELECT a.AppointmentID, a.CustomerID, a.AppointmentDate, a.Status, a.Description, a.RescheduleCount, " +
+                "SELECT a.AppointmentID, a.CustomerID, a.AppointmentDate, a.Status, a.Description, a.RescheduleCount, a.CreatedAt, a.UpdatedAt, " +
                         "u.FullName AS customerName " +
                         "FROM Appointment a " +
                         "JOIN Customer c ON a.CustomerID = c.CustomerID " +
@@ -370,7 +424,7 @@ public class AppointmentDAO extends DbContext {
             sql.append(") ");
         }
 
-        sql.append("ORDER BY a.Date ");
+        sql.append("ORDER BY a.AppointmentDate ");
         sql.append("oldest".equalsIgnoreCase(sortOrder) ? "ASC" : "DESC");
         sql.append(" LIMIT ? OFFSET ?");
 

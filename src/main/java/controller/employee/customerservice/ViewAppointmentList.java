@@ -123,7 +123,12 @@ public class ViewAppointmentList extends HttpServlet {
             session.setAttribute("messageType", "error");
         }
 
-        response.sendRedirect(request.getContextPath() + "/customerservice/appointment-list");
+        String redirectUrl = request.getParameter("redirectUrl");
+        if (redirectUrl == null || redirectUrl.isEmpty()) {
+            redirectUrl = request.getContextPath() + "/customerservice/appointment-list";
+        }
+        response.sendRedirect(redirectUrl);
+
     }
 }
 

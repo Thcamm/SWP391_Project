@@ -44,7 +44,7 @@ function fetchFeedbacks() {
                 rating: f.rating || 0,
                 comment: censorText(f.feedbackText || ''),
                 date: f.feedbackDate,
-                status: f.Status ? f.Status.toLowerCase() : 'pending',
+                status: f.status ? f.status.toLowerCase() : 'pending',
                 response: f.replyText ? {
                     text: censorText(f.replyText),
                     date: f.replyDate,

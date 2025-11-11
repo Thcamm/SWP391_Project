@@ -11,12 +11,13 @@ public class ServiceRequest {
     private Timestamp requestDate;
     private String status;
     private String note;
+    private Timestamp updatedAt;
 
     public ServiceRequest() {
     }
 
     public ServiceRequest(int requestID, int customerID, int vehicleID, int serviceID, Integer appointmentID,
-            Timestamp requestDate, String status, String note) {
+            Timestamp requestDate, String status, String note, Timestamp updatedAt) {
         this.requestID = requestID;
         this.customerID = customerID;
         this.vehicleID = vehicleID;
@@ -25,6 +26,7 @@ public class ServiceRequest {
         this.requestDate = requestDate;
         this.status = status;
         this.note = note;
+        this.updatedAt = updatedAt;
     }
 
 
@@ -90,6 +92,14 @@ public class ServiceRequest {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     // Business methods

@@ -283,8 +283,8 @@
         <a href="${pageContext.request.contextPath}/support-faq" class="menu-item">
             <span>Frequently Asked Questions</span>
         </a>
-        <a href="${pageContext.request.contextPath}/customer/workorder-list" class="menu-item">
-            <span>WORK ORDER LIST</span>
+        <a href="${pageContext.request.contextPath}/customer/repair-list" class="menu-item">
+            <span>TRACKER</span>
         </a>
         <a href="${pageContext.request.contextPath}/view/user/view-feedback-list.jsp" class="menu-item">
             <span>Feedback About Us</span>

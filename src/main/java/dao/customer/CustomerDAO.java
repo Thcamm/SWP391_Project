@@ -394,7 +394,7 @@ public Customer getCustomerById(int customerId) throws SQLException {
         Customer customer = null;
 
 
-        String sql = "SELECT c.CustomerID, u.UserID, u.FullName, u.Email, u.PhoneNumber " +
+        String sql = "SELECT c.CustomerID, u.UserID, u.FullName, u.Email, u.PhoneNumber,u.Gender,u.Birthdate,u.Address " +
                 "FROM Customer c " +
                 "JOIN User u ON c.UserID = u.UserID " +
                 "WHERE c.CustomerID = ?";
@@ -412,6 +412,9 @@ public Customer getCustomerById(int customerId) throws SQLException {
                     customer.setFullName(rs.getString("FullName"));
                     customer.setEmail(rs.getString("Email"));
                     customer.setPhoneNumber(rs.getString("PhoneNumber"));
+                    customer.setGender(rs.getString("Gender"));
+                    customer.setBirthDate(rs.getDate("Birthdate")); // sửa tên cột
+                    customer.setAddress(rs.getString("Address"));
                 }
             }
         }catch (SQLException e) {
@@ -439,4 +442,34 @@ public Customer getCustomerById(int customerId) throws SQLException {
         }
         return null;
     }
+    public void updateCustomer(Customer customer) throws SQLException {
+        String sql = "UPDATE Customer c " +
+                "JOIN `User` u ON c.UserID = u.UserID " +
+                "SET u.FullName = ?, " +
+                "    u.Email = ?, " +
+                "    u.PhoneNumber = ?, " +
+                "    u.Gender = ?, " +
+                "    u.Address = ?, " +
+                "    u.PasswordHash = ? " +
+                "WHERE c.CustomerID = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, customer.getFullName());
+            ps.setString(2, customer.getEmail());
+            ps.setString(3, customer.getPhoneNumber());
+            ps.setString(4, customer.getGender());
+            ps.setString(5, customer.getAddress());
+
+            // Nếu cần hash password trước khi lưu
+            String passwordHash = customer.getPasswordHash();
+            ps.setString(6, passwordHash != null ? passwordHash : "");
+
+            ps.setInt(7, customer.getCustomerId());
+
+            ps.executeUpdate();
+        }
+    }
+
 }

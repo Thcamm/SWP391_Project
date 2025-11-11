@@ -111,17 +111,17 @@
         </a>
 
         <!-- Navigation ở giữa -->
-        <nav class="main-nav d-none d-lg-block">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a href="${pageContext.request.contextPath}/customerservice/home"
-                       class="nav-link ${pageContext.request.requestURI.contains('/home') ? 'active' : ''}">
-                        <i class="bi bi-house-door me-1"></i>Home
-                    </a>
-                </li>
+<%--        <nav class="main-nav d-none d-lg-block">--%>
+<%--            <ul class="navbar-nav">--%>
+<%--                <li class="nav-item">--%>
+<%--                    <a href="${pageContext.request.contextPath}/customerservice/home"--%>
+<%--                       class="nav-link ${pageContext.request.requestURI.contains('/home') ? 'active' : ''}">--%>
+<%--                        <i class="bi bi-house-door me-1"></i>Home--%>
+<%--                    </a>--%>
+<%--                </li>--%>
 
-            </ul>
-        </nav>
+<%--            </ul>--%>
+<%--        </nav>--%>
 
         <!-- User info bên phải -->
         <div class="d-flex align-items-center gap-3">
