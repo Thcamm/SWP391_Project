@@ -29,16 +29,15 @@ import java.time.LocalDateTime;
  * ready)
  * 2. Task Assignment (Diagnosis & Repair) (TODO: implement when DAOs ready)
  * 3. Task Reassignment & Overdue Management
- * 4. Exception Handling (counts for dashboard) ✅
+ * 4. Exception Handling (counts for dashboard)
  * 
  * Design Pattern: Service Layer (Business Logic)
  * Transaction Management: Handled in Service methods
  * 
  * @author An
- * @version 2.0 - Refactored to centralize all business logic
  * 
- *          NOTE: Phase 2 - Skeleton created. Full implementations pending DAO
- *          method additions.
+ *         NOTE: Phase 2 - Skeleton created. Full implementations pending DAO
+ *         method additions.
  */
 public class TechManagerService {
 
@@ -59,6 +58,21 @@ public class TechManagerService {
         this.employeeDAO = new EmployeeDAO();
         this.exceptionDAO = new TechManagerExceptionDAO();
         this.notificationService = new NotificationService();
+    }
+
+    // =========================================================================
+    // UTILITY METHODS
+    // =========================================================================
+
+    /**
+     * Get TechManager's Employee ID from username.
+     * 
+     * @param userName the username
+     * @return Employee ID or null if not found
+     * @throws SQLException if database error occurs
+     */
+    public Integer getTechManagerEmployeeId(String userName) throws SQLException {
+        return employeeDAO.getEmployeeIdByUserName(userName);
     }
 
     // =========================================================================
@@ -211,9 +225,7 @@ public class TechManagerService {
         task.setTaskType(TaskAssignment.TaskType.DIAGNOSIS);
         task.setStatus(TaskAssignment.TaskStatus.ASSIGNED);
         task.setNotes(instructions);
-        // Set planned_start with buffer time (2 hours from now) to avoid immediate
-        // overdue
-        task.setPlannedStart(LocalDateTime.now().plusHours(2));
+        task.setPlannedStart(LocalDateTime.now());
 
         System.out.println("[assignDiagnosisTask] Creating task: DetailID=" + detailId +
                 ", TechID=" + technicianId + ", PlannedStart=" + task.getPlannedStart());
@@ -254,9 +266,7 @@ public class TechManagerService {
         task.setTaskType(TaskAssignment.TaskType.REPAIR);
         task.setStatus(TaskAssignment.TaskStatus.ASSIGNED);
         task.setNotes(instructions);
-        // Set planned_start with buffer time (2 hours from now) to avoid immediate
-        // overdue
-        task.setPlannedStart(LocalDateTime.now().plusHours(2));
+        task.setPlannedStart(LocalDateTime.now());
 
         System.out.println("[assignRepairTask] Creating task: DetailID=" + detailId +
                 ", TechID=" + technicianId + ", PlannedStart=" + task.getPlannedStart());

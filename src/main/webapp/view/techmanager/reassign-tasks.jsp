@@ -30,9 +30,21 @@
             </div>
 
             <!-- Messages -->
-            <c:if test="${param.message != null}">
-                <div class="alert alert-${param.type} alert-dismissible fade show" role="alert">
-                    <c:out value="${param.message}" />
+            <c:if test="${not empty param.message}">
+                <c:set var="alertType" value="${not empty param.type ? param.type : 'info'}" />
+                <div class="alert alert-${alertType} alert-dismissible fade show" role="alert">
+                    <c:choose>
+                        <c:when test="${param.type == 'success'}">
+                            <i class="bi bi-check-circle-fill"></i>
+                        </c:when>
+                        <c:when test="${param.type == 'error' or param.type == 'danger'}">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                        </c:when>
+                        <c:otherwise>
+                            <i class="bi bi-info-circle-fill"></i>
+                        </c:otherwise>
+                    </c:choose>
+                    <strong><c:out value="${param.message}" /></strong>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             </c:if>
@@ -146,7 +158,9 @@
                                             <div class="modal fade" id="reassignModal${task.assignmentId}" tabindex="-1">
                                                 <div class="modal-dialog modal-lg">
                                                     <div class="modal-content">
-                                                        <form method="post" action="${pageContext.request.contextPath}/techmanager/reassign-tasks">
+                                                        <form method="post" 
+                                                              action="${pageContext.request.contextPath}/techmanager/reassign-tasks"
+                                                              onsubmit="return handleReassignSubmit(this, '${task.assignmentId}')">
                                                             <div class="modal-header bg-primary text-white">
                                                                 <h5 class="modal-title">
                                                                     <i class="bi bi-arrow-repeat"></i> Reassign Task #${task.assignmentId}
@@ -239,8 +253,12 @@
                                                             </div>
                                                             <div class="modal-footer">
                                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                                <button type="submit" class="btn btn-primary">
+                                                                <button type="submit" class="btn btn-primary" id="submitBtn${task.assignmentId}">
                                                                     <i class="bi bi-check-circle"></i> Reassign Task
+                                                                </button>
+                                                                <button type="button" class="btn btn-primary d-none" id="loadingBtn${task.assignmentId}" disabled>
+                                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                                    Processing...
                                                                 </button>
                                                             </div>
                                                         </form>
@@ -296,6 +314,47 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/techmanager/reassign-tasks.js"></script>
+    
+    <script>
+        // Handle form submission with loading state
+        function handleReassignSubmit(form, taskId) {
+            const submitBtn = document.getElementById('submitBtn' + taskId);
+            const loadingBtn = document.getElementById('loadingBtn' + taskId);
+            
+            // Validate technician selection
+            const techSelect = document.getElementById('techSelect_' + taskId);
+            if (!techSelect.value) {
+                alert('Please select a technician');
+                return false;
+            }
+            
+            // Show loading state
+            submitBtn.classList.add('d-none');
+            loadingBtn.classList.remove('d-none');
+            
+            // Disable form inputs
+            const inputs = form.querySelectorAll('input, select, button');
+            inputs.forEach(input => input.disabled = true);
+            
+            return true; // Allow form submission
+        }
+        
+        // Auto-scroll to message on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const alertElement = document.querySelector('.alert');
+            if (alertElement) {
+                alertElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Auto-dismiss success messages after 5 seconds
+                if (alertElement.classList.contains('alert-success')) {
+                    setTimeout(() => {
+                        const closeBtn = alertElement.querySelector('.btn-close');
+                        if (closeBtn) closeBtn.click();
+                    }, 5000);
+                }
+            }
+        });
+    </script>
     
     <%@ include file="footer-techmanager.jsp" %>
 </body>

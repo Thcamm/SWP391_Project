@@ -51,6 +51,14 @@
                         </div>
                     </div>
                     <div class="col-md-3">
+                        <div class="card text-white bg-success">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="bi bi-hourglass-split"></i> In Progress</h5>
+                                <h2>${totalInProgress}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <div class="card text-white bg-info">
                             <div class="card-body">
                                 <h5 class="card-title"><i class="bi bi-people"></i> Available Technicians</h5>
@@ -59,6 +67,63 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- In-Progress Diagnosis Tasks -->
+                <c:if test="${not empty inProgressTasks}">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> Diagnosis Tasks In Progress</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Assignment #</th>
+                                            <th>WO #</th>
+                                            <th>Vehicle</th>
+                                            <th>Customer</th>
+                                            <th>Technician</th>
+                                            <th>Started At</th>
+                                            <th>Task Description</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <c:forEach items="${inProgressTasks}" var="task">
+                                            <tr>
+                                                <td><strong>#${task.assignmentId}</strong></td>
+                                                <td><strong>#${task.workOrderId}</strong></td>
+                                                <td>
+                                                    <i class="bi bi-car-front"></i>
+                                                    ${task.vehicleInfo}
+                                                </td>
+                                                <td>
+                                                    <i class="bi bi-person"></i>
+                                                    ${task.customerName}
+                                                </td>
+                                                <td>
+                                                    <i class="bi bi-person-badge"></i>
+                                                    <strong>${task.technicianName}</strong><br>
+                                                    <small class="text-muted">${task.technicianCode}</small>
+                                                </td>
+                                                <td>
+                                                    <fmt:formatDate value="${task.startAt}" pattern="dd/MM/yyyy HH:mm" />
+                                                </td>
+                                                <td>${task.workOrderDetailDescription}</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-hourglass-split"></i> ${task.status}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </c:if>
 
                 <!-- Pending Diagnosis Table -->
                 <div class="card shadow-sm">

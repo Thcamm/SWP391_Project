@@ -11,6 +11,8 @@ import model.employee.techmanager.TaskReassignmentDTO;
 import service.employee.techmanager.TaskReassignmentService;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -108,18 +110,22 @@ public class TasksNeedReassignmentServlet extends HttpServlet {
             String resultMessage = taskReassignmentService.reassignTask(
                     assignmentId, newTechnicianId, plannedStart, plannedEnd);
 
+            // Encode message for URL
+            String encodedMessage = URLEncoder.encode(resultMessage, StandardCharsets.UTF_8);
+
             if (resultMessage.contains("successfully")) {
                 response.sendRedirect(request.getContextPath() +
-                        "/techmanager/reassign-tasks?message=" + resultMessage + "&type=success");
+                        "/techmanager/reassign-tasks?message=" + encodedMessage + "&type=success");
             } else {
                 response.sendRedirect(request.getContextPath() +
-                        "/techmanager/reassign-tasks?message=" + resultMessage + "&type=error");
+                        "/techmanager/reassign-tasks?message=" + encodedMessage + "&type=error");
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+            String errorMsg = URLEncoder.encode("Error: " + e.getMessage(), StandardCharsets.UTF_8);
             response.sendRedirect(request.getContextPath() +
-                    "/techmanager/reassign-tasks?message=Error: " + e.getMessage() + "&type=error");
+                    "/techmanager/reassign-tasks?message=" + errorMsg + "&type=error");
         }
     }
 }

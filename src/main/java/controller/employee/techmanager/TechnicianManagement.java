@@ -16,16 +16,16 @@ import model.dto.TechnicianDTO;
 import model.employee.Employee;
 
 /**
- * UC-TM-11: My Team - View Technician Team
+ * Team Management - View All Technicians
  * 
- * Tech Manager views all technicians under their management (both Active &
- * Inactive).
+ * Tech Manager views ALL technicians in the system (both Active & Inactive).
+ * Not limited to technicians under their management.
  * 
  * @author SWP391 Team
- * @version 1.0
+ * @version 2.0
  */
-@WebServlet("/techmanager/my-team")
-public class MyTeamServlet extends HttpServlet {
+@WebServlet("/techmanager/team-management")
+public class TechnicianManagement extends HttpServlet {
 
     private EmployeeDAO employeeDAO;
 
@@ -44,6 +44,16 @@ public class MyTeamServlet extends HttpServlet {
             return;
         }
 
+        // DEBUG: Print all session attributes
+        System.out.println("[MyTeamServlet DEBUG] ========== SESSION ATTRIBUTES ==========");
+        java.util.Enumeration<String> attributeNames = session.getAttributeNames();
+        while (attributeNames.hasMoreElements()) {
+            String attrName = attributeNames.nextElement();
+            Object attrValue = session.getAttribute(attrName);
+            System.out.println("[MyTeamServlet DEBUG] " + attrName + " = " + attrValue);
+        }
+        System.out.println("[MyTeamServlet DEBUG] ======================================");
+
         try {
             // Get current Tech Manager's Employee record
             Integer userId = (Integer) session.getAttribute("userID");
@@ -53,6 +63,8 @@ public class MyTeamServlet extends HttpServlet {
                 userId = (Integer) session.getAttribute("userId");
             }
 
+            System.out.println("[MyTeamServlet DEBUG] Session userId: " + userId);
+
             if (userId == null) {
                 request.setAttribute("errorMessage", "User ID not found in session. Please login again.");
                 response.sendRedirect(request.getContextPath() + "/login");
@@ -61,34 +73,41 @@ public class MyTeamServlet extends HttpServlet {
 
             Employee currentEmployee = employeeDAO.getEmployeeByUserId(userId);
 
+            System.out.println("[MyTeamServlet DEBUG] Current Employee: " +
+                    (currentEmployee != null ? "ID=" + currentEmployee.getEmployeeId() : "NULL"));
+
             if (currentEmployee == null) {
                 request.setAttribute("errorMessage", "Employee record not found for User ID: " + userId);
-                request.getRequestDispatcher("/view/techmanager/my-team.jsp").forward(request, response);
+                request.getRequestDispatcher("/view/techmanager/team-management.jsp").forward(request, response);
                 return;
             }
 
-            // Fetch all technicians managed by this TM
-            List<TechnicianDTO> technicians = employeeDAO.getAllTechniciansByManager(
-                    currentEmployee.getEmployeeId());
+            // Fetch ALL technicians in the system (not filtered by ManagedBy)
+            System.out.println("[MyTeamServlet DEBUG] Fetching ALL technicians in system");
+
+            List<TechnicianDTO> technicians = employeeDAO.getAllTechniciansDebug();
+
+            System.out.println("[MyTeamServlet DEBUG] Total technicians found: " + technicians.size());
 
             // Calculate statistics
             long activeCount = technicians.stream().filter(TechnicianDTO::isActive).count();
             long inactiveCount = technicians.size() - activeCount;
+
+            System.out.println("[MyTeamServlet DEBUG] Active: " + activeCount + ", Inactive: " + inactiveCount);
 
             // Set attributes
             request.setAttribute("technicians", technicians);
             request.setAttribute("totalTechnicians", technicians.size());
             request.setAttribute("activeTechnicians", activeCount);
             request.setAttribute("inactiveTechnicians", inactiveCount);
-            request.setAttribute("currentManagerName", session.getAttribute("fullName"));
 
             // Forward to JSP
-            request.getRequestDispatcher("/view/techmanager/my-team.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/techmanager/team-management.jsp").forward(request, response);
 
         } catch (SQLException e) {
             e.printStackTrace();
             request.setAttribute("errorMessage", "Database error: " + e.getMessage());
-            request.getRequestDispatcher("/view/techmanager/my-team.jsp").forward(request, response);
+            request.getRequestDispatcher("/view/techmanager/team-management.jsp").forward(request, response);
         }
     }
 }

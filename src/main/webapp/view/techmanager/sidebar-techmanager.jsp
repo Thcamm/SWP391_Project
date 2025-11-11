@@ -58,10 +58,10 @@ prefix="c" %> <%-- Get active menu parameter --%>
 
     <div class="nav-item">
       <a
-        href="${pageContext.request.contextPath}/techmanager/my-team"
-        class="nav-link ${activeMenu == 'my-team' ? 'active' : ''}">
+        href="${pageContext.request.contextPath}/techmanager/team-management"
+        class="nav-link ${activeMenu == 'team-management' ? 'active' : ''}">
         <i class="bi bi-people-fill"></i>
-        <span>My Team</span>
+        <span>Team Management</span>
       </a>
     </div>
 

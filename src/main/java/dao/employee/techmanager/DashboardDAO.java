@@ -42,15 +42,54 @@ public class DashboardDAO {
     }
 
     /**
-     * Count Diagnosis tasks that are 'ASSIGNED'.
-     * These tasks have been assigned by TM but not yet started by Technician.
+     * Count WorkOrderDetails (from REQUEST source) that need diagnosis assignment
+     * for a specific Tech Manager.
+     * These are details that don't have a DIAGNOSIS TaskAssignment yet
+     * and belong to WorkOrders managed by this TechManager.
+     * This matches the logic in assign-diagnosis.jsp page.
      * 
-     * @return count of assigned diagnosis tasks
+     * @param techManagerId the Tech Manager's employee ID
+     * @return count of details needing diagnosis assignment
      * @throws SQLException if database error occurs
      */
+    public int countAssignedDiagnosisForManager(int techManagerId) throws SQLException {
+        String sql = "SELECT COUNT(DISTINCT wd.DetailID) " +
+                "FROM WorkOrderDetail wd " +
+                "JOIN WorkOrder wo ON wd.WorkOrderID = wo.WorkOrderID " +
+                "LEFT JOIN TaskAssignment ta ON wd.DetailID = ta.DetailID AND ta.task_type = 'DIAGNOSIS' " +
+                "WHERE wo.TechManagerID = ? " +
+                "AND wd.source = 'REQUEST' " +
+                "AND (wo.Status = 'PENDING' OR wo.Status = 'IN_PROCESS') " +
+                "AND ta.AssignmentID IS NULL";
+
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, techManagerId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        }
+    }
+
+    /**
+     * Count WorkOrderDetails (from REQUEST source) that need diagnosis assignment.
+     * DEPRECATED: Use countAssignedDiagnosisForManager() instead to get accurate
+     * count.
+     * This method counts ALL unassigned details regardless of TechManager.
+     * 
+     * @return count of details needing diagnosis assignment
+     * @throws SQLException if database error occurs
+     */
+    @Deprecated
     public int countAssignedDiagnosis() throws SQLException {
-        String sql = "SELECT COUNT(*) FROM TaskAssignment " +
-                "WHERE task_type = 'DIAGNOSIS' AND Status = 'ASSIGNED'";
+        String sql = "SELECT COUNT(DISTINCT wd.DetailID) " +
+                "FROM WorkOrderDetail wd " +
+                "JOIN WorkOrder wo ON wd.WorkOrderID = wo.WorkOrderID " +
+                "LEFT JOIN TaskAssignment ta ON wd.DetailID = ta.DetailID AND ta.task_type = 'DIAGNOSIS' " +
+                "WHERE wd.source = 'REQUEST' " +
+                "AND (wo.Status = 'PENDING' OR wo.Status = 'IN_PROCESS') " +
+                "AND ta.AssignmentID IS NULL";
 
         try (Connection conn = DbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
@@ -64,12 +103,40 @@ public class DashboardDAO {
     // =========================================================================
 
     /**
-     * Count Diagnosis tasks that are 'IN_PROGRESS'.
+     * Count Diagnosis tasks that are 'IN_PROGRESS' for a specific Tech Manager.
      * The Technician has started diagnosis and is preparing the quote.
+     * 
+     * @param techManagerId the Tech Manager's employee ID
+     * @return count of in-progress diagnosis tasks
+     * @throws SQLException if database error occurs
+     */
+    public int countInProgressDiagnosisForManager(int techManagerId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM TaskAssignment ta " +
+                "JOIN WorkOrderDetail wd ON ta.DetailID = wd.DetailID " +
+                "JOIN WorkOrder wo ON wd.WorkOrderID = wo.WorkOrderID " +
+                "WHERE wo.TechManagerID = ? " +
+                "AND ta.task_type = 'DIAGNOSIS' " +
+                "AND ta.Status = 'IN_PROGRESS'";
+
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, techManagerId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        }
+    }
+
+    /**
+     * Count Diagnosis tasks that are 'IN_PROGRESS'.
+     * DEPRECATED: Use countInProgressDiagnosisForManager() instead.
+     * This method counts ALL in-progress diagnosis tasks regardless of TechManager.
      * 
      * @return count of in-progress diagnosis tasks
      * @throws SQLException if database error occurs
      */
+    @Deprecated
     public int countInProgressDiagnosis() throws SQLException {
         String sql = "SELECT COUNT(*) FROM TaskAssignment " +
                 "WHERE task_type = 'DIAGNOSIS' AND Status = 'IN_PROGRESS'";
@@ -187,7 +254,8 @@ public class DashboardDAO {
     }
 
     /**
-     * Count WorkOrders where all tasks are COMPLETE but WorkOrder status is still IN_PROCESS.
+     * Count WorkOrders where all tasks are COMPLETE but WorkOrder status is still
+     * IN_PROCESS.
      * These are ready for TM to close (GĐ7).
      * 
      * @return count of work orders ready for closure
@@ -329,8 +397,9 @@ public class DashboardDAO {
                 dto.setActivityType(rs.getString("ActivityType"));
                 dto.setDescription(rs.getString("Description"));
                 dto.setActivityTime(rs.getTimestamp("ActivityTime"));
-                dto.setTaskAssignmentID(rs.getObject("TaskAssignmentID") != null 
-                    ? rs.getInt("TaskAssignmentID") : null);
+                dto.setTaskAssignmentID(rs.getObject("TaskAssignmentID") != null
+                        ? rs.getInt("TaskAssignmentID")
+                        : null);
                 dto.setTaskDescription(rs.getString("TaskDescription"));
                 dto.setVehicleInfo(rs.getString("VehicleInfo"));
                 activities.add(dto);

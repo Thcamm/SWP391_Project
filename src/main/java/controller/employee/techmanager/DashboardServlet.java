@@ -1,15 +1,16 @@
 package controller.employee.techmanager;
 
-import dao.workorder.RejectedTaskDAO;
 import model.dto.ActivityLogDTO;
 import model.dto.DiagnosticApprovalDTO;
 import service.employee.techmanager.DashboardService;
 import service.employee.techmanager.TechManagerService;
+import service.employee.techmanager.DeclinedTaskService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -21,13 +22,18 @@ import java.util.Map;
  * This servlet gathers and displays key performance indicators (KPIs) and
  * statistics related to the 7-phase garage workflow.
  *
- * <p><b>NEW WORKFLOW (7 Phases):</b></p>
+ * <p>
+ * <b>NEW WORKFLOW (7 Phases):</b>
+ * </p>
  * <ol>
  * <li><b>GĐ0:</b> ServiceRequest Creation (Customer/Receptionist)</li>
- * <li><b>GĐ1:</b> ServiceRequest Approval & Diagnosis Assignment (TM → KTV)</li>
- * <li><b>GĐ2:</b> KTV Diagnosis & Quote Creation (KTV creates VehicleDiagnostic)</li>
+ * <li><b>GĐ1:</b> ServiceRequest Approval & Diagnosis Assignment (TM →
+ * KTV)</li>
+ * <li><b>GĐ2:</b> KTV Diagnosis & Quote Creation (KTV creates
+ * VehicleDiagnostic)</li>
  * <li><b>GĐ3:</b> Customer Approval (Customer approves/rejects quote)</li>
- * <li><b>GĐ4:</b> System Auto-Bridge (Trigger creates WorkOrderDetail + WorkOrderPart)</li>
+ * <li><b>GĐ4:</b> System Auto-Bridge (Trigger creates WorkOrderDetail +
+ * WorkOrderPart)</li>
  * <li><b>GĐ5:</b> Repair Assignment (TM → KTV)</li>
  * <li><b>GĐ6:</b> Repair Execution (KTV performs repair)</li>
  * <li><b>GĐ7:</b> WorkOrder Closure (TM closes WorkOrder)</li>
@@ -40,7 +46,7 @@ public class DashboardServlet extends HttpServlet {
 
     private final DashboardService dashboardService = new DashboardService();
     private final TechManagerService techManagerService = new TechManagerService();
-    private final RejectedTaskDAO rejectedTaskDAO = new RejectedTaskDAO();
+    private final DeclinedTaskService declinedTaskService = new DeclinedTaskService();
 
     /**
      * Handles the HTTP GET request by fetching all dashboard statistics
@@ -56,17 +62,36 @@ public class DashboardServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
+            // Get TechManager's EmployeeID from session
+            HttpSession session = request.getSession();
+            String userName = (String) session.getAttribute("userName");
+
+            if (userName == null) {
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
+
+            // Get TechManager's Employee ID
+            Integer techManagerEmployeeId = techManagerService.getTechManagerEmployeeId(userName);
+            if (techManagerEmployeeId == null) {
+                request.setAttribute("errorMessage", "TechManager employee record not found");
+                request.getRequestDispatcher("/view/error.jsp").forward(request, response);
+                return;
+            }
+
             Map<String, Integer> stats = new HashMap<>();
 
             // ===== GĐ0→1: Tiếp nhận & Duyệt Yêu cầu =====
             stats.put("pendingRequests", dashboardService.countPendingServiceRequests());
 
             // ===== GĐ1: Phân công Chẩn đoán =====
-            stats.put("assignedDiagnosis", dashboardService.countAssignedDiagnosis());
+            // FIX: Use TechManager-specific count instead of global count
+            stats.put("assignedDiagnosis", dashboardService.countAssignedDiagnosisForManager(techManagerEmployeeId));
 
             // ===== GĐ2: KTV Chẩn đoán & Báo giá =====
-            stats.put("inProgressDiagnosis", dashboardService.countInProgressDiagnosis());
-            
+            // FIX: Use TechManager-specific count instead of global count
+            stats.put("inProgressDiagnosis", dashboardService.countInProgressDiagnosisForManager(techManagerEmployeeId));
+
             // ===== GĐ3: Chờ Khách hàng Duyệt =====
             stats.put("pendingQuotes", dashboardService.countPendingCustomerApproval());
             stats.put("overdueDiagnostics", dashboardService.countOverdueDiagnostics()); // NEW: Báo giá quá hạn
@@ -90,7 +115,7 @@ public class DashboardServlet extends HttpServlet {
             stats.put("thisWeekCompleted", dashboardService.countThisWeekCompleted());
 
             // ===== Cảnh báo Quản lý (Xử lý Ngoại lệ) =====
-            stats.put("rejectedTasks", rejectedTaskDAO.countRejectedTasks());
+            stats.put("rejectedTasks", declinedTaskService.countDeclinedTasks());
             stats.put("overdueTasks", techManagerService.countOverdueTasks());
             stats.put("declinedTasks", techManagerService.countDeclinedTasks());
             stats.put("tasksNeedReassignment", techManagerService.countTasksNeedReassignment());

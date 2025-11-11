@@ -38,12 +38,28 @@ public class DashboardService {
 
     /**
      * Get count of assigned diagnosis tasks (assigned but not started).
+     * DEPRECATED: Use countAssignedDiagnosisForManager() for accurate count per
+     * TechManager.
      * 
      * @return count of assigned diagnosis tasks
      * @throws SQLException if database error occurs
      */
+    @Deprecated
     public int countAssignedDiagnosis() throws SQLException {
         return dashboardDAO.countAssignedDiagnosis();
+    }
+
+    /**
+     * Get count of WorkOrderDetails needing diagnosis assignment for specific
+     * TechManager.
+     * This matches what the assign-diagnosis page shows.
+     * 
+     * @param techManagerId the Tech Manager's employee ID
+     * @return count of diagnosis tasks needing assignment
+     * @throws SQLException if database error occurs
+     */
+    public int countAssignedDiagnosisForManager(int techManagerId) throws SQLException {
+        return dashboardDAO.countAssignedDiagnosisForManager(techManagerId);
     }
 
     // =========================================================================
@@ -51,11 +67,24 @@ public class DashboardService {
     // =========================================================================
 
     /**
+     * Get count of in-progress diagnosis tasks for a specific Tech Manager.
+     * 
+     * @param techManagerId the Tech Manager's employee ID
+     * @return count of in-progress diagnosis
+     * @throws SQLException if database error occurs
+     */
+    public int countInProgressDiagnosisForManager(int techManagerId) throws SQLException {
+        return dashboardDAO.countInProgressDiagnosisForManager(techManagerId);
+    }
+
+    /**
      * Get count of in-progress diagnosis tasks (KTV is diagnosing).
+     * DEPRECATED: Use countInProgressDiagnosisForManager() instead.
      * 
      * @return count of in-progress diagnosis
      * @throws SQLException if database error occurs
      */
+    @Deprecated
     public int countInProgressDiagnosis() throws SQLException {
         return dashboardDAO.countInProgressDiagnosis();
     }

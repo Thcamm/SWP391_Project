@@ -1085,4 +1085,6 @@ CREATE INDEX ix_dp_vd_isapproved
     'NOTE_ADDED',
     'TASK_AUTO_CANCEL'
   ) NOT NULL;
+  
+  ALTER TABLE VehicleDiagnostic ADD COLUMN RejectReason VARCHAR(255) NULL;
                 

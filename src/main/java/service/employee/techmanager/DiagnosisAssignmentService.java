@@ -127,4 +127,18 @@ public class DiagnosisAssignmentService {
 
         return assignmentId;
     }
+
+    /**
+     * Get list of diagnosis tasks currently in progress for a specific TechManager.
+     * These are tasks that have been assigned and technicians are actively working
+     * on.
+     * 
+     * @param techManagerEmployeeId TechManager's employee ID
+     * @return list of in-progress diagnosis tasks
+     * @throws SQLException if database error occurs
+     */
+    public List<TaskAssignmentDAO.InProgressDiagnosisTask> getInProgressDiagnosisTasks(int techManagerEmployeeId)
+            throws SQLException {
+        return taskAssignmentDAO.getInProgressDiagnosisTasks(techManagerEmployeeId);
+    }
 }

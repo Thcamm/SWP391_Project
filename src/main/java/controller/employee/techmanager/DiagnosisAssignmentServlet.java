@@ -63,12 +63,18 @@ public class DiagnosisAssignmentServlet extends HttpServlet {
             List<TaskAssignmentDAO.WorkOrderDetailWithInfo> pendingDetails = diagnosisAssignmentService
                     .getPendingDiagnosisTasks(techManagerEmployeeId);
 
+            // Get list of in-progress diagnosis tasks
+            List<TaskAssignmentDAO.InProgressDiagnosisTask> inProgressTasks = diagnosisAssignmentService
+                    .getInProgressDiagnosisTasks(techManagerEmployeeId);
+
             // Get list of available Technicians
             List<Employee> technicians = diagnosisAssignmentService.getAvailableTechnicians();
 
             request.setAttribute("pendingDetails", pendingDetails);
+            request.setAttribute("inProgressTasks", inProgressTasks);
             request.setAttribute("technicians", technicians);
             request.setAttribute("totalPending", pendingDetails.size());
+            request.setAttribute("totalInProgress", inProgressTasks.size());
 
             // Forward to JSP
             request.getRequestDispatcher("/view/techmanager/assign-diagnosis.jsp")

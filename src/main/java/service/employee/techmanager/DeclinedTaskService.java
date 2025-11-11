@@ -28,6 +28,28 @@ public class DeclinedTaskService {
      * @throws SQLException if database error occurs
      */
     public List<DeclinedTaskDTO> getDeclinedTasks() throws SQLException {
-        return declinedTaskDAO.getDeclinedTasks();
+        System.out.println("[DeclinedTaskService] ===== getDeclinedTasks() called =====");
+        
+        try {
+            List<DeclinedTaskDTO> result = declinedTaskDAO.getDeclinedTasks();
+            System.out.println("[DeclinedTaskService] DAO returned " + result.size() + " declined tasks");
+            return result;
+            
+        } catch (SQLException e) {
+            System.err.println("[DeclinedTaskService] SQL ERROR: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    /**
+     * Count number of declined tasks.
+     * Used for dashboard statistics.
+     * 
+     * @return count of declined tasks
+     * @throws SQLException if database error occurs
+     */
+    public int countDeclinedTasks() throws SQLException {
+        return declinedTaskDAO.countDeclinedTasks();
     }
 }

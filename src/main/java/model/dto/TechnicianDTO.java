@@ -11,21 +11,22 @@ package model.dto;
  * @version 1.0
  */
 public class TechnicianDTO {
-    
+
     private int employeeID;
     private String employeeCode;
     private int userID;
     private String fullName;
     private String phoneNumber;
     private String email;
-    private int activeStatus;  // 1 = Active, 0 = Inactive
+    private int activeStatus; // 1 = Active, 0 = Inactive
+    private Integer managedBy; // For debugging - which Tech Manager manages this technician
 
     // Constructors
     public TechnicianDTO() {
     }
 
-    public TechnicianDTO(int employeeID, String employeeCode, int userID, String fullName, 
-                        String phoneNumber, String email, int activeStatus) {
+    public TechnicianDTO(int employeeID, String employeeCode, int userID, String fullName,
+            String phoneNumber, String email, int activeStatus) {
         this.employeeID = employeeID;
         this.employeeCode = employeeCode;
         this.userID = userID;
@@ -90,6 +91,14 @@ public class TechnicianDTO {
 
     public void setActiveStatus(int activeStatus) {
         this.activeStatus = activeStatus;
+    }
+
+    public Integer getManagedBy() {
+        return managedBy;
+    }
+
+    public void setManagedBy(Integer managedBy) {
+        this.managedBy = managedBy;
     }
 
     /**
