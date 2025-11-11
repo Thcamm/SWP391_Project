@@ -13,11 +13,10 @@ name: "CodeQL Advanced"
 
 on:
   push:
-    branches:
-      - '**'          # Quét cho tất cả các nhánh
+    branches: [ "thuyvu" ]
   pull_request:
-    branches:
-      - '**' 
+    branches: [ "thuyvu" ]
+
   schedule:
     - cron: '24 21 * * 0'
 
