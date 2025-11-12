@@ -7,13 +7,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import dao.employee.admin.AdminDAO;
-import dao.employee.technician.TechnicianDAO;
 import dao.workorder.TaskAssignmentDAO;
-import dao.misc.NotificationDAO;
 import model.employee.Employee;
-import model.employee.technician.TaskAssignment;
-import model.misc.Notification;
+import service.employee.techmanager.DiagnosisAssignmentService;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -21,26 +17,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * GIAI ĐOẠN 1: TechManager assigns DIAGNOSIS tasks to Technicians
+ * GIAI ĐOẠN 1: TechManager assigns DIAGNOSIS tasks to Technicians (GĐ1)
  * After approving ServiceRequest and creating WorkOrder,
  * TechManager uses this servlet to assign diagnosis task to a Technician
  * 
- * NEW: Supports task scheduling with planned_start and planned_end times
+ * @author SWP391 Team
+ * @version 2.0 (Refactored to 3-tier architecture)
  */
 @WebServlet("/techmanager/assign-diagnosis")
 public class DiagnosisAssignmentServlet extends HttpServlet {
 
-    private TaskAssignmentDAO taskAssignmentDAO;
-    private TechnicianDAO technicianDAO;
-    private AdminDAO adminDAO;
-    private NotificationDAO notificationDAO;
+    private DiagnosisAssignmentService diagnosisAssignmentService;
 
     @Override
     public void init() throws ServletException {
-        this.taskAssignmentDAO = new TaskAssignmentDAO();
-        this.technicianDAO = new TechnicianDAO();
-        this.adminDAO = new AdminDAO();
-        this.notificationDAO = new NotificationDAO();
+        this.diagnosisAssignmentService = new DiagnosisAssignmentService();
     }
 
     /**
@@ -61,7 +52,7 @@ public class DiagnosisAssignmentServlet extends HttpServlet {
                 return;
             }
 
-            Integer techManagerEmployeeId = adminDAO.getEmployeeIdByUsername(userName);
+            Integer techManagerEmployeeId = diagnosisAssignmentService.getTechManagerEmployeeId(userName);
             if (techManagerEmployeeId == null) {
                 request.setAttribute("errorMessage", "TechManager employee record not found");
                 request.getRequestDispatcher("/view/error.jsp").forward(request, response);
@@ -69,15 +60,21 @@ public class DiagnosisAssignmentServlet extends HttpServlet {
             }
 
             // Get WorkOrderDetails that need diagnosis assignment
-            List<TaskAssignmentDAO.WorkOrderDetailWithInfo> pendingDetails = taskAssignmentDAO
-                    .getWorkOrderDetailsNeedingDiagnosisAssignment(techManagerEmployeeId);
+            List<TaskAssignmentDAO.WorkOrderDetailWithInfo> pendingDetails = diagnosisAssignmentService
+                    .getPendingDiagnosisTasks(techManagerEmployeeId);
+
+            // Get list of in-progress diagnosis tasks
+            List<TaskAssignmentDAO.InProgressDiagnosisTask> inProgressTasks = diagnosisAssignmentService
+                    .getInProgressDiagnosisTasks(techManagerEmployeeId);
 
             // Get list of available Technicians
-            List<Employee> technicians = technicianDAO.getAllTechnicians();
+            List<Employee> technicians = diagnosisAssignmentService.getAvailableTechnicians();
 
             request.setAttribute("pendingDetails", pendingDetails);
+            request.setAttribute("inProgressTasks", inProgressTasks);
             request.setAttribute("technicians", technicians);
             request.setAttribute("totalPending", pendingDetails.size());
+            request.setAttribute("totalInProgress", inProgressTasks.size());
 
             // Forward to JSP
             request.getRequestDispatcher("/view/techmanager/assign-diagnosis.jsp")
@@ -108,7 +105,7 @@ public class DiagnosisAssignmentServlet extends HttpServlet {
             String priority = request.getParameter("priority");
             String notes = request.getParameter("notes");
 
-            // NEW: Get scheduling parameters
+            // Get scheduling parameters
             String plannedStartStr = request.getParameter("plannedStart");
             String plannedEndStr = request.getParameter("plannedEnd");
 
@@ -141,65 +138,26 @@ public class DiagnosisAssignmentServlet extends HttpServlet {
                 }
             }
 
-            // Validate: planned_end must be after planned_start
-            if (plannedStart != null && plannedEnd != null) {
-                if (!plannedEnd.isAfter(plannedStart)) {
+            // Assign diagnosis task via service
+            try {
+                int assignmentId = diagnosisAssignmentService.assignDiagnosisTask(
+                        detailId, technicianId, priority, notes, plannedStart, plannedEnd);
+
+                if (assignmentId > 0) {
                     response.sendRedirect(request.getContextPath() +
                             "/techmanager/assign-diagnosis?message=" +
-                            java.net.URLEncoder.encode("Planned end time must be after planned start time.", "UTF-8") +
+                            java.net.URLEncoder.encode("Diagnosis task assigned successfully!", "UTF-8") +
+                            "&type=success");
+                } else {
+                    response.sendRedirect(request.getContextPath() +
+                            "/techmanager/assign-diagnosis?message=" +
+                            java.net.URLEncoder.encode("Failed to assign diagnosis task.", "UTF-8") +
                             "&type=error");
-                    return;
                 }
-            }
-
-            // Create TaskAssignment
-            TaskAssignment task = new TaskAssignment();
-            task.setDetailID(detailId);
-            task.setAssignToTechID(technicianId);
-            task.setAssignedDate(LocalDateTime.now());
-            task.setTaskDescription("Chẩn đoán tình trạng xe và xác định vấn đề");
-            task.setTaskType(TaskAssignment.TaskType.DIAGNOSIS);
-            task.setStatus(TaskAssignment.TaskStatus.ASSIGNED);
-
-            // Set priority
-            if (priority != null && !priority.trim().isEmpty()) {
-                task.setPriority(TaskAssignment.Priority.valueOf(priority.toUpperCase()));
-            } else {
-                task.setPriority(TaskAssignment.Priority.MEDIUM);
-            }
-
-            task.setNotes(notes);
-
-            // NEW: Set scheduling times
-            task.setPlannedStart(plannedStart);
-            task.setPlannedEnd(plannedEnd);
-
-            // Save to database
-            int assignmentId = taskAssignmentDAO.createTaskAssignment(task);
-
-            if (assignmentId > 0) {
-                // Create notification for Technician
-                Employee technician = technicianDAO.getTechnicianById(technicianId);
-                if (technician != null) {
-                    Notification notif = new Notification();
-                    notif.setUserId(technician.getUserId()); // Employee extends User, so getUserId() is available
-                    notif.setTitle("New Diagnosis Task Assigned");
-                    notif.setBody("You have been assigned a diagnosis task. Priority: " + task.getPriority());
-                    notif.setEntityType("WORK_ORDER");
-                    notif.setEntityId(assignmentId);
-                    notificationDAO.createNotification(notif);
-                }
-
-                // Success
+            } catch (IllegalArgumentException e) {
                 response.sendRedirect(request.getContextPath() +
                         "/techmanager/assign-diagnosis?message=" +
-                        java.net.URLEncoder.encode("Diagnosis task assigned successfully!", "UTF-8") +
-                        "&type=success");
-            } else {
-                // Failed
-                response.sendRedirect(request.getContextPath() +
-                        "/techmanager/assign-diagnosis?message=" +
-                        java.net.URLEncoder.encode("Failed to assign diagnosis task.", "UTF-8") +
+                        java.net.URLEncoder.encode(e.getMessage(), "UTF-8") +
                         "&type=error");
             }
 

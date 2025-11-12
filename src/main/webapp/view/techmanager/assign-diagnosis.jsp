@@ -51,6 +51,14 @@
                         </div>
                     </div>
                     <div class="col-md-3">
+                        <div class="card text-white bg-success">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="bi bi-hourglass-split"></i> In Progress</h5>
+                                <h2>${totalInProgress}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
                         <div class="card text-white bg-info">
                             <div class="card-body">
                                 <h5 class="card-title"><i class="bi bi-people"></i> Available Technicians</h5>
@@ -59,6 +67,63 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- In-Progress Diagnosis Tasks -->
+                <c:if test="${not empty inProgressTasks}">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> Diagnosis Tasks In Progress</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Assignment #</th>
+                                            <th>WO #</th>
+                                            <th>Vehicle</th>
+                                            <th>Customer</th>
+                                            <th>Technician</th>
+                                            <th>Started At</th>
+                                            <th>Task Description</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <c:forEach items="${inProgressTasks}" var="task">
+                                            <tr>
+                                                <td><strong>#${task.assignmentId}</strong></td>
+                                                <td><strong>#${task.workOrderId}</strong></td>
+                                                <td>
+                                                    <i class="bi bi-car-front"></i>
+                                                    ${task.vehicleInfo}
+                                                </td>
+                                                <td>
+                                                    <i class="bi bi-person"></i>
+                                                    ${task.customerName}
+                                                </td>
+                                                <td>
+                                                    <i class="bi bi-person-badge"></i>
+                                                    <strong>${task.technicianName}</strong><br>
+                                                    <small class="text-muted">${task.technicianCode}</small>
+                                                </td>
+                                                <td>
+                                                    <fmt:formatDate value="${task.startAt}" pattern="dd/MM/yyyy HH:mm" />
+                                                </td>
+                                                <td>${task.workOrderDetailDescription}</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        <i class="bi bi-hourglass-split"></i> ${task.status}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </c:if>
 
                 <!-- Pending Diagnosis Table -->
                 <div class="card shadow-sm">
@@ -155,7 +220,7 @@
 
     <!-- Assignment Modal -->
     <div class="modal fade" id="assignModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
                 <form method="post" action="${pageContext.request.contextPath}/techmanager/assign-diagnosis">
                     <div class="modal-header bg-primary text-white">
@@ -165,24 +230,18 @@
                     <div class="modal-body">
                         <input type="hidden" name="detailId" id="modalDetailId">
                         
-                        <div class="mb-3">
-                            <label class="form-label"><strong>WorkOrder:</strong></label>
-                            <p id="modalWorkOrderInfo" class="form-text"></p>
+                        <!-- Compact Task Info -->
+                        <div class="alert alert-light mb-2 py-2">
+                            <small>
+                                <strong>WO:</strong> <span id="modalWorkOrderInfo"></span><br>
+                                <strong>Vehicle:</strong> <span id="modalVehicleInfo"></span><br>
+                                <strong>Task:</strong> <span id="modalTaskDesc"></span>
+                            </small>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label"><strong>Vehicle:</strong></label>
-                            <p id="modalVehicleInfo" class="form-text"></p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label"><strong>Task:</strong></label>
-                            <p id="modalTaskDesc" class="form-text"></p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="technicianId" class="form-label">Select Technician <span class="text-danger">*</span></label>
-                            <select class="form-select" name="technicianId" id="technicianId" required onchange="loadTechnicianSchedule()">
+                        <div class="mb-2">
+                            <label for="technicianId" class="form-label small">Select Technician <span class="text-danger">*</span></label>
+                            <select class="form-select form-select-sm" name="technicianId" id="technicianId" required onchange="loadTechnicianSchedule()">
                                 <option value="">-- Choose Technician --</option>
                                 <c:forEach items="${technicians}" var="tech">
                                     <option value="${tech.employeeId}">
@@ -192,39 +251,37 @@
                             </select>
                         </div>
 
-                        <!-- NEW: Scheduling Section -->
-                        <div class="card mb-3 border-info">
-                            <div class="card-header bg-info text-white">
-                                <i class="bi bi-calendar-check"></i> Task Scheduling (Optional)
+                        <!-- Scheduling Section -->
+                        <div class="card mb-2 border-info">
+                            <div class="card-header bg-info text-white py-1">
+                                <small><i class="bi bi-calendar-check"></i> Task Scheduling (Optional)</small>
                             </div>
-                            <div class="card-body">
+                            <div class="card-body py-2">
                                 <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="plannedStart" class="form-label">Planned Start Time</label>
-                                        <input type="datetime-local" class="form-control" name="plannedStart" id="plannedStart">
-                                        <small class="form-text text-muted">When technician should start</small>
+                                    <div class="col-md-6 mb-2">
+                                        <label for="plannedStart" class="form-label small">Planned Start</label>
+                                        <input type="datetime-local" class="form-control form-control-sm" name="plannedStart" id="plannedStart">
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="plannedEnd" class="form-label">Planned End Time</label>
-                                        <input type="datetime-local" class="form-control" name="plannedEnd" id="plannedEnd">
-                                        <small class="form-text text-muted">Expected completion time</small>
+                                    <div class="col-md-6 mb-2">
+                                        <label for="plannedEnd" class="form-label small">Planned End</label>
+                                        <input type="datetime-local" class="form-control form-control-sm" name="plannedEnd" id="plannedEnd">
                                     </div>
                                 </div>
                                 
                                 <!-- Technician Schedule Preview -->
-                                <div id="schedulePreview" class="alert alert-light d-none">
-                                    <strong><i class="bi bi-clock-history"></i> Technician's Schedule:</strong>
-                                    <div id="scheduleContent" class="mt-2"></div>
-                                    <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="refreshSchedule()">
+                                <div id="schedulePreview" class="alert alert-light d-none py-2 mb-0">
+                                    <small><strong><i class="bi bi-clock-history"></i> Technician's Schedule:</strong></small>
+                                    <div id="scheduleContent" class="mt-1"></div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary mt-1" onclick="refreshSchedule()">
                                         <i class="bi bi-arrow-clockwise"></i> Refresh
                                     </button>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="priority" class="form-label">Priority <span class="text-danger">*</span></label>
-                            <select class="form-select" name="priority" id="priority" required>
+                        <div class="mb-2">
+                            <label for="priority" class="form-label small">Priority <span class="text-danger">*</span></label>
+                            <select class="form-select form-select-sm" name="priority" id="priority" required>
                                 <option value="LOW">Low</option>
                                 <option value="MEDIUM" selected>Medium</option>
                                 <option value="HIGH">High</option>
@@ -232,15 +289,15 @@
                             </select>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="notes" class="form-label">Notes (Optional)</label>
-                            <textarea class="form-control" name="notes" id="notes" rows="3" 
-                                      placeholder="Any special instructions for the technician..."></textarea>
+                        <div class="mb-2">
+                            <label for="notes" class="form-label small">Notes (Optional)</label>
+                            <textarea class="form-control form-control-sm" name="notes" id="notes" rows="2" 
+                                      placeholder="Any special instructions..."></textarea>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">
+                    <div class="modal-footer py-2">
+                        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-sm btn-primary">
                             <i class="bi bi-check-circle"></i> Assign Task
                         </button>
                     </div>

@@ -179,6 +179,28 @@ public class EmployeeDAO extends DbContext {
     }
 
     /**
+     * Get Employee ID by username
+     */
+    public Integer getEmployeeIdByUserName(String userName) throws SQLException {
+        String sql = "SELECT e.EmployeeID FROM Employee e " +
+                "JOIN User u ON e.UserID = u.UserID " +
+                "WHERE u.UserName = ?";
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, userName);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("EmployeeID");
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Extract Employee object from ResultSet
      */
     private Employee extractEmployee(ResultSet rs) throws SQLException {
@@ -190,12 +212,180 @@ public class EmployeeDAO extends DbContext {
         double salary = rs.getDouble("Salary");
         employee.setSalary(salary);
 
-        int managedBy = rs.getInt("ManagedBy");
-        employee.setManagedBy(rs.wasNull() ? null : managedBy);
+        // Handle nullable ManagedBy
+        Integer managedBy = (Integer) rs.getObject("ManagedBy");
+        employee.setManagedBy(managedBy != null ? managedBy : 0);
 
-        int createdBy = rs.getInt("CreatedBy");
-        employee.setCreateBy(rs.wasNull() ? null : createdBy);
+        // Handle nullable CreatedBy
+        Integer createdBy = (Integer) rs.getObject("CreatedBy");
+        employee.setCreateBy(createdBy != null ? createdBy : 0);
 
         return employee;
+    }
+
+    // =========================================================================
+    // TECH MANAGER FUNCTIONALITY - UC-TM-02, UC-TM-03, UC-TM-11
+    // =========================================================================
+
+    /**
+     * Get list of ACTIVE technicians only (for task assignment).
+     * Used in UC-TM-02 (Assign Diagnosis) and UC-TM-03 (Assign Repair).
+     * 
+     * @return List of Employee objects representing active technicians with User
+     *         info
+     * @throws SQLException if database error occurs
+     */
+    public java.util.List<model.dto.TechnicianDTO> getActiveTechnicians() throws SQLException {
+        String sql = "SELECT " +
+                "    e.EmployeeID, " +
+                "    e.EmployeeCode, " +
+                "    e.UserID, " +
+                "    u.FullName, " +
+                "    u.PhoneNumber, " +
+                "    u.Email, " +
+                "    u.ActiveStatus " +
+                "FROM Employee e " +
+                "JOIN User u ON e.UserID = u.UserID " +
+                "JOIN RoleInfo r ON u.RoleID = r.RoleID " +
+                "WHERE r.RoleName = 'Technician' " +
+                "  AND u.ActiveStatus = 1 " + // ONLY ACTIVE
+                "ORDER BY u.FullName";
+
+        java.util.List<model.dto.TechnicianDTO> technicians = new java.util.ArrayList<>();
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                model.dto.TechnicianDTO dto = new model.dto.TechnicianDTO();
+                dto.setEmployeeID(rs.getInt("EmployeeID"));
+                dto.setEmployeeCode(rs.getString("EmployeeCode"));
+                dto.setUserID(rs.getInt("UserID"));
+                dto.setFullName(rs.getString("FullName"));
+                dto.setPhoneNumber(rs.getString("PhoneNumber"));
+                dto.setEmail(rs.getString("Email"));
+                dto.setActiveStatus(rs.getInt("ActiveStatus"));
+                technicians.add(dto);
+            }
+        }
+
+        return technicians;
+    }
+
+    /**
+     * Get ALL technicians (both Active and Inactive) managed by a specific Tech
+     * Manager.
+     * Used in UC-TM-11 (My Team page).
+     * 
+     * @param techManagerEmployeeID - The EmployeeID of the Tech Manager
+     * @return List of TechnicianDTO with ActiveStatus info
+     * @throws SQLException if database error occurs
+     */
+    public java.util.List<model.dto.TechnicianDTO> getAllTechniciansByManager(int techManagerEmployeeID)
+            throws SQLException {
+        String sql = "SELECT " +
+                "    e.EmployeeID, " +
+                "    e.EmployeeCode, " +
+                "    e.UserID, " +
+                "    u.FullName, " +
+                "    u.PhoneNumber, " +
+                "    u.Email, " +
+                "    u.ActiveStatus " +
+                "FROM Employee e " +
+                "JOIN User u ON e.UserID = u.UserID " +
+                "JOIN RoleInfo r ON u.RoleID = r.RoleID " +
+                "WHERE r.RoleName = 'Technician' " +
+                "  AND e.ManagedBy = ? " + // Managed by current TM
+                "ORDER BY u.ActiveStatus DESC, u.FullName"; // Active first
+
+        System.out.println("[EmployeeDAO DEBUG] Query technicians with ManagedBy = " + techManagerEmployeeID);
+        System.out.println("[EmployeeDAO DEBUG] SQL: " + sql);
+
+        java.util.List<model.dto.TechnicianDTO> technicians = new java.util.ArrayList<>();
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, techManagerEmployeeID);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                int count = 0;
+                while (rs.next()) {
+                    count++;
+                    model.dto.TechnicianDTO dto = new model.dto.TechnicianDTO();
+                    dto.setEmployeeID(rs.getInt("EmployeeID"));
+                    dto.setEmployeeCode(rs.getString("EmployeeCode"));
+                    dto.setUserID(rs.getInt("UserID"));
+                    dto.setFullName(rs.getString("FullName"));
+                    dto.setPhoneNumber(rs.getString("PhoneNumber"));
+                    dto.setEmail(rs.getString("Email"));
+                    dto.setActiveStatus(rs.getInt("ActiveStatus"));
+                    technicians.add(dto);
+
+                    System.out.println("[EmployeeDAO DEBUG] Found technician #" + count + ": " +
+                            dto.getFullName() + " (ID=" + dto.getEmployeeID() + ", Active=" + dto.isActive() + ")");
+                }
+                System.out.println("[EmployeeDAO DEBUG] Total technicians found: " + count);
+            }
+        }
+
+        return technicians;
+    }
+
+    /**
+     * DEBUG METHOD: Get ALL technicians regardless of ManagedBy
+     * Used for debugging "My Team" page issues
+     */
+    public java.util.List<model.dto.TechnicianDTO> getAllTechniciansDebug() throws SQLException {
+        String sql = "SELECT " +
+                "    e.EmployeeID, " +
+                "    e.EmployeeCode, " +
+                "    e.UserID, " +
+                "    e.ManagedBy, " +
+                "    u.FullName, " +
+                "    u.PhoneNumber, " +
+                "    u.Email, " +
+                "    u.ActiveStatus " +
+                "FROM Employee e " +
+                "JOIN User u ON e.UserID = u.UserID " +
+                "JOIN RoleInfo r ON u.RoleID = r.RoleID " +
+                "WHERE r.RoleName = 'Technician' " +
+                "ORDER BY e.ManagedBy, u.FullName";
+
+        System.out.println("[EmployeeDAO DEBUG] Fetching ALL technicians (no ManagedBy filter)");
+
+        java.util.List<model.dto.TechnicianDTO> technicians = new java.util.ArrayList<>();
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            int count = 0;
+            while (rs.next()) {
+                count++;
+                model.dto.TechnicianDTO dto = new model.dto.TechnicianDTO();
+                dto.setEmployeeID(rs.getInt("EmployeeID"));
+                dto.setEmployeeCode(rs.getString("EmployeeCode"));
+                dto.setUserID(rs.getInt("UserID"));
+                dto.setFullName(rs.getString("FullName"));
+                dto.setPhoneNumber(rs.getString("PhoneNumber"));
+                dto.setEmail(rs.getString("Email"));
+                dto.setActiveStatus(rs.getInt("ActiveStatus"));
+
+                // Get ManagedBy (nullable)
+                Integer managedBy = (Integer) rs.getObject("ManagedBy");
+                dto.setManagedBy(managedBy);
+
+                technicians.add(dto);
+
+                System.out.println("[EmployeeDAO DEBUG] Tech #" + count + ": " +
+                        dto.getFullName() + " (EmpID=" + dto.getEmployeeID() +
+                        ", ManagedBy=" + (managedBy != null ? managedBy : "NULL") + ")");
+            }
+            System.out.println("[EmployeeDAO DEBUG] Total ALL technicians: " + count);
+        }
+
+        return technicians;
     }
 }
