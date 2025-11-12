@@ -306,24 +306,43 @@ public class VehicleDiagnosticDAO {
     /**
      * Lấy diagnostics theo AssignmentID
      */
-    public List<VehicleDiagnostic> getDiagnosticsByAssignment(Connection conn, int assignmentId)
-            throws SQLException {
-        String sql = "SELECT * FROM VehicleDiagnostic " +
-                "WHERE AssignmentID = ? " +
-                "ORDER BY CreatedAt DESC";
+    public List<VehicleDiagnostic> getDiagnosticsByAssignmentId(int assignmentId) throws SQLException {
+        String sql = """
+        SELECT vd.*, 
+               v.LicensePlate, v.Brand, v.Model,
+               u.FullName AS TechnicianName
+        FROM VehicleDiagnostic vd
+        JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID
+        JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID
+        JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID
+        JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID
+        JOIN Vehicle v ON sr.VehicleID = v.VehicleID
+        JOIN Employee e ON ta.TechnicianID = e.EmployeeID
+        JOIN `User` u ON e.UserID = u.UserID
+        WHERE ta.AssignmentID = ?
+        ORDER BY vd.CreatedAt DESC
+    """;
 
-        List<VehicleDiagnostic> list = new ArrayList<>();
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, assignmentId);
             try (ResultSet rs = ps.executeQuery()) {
+                List<VehicleDiagnostic> list = new ArrayList<>();
                 while (rs.next()) {
-                    list.add(mapDiagnostic(rs));
+                    VehicleDiagnostic vd = mapDiagnostic(rs);
+                    vd.setVehicleInfo(
+                            rs.getString("LicensePlate") + " - " +
+                                    rs.getString("Brand") + " " +
+                                    rs.getString("Model")
+                    );
+                    vd.setTechnicianName(rs.getString("TechnicianName"));
+                    list.add(vd);
                 }
+                return list;
             }
         }
-        return list;
     }
+
 
     /**
      * Lấy danh sách technicians tham gia diagnostic

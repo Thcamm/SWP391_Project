@@ -3,6 +3,7 @@ package controller.customer;
 import common.constant.MessageConstants;
 import common.message.ServiceResult;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,6 +12,7 @@ import service.diagnostic.CustomerDiagnosticService;
 
 import java.io.IOException;
 
+@WebServlet("/customer/diagnostic/view")
 public class CustomerDiagnosticServlet extends HttpServlet {
     private final CustomerDiagnosticService customerDiagnosticService = new CustomerDiagnosticService();
 

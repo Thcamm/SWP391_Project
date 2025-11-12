@@ -365,4 +365,15 @@ public class VehicleDiagnosticService {
     }
 
 
+    public ServiceResult getDiagnosticsByAssignmentId(int assignmentId) {
+        try {
+            List<VehicleDiagnostic> list = diagnosticDAO.getDiagnosticsByAssignmentId(assignmentId);
+            return ServiceResult.success(MessageConstants.DIAG003, list);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return ServiceResult.error(MessageConstants.ERR007);
+        }
+    }
+
+
 }

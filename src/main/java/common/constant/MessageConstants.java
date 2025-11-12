@@ -336,6 +336,13 @@ public class MessageConstants {
             "Invalid Action"
     );
 
+    public static final SystemMessage ERR007 = new SystemMessage(
+            "ERR007",
+            MessageType.ERROR,
+            "Load data",
+            "ERROR loading diagnostic"
+    );
+
     public static final SystemMessage VAL001 = new SystemMessage(
             "VAL001",
             MessageType.VALIDATION,
