@@ -168,7 +168,8 @@ public class TechnicianDAO {
                 "wd.EstimateHours, " +
                 "CONCAT(v.LicensePlate, ' - ', v.Brand, ' ', v.Model) AS VehicleInfo, " +
                 "GROUP_CONCAT(DISTINCT st.ServiceName SEPARATOR ', ') AS ServiceNames, " +
-                "u.FullName as CustomerName " +
+                "u.FullName as CustomerName, " +
+                "u.Email AS CustomerEmail " +
                 "FROM TaskAssignment ta " +
                 "JOIN WorkOrderDetail wd ON ta.DetailID = wd.DetailID " +
                 "JOIN WorkOrder wo ON wd.WorkOrderID = wo.WorkOrderID " +
@@ -188,6 +189,8 @@ public class TechnicianDAO {
                 if (rs.next()) {
                     TaskAssignment task = mapResultSetToTask(rs);
                     task.setServiceInfo(rs.getString("ServiceNames"));
+                    task.setCustomerName(rs.getString("CustomerName"));
+                    task.setCustomerEmail(rs.getString("CustomerEmail"));
                     return task;
                 }
             }
@@ -525,6 +528,11 @@ public class TechnicianDAO {
         } catch (SQLException ignore) {}
 
         try {
+            task.setCustomerEmail(rs.getString("CustomerEmail"));
+        } catch (SQLException ignore) {}
+
+
+        try {
             task.setEstimateHours(rs.getDouble("EstimateHours"));
         } catch (SQLException ignore) {}
 
@@ -767,7 +775,7 @@ public class TechnicianDAO {
                 "SELECT COUNT(*) " +
                         "FROM TaskAssignment " +
                         "WHERE AssignToTechID = ? " +
-                        "  AND Status IN ('ASSIGNED','IN_PROGRESS') " +
+                        "  AND Status IN ('IN_PROGRESS') " +  // da bo assigned
                         "  AND planned_start IS NOT NULL AND planned_end IS NOT NULL " +
                         "  AND planned_start < ? " +   // start < other_end
                         "  AND planned_end   > ? " +   // end   > other_start

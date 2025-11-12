@@ -217,6 +217,7 @@ public class TechnicianService {
                 boolean hasOverlap = technicianDAO.hasOverlapAssignments(conn, technicianId, ps, pe, assignmentId);
                 if (hasOverlap) {
                     conn.rollback();
+                    System.out.println("Loi over lap chua chuan");
                     return ServiceResult.error(MessageConstants.TASK013);
                 }
 

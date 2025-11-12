@@ -21,6 +21,14 @@ public class VehicleDiagnostic {
     private DiagnosticStatus status = DiagnosticStatus.SUBMITTED; // default giống DB
     private LocalDateTime createdAt;
     private boolean isSubmitApproval;
+    private String rejectReason;
+
+    public String getRejectReason() {
+        return rejectReason;
+    }
+    public void setRejectReason(String rejectReason) {
+        this.rejectReason = rejectReason;
+    }
 
     // labor
     private transient BigDecimal laborCostCalculated;
