@@ -10,10 +10,15 @@ import java.util.List;
 
 /**
  * Service for Repair Assignment business logic.
- * Manages repair task assignment workflow (Phase 3/GĐ4).
+ * Manages repair task assignment workflow (GĐ5).
+ * 
+ * LUỒNG MỚI (Triage Workflow):
+ * - Handles WODs from BOTH sources:
+ *   1. REQUEST: Direct from GĐ2 Triage (skip diagnosis)
+ *   2. DIAGNOSTIC: From GĐ4 Quote Approval (customer approved)
  * 
  * @author SWP391 Team
- * @version 1.0
+ * @version 2.0 (Updated for LUỒNG MỚI)
  */
 public class RepairAssignmentService {
 
@@ -26,7 +31,12 @@ public class RepairAssignmentService {
     /**
      * Get all approved repairs waiting for technician assignment.
      * 
-     * @return list of approved repairs
+     * LUỒNG MỚI:
+     * - Returns WODs from BOTH sources (REQUEST + DIAGNOSTIC)
+     * - REQUEST: Classified by GĐ2 Triage as direct repair (skip diagnosis)
+     * - DIAGNOSTIC: Approved by customer after GĐ4 Quote
+     * 
+     * @return list of approved repairs from both sources
      * @throws SQLException if database error occurs
      */
     public List<ApprovedRepairDTO> getApprovedRepairs() throws SQLException {

@@ -18,7 +18,14 @@ import java.util.List;
 public class RepairAssignmentDAO {
 
     /**
-     * Get approved Repairs (customer approved) that need repair assignment
+     * LUỒNG MỚI - GĐ 5: Get approved Repairs that need repair assignment
+     * 
+     * REFACTORED: Changed from only DIAGNOSTIC to BOTH REQUEST and DIAGNOSTIC
+     * - REQUEST: Services classified as "Làm luôn" in Triage (skip diagnosis)
+     * - DIAGNOSTIC: Services that went through diagnosis and were approved
+     * 
+     * Returns WorkOrderDetails from BOTH sources that don't have a REPAIR
+     * TaskAssignment yet
      */
     public List<ApprovedRepairDTO> getApprovedRepairs() throws SQLException {
         List<ApprovedRepairDTO> Repairs = new ArrayList<>();
@@ -26,7 +33,7 @@ public class RepairAssignmentDAO {
         String sql = "SELECT wod.DetailID as detailId, wod.WorkOrderID as workOrderId, " +
                 "wod.TaskDescription as taskDescription, " +
                 "wod.EstimateAmount as estimateAmount, wod.approved_at as approvedAt, " +
-                "wod.diagnostic_id as diagnosticId, " +
+                "wod.diagnostic_id as diagnosticId, wod.source as source, " + // Added source for debugging
                 "v.VehicleID as vehicleId, v.LicensePlate as licensePlate, v.Model as vehicleModel, " +
                 "u.FullName as customerName, u.PhoneNumber as phoneNumber " +
                 "FROM WorkOrderDetail wod " +
@@ -36,7 +43,7 @@ public class RepairAssignmentDAO {
                 "JOIN Customer c ON v.CustomerID = c.CustomerID " +
                 "JOIN User u ON c.UserID = u.UserID " +
                 "WHERE wod.approval_status = 'APPROVED' " +
-                "AND wod.source = 'DIAGNOSTIC' " +
+                "AND (wod.source = 'REQUEST' OR wod.source = 'DIAGNOSTIC') " + // CHANGED: Both sources
                 "AND NOT EXISTS ( " +
                 "    SELECT 1 FROM TaskAssignment ta " +
                 "    WHERE ta.DetailID = wod.DetailID AND ta.task_type = 'REPAIR' " +

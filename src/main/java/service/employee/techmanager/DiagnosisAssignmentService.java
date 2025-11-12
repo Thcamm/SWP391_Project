@@ -14,10 +14,14 @@ import java.util.List;
 
 /**
  * Service for Diagnosis Assignment business logic.
- * Manages diagnosis task assignment workflow (Phase 1/GĐ1).
+ * Manages diagnosis task assignment workflow (GĐ3).
+ * 
+ * LUỒNG MỚI (Triage Workflow):
+ * - Only handles WorkOrderDetails with source='DIAGNOSTIC' (from GĐ2 Triage)
+ * - REQUEST WODs skip this step and go directly to Repair Assignment (GĐ5)
  * 
  * @author SWP391 Team
- * @version 1.0
+ * @version 2.0 (Updated for LUỒNG MỚI)
  */
 public class DiagnosisAssignmentService {
 
@@ -47,8 +51,12 @@ public class DiagnosisAssignmentService {
     /**
      * Get WorkOrderDetails that need diagnosis assignment.
      * 
+     * LUỒNG MỚI:
+     * - Only returns WODs with source='DIAGNOSTIC' (classified by GĐ2 Triage)
+     * - REQUEST WODs are excluded (they go to Repair Assignment directly)
+     * 
      * @param techManagerEmployeeId TechManager's employee ID
-     * @return list of pending work order details
+     * @return list of DIAGNOSTIC work order details awaiting assignment
      * @throws SQLException if database error occurs
      */
     public List<TaskAssignmentDAO.WorkOrderDetailWithInfo> getPendingDiagnosisTasks(int techManagerEmployeeId)

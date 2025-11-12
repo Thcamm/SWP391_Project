@@ -1,36 +1,43 @@
 package service.employee.techmanager;
 
-import dao.carservice.ServiceRequestDAO;
 import dao.employee.admin.AdminDAO;
-import dao.workorder.WorkOrderDAO;
-import dao.workorder.WorkOrderDetailDAO;
-import model.dto.ServiceRequestViewDTO;
-import model.workorder.WorkOrder;
-import model.workorder.WorkOrderDetail;
+import model.employee.techmanager.PendingServiceRequestDTO;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
 /**
+ * DEPRECATED - Partial Replacement by TechManagerService
+ * 
  * Service for Service Request Approval business logic (GĐ0 → GĐ1).
- * Manages service request approval and initial WorkOrder creation.
+ * 
+ * ⚠️ LUỒNG 4.0 (Merged Workflow):
+ * - Approval logic has been MOVED to
+ * TechManagerService.approveAndClassifyServiceRequest()
+ * - This class now only provides UTILITY methods for
+ * ServiceRequestApprovalServlet
+ * 
+ * KEPT METHODS (Utility):
+ * - getPendingServiceRequests() - Query service requests
+ * - getTechManagerEmployeeId() - Get employee ID
+ * - rejectServiceRequest() - Handle rejections
  * 
  * @author SWP391 Team
- * @version 1.0
+ * @version 4.0 (Merged Workflow)
+ * @deprecated Use TechManagerService for approval logic. This class only
+ *             provides utilities.
  */
+@Deprecated
 public class ServiceRequestApprovalService {
 
-    private final ServiceRequestDAO serviceRequestDAO;
-    private final WorkOrderDAO workOrderDAO;
-    private final WorkOrderDetailDAO workOrderDetailDAO;
+    private final dao.employee.techmanager.ServiceRequestDAO serviceRequestDAO;
+    private final dao.carservice.ServiceRequestDAO carServiceRequestDAO; // For getServiceRequestDetails
     private final AdminDAO adminDAO;
 
     public ServiceRequestApprovalService() {
-        this.serviceRequestDAO = new ServiceRequestDAO();
-        this.workOrderDAO = new WorkOrderDAO();
-        this.workOrderDetailDAO = new WorkOrderDetailDAO();
+        this.serviceRequestDAO = new dao.employee.techmanager.ServiceRequestDAO();
+        this.carServiceRequestDAO = new dao.carservice.ServiceRequestDAO();
         this.adminDAO = new AdminDAO();
     }
 
@@ -46,76 +53,39 @@ public class ServiceRequestApprovalService {
     }
 
     /**
-     * Get all pending service requests.
+     * Get all pending service requests with full details.
      * 
      * @return list of pending service requests
      * @throws SQLException if database error occurs
      */
-    public List<ServiceRequestViewDTO> getPendingServiceRequests() throws SQLException {
+    public List<PendingServiceRequestDTO> getPendingServiceRequests() throws SQLException {
         return serviceRequestDAO.getPendingServiceRequests();
     }
 
     /**
-     * Approve service request and create WorkOrder with initial DIAGNOSIS detail.
-     * This is a transactional operation (GĐ0 → GĐ1 transition).
+     * DELETED - LUỒNG CŨ (OLD WORKFLOW)
      * 
-     * @param conn                  database connection (for transaction management)
-     * @param requestId             service request ID
-     * @param taskDescription       diagnosis task description
-     * @param techManagerEmployeeId TechManager's employee ID
-     * @return created WorkOrder ID if successful
-     * @throws SQLException          if database error occurs
-     * @throws IllegalStateException if service request is not in PENDING status
+     * This method has been REPLACED by:
+     * TechManagerService.approveServiceRequestAndCreateWorkOrder()
+     * 
+     * OLD LOGIC (Deleted):
+     * - Created 1 WorkOrder + 1 WorkOrderDetail "Chẩn đoán tổng quát"
+     * - Set source=REQUEST, approval_status=APPROVED immediately
+     * 
+     * NEW LOGIC (LUỒNG MỚI - in TechManagerService):
+     * - Creates 1 WorkOrder + N WorkOrderDetails (one per service)
+     * - Each WOD has source=NULL, approval_status=PENDING
+     * - Redirects to Triage screen (GĐ 2) for classification
+     * 
+     * @deprecated Use TechManagerService.approveServiceRequestAndCreateWorkOrder()
+     *             instead
      */
-    public int approveServiceRequest(Connection conn, int requestId, String taskDescription,
-            int techManagerEmployeeId) throws SQLException {
-
-        // Step 1: Check ServiceRequest status
-        model.workorder.ServiceRequest serviceRequest = serviceRequestDAO.getServiceRequestForUpdate(conn, requestId);
-        if (serviceRequest == null) {
-            throw new IllegalArgumentException("Service Request not found");
-        }
-
-        if (!"PENDING".equals(serviceRequest.getStatus())) {
-            throw new IllegalStateException("Service Request is not in PENDING status");
-        }
-
-        // Step 2: Update ServiceRequest to APPROVE
-        boolean statusUpdated = serviceRequestDAO.updateServiceRequestStatus(conn, requestId, "APPROVE");
-        if (!statusUpdated) {
-            throw new SQLException("Failed to update Service Request status");
-        }
-
-        // Step 3: Create WorkOrder
-        WorkOrder workOrder = new WorkOrder();
-        workOrder.setTechManagerId(techManagerEmployeeId);
-        workOrder.setRequestId(requestId);
-        workOrder.setEstimateAmount(BigDecimal.ZERO);
-        workOrder.setStatus(WorkOrder.Status.IN_PROCESS);
-
-        int workOrderId = workOrderDAO.createWorkOrder(conn, workOrder);
-        if (workOrderId <= 0) {
-            throw new SQLException("Failed to create WorkOrder");
-        }
-
-        // Step 4: Create initial DIAGNOSIS WorkOrderDetail
-        WorkOrderDetail diagnosisDetail = new WorkOrderDetail();
-        diagnosisDetail.setWorkOrderId(workOrderId);
-        diagnosisDetail.setSource(WorkOrderDetail.Source.REQUEST);
-        diagnosisDetail.setTaskDescription(
-                taskDescription != null && !taskDescription.trim().isEmpty()
-                        ? taskDescription
-                        : "Chẩn đoán tổng quát tình trạng xe");
-        diagnosisDetail.setApprovalStatus(WorkOrderDetail.ApprovalStatus.APPROVED);
-        diagnosisDetail.setEstimateHours(BigDecimal.valueOf(1.0));
-        diagnosisDetail.setEstimateAmount(BigDecimal.ZERO);
-
-        int detailId = workOrderDetailDAO.createWorkOrderDetail(conn, diagnosisDetail);
-        if (detailId <= 0) {
-            throw new SQLException("Failed to create WorkOrderDetail");
-        }
-
-        return workOrderId;
+    @Deprecated
+    private void approveServiceRequest_OLD_LOGIC_DELETED() {
+        throw new UnsupportedOperationException(
+                "LUỒNG CŨ - This method has been deleted. " +
+                        "Use TechManagerService.approveServiceRequestAndCreateWorkOrder() instead. " +
+                        "See LUỒNG MỚI documentation in TechManagerService.");
     }
 
     /**
@@ -127,6 +97,25 @@ public class ServiceRequestApprovalService {
      * @throws SQLException if database error occurs
      */
     public boolean rejectServiceRequest(int requestId, String reason) throws SQLException {
-        return serviceRequestDAO.updateServiceRequestStatus(requestId, "REJECTED");
+        try (Connection conn = common.DbContext.getConnection()) {
+            conn.setAutoCommit(false);
+            try {
+                serviceRequestDAO.updateServiceRequestStatus(conn, requestId, "REJECTED");
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                conn.setAutoCommit(true);
+            }
+        }
+    }
+
+    /**
+     * LUỒNG 4.0: Get services for a specific request
+     */
+    public List<model.workorder.ServiceRequestDetail> getServicesForRequest(int requestId) throws SQLException {
+        return carServiceRequestDAO.getServiceRequestDetails(requestId);
     }
 }

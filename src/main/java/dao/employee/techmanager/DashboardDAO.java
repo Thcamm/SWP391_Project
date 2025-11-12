@@ -42,11 +42,30 @@ public class DashboardDAO {
     }
 
     /**
-     * Count WorkOrderDetails (from REQUEST source) that need diagnosis assignment
+     * LUỒNG MỚI - GĐ 2: Count WorkOrderDetails awaiting Triage (source=NULL)
+     * These are WODs created after approval but not yet classified by TM.
+     * 
+     * @return count of details awaiting triage
+     * @throws SQLException if database error occurs
+     */
+    public int countPendingTriageDetails() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM WorkOrderDetail WHERE source IS NULL";
+
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+            return rs.next() ? rs.getInt(1) : 0;
+        }
+    }
+
+    /**
+     * LUỒNG MỚI - GĐ 3: Count WorkOrderDetails (DIAGNOSTIC only) that need
+     * diagnosis assignment
      * for a specific Tech Manager.
-     * These are details that don't have a DIAGNOSIS TaskAssignment yet
-     * and belong to WorkOrders managed by this TechManager.
-     * This matches the logic in assign-diagnosis.jsp page.
+     * 
+     * REFACTORED: Changed from source='REQUEST' to source='DIAGNOSTIC'
+     * - After Triage, only DIAGNOSTIC services need diagnosis
+     * - REQUEST services skip diagnosis and go directly to repair
      * 
      * @param techManagerId the Tech Manager's employee ID
      * @return count of details needing diagnosis assignment
@@ -58,7 +77,7 @@ public class DashboardDAO {
                 "JOIN WorkOrder wo ON wd.WorkOrderID = wo.WorkOrderID " +
                 "LEFT JOIN TaskAssignment ta ON wd.DetailID = ta.DetailID AND ta.task_type = 'DIAGNOSIS' " +
                 "WHERE wo.TechManagerID = ? " +
-                "AND wd.source = 'REQUEST' " +
+                "AND wd.source = 'DIAGNOSTIC' " + // CHANGED: Only DIAGNOSTIC needs diagnosis
                 "AND (wo.Status = 'PENDING' OR wo.Status = 'IN_PROCESS') " +
                 "AND ta.AssignmentID IS NULL";
 
@@ -73,10 +92,12 @@ public class DashboardDAO {
     }
 
     /**
-     * Count WorkOrderDetails (from REQUEST source) that need diagnosis assignment.
+     * Count WorkOrderDetails (from DIAGNOSTIC source) that need diagnosis assignment.
      * DEPRECATED: Use countAssignedDiagnosisForManager() instead to get accurate
      * count.
      * This method counts ALL unassigned details regardless of TechManager.
+     * 
+     * LUỒNG MỚI: Changed from source='REQUEST' to source='DIAGNOSTIC'
      * 
      * @return count of details needing diagnosis assignment
      * @throws SQLException if database error occurs
@@ -86,8 +107,8 @@ public class DashboardDAO {
         String sql = "SELECT COUNT(DISTINCT wd.DetailID) " +
                 "FROM WorkOrderDetail wd " +
                 "JOIN WorkOrder wo ON wd.WorkOrderID = wo.WorkOrderID " +
-                "LEFT JOIN TaskAssignment ta ON wd.DetailID = ta.DetailID AND ta.task_type = 'DIAGNOSIS' " +
-                "WHERE wd.source = 'REQUEST' " +
+                "LEFT JOIN TaskAssignment ta ON wd.DetailID ta.DetailID AND ta.task_type = 'DIAGNOSIS' " +
+                "WHERE wd.source = 'DIAGNOSTIC' " + // CHANGED: Only DIAGNOSTIC needs diagnosis (LUỒNG MỚI)
                 "AND (wo.Status = 'PENDING' OR wo.Status = 'IN_PROCESS') " +
                 "AND ta.AssignmentID IS NULL";
 
@@ -170,17 +191,24 @@ public class DashboardDAO {
     // =========================================================================
 
     /**
-     * Count WorkOrderDetails (source='DIAGNOSTIC') that don't have a TaskAssignment
-     * yet.
-     * These are created automatically by trigger after customer approval
-     * and are waiting for TM to assign repair tasks.
+     * LUỒNG MỚI - GĐ 5: Count WorkOrderDetails (BOTH sources) awaiting repair
+     * assignment.
+     * 
+     * REFACTORED: Changed from only DIAGNOSTIC to BOTH REQUEST and DIAGNOSTIC
+     * - REQUEST: Services classified as "Làm luôn" in Triage (skip diagnosis)
+     * - DIAGNOSTIC: Services that went through diagnosis and were approved
+     * 
+     * These are created either:
+     * 1. From Triage (source='REQUEST') - Direct repair
+     * 2. From trigger after customer approval (source='DIAGNOSTIC') -
+     * Post-diagnosis repair
      * 
      * @return count of unassigned WorkOrderDetails
      * @throws SQLException if database error occurs
      */
     public int countUnassignedWorkOrderDetails() throws SQLException {
         String sql = "SELECT COUNT(*) FROM WorkOrderDetail wod " +
-                "WHERE wod.source = 'DIAGNOSTIC' " +
+                "WHERE (wod.source = 'REQUEST' OR wod.source = 'DIAGNOSTIC') " + // CHANGED: Both sources
                 "AND NOT EXISTS (" +
                 "    SELECT 1 FROM TaskAssignment ta " +
                 "    WHERE ta.DetailID = wod.DetailID AND ta.task_type = 'REPAIR'" +

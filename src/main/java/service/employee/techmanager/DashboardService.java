@@ -37,6 +37,19 @@ public class DashboardService {
     }
 
     /**
+     * LUỒNG MỚI - GĐ 2: Get count of WorkOrderDetails awaiting Triage
+     * classification.
+     * These are WODs with source=NULL that need TM to classify as REQUEST or
+     * DIAGNOSTIC.
+     * 
+     * @return count of details awaiting triage
+     * @throws SQLException if database error occurs
+     */
+    public int countPendingTriageDetails() throws SQLException {
+        return dashboardDAO.countPendingTriageDetails();
+    }
+
+    /**
      * Get count of assigned diagnosis tasks (assigned but not started).
      * DEPRECATED: Use countAssignedDiagnosisForManager() for accurate count per
      * TechManager.

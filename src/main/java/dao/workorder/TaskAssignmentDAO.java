@@ -223,8 +223,13 @@ public class TaskAssignmentDAO extends DbContext {
 
     /**
      * [TECH_MANAGER ONLY]
-     * Get WorkOrderDetails that need diagnosis assignment
-     * These are details from REQUEST source that don't have a DIAGNOSIS task yet
+     * LUỒNG MỚI - GĐ 3: Get WorkOrderDetails that need diagnosis assignment
+     * 
+     * REFACTORED: Changed from source='REQUEST' to source='DIAGNOSTIC'
+     * - After Triage, only DIAGNOSTIC services need diagnosis
+     * - REQUEST services skip diagnosis and go directly to repair
+     * 
+     * These are details from DIAGNOSTIC source that don't have a DIAGNOSIS task yet
      */
     public List<WorkOrderDetailWithInfo> getWorkOrderDetailsNeedingDiagnosisAssignment(int techManagerId)
             throws SQLException {
@@ -241,7 +246,7 @@ public class TaskAssignmentDAO extends DbContext {
                 "JOIN User u ON c.UserID = u.UserID " +
                 "LEFT JOIN TaskAssignment ta ON wd.DetailID = ta.DetailID AND ta.task_type = 'DIAGNOSIS' " +
                 "WHERE wo.TechManagerID = ? " +
-                "AND wd.source = 'REQUEST' " +
+                "AND wd.source = 'DIAGNOSTIC' " + // CHANGED: Only DIAGNOSTIC needs diagnosis
                 "AND (wo.Status = 'PENDING' OR wo.Status = 'IN_PROCESS') " +
                 "GROUP BY wd.DetailID " +
                 "HAVING AssignmentCount = 0 " +

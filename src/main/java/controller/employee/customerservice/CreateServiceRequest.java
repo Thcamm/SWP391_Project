@@ -19,7 +19,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-@WebServlet(name = "CustomerCreateRequestServlet", urlPatterns = {"/customerservice/createRequest"})
+@WebServlet(name = "CustomerCreateRequestServlet", urlPatterns = { "/customerservice/createRequest" })
 public class CreateServiceRequest extends HttpServlet {
 
     private final CarDataDAO carDataDAO = new CarDataDAO();
@@ -113,8 +113,10 @@ public class CreateServiceRequest extends HttpServlet {
             List<String> vehicleKeys = new ArrayList<>();
             List<String> serviceKeys = new ArrayList<>();
             request.getParameterMap().keySet().forEach(key -> {
-                if (key.startsWith("vehicleIds")) vehicleKeys.add(key);
-                if (key.startsWith("serviceIds")) serviceKeys.add(key);
+                if (key.startsWith("vehicleIds"))
+                    vehicleKeys.add(key);
+                if (key.startsWith("serviceIds"))
+                    serviceKeys.add(key);
             });
 
             if (vehicleKeys.isEmpty()) {
@@ -133,7 +135,8 @@ public class CreateServiceRequest extends HttpServlet {
                 String vehicleStr = request.getParameter(vehicleKeys.get(i));
                 String[] serviceArr = i < serviceKeys.size() ? request.getParameterValues(serviceKeys.get(i)) : null;
 
-                if (vehicleStr == null || vehicleStr.isEmpty()) continue;
+                if (vehicleStr == null || vehicleStr.isEmpty())
+                    continue;
                 if (serviceArr == null || serviceArr.length == 0) {
                     session.setAttribute("message", "Vui lòng chọn dịch vụ cho Service Order #" + (i + 1));
                     session.setAttribute("messageType", "error");
@@ -144,8 +147,11 @@ public class CreateServiceRequest extends HttpServlet {
 
                 int vehicleId = Integer.parseInt(vehicleStr);
                 List<Integer> serviceIds = new ArrayList<>();
-                for (String s : serviceArr) if (s != null && !s.isEmpty()) serviceIds.add(Integer.parseInt(s));
-                if (serviceIds.isEmpty()) continue;
+                for (String s : serviceArr)
+                    if (s != null && !s.isEmpty())
+                        serviceIds.add(Integer.parseInt(s));
+                if (serviceIds.isEmpty())
+                    continue;
 
                 ServiceRequest newRequest = new ServiceRequest();
                 newRequest.setCustomerID(customerId);
@@ -158,7 +164,7 @@ public class CreateServiceRequest extends HttpServlet {
 
             session.setAttribute("message", "Service orders created successfully!");
             session.setAttribute("messageType", "success");
-            response.sendRedirect(request.getContextPath() + "/customerservice/requests");
+            response.sendRedirect(request.getContextPath() + "/customerservice/view-all-repairs");
 
         } catch (SQLException | NumberFormatException e) {
             e.printStackTrace();

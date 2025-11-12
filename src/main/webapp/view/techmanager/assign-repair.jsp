@@ -28,10 +28,12 @@
                     <div>
                         <h2 class="mb-1">
                             <i class="bi bi-tools text-primary"></i>
-                            Assign Repair Tasks
+                            GĐ5: Assign Repair Tasks
                         </h2>
                         <p class="text-muted mb-0">
-                            Phase 3: Assign approved repairs to technicians
+                            <strong>LUỒNG MỚI:</strong> Repairs from 
+                            <span class="badge bg-success">REQUEST</span> (direct from GĐ2) + 
+                            <span class="badge bg-info">DIAGNOSTIC</span> (from GĐ4 Quote)
                         </p>
                     </div>
                     <button type="button" class="btn btn-outline-secondary" onclick="window.location.reload();">

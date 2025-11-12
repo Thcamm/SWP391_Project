@@ -23,8 +23,11 @@
         <div class="content-wrapper">
             <div class="page-header">
                 <h1 class="h2">
-                    <i class="bi bi-person-check"></i> Assign Diagnosis Tasks
+                    <i class="bi bi-person-check"></i> GĐ3: Assign Diagnosis Tasks
                 </h1>
+                <p class="text-muted">
+                    <strong>LUỒNG MỚI:</strong> Only <span class="badge bg-info">DIAGNOSTIC</span> services (from GĐ2 Triage) appear here
+                </p>
                 <div class="btn-toolbar">
                     <a href="${pageContext.request.contextPath}/techmanager/service-requests" class="btn btn-sm btn-outline-secondary">
                         <i class="bi bi-arrow-left"></i> Back to Requests
