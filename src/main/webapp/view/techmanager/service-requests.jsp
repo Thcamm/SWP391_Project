@@ -144,11 +144,11 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
                           <button
                             type="button"
                             class="btn btn-success"
-                            onclick="toggleClassifySection(${request.requestId})">
+                            onclick="toggleClassifySection('${request.requestId}')">
                             <i class="bi bi-check-circle"></i>
                             Approve & Classify
                           </button>
-                          <button type="button" class="btn btn-danger" onclick="rejectRequest(${request.requestId})">
+                          <button type="button" class="btn btn-danger" onclick="rejectRequest('${request.requestId}')">
                             <i class="bi bi-x-circle"></i>
                             Reject
                           </button>
@@ -232,7 +232,7 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
                                               type="radio"
                                               name="source_${service.serviceId}"
                                               value="REQUEST"
-                                              onchange="markClassified(${request.requestId}, ${service.serviceId}, 'REQUEST')" />
+                                              onchange="markClassified('${request.requestId}', '${service.serviceId}', 'REQUEST')" />
                                             <i class="bi bi-tools"></i>
                                             REQUEST
                                           </label>
@@ -241,7 +241,7 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
                                               type="radio"
                                               name="source_${service.serviceId}"
                                               value="DIAGNOSTIC"
-                                              onchange="markClassified(${request.requestId}, ${service.serviceId}, 'DIAGNOSTIC')" />
+                                              onchange="markClassified('${request.requestId}', '${service.serviceId}', 'DIAGNOSTIC')" />
                                             <i class="bi bi-clipboard-pulse"></i>
                                             DIAGNOSTIC
                                           </label>
@@ -258,7 +258,7 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
                             <button
                               type="button"
                               class="btn btn-secondary"
-                              onclick="toggleClassifySection(${request.requestId})">
+                              onclick="toggleClassifySection('${request.requestId}')">
                               <i class="bi bi-x-circle"></i>
                               Cancel
                             </button>
