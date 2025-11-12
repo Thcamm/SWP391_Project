@@ -231,24 +231,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                           <div class="form-text"></div>
                         </div>
 
-                        <div class="mb-3">
-                          <label for="salary" class="form-label"
-                            >Base Salary</label
-                          >
-                          <div class="input-group">
-                            <input
-                              type="number"
-                              class="form-control"
-                              id="salary"
-                              name="salary"
-                              placeholder="Basic salary"
-                              min="0"
-                              step="100000"
-                            />
-                            <span class="input-group-text">VNĐ</span>
-                          </div>
-                          <div class="form-text">Blank if not determined</div>
-                        </div>
+                     
 
                         <div class="mb-3">
                           <label for="hireDate" class="form-label"
