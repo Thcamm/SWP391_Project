@@ -2,44 +2,71 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Danh sách Work Order</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Work Order List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-<div class="container mt-5">
-    <h3 class="mb-4 text-center text-dark">Danh sách Work Order</h3>
-    <table class="table table-bordered table-striped shadow-sm">
-        <thead class="table-dark">
+<jsp:include page="/common/header.jsp" />
+
+<div class="container py-5">
+    <h2 class="mb-4 text-center">List of Work Orders Eligible for Feedback</h2>
+
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark text-center">
         <tr>
-            <th>#</th>
-            <th>Mã Work Order</th>
-            <th>Trạng thái</th>
-            <th>Ước tính</th>
-            <th>Ngày tạo</th>
-            <th>Thao tác</th>
+            <th style="width: 60px;">#</th>
+            <th>Work Order ID</th>
+            <th>Action</th>
         </tr>
         </thead>
         <tbody>
-        <c:forEach var="wo" items="${workOrders}" varStatus="i">
+        <c:forEach var="item" items="${feedbackViewList.paginatedData}" varStatus="loop">
             <tr>
-                <td>${i.index + 1}</td>
-                <td>${wo.workOrderId}</td>
-                <td>${wo.status}</td>
-                <td>${wo.estimateAmount}</td>
-                <td>${wo.createdAt}</td>
-                <td>
-                    <a href="${pageContext.request.contextPath}/customer/send-feedback?workOrderID=${wo.workOrderId}"
-                       class="btn btn-sm btn-primary">
-                        Gửi Feedback
-                    </a>
+                <td class="text-center">${loop.index + 1}</td>
+                <td class="text-center">${item.workOrder.workOrderId}</td>
+                <td class="text-center">
+                    <c:choose>
+
+                        <c:when test="${item.feedbackAction == 'ALLOW_FEEDBACK'}">
+                            <a href="${pageContext.request.contextPath}/customer/send-feedback?workOrderID=${item.workOrder.workOrderId}"
+                               class="btn btn-success btn-sm">
+                                Send Feedback
+                            </a>
+                        </c:when>
+
+                        <c:when test="${item.feedbackAction == 'HAS_FEEDBACK'}">
+                            <a href="${pageContext.request.contextPath}/customer/view-feedback?feedbackId=${item.feedback.feedbackID}"
+                               class="btn btn-primary btn-sm">
+                                <i class="fa fa-eye"></i> View Feedback
+                            </a>
+                        </c:when>
+
+                        <c:when test="${item.feedbackAction == 'EXPIRED'}">
+                            <span class="badge bg-secondary">Expired</span>
+                        </c:when>
+
+
+                        <c:otherwise>
+                            <span class="text-muted">Unavailable</span>
+                        </c:otherwise>
+                    </c:choose>
                 </td>
             </tr>
         </c:forEach>
         </tbody>
     </table>
+
+    <jsp:include page="/view/customerservice/pagination.jsp">
+        <jsp:param name="currentPage" value="${feedbackViewList.currentPage}" />
+        <jsp:param name="totalPages" value="${feedbackViewList.totalPages}" />
+        <jsp:param name="baseUrl" value="/customer/workorder-list" />
+        <jsp:param name="queryString" value="" />
+    </jsp:include>
 </div>
+
+<jsp:include page="/common/footer.jsp" />
 </body>
 </html>

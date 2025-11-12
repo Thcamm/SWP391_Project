@@ -35,22 +35,22 @@
         <a href="${pageContext.request.contextPath}/user/changePassword" class="btn btn-secondary">Change Password</a>
         <c:set var="homeLink" value="${pageContext.request.contextPath}/Home" />
         <c:choose>
-            <c:when test="${sessionScope.roleCode == 'ADMIN'}">
+            <c:when test="${sessionScope.roleID == 1}">
                 <c:set var="homeLink" value="${pageContext.request.contextPath}/admin/users" />
             </c:when>
-            <c:when test="${sessionScope.roleCode == 'TECHMANAGER'}">
-                <c:set var="homeLink" value="${pageContext.request.contextPath}/techmanager/dashboard"/>
+            <c:when test="${sessionScope.roleID == 2}">
+                <c:set var="homeLink" value="${pageContext.request.contextPath}/techmanager/dashboard" />
             </c:when>
-            <c:when test="${sessionScope.roleCode == 'TECHNICAL'}">
+            <c:when test="${sessionScope.roleID == 3}">
                 <c:set var="homeLink" value="${pageContext.request.contextPath}/technician/home" />
             </c:when>
-            <c:when test="${sessionScope.roleCode == 'Store Keeper'}">
-                <c:set var="homeLink" value="${pageContext.request.contextPath}/inventory/dashboard" />
+            <c:when test="${sessionScope.roleID == 4}">
+                <c:set var="homeLink" value="${pageContext.request.contextPath}/inventory" />
             </c:when>
-            <c:when test="${sessionScope.roleCode == 'ACCOUNTANT'}">
+            <c:when test="${sessionScope.roleID == 5}">
                 <c:set var="homeLink" value="${pageContext.request.contextPath}/accountant/home" />
             </c:when>
-            <c:when test="${sessionScope.roleCode == 'CUSTOMER_SERVICE'}">
+            <c:when test="${sessionScope.roleID == 6}">
                 <c:set var="homeLink" value="${pageContext.request.contextPath}/customerservice/home" />
             </c:when>
         </c:choose>
@@ -80,7 +80,7 @@
             <c:when test="${not empty serviceHistory}">
                 <c:forEach var="item" items="${serviceHistory}">
                     <tr>
-                        <td>${vehicle.licensePlate}</td>
+                        <td><c:out value="${item.licensePlate}"/></td>
                         <td><c:out value="${item.serviceName}"/></td>
                         <td>
                             <a href="#"
@@ -94,7 +94,7 @@
                             </span>
                         </td>
                         <td>
-                            <fmt:formatNumber value="${item.price}" type="currency" currencySymbol=""/> VND
+                            <fmt:formatNumber value="${item.price}" pattern="#,##0"/> VND
                         </td>
                     </tr>
                 </c:forEach>

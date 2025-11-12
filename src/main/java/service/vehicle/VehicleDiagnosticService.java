@@ -357,5 +357,23 @@ public class VehicleDiagnosticService {
         }
     }
 
+    public void autoRejectExpiredDiagnostics(int graceMinutes){
+        int count = diagnosticDAO.autoRejectExpiredDiagnostics(graceMinutes);
+        if(count > 0){
+            System.out.println("diagnostics were auto rejected dueto time out");
+        }
+    }
+
+
+    public ServiceResult getDiagnosticsByAssignmentId(int assignmentId) {
+        try {
+            List<VehicleDiagnostic> list = diagnosticDAO.getDiagnosticsByAssignmentId(assignmentId);
+            return ServiceResult.success(MessageConstants.DIAG003, list);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return ServiceResult.error(MessageConstants.ERR007);
+        }
+    }
+
 
 }

@@ -3,9 +3,27 @@
 <jsp:include page="header.jsp" />
 
 <div class="container-fluid p-0">
-  <div class="row g-0">
-    <div class="col-auto" style="width: 280px">
-      <jsp:include page="sidebar.jsp" />
+    <div class="row g-0">
+        <div class="col-auto" style="width: 280px;">
+            <jsp:include page="sidebar.jsp"/>
+        </div>
+
+        <!-- Main Content Column -->
+        <div class="col">
+            <main class="main" style="padding: 1.25rem; padding-bottom: 0;">
+                <div class="content-card"
+                     style="background: white;
+                      border: 1px solid #e5e7eb;
+                       border-radius: 12px;
+                        padding: 2.5rem;
+                         min-height: calc(100vh - 64px - 1.25rem);
+                          display: flex; flex-direction: column;
+                           align-items: center; justify-content: center;
+                            text-align: center;">
+
+                </div>
+            </main>
+        </div>
     </div>
 
     <!-- Main Content Column -->

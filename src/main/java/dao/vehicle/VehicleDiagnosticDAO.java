@@ -147,6 +147,27 @@ public class VehicleDiagnosticDAO {
         }
     }
 
+
+    public int updatePartApproval(Connection c, int diagnosticPartId, boolean approved) throws SQLException {
+        String sql = "UPDATE DiagnosticPart SET IsApproved = ? WHERE DiagnosticPartID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setBoolean(1, approved);
+            ps.setInt(2, diagnosticPartId);
+            return ps.executeUpdate();
+        }
+    }
+
+    public int updateStatus(Connection c, int diagnosticId, String status, String reason) throws SQLException {
+        String sql = "UPDATE VehicleDiagnostic SET Status = ?, RejectReason = ? WHERE VehicleDiagnosticID = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setString(2, reason);
+            ps.setInt(3, diagnosticId);
+            return ps.executeUpdate();
+        }
+    }
+
+
     // ================================================================
     // READ OPERATIONS - SINGLE RECORD
     // ================================================================
@@ -285,24 +306,43 @@ public class VehicleDiagnosticDAO {
     /**
      * Lấy diagnostics theo AssignmentID
      */
-    public List<VehicleDiagnostic> getDiagnosticsByAssignment(Connection conn, int assignmentId)
-            throws SQLException {
-        String sql = "SELECT * FROM VehicleDiagnostic " +
-                "WHERE AssignmentID = ? " +
-                "ORDER BY CreatedAt DESC";
+    public List<VehicleDiagnostic> getDiagnosticsByAssignmentId(int assignmentId) throws SQLException {
+        String sql = """
+        SELECT vd.*, 
+               v.LicensePlate, v.Brand, v.Model,
+               u.FullName AS TechnicianName
+        FROM VehicleDiagnostic vd
+        JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID
+        JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID
+        JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID
+        JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID
+        JOIN Vehicle v ON sr.VehicleID = v.VehicleID
+        JOIN Employee e ON ta.TechnicianID = e.EmployeeID
+        JOIN `User` u ON e.UserID = u.UserID
+        WHERE ta.AssignmentID = ?
+        ORDER BY vd.CreatedAt DESC
+    """;
 
-        List<VehicleDiagnostic> list = new ArrayList<>();
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, assignmentId);
             try (ResultSet rs = ps.executeQuery()) {
+                List<VehicleDiagnostic> list = new ArrayList<>();
                 while (rs.next()) {
-                    list.add(mapDiagnostic(rs));
+                    VehicleDiagnostic vd = mapDiagnostic(rs);
+                    vd.setVehicleInfo(
+                            rs.getString("LicensePlate") + " - " +
+                                    rs.getString("Brand") + " " +
+                                    rs.getString("Model")
+                    );
+                    vd.setTechnicianName(rs.getString("TechnicianName"));
+                    list.add(vd);
                 }
+                return list;
             }
         }
-        return list;
     }
+
 
     /**
      * Lấy danh sách technicians tham gia diagnostic
@@ -772,6 +812,27 @@ public class VehicleDiagnosticDAO {
         }
     }
 
+    public int autoRejectExpiredDiagnostics(int graceMinutes) {
+        String sql = """
+        UPDATE VehicleDiagnostic
+        SET Status = 'REJECTED',
+             RejectReason = 'Auto-rejected: Customer did not respond within 10 minutes'
+        WHERE Status = 'SUBMITTED'
+          AND TIMESTAMPDIFF(MINUTE, CreatedAt, NOW()) > ?
+    """;
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, graceMinutes);
+            int rows = ps.executeUpdate();
+            System.out.println("Auto-rejected diagnostics: " + rows);
+            return rows;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     /**
      * Kiểm tra technician có quyền access diagnostic không
      */
@@ -833,7 +894,7 @@ public class VehicleDiagnosticDAO {
 //        }
 //    }
 //
-  /**
+    /**
      * Update diagnostic (full update including Status enum)
      */
 //    public boolean update(Connection conn, VehicleDiagnostic diagnostic) throws SQLException {
@@ -929,6 +990,10 @@ public class VehicleDiagnosticDAO {
         if (createdAt != null) {
             vd.setCreatedAt(createdAt.toLocalDateTime());
         }
+
+        try {
+            vd.setRejectReason(rs.getString("RejectReason"));
+        } catch (SQLException ignore) {}
 
         return vd;
     }

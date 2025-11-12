@@ -321,6 +321,7 @@
     </style>
 </head>
 <body>
+<jsp:include page="/view/customerservice/result.jsp" />
 <jsp:include page="/common/header.jsp" />
 
 <main class="appointment-section">
@@ -432,7 +433,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <c:forEach var="apm" items="${appointments}">
+                            <c:forEach var="apm" items="${appointments.paginatedData}">
                                 <tr>
                                     <td>${apm.appointmentID}</td>
                                     <td>${apm.appointmentDate}</td>
@@ -496,7 +497,7 @@
                                 </tr>
                             </c:forEach>
 
-                            <c:if test="${empty appointments}">
+                            <c:if test="${empty appointments.paginatedData}">
                                 <tr>
                                     <td colspan="5" class="text-center py-4">
                                         <i>No appointments found.</i>
@@ -506,6 +507,14 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <jsp:include page="/view/customerservice/pagination.jsp">
+                        <jsp:param name="currentPage" value="${appointments.currentPage}" />
+                        <jsp:param name="totalPages" value="${appointments.totalPages}" />
+                        <jsp:param name="baseUrl" value="/customerservice/appointment-history" />
+                        <jsp:param name="queryString"
+                                   value="&fromDate=${param.fromDate}&toDate=${param.toDate}&status=${param.status}&sortOrder=${param.sortOrder}" />
+                    </jsp:include>
                 </div>
             </div>
         </div>

@@ -90,104 +90,90 @@ contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib uri="http://
       <span>Customer Service Panel</span>
     </div>
 
-    <nav class="flex-grow-1">
-      <div class="menu-title">Main Menu</div>
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a
-            class="nav-link ${fn:contains(currentURI, '/home') ? 'active' : ''}"
-            href="${pageContext.request.contextPath}/customerservice/home">
-            <i class="bi bi-house-door"></i>
-            <span>Dashboard</span>
-          </a>
-          <a
-            class="nav-link ${fn:contains(currentURI, '/search-customer') ? 'active' : ''}"
-            href="${pageContext.request.contextPath}/customerservice/service-types">
-            <i class="bi bi-receipt"></i>
-            <span>Services</span>
-          </a>
-        </li>
-        <%--
-        <li class="nav-item">
-          --%> <%--
-          <a class="nav-link ${fn:contains(currentURI, '/search-customer') ? 'active' : ''}" --%>
-            <%-- href="${pageContext.request.contextPath}/customerservice/search-customer">--%> <%--
-            <i class="bi bi-receipt"></i>
-            --%> <%--
-            <span>Customers</span>
-            --%> <%--
-          </a>
-          --%> <%--
-        </li>
-        --%> <%--
-        <li class="nav-item">
-          --%> <%--
-          <a class="nav-link ${fn:contains(currentURI, '/appointment-list') ? 'active' : ''}" --%>
-            <%-- href="${pageContext.request.contextPath}/customerservice/appointment-list">--%> <%--
-            <i class="bi bi-cash-coin"></i>
-            --%> <%--
-            <span>Appointments</span>
-            --%> <%--
-          </a>
-          --%> <%--
-        </li>
-        --%>
-      </ul>
+        <nav class="flex-grow-1">
+            <div class="menu-title">Main Menu</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link ${fn:contains(currentURI, '/home') ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/customerservice/home">
+                        <i class="bi bi-house-door"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a class="nav-link ${fn:contains(currentURI, '/service-types') ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/customerservice/service-types">
+                        <i class="bi bi-receipt"></i>
+                        <span>Services</span>
+                    </a>
+                </li>
+            </ul>
 
-      <div class="menu-title">Customer</div>
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a
-            class="nav-link ${fn:contains(currentURI, '/search-customer') ? 'active' : ''}"
-            href="${pageContext.request.contextPath}/customerservice/search-customer">
-            <i class="bi bi-graph-up"></i>
-            <span>Customer List</span>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link ${fn:contains(currentURI, '/create-customer') ? 'active' : ''}"
-            href="${pageContext.request.contextPath}/customerservice/create-customer">
-            <i class="bi bi-bar-chart"></i>
-            <span>Create Customer</span>
-          </a>
-        </li>
-      </ul>
-      <div class="menu-title">Appointments</div>
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="nav-link" href="${pageContext.request.contextPath}/customerservice/appointment-list">
-            <i class="bi bi-clock-history text-danger"></i>
-            <span>Appointment List</span>
-          </a>
-        </li>
-      </ul>
-      <div class="menu-title">Support Request</div>
+            <div class="menu-title">Customer</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link ${fn:contains(currentURI, '/search-customer') ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/customerservice/search-customer">
+                        <i class="bi bi-graph-up"></i>
+                        <span>Customer List</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link ${fn:contains(currentURI, '/create-customer') ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/customerservice/create-customer">
+                        <i class="bi bi-bar-chart"></i>
+                        <span>Create Customer</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="menu-title">Appointments</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link ${fn:contains(currentURI, '/appointment-list') ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/customerservice/appointment-list">
+                        <i class="bi bi-clock-history text-danger"></i>
+                        <span>Appointment List</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link ${fn:contains(currentURI, '/view-all-repairs') ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/customerservice/view-all-repairs">
+                        <i class="bi bi-clock-history text-danger"></i>
+                        <span>Tracking List</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="menu-title">Feedback</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link ${fn:contains(currentURI, '/reply-feedback.jsp') ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/view/customerservice/reply-feedback.jsp">
+                        <i class="bi bi-clock-history text-danger"></i>
+                        <span>Feedback Reply</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="menu-title">Support Request</div>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link ${fn:contains(currentURI, '/view-support-request') ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/customerservice/view-support-request">
+                        <i class="bi bi-clock-history "></i>
+                        <span>Support Requests</span>
+                    </a>
+                </li>
+            </ul>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link ${fn:contains(currentURI, '/faq') ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/customerservice/faq">
+                        <i class="bi bi-clock-history "></i>
+                        <span>Support FAQ</span>
+                    </a>
+                </li>
+            </ul>
 
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a
-            class="nav-link ${fn:contains(currentURI, '/view-support-request') ? 'active' : ''}"
-            href="${pageContext.request.contextPath}/customerservice/view-support-request">
-            <i class="bi bi-clock-history"></i>
-            <span>Support Requests</span>
-          </a>
-        </li>
-        <%--
-        <li class="nav-item">
-          --%> <%--
-          <a class="nav-link" --%>
-            <%-- href="${pageContext.request.contextPath}/accountant/invoice?action=create">--%> <%--
-            <i class="bi bi-plus-circle text-success"></i>
-            --%> <%--
-            <span>Create Invoice</span>
-            --%> <%--
-          </a>
-          --%> <%--
-        </li>
-        --%>
-      </ul>
-    </nav>
+        </nav>
 
     <div class="sidebar-footer">
       <a href="${pageContext.request.contextPath}/support" class="btn-support">

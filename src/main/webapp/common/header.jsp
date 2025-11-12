@@ -249,7 +249,28 @@
     <!-- Main Navbar -->
     <nav class="main-navbar">
         <div class="container d-flex justify-content-between align-items-center">
-            <a class="navbar-brand" href="${pageContext.request.contextPath}/Home">
+            <c:set var="homeLink" value="${pageContext.request.contextPath}/Home" />
+            <c:choose>
+                <c:when test="${sessionScope.roleID == 1}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/admin/users" />
+                </c:when>
+                <c:when test="${sessionScope.roleID == 2}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/techmanager/dashboard" />
+                </c:when>
+                <c:when test="${sessionScope.roleID == 3}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/technician/home" />
+                </c:when>
+                <c:when test="${sessionScope.roleID == 4}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/inventory" />
+                </c:when>
+                <c:when test="${sessionScope.roleID == 5}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/accountant/home" />
+                </c:when>
+                <c:when test="${sessionScope.roleID == 6}">
+                    <c:set var="homeLink" value="${pageContext.request.contextPath}/customerservice/home" />
+                </c:when>
+            </c:choose>
+            <a class="navbar-brand" href="${homeLink}">
                 CS<span>CARSPA.VN</span>
             </a>
             <div class="nav-icons d-flex align-items-center">
@@ -283,12 +304,20 @@
         <a href="${pageContext.request.contextPath}/support-faq" class="menu-item">
             <span>Frequently Asked Questions</span>
         </a>
-        <a href="${pageContext.request.contextPath}/customer/workorder-list" class="menu-item">
-            <span>WORK ORDER LIST</span>
+        <a href="${pageContext.request.contextPath}/customer/repair-list" class="menu-item">
+            <span>TRACKER</span>
+        </a>
+        <a href="${pageContext.request.contextPath}/view/user/view-feedback-list.jsp" class="menu-item">
+            <span>Feedback About Us</span>
         </a>
         <a href="${pageContext.request.contextPath}/customer/garage" class="menu-item">
             <span>Vehicle Management (My Garage)</span>
         </a>
+
+            <a href="${pageContext.request.contextPath}/customer/approve-quote">
+                Notification of Quote Approval
+            </a>
+
     </nav>
 </div>
 

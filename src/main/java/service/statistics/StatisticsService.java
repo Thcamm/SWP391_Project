@@ -7,6 +7,9 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Statistics Service - Simplified
+ */
 public class StatisticsService {
 
     private final StatisticsDAO statisticsDAO;
@@ -15,102 +18,82 @@ public class StatisticsService {
         this.statisticsDAO = new StatisticsDAO();
     }
 
-    /**
-     * Lấy KPI Summary
-     */
+    public StatisticsService(StatisticsDAO statisticsDAO) {
+        this.statisticsDAO = statisticsDAO;
+    }
+
     public ReportDTO getKPISummary() throws Exception {
         try {
             return statisticsDAO.getKPISummary();
         } catch (SQLException e) {
-            throw new Exception("Lỗi khi lấy KPI: " + e.getMessage(), e);
+            throw new Exception("Error getting KPI summary: " + e.getMessage(), e);
         }
     }
 
-    /**
-     * Lấy tổng số khách hàng
-     */
     public int getTotalCustomers() throws Exception {
         try {
             return statisticsDAO.getTotalCustomers();
         } catch (SQLException e) {
-            throw new Exception("Lỗi khi lấy số lượng khách hàng: " + e.getMessage(), e);
+            throw new Exception("Error getting customer count: " + e.getMessage(), e);
         }
     }
 
-    /**
-     * Lấy tỷ lệ thanh toán đúng hạn
-     */
-    public BigDecimal getOnTimePaymentRate() throws Exception {
-        try {
-            return statisticsDAO.getOnTimePaymentRate();
-        } catch (SQLException e) {
-            throw new Exception("Lỗi khi lấy tỷ lệ thanh toán: " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Lấy tốc độ tăng trưởng
-     */
-    public BigDecimal getRevenueGrowthRate() throws Exception {
-        try {
-            return statisticsDAO.getRevenueGrowthRate();
-        } catch (SQLException e) {
-            throw new Exception("Lỗi khi lấy tốc độ tăng trưởng: " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Lấy doanh thu theo tuần
-     */
-    public List<ReportDTO> getRevenueByWeek() throws Exception {
-        try {
-            return statisticsDAO.getRevenueByWeek();
-        } catch (SQLException e) {
-            throw new Exception("Lỗi khi lấy doanh thu theo tuần: " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * So sánh năm trước vs năm nay
-     */
-    public List<ReportDTO> getYearOverYearComparison() throws Exception {
-        try {
-            return statisticsDAO.getYearOverYearComparison();
-        } catch (SQLException e) {
-            throw new Exception("Lỗi khi so sánh năm: " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Lấy tỷ lệ thu hồi nợ
-     */
     public BigDecimal getCollectionRate() throws Exception {
         try {
             return statisticsDAO.getCollectionRate();
         } catch (SQLException e) {
-            throw new Exception("Lỗi khi lấy tỷ lệ thu hồi: " + e.getMessage(), e);
+            throw new Exception("Error getting collection rate: " + e.getMessage(), e);
         }
     }
 
-    /**
-     * Top tháng doanh thu cao
-     */
-    public List<ReportDTO> getTopRevenueMonths(int limit) throws Exception {
+    public BigDecimal getRevenueGrowthRate() throws Exception {
         try {
-            return statisticsDAO.getTopRevenueMonths(limit);
+            return statisticsDAO.getRevenueGrowthRate();
         } catch (SQLException e) {
-            throw new Exception("Lỗi khi lấy top tháng: " + e.getMessage(), e);
+            throw new Exception("Error getting growth rate: " + e.getMessage(), e);
         }
     }
 
-    /**
-     * Khách hàng mới theo tháng
-     */
-    public List<ReportDTO> getNewCustomersByMonth() throws Exception {
+    public List<ReportDTO> getTopRevenueMonths() throws Exception {
         try {
-            return statisticsDAO.getNewCustomersByMonth();
+            return statisticsDAO.getTopRevenueMonths();
         } catch (SQLException e) {
-            throw new Exception("Lỗi khi lấy khách hàng mới: " + e.getMessage(), e);
+            throw new Exception("Error getting top months: " + e.getMessage(), e);
         }
+    }
+
+    public StatisticsSummary getDashboardStatistics() throws Exception {
+        StatisticsSummary summary = new StatisticsSummary();
+
+        summary.setKpiSummary(getKPISummary());
+        summary.setTotalCustomers(getTotalCustomers());
+        summary.setCollectionRate(getCollectionRate());
+        summary.setGrowthRate(getRevenueGrowthRate());
+        summary.setTopMonths(getTopRevenueMonths());
+
+        return summary;
+    }
+
+    public static class StatisticsSummary {
+        private ReportDTO kpiSummary;
+        private int totalCustomers;
+        private BigDecimal collectionRate;
+        private BigDecimal growthRate;
+        private List<ReportDTO> topMonths;
+
+        public ReportDTO getKpiSummary() { return kpiSummary; }
+        public void setKpiSummary(ReportDTO kpiSummary) { this.kpiSummary = kpiSummary; }
+
+        public int getTotalCustomers() { return totalCustomers; }
+        public void setTotalCustomers(int totalCustomers) { this.totalCustomers = totalCustomers; }
+
+        public BigDecimal getCollectionRate() { return collectionRate; }
+        public void setCollectionRate(BigDecimal collectionRate) { this.collectionRate = collectionRate; }
+
+        public BigDecimal getGrowthRate() { return growthRate; }
+        public void setGrowthRate(BigDecimal growthRate) { this.growthRate = growthRate; }
+
+        public List<ReportDTO> getTopMonths() { return topMonths; }
+        public void setTopMonths(List<ReportDTO> topMonths) { this.topMonths = topMonths; }
     }
 }

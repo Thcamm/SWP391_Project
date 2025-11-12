@@ -5,6 +5,7 @@
         background: transparent;
         padding: 1.25rem;
         padding-top: 0;
+        margin-top: 30px;
     }
     .footer {
         background: white;

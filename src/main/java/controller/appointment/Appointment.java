@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import model.user.User;
 import model.vehicle.Vehicle;
 import service.vehicle.VehicleService;
+import util.MailService;
 
 import java.io.IOException;
 
@@ -55,17 +56,6 @@ public class Appointment extends HttpServlet {
         AppointmentDAO appointmentDAO = new AppointmentDAO(); // Hoặc dùng Service
         VehicleService vehicleService = new VehicleService(vehicleDAO);
 
-        // (Optional) Validation: Check required fields are not empty
-        if (licensePlate == null || licensePlate.trim().isEmpty() || dateStr == null || dateStr.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "License plate and date are required.");
-            request.getRequestDispatcher("/view/customer/appointment-scheduling.jsp").forward(request, response);
-            return;
-        }
-        if (!vehicleService.validateLicensePlateFormat(licensePlate)) {
-            request.setAttribute("errorMessage", "Invalid license plate format.");
-            request.getRequestDispatcher("/view/customer/appointment-scheduling.jsp").forward(request, response);
-            return;
-        }
 
         try {
             // 4. Get CustomerID from UserID
@@ -76,27 +66,10 @@ public class Appointment extends HttpServlet {
                 throw new ServletException("Customer profile not found for the logged-in user.");
             }
 
-            // 5. Handle Vehicle: Find or Create new
-            int vehicleID = vehicleDAO.getVehicleIdByLicensePlate(licensePlate);
-            if (vehicleID == -1) {
-                // If vehicle doesn't exist, create new vehicle
-                Vehicle newVehicle = new Vehicle();
-                newVehicle.setCustomerID(customerID);
-                newVehicle.setLicensePlate(licensePlate);
-                newVehicle.setBrand(carBrand);
-                // No need to manually set vehicleID
-
-                vehicleID = vehicleDAO.insertVehicle(newVehicle); // Get ID from return
-
-                if (vehicleID == -1) {
-                    throw new ServletException("Failed to insert vehicle");
-                }
-            }
 
             // 6. Handle Appointment
             model.appointment.Appointment appointment = new model.appointment.Appointment();
             appointment.setCustomerID(customerID);
-            appointment.setVehicleID(vehicleID);
             java.time.LocalDateTime dateTime = java.time.LocalDateTime.parse(dateStr);
             appointment.setAppointmentDate(dateTime);
             appointment.setDescription(description);
@@ -105,6 +78,7 @@ public class Appointment extends HttpServlet {
             // 7. Save to database
             appointmentDAO.insertAppointment(appointment);
 
+            MailService.sendEmail(user.getEmail(),  "AppointmentService scheduled successfully","AppointmentService scheduled successfully");
             // 8. Redirect after success (PRG Pattern)
             request.setAttribute("successMessage", "AppointmentService scheduled successfully!");
             request.getRequestDispatcher("/view/customer/appointment-scheduling.jsp").forward(request, response);

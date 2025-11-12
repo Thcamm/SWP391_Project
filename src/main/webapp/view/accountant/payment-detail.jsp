@@ -384,7 +384,7 @@
         .content-card {
             border: none !important;
             box-shadow: none !important;
-            padding: 0 !important;
+            padding: 20px !important;
         }
 
         .container-fluid, .row, .col {

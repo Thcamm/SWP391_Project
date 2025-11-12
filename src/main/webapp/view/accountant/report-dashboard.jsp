@@ -121,8 +121,8 @@
                                             <p class="text-muted mb-1" style="font-size: 0.875rem;">Overdue</p>
                                             <h3 class="mb-0" style="color: #dc2626; font-weight: 700;">
                                                 <c:choose>
-                                                    <c:when test="${not empty overdueReport}">
-                                                        ${overdueReport[0].count}
+                                                    <c:when test="${not empty overdueInvoices}">
+                                                        ${overdueInvoices.count}
                                                     </c:when>
                                                     <c:otherwise>0</c:otherwise>
                                                 </c:choose>
@@ -133,7 +133,15 @@
                                         </div>
                                     </div>
                                     <small class="text-danger">
-                                        <i class="bi bi-exclamation-circle"></i> Needs attention
+                                        <i class="bi bi-exclamation-circle"></i>
+                                        <c:choose>
+                                            <c:when test="${not empty overdueInvoices && overdueInvoices.amount > 0}">
+                                                <fmt:formatNumber value="${overdueInvoices.amount}" pattern="#,###"/> ₫
+                                            </c:when>
+                                            <c:otherwise>
+                                                No overdue invoices
+                                            </c:otherwise>
+                                        </c:choose>
                                     </small>
                                 </div>
                             </div>
@@ -144,8 +152,8 @@
                     <div class="row g-3 mb-4">
                         <!-- Revenue By Month Chart -->
                         <div class="col-md-8">
-                            <div class="card" style="border: 1px solid #e5e7eb; border-radius: 12px;">
-                                <div class="card-header" style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; padding: 1.25rem;">
+                            <div class="card" style="border: 1px solid #e5e7eb; border-radius: 12px; height: 500px; display: flex; flex-direction: column;">
+                                <div class="card-header" style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; padding: 1.25rem; flex-shrink: 0;">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <h5 class="mb-0" style="color: #111827; font-weight: 600;">
                                             <i class="bi bi-bar-chart me-2" style="color: #667eea;"></i>
@@ -158,46 +166,67 @@
                                         </a>
                                     </div>
                                 </div>
-                                <div class="card-body" style="padding: 1.5rem;">
-                                    <canvas id="revenueChart" height="80"></canvas>
+                                <div class="card-body" style="padding: 1.5rem; flex: 1; display: flex; flex-direction: column; min-height: 0;">
+                                    <div style="flex: 1; position: relative; min-height: 0;">
+                                        <canvas id="revenueChart"></canvas>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Payment Method Chart -->
                         <div class="col-md-4">
-                            <div class="card" style="border: 1px solid #e5e7eb; border-radius: 12px;">
-                                <div class="card-header" style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; padding: 1.25rem;">
+                            <div class="card" style="border: 1px solid #e5e7eb; border-radius: 12px; height: 500px; display: flex; flex-direction: column;">
+                                <div class="card-header" style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; padding: 1.25rem; flex-shrink: 0;">
                                     <h5 class="mb-0" style="color: #111827; font-weight: 600;">
                                         <i class="bi bi-pie-chart me-2" style="color: #059669;"></i>
                                         Payment Methods
                                     </h5>
                                 </div>
-                                <div class="card-body" style="padding: 1.5rem;">
-                                    <canvas id="paymentMethodChart"></canvas>
-
-                                    <!-- Payment Method Summary -->
-                                    <div class="mt-3">
-                                        <c:forEach var="method" items="${paymentByMethod}">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <div class="d-flex align-items-center gap-2">
-                                                    <c:choose>
-                                                        <c:when test="${method.paymentMethod == 'ONLINE'}">
-                                                            <div style="width: 12px; height: 12px; background-color: #3b82f6; border-radius: 50%;"></div>
-                                                            <span>Online/Transfer</span>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <div style="width: 12px; height: 12px; background-color: #6b7280; border-radius: 50%;"></div>
-                                                            <span>Cash</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
+                                <div class="card-body" style="padding: 1.5rem; flex: 1; display: flex; flex-direction: column; min-height: 0;">
+                                    <c:choose>
+                                        <c:when test="${empty paymentByMethod}">
+                                            <!-- Empty state -->
+                                            <div class="d-flex align-items-center justify-content-center" style="flex: 1;">
+                                                <div class="text-center">
+                                                    <i class="bi bi-inbox" style="font-size: 3rem; color: #d1d5db;"></i>
+                                                    <p class="text-muted mt-3 mb-0">No payment data available</p>
+                                                    <small class="text-muted d-block mt-2">
+                                                        Try adjusting the date range filter above
+                                                    </small>
                                                 </div>
-                                                <strong>
-                                                    <fmt:formatNumber value="${method.paymentAmount}" pattern="#,###"/> ₫
-                                                </strong>
                                             </div>
-                                        </c:forEach>
-                                    </div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <!-- Chart container -->
+                                            <div style="flex: 1; position: relative; min-height: 0; max-height: 280px; margin-bottom: 1rem;">
+                                                <canvas id="paymentMethodChart"></canvas>
+                                            </div>
+
+                                            <!-- Payment Method Summary -->
+                                            <div style="flex-shrink: 0; max-height: 150px; overflow-y: auto; border-top: 1px solid #e5e7eb; padding-top: 1rem;">
+                                                <c:forEach var="method" items="${paymentByMethod}">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <c:choose>
+                                                                <c:when test="${method.paymentMethod == 'ONLINE'}">
+                                                                    <div style="width: 12px; height: 12px; background-color: #3b82f6; border-radius: 50%;"></div>
+                                                                    <span style="font-size: 0.875rem;">Online/Transfer</span>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <div style="width: 12px; height: 12px; background-color: #6b7280; border-radius: 50%;"></div>
+                                                                    <span style="font-size: 0.875rem;">Cash</span>
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </div>
+                                                        <strong style="font-size: 0.875rem;">
+                                                            <fmt:formatNumber value="${method.paymentAmount}" pattern="#,###"/> ₫
+                                                        </strong>
+                                                    </div>
+                                                </c:forEach>
+                                            </div>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </div>
                         </div>
@@ -296,6 +325,7 @@
                                             <c:choose>
                                                 <c:when test="${not empty topCustomers}">
                                                     <c:forEach var="customer" items="${topCustomers}" varStatus="status">
+                                                        <c:set var="outstanding" value="${customer.totalInvoiced - customer.totalPaid}" />
                                                         <tr>
                                                             <td style="padding: 1rem;">
                                                                 <div class="d-flex align-items-center gap-2">
@@ -312,8 +342,8 @@
                                                                 </span>
                                                             </td>
                                                             <td style="padding: 1rem; text-align: right;">
-                                                                <span class="${customer.outstandingBalance > 0 ? 'text-danger' : 'text-muted'}">
-                                                                    <fmt:formatNumber value="${customer.outstandingBalance}" pattern="#,###"/> ₫
+                                                                <span class="${outstanding > 0 ? 'text-danger' : 'text-muted'}">
+                                                                    <fmt:formatNumber value="${outstanding}" pattern="#,###"/> ₫
                                                                 </span>
                                                             </td>
                                                         </tr>
@@ -347,15 +377,6 @@
 
 <!-- Initialize Chart Data -->
 <script>
-    /**
-     * Financial Report Charts Data
-     * Author: Thcamm
-     * Date: 2025-11-04
-     */
-
-// ==========================================
-// 1. REVENUE DATA
-// ==========================================
     const revenueData = {
         labels: [
             <c:forEach var="revenue" items="${revenueByMonth}" varStatus="status">
@@ -374,9 +395,6 @@
         ]
     };
 
-    // ==========================================
-    // 2. PAYMENT METHOD DATA
-    // ==========================================
     const paymentMethodData = {
         labels: [
             <c:forEach var="method" items="${paymentByMethod}" varStatus="status">
@@ -394,19 +412,11 @@
             </c:forEach>
         ]
     };
-
-    console.log('📊 Report Data Initialized:');
-    console.log('Revenue:', revenueData);
-    console.log('Payment Methods:', paymentMethodData);
 </script>
 
 <!-- Render Charts -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-
-        // ==========================================
-        // 1. REVENUE CHART (Bar Chart)
-        // ==========================================
         const revenueCtx = document.getElementById('revenueChart');
         if (revenueCtx) {
             new Chart(revenueCtx.getContext('2d'), {
@@ -434,17 +444,14 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             display: true,
                             position: 'top',
                             labels: {
                                 padding: 15,
-                                font: {
-                                    size: 12,
-                                    weight: '600'
-                                }
+                                font: { size: 12, weight: '600' }
                             }
                         },
                         tooltip: {
@@ -471,11 +478,10 @@
             });
         }
 
-        // ==========================================
-        // 2. PAYMENT METHOD CHART (Doughnut Chart)
-        // ==========================================
         const paymentCtx = document.getElementById('paymentMethodChart');
-        if (paymentCtx) {
+
+        if (paymentCtx && paymentMethodData.labels.length > 0) {
+
             new Chart(paymentCtx.getContext('2d'), {
                 type: 'doughnut',
                 data: {
@@ -483,8 +489,8 @@
                     datasets: [{
                         data: paymentMethodData.values,
                         backgroundColor: [
-                            'rgba(59, 130, 246, 0.8)',  // Blue for Online
-                            'rgba(107, 114, 128, 0.8)'  // Gray for Cash
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(107, 114, 128, 0.8)'
                         ],
                         borderColor: [
                             'rgba(59, 130, 246, 1)',
@@ -496,22 +502,19 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             display: true,
                             position: 'bottom',
                             labels: {
-                                padding: 15,
-                                font: {
-                                    size: 12
-                                },
+                                padding: 12,
+                                font: { size: 11 },
                                 generateLabels: function(chart) {
                                     const data = chart.data;
                                     if (data.labels.length && data.datasets.length) {
                                         return data.labels.map((label, i) => {
                                             const value = data.datasets[0].data[i];
-                                            const count = paymentMethodData.counts[i];
                                             const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
                                             const percentage = ((value / total) * 100).toFixed(1);
 
@@ -542,12 +545,12 @@
                             }
                         }
                     },
-                    cutout: '60%'
+                    cutout: '65%'
                 }
             });
-        }
 
-        console.log('All financial charts rendered successfully');
+        } else {
+        }
     });
 </script>
 

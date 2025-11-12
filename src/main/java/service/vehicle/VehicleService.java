@@ -25,7 +25,7 @@ public class VehicleService {
 
     /**
      * Validate format sơ bộ cho biển VN (tùy ông bạn muốn mở rộng).
-     * Đây là validate đơn giản: có chữ và số, chiều dài hợp lý.
+     * có chữ và số, chiều dài hợp lý.
      */
     public boolean validateLicensePlateFormat(String licensePlate) {
         if (licensePlate == null) return false;
@@ -39,7 +39,7 @@ public class VehicleService {
 
     /**
      * Kiểm tra biển đã tồn tại chưa, loại trừ vehicleId hiện tại (nếu update).
-     * vehicleIdToExclude = -1 hoặc 0 => không loại trừ.
+     * vehicleIdToExclude = -1 hoặc 1 => không loại trừ.
      */
     public boolean isLicensePlateTaken(String licensePlate, int vehicleIdToExclude) throws SQLException {
         String norm = normalizeLicensePlate(licensePlate);

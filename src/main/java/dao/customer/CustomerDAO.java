@@ -18,19 +18,9 @@ public class CustomerDAO extends DbContext {
                 "(RoleID, FullName, Email, PhoneNumber, Gender, Birthdate, Address, ActiveStatus, UserName, PasswordHash) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        String sqlCustomer = "INSERT INTO Customer (UserID, PointLoyalty) VALUES (?, ?)";
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stUser = conn.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS)) {
 
-        Connection conn = null;
-        PreparedStatement stUser = null;
-        PreparedStatement stCustomer = null;
-        ResultSet rs = null;
-
-        try {
-            conn = DbContext.getConnection();
-            conn.setAutoCommit(false);
-
-            // === 1. Insert vào bảng User ===
-            stUser = conn.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS);
             stUser.setInt(1, customer.getRoleId());
             stUser.setString(2, customer.getFullName());
             stUser.setString(3, customer.getEmail());
@@ -64,51 +54,11 @@ public class CustomerDAO extends DbContext {
             stUser.setString(10, customer.getPasswordHash());
 
             int affected = stUser.executeUpdate();
-
-            if (affected == 0) {
-                conn.rollback();
-                throw new SQLException("Không thể thêm người dùng (User).");
-            }
-
-            rs = stUser.getGeneratedKeys();
-            int userId = 0;
-            if (rs.next()) {
-                userId = rs.getInt(1);
-            } else {
-                conn.rollback();
-                throw new SQLException("Không lấy được UserID vừa tạo.");
-            }
-
-
-            stCustomer = conn.prepareStatement(sqlCustomer);
-            stCustomer.setInt(1, userId);
-            stCustomer.setInt(2, customer.getPointLoyalty());
-            stCustomer.executeUpdate();
-
-            conn.commit(); // thành công
-            return true;
+            return affected > 0;
 
         } catch (SQLException e) {
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
             e.printStackTrace();
             return false;
-
-        } finally {
-            try {
-                if (rs != null) rs.close();
-                if (stUser != null) stUser.close();
-                if (stCustomer != null) stCustomer.close();
-                if (conn != null) conn.setAutoCommit(true);
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -444,7 +394,7 @@ public Customer getCustomerById(int customerId) throws SQLException {
         Customer customer = null;
 
 
-        String sql = "SELECT c.CustomerID, u.UserID, u.FullName, u.Email, u.PhoneNumber " +
+        String sql = "SELECT c.CustomerID, u.UserID, u.FullName, u.Email, u.PhoneNumber,u.Gender,u.Birthdate,u.Address " +
                 "FROM Customer c " +
                 "JOIN User u ON c.UserID = u.UserID " +
                 "WHERE c.CustomerID = ?";
@@ -462,6 +412,9 @@ public Customer getCustomerById(int customerId) throws SQLException {
                     customer.setFullName(rs.getString("FullName"));
                     customer.setEmail(rs.getString("Email"));
                     customer.setPhoneNumber(rs.getString("PhoneNumber"));
+                    customer.setGender(rs.getString("Gender"));
+                    customer.setBirthDate(rs.getDate("Birthdate")); // sửa tên cột
+                    customer.setAddress(rs.getString("Address"));
                 }
             }
         }catch (SQLException e) {
@@ -489,4 +442,34 @@ public Customer getCustomerById(int customerId) throws SQLException {
         }
         return null;
     }
+    public void updateCustomer(Customer customer) throws SQLException {
+        String sql = "UPDATE Customer c " +
+                "JOIN `User` u ON c.UserID = u.UserID " +
+                "SET u.FullName = ?, " +
+                "    u.Email = ?, " +
+                "    u.PhoneNumber = ?, " +
+                "    u.Gender = ?, " +
+                "    u.Address = ?, " +
+                "    u.PasswordHash = ? " +
+                "WHERE c.CustomerID = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, customer.getFullName());
+            ps.setString(2, customer.getEmail());
+            ps.setString(3, customer.getPhoneNumber());
+            ps.setString(4, customer.getGender());
+            ps.setString(5, customer.getAddress());
+
+            // Nếu cần hash password trước khi lưu
+            String passwordHash = customer.getPasswordHash();
+            ps.setString(6, passwordHash != null ? passwordHash : "");
+
+            ps.setInt(7, customer.getCustomerId());
+
+            ps.executeUpdate();
+        }
+    }
+
 }

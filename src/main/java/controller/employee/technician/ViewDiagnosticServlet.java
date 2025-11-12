@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.inventory.DiagnosticPart;
 import model.vehicle.VehicleDiagnostic;
+import service.vehicle.VehicleDiagnosticService;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -23,9 +24,11 @@ import java.util.Map;
 @WebServlet("/technician/diagnostic/view")
 public class ViewDiagnosticServlet extends HttpServlet {
     private final VehicleDiagnosticDAO dao = new VehicleDiagnosticDAO();
+    private final VehicleDiagnosticService vehicleDiagnosticService = new VehicleDiagnosticService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        vehicleDiagnosticService.autoRejectExpiredDiagnostics(10);
         int diagnosticId;
         try {
             diagnosticId = Integer.parseInt(req.getParameter("diagnosticId"));

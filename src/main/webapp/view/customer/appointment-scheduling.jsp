@@ -65,23 +65,6 @@
                         </div>
                     </div>
 
-                    <!-- Row 2: Hãng xe + Biển số xe -->
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="carBrand" class="form-label">
-                                Hãng xe <span class="required">*</span>
-                            </label>
-                            <input type="text" class="form-control" id="carBrand" name="carBrand"
-                                   placeholder="Ví dụ: Toyota, Honda, BMW..." required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="licensePlate" class="form-label">
-                                Biển số xe <span class="required">*</span>
-                            </label>
-                            <input type="text" class="form-control" id="licensePlate" name="licensePlate"
-                                   placeholder="Ví dụ: 51A-12345" required>
-                        </div>
-                    </div>
 
                     <!-- Ngày hẹn - Full width -->
                     <div class="mb-3">

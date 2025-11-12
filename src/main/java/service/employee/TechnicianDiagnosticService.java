@@ -132,7 +132,7 @@ public class TechnicianDiagnosticService {
      * @return ServiceResult
      */
     public ServiceResult addPartsToDiagnostic(int technicianId, int diagnosticId,
-            List<DiagnosticPart> parts) {
+                                              List<DiagnosticPart> parts) {
         Connection conn = null;
         try {
             conn = DbContext.getConnection();
@@ -302,7 +302,7 @@ public class TechnicianDiagnosticService {
      * @return ServiceResult
      */
     public ServiceResult updateDiagnostic(int technicianId, int diagnosticId,
-            String issueFound, BigDecimal laborCost) {
+                                          String issueFound, BigDecimal laborCost) {
         Connection conn = null;
         try {
             conn = DbContext.getConnection();
@@ -421,77 +421,53 @@ public class TechnicianDiagnosticService {
         }
     }
 
-    // ================================================================
-    // DELETE OPERATIONS
-    // ================================================================
 
-    /**
-     * Xóa diagnostic (soft delete)
-     * Chỉ cho phép xóa khi chưa được approve
-     *
-     * @param technicianId EmployeeID
-     * @param diagnosticId VehicleDiagnosticID
-     * @return ServiceResult
-     */
-    public ServiceResult deleteDiagnostic(int technicianId, int diagnosticId) {
-        Connection conn = null;
-        try {
-            conn = DbContext.getConnection();
-            conn.setAutoCommit(false);
+//    public ServiceResult deleteDiagnostic(int technicianId, int diagnosticId) {
+//        Connection conn = null;
+//        try {
+//            conn = DbContext.getConnection();
+//            conn.setAutoCommit(false);
+//
+//            // Check permission
+//            if (!diagnosticDAO.canTechnicianAccessDiagnostic(conn, diagnosticId, technicianId)) {
+//                conn.rollback();
+//                return ServiceResult.error(MessageConstants.TASK009);
+//            }
+//
+//            // Get diagnostic
+//            VehicleDiagnostic diagnostic = diagnosticDAO.getDiagnosticById(conn, diagnosticId);
+//            if (diagnostic == null) {
+//                conn.rollback();
+//                return ServiceResult.error(MessageConstants.ERR002);
+//            }
+//
+//
+//
+//            // Soft delete
+//            boolean deleted = diagnosticDAO.deleteDiagnostic(conn, diagnosticId);
+//            if (!deleted) {
+//                conn.rollback();
+//                return ServiceResult.error(MessageConstants.ERR001);
+//            }
+//
+//            // Log activity
+//            logActivity(conn, technicianId, "DIAGNOSTIC_DELETED",
+//                    diagnostic.getAssignmentID(),
+//                    "Deleted diagnostic");
+//
+//            conn.commit();
+//            return ServiceResult.success(MessageConstants.DIAG002);
+//
+//        } catch (Exception e) {
+//            DbContext.rollback(conn);
+//            e.printStackTrace();
+//            return ServiceResult.error(MessageConstants.ERR001);
+//        } finally {
+//            DbContext.close(conn);
+//        }
+//    }
 
-            // Check permission
-            if (!diagnosticDAO.canTechnicianAccessDiagnostic(conn, diagnosticId, technicianId)) {
-                conn.rollback();
-                return ServiceResult.error(MessageConstants.TASK009);
-            }
 
-            // Get diagnostic
-            VehicleDiagnostic diagnostic = diagnosticDAO.getDiagnosticById(conn, diagnosticId);
-            if (diagnostic == null) {
-                conn.rollback();
-                return ServiceResult.error(MessageConstants.ERR002);
-            }
-
-            // TODO: Check if any parts are approved
-            // If yes, cannot delete
-
-            // Soft delete
-            boolean deleted = diagnosticDAO.deleteDiagnostic(conn, diagnosticId);
-            if (!deleted) {
-                conn.rollback();
-                return ServiceResult.error(MessageConstants.ERR001);
-            }
-
-            // Log activity
-            logActivity(conn, technicianId, "DIAGNOSTIC_DELETED",
-                    diagnostic.getAssignmentID(),
-                    "Deleted diagnostic");
-
-            conn.commit();
-            return ServiceResult.success(MessageConstants.DIAG002);
-
-        } catch (Exception e) {
-            DbContext.rollback(conn);
-            e.printStackTrace();
-            return ServiceResult.error(MessageConstants.ERR001);
-        } finally {
-            DbContext.close(conn);
-        }
-    }
-
-    // ================================================================
-    // VALIDATION HELPERS
-    // ================================================================
-
-    /**
-     * Kiểm tra technician có quyền tạo diagnostic cho assignment không
-     * (Phải là người được assign task đó và task phải IN_PROGRESS)
-     *
-     * @param conn         Database connection
-     * @param technicianId EmployeeID
-     * @param assignmentId TaskAssignmentID
-     * @return true nếu có quyền
-     */
     private boolean canTechnicianCreateDiagnostic(Connection conn, int technicianId, int assignmentId) {
         try {// BỎ điều kiện task_type vì không chắc cột này tồn tại
             String sql = "SELECT COUNT(*) AS cnt " +
@@ -515,17 +491,9 @@ public class TechnicianDiagnosticService {
         return false;
     }
 
-    /**
-     * Log activity vào TechnicianActivityLog
-     *
-     * @param conn         Database connection
-     * @param technicianId EmployeeID
-     * @param activityType Activity type (DIAGNOSTIC_CREATED, etc.)
-     * @param assignmentId TaskAssignmentID
-     * @param description  Description
-     */
+
     private void logActivity(Connection conn, int technicianId, String activityType,
-            int assignmentId, String description) {
+                             int assignmentId, String description) {
         try {
             activityDAO.logActivity(conn, technicianId, activityType, assignmentId, description);
         } catch (Exception e) {
