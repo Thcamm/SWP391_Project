@@ -157,13 +157,23 @@ public class ViewSupportRequest extends HttpServlet {
             response.sendError(500, "Error loading support request list.");
         }
     }
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
+
+        // 1. Lấy URL để chuyển hướng
+        String redirectUrl = request.getParameter("redirectUrl");
+
+        // 2. Tạo URL dự phòng (nếu lỡ quên thêm redirectUrl vào form)
+        String fallbackUrl = request.getContextPath() + "/customerservice/view-support-request";
+
+        // 3. Nếu redirectUrl rỗng hoặc null, dùng URL dự phòng
+        if (redirectUrl == null || redirectUrl.isEmpty()) {
+            redirectUrl = fallbackUrl;
+        }
 
         String requestIdParam = request.getParameter("requestId");
         String newStatus = request.getParameter("status");
@@ -172,7 +182,9 @@ public class ViewSupportRequest extends HttpServlet {
         if (requestIdParam == null || newStatus == null) {
             session.setAttribute("message", "Missing parameters: requestId or status.");
             session.setAttribute("messageType", "error");
-            response.sendRedirect(request.getContextPath() + "/customerservice/view-support-request");
+
+            // 4. Dùng redirectUrl
+            response.sendRedirect(redirectUrl);
             return;
         }
 
@@ -186,6 +198,9 @@ public class ViewSupportRequest extends HttpServlet {
                 dao.updateSupportRequestStatus(requestId, newStatus);
                 session.setAttribute("message", "Update support request status successfully.");
                 session.setAttribute("messageType", "success");
+            } else {
+                session.setAttribute("message", "Update failed (check failed).");
+                session.setAttribute("messageType", "error");
             }
 
         } catch (Exception e) {
@@ -193,7 +208,7 @@ public class ViewSupportRequest extends HttpServlet {
             session.setAttribute("messageType", "error");
         }
 
-        response.sendRedirect(request.getContextPath() + "/customerservice/view-support-request");
+        // 5. Dùng redirectUrl ở cuối cùng
+        response.sendRedirect(redirectUrl);
     }
-
 }

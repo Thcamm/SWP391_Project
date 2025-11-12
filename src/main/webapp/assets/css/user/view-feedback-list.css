@@ -1,0 +1,378 @@
+/* Custom Styles for Reviews Page */
+
+/* Typography */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Star Rating Styles */
+.star {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.star:hover {
+    transform: scale(1.1);
+}
+
+.star.filled {
+    fill: #facc15;
+    color: #facc15;
+}
+
+.star.empty {
+    fill: #e5e7eb;
+    color: #e5e7eb;
+}
+
+/* Rating Bar Styles */
+.rating-bar-button {
+    transition: all 0.2s ease;
+}
+
+.rating-bar-button:hover {
+    background-color: #f9fafb;
+}
+
+.rating-bar-button.active {
+    background-color: #f3f4f6;
+    ring-width: 2px;
+    ring-color: #111827;
+}
+
+.rating-bar {
+    height: 8px;
+    background-color: #e5e7eb;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.rating-bar-fill {
+    height: 100%;
+    background: linear-gradient(to right, #111827, #374151);
+    transition: width 0.3s ease;
+}
+
+/* Review Card Styles */
+.review-card {
+    transition: all 0.3s ease;
+}
+
+.review-card:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: translateY(-2px);
+}
+
+.review-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 9999px;
+    background: linear-gradient(to bottom right, #111827, #374151);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+.review-image {
+    width: 96px;
+    height: 96px;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    border: 2px solid #e5e7eb;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.review-image:hover {
+    transform: scale(1.05);
+}
+
+.review-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.review-image:hover img {
+    transform: scale(1.1);
+}
+
+/* Badge Styles */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.badge-outline {
+    border: 1px solid #d1d5db;
+    color: #374151;
+    background-color: transparent;
+}
+
+.badge-secondary {
+    background-color: #f3f4f6;
+    color: #111827;
+}
+
+.badge-filter {
+    background-color: #111827;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.badge-filter:hover {
+    background-color: #1f2937;
+}
+
+.badge-anonymous {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+/* Pagination Styles */
+.pagination-button {
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    background-color: white;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.pagination-button:hover:not(:disabled) {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.pagination-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-button.active {
+    background-color: #111827;
+    color: white;
+    border-color: #111827;
+}
+
+.pagination-button.active:hover {
+    background-color: #1f2937;
+}
+
+/* Line Clamp Utility */
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Loading Animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading {
+    animation: spin 1s linear infinite;
+}
+
+/* Smooth Transitions */
+* {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Focus Styles */
+input:focus,
+select:focus {
+    outline: none;
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .no-print {
+        display: none;
+    }
+}
+
+/* Accessibility */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Hover Effects */
+.hover-scale {
+    transition: transform 0.2s ease;
+}
+
+.hover-scale:hover {
+    transform: scale(1.02);
+}
+
+/* Gradient Text */
+.gradient-text {
+    background: linear-gradient(to right, #111827, #374151);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Card Shadow on Hover */
+.card-hover-shadow {
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.card-hover-shadow:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    transform: translateY(-4px);
+}
+
+/* Animated Underline */
+.animated-underline {
+    position: relative;
+    text-decoration: none;
+}
+
+.animated-underline::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: #111827;
+    transition: width 0.3s ease;
+}
+
+.animated-underline:hover::after {
+    width: 100%;
+}
+
+/* Image Fade In */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Service Tag Styles */
+.service-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    background-color: white;
+    transition: all 0.2s ease;
+}
+
+.service-tag:hover {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+}
+
+/* Detailed Rating Item */
+.detailed-rating-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+}
+
+/* Clear Filters Button */
+.clear-filters {
+    color: #6b7280;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.clear-filters:hover {
+    color: #111827;
+}
+
+/* Result Count */
+#resultCount {
+    white-space: nowrap;
+}
+
+/* Mobile Responsive */
+@media (max-width: 640px) {
+    .review-card {
+        padding: 1rem;
+    }
+
+    .review-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .review-image {
+        width: 80px;
+        height: 80px;
+    }
+}

@@ -61,12 +61,93 @@ public class AddVehicle extends HttpServlet {
             handleSaveVehicle(request, response);
             return;
         }
+        if ("updateVehicle".equals(action)) {
+            handleUpdateVehicle(request, response); // Hàm này bạn cần tạo
+            return;
+        }
 
         // Invalid action
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().write("{\"success\":false,\"message\":\"Invalid action\"}");
     }
+    /**
+     * (MỚI) Handle update existing vehicle
+     */
+    private void handleUpdateVehicle(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
 
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        String jsonResponse;
+
+        try {
+            // Get parameters
+            String vehicleIdStr = request.getParameter("vehicleId"); // Thêm mới
+            String customerIdStr = request.getParameter("customerId");
+            String brandIdStr = request.getParameter("brandId");
+            String modelName = request.getParameter("modelName");
+            String yearStr = request.getParameter("yearManufacture");
+            String licensePlate = request.getParameter("licensePlate");
+
+            // --- Validation (Tương tự handleSaveVehicle) ---
+            if (isEmpty(vehicleIdStr) || isEmpty(brandIdStr) /* ...v.v... */) {
+                out.write(buildErrorJson("Thiếu thông tin cập nhật"));
+                return;
+            }
+
+            int vehicleId = Integer.parseInt(vehicleIdStr);
+            int customerId = Integer.parseInt(customerIdStr);
+            int brandId = Integer.parseInt(brandIdStr);
+            int year = Integer.parseInt(yearStr);
+
+            // KHÁC BIỆT QUAN TRỌNG:
+            // Kiểm tra biển số trùng, nhưng loại trừ chính xe này (vehicleId)
+            if (vehicleService.isLicensePlateTaken(licensePlate, vehicleId)) {
+                jsonResponse = buildErrorJson("Biển số đã tồn tại trên xe khác");
+                out.write(jsonResponse);
+                return;
+            }
+
+            // Lấy tên hãng xe (giống hệt)
+            CarBrand brand = carDAO.getBrandById(brandId);
+            if (brand == null) {
+                out.write(buildErrorJson("Hãng xe không tồn tại"));
+                return;
+            }
+
+            // Tạo đối tượng Vehicle (thêm VehicleID)
+            Vehicle vehicleToUpdate = new Vehicle();
+            vehicleToUpdate.setVehicleID(vehicleId); // Thêm mới
+            vehicleToUpdate.setCustomerID(customerId);
+            vehicleToUpdate.setBrand(brand.getBrandName());
+            vehicleToUpdate.setModel(modelName);
+            vehicleToUpdate.setYearManufacture(year);
+            vehicleToUpdate.setLicensePlate(licensePlate.toUpperCase());
+
+            // Gọi DAO để update (bạn cần tạo hàm này)
+            boolean success = vehicleDAO.updateVehicleForCustomer(vehicleToUpdate);
+
+            if (success) {
+                // Trả về JSON thành công, giống như 'save'
+                jsonResponse = buildSuccessJson(
+                        vehicleId,
+                        brand.getBrandName(),
+                        modelName,
+                        licensePlate.toUpperCase(),
+                        year
+                );
+                out.write(jsonResponse);
+            } else {
+                out.write(buildErrorJson("Cập nhật xe thất bại"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            out.write(buildErrorJson("Lỗi server: " + e.getMessage()));
+        } finally {
+            out.close();
+        }
+    }
     /**
      * Handle get models by brand ID
      */

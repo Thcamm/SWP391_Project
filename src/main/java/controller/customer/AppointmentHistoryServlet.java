@@ -1,5 +1,6 @@
 package controller.customer;
 
+import common.utils.PaginationUtils;
 import dao.appointment.AppointmentDAO;
 import dao.customer.CustomerDAO;
 import jakarta.servlet.ServletException;
@@ -41,21 +42,42 @@ public class AppointmentHistoryServlet extends HttpServlet {
         String toDate = request.getParameter("toDate");
         String status = request.getParameter("status");
         String sortOrder = request.getParameter("sortOrder");
+        int currentPage = 1;
+        int itemsPerPage = 10;
+
+        if (request.getParameter("page") != null) {
+            try {
+                currentPage = Integer.parseInt(request.getParameter("page"));
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        PaginationUtils.PaginationResult<Appointment> result;
         List<Appointment> appointments;
         if ((fromDate == null || fromDate.isEmpty()) &&
                 (toDate == null || toDate.isEmpty()) &&
                 (status == null || status.isEmpty()) &&
                 (sortOrder == null || sortOrder.isEmpty())) {
-            appointments = appointmentDAO.getAppointmentsByCustomerId(customerId);
+            int totalItems = appointmentDAO.countAppointmentsByCustomerId(customerId);
+            PaginationUtils.PaginationCalculation calc =
+                    PaginationUtils.calculateParams(totalItems, currentPage, itemsPerPage);
+
+            appointments = appointmentDAO.getAppointmentsByCustomerId(customerId, itemsPerPage, calc.getOffset());
+            result = new PaginationUtils.PaginationResult<>(
+                    appointments, totalItems, calc.getTotalPages(),calc.getSafePage(), itemsPerPage);
         } else {
-            appointments = appointmentDAO.getAppointmentByFilter(customerId, fromDate, toDate, status, sortOrder);
+            int totalItems = appointmentDAO.countAppointmentsByFilter(customerId, fromDate, toDate, status, sortOrder);
+            PaginationUtils.PaginationCalculation calc =
+                    PaginationUtils.calculateParams(totalItems, currentPage, itemsPerPage);
+            appointments = appointmentDAO.getAppointmentByFilter(customerId, fromDate, toDate, status, sortOrder, itemsPerPage, calc.getOffset());
+            result = new PaginationUtils.PaginationResult<>(
+                    appointments, totalItems, calc.getTotalPages(), calc.getSafePage(), itemsPerPage);
         }
         try {
             request.setAttribute("statuses", appointmentDAO.getAllStatuses());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        request.setAttribute("appointments", appointments);
+        request.setAttribute("appointments", result);
         request.getRequestDispatcher("/view/customer/appointment-history.jsp").forward(request, response);
     }
 

@@ -66,27 +66,10 @@ public class Appointment extends HttpServlet {
                 throw new ServletException("Customer profile not found for the logged-in user.");
             }
 
-            // 5. Handle Vehicle: Find or Create new
-            int vehicleID = vehicleDAO.getVehicleIdByLicensePlate(licensePlate);
-            if (vehicleID == -1) {
-                // If vehicle doesn't exist, create new vehicle
-                Vehicle newVehicle = new Vehicle();
-                newVehicle.setCustomerID(customerID);
-                newVehicle.setLicensePlate(licensePlate);
-                newVehicle.setBrand(carBrand);
-                // No need to manually set vehicleID
-
-                vehicleID = vehicleDAO.insertVehicle(newVehicle); // Get ID from return
-
-                if (vehicleID == -1) {
-                    throw new ServletException("Failed to insert vehicle");
-                }
-            }
 
             // 6. Handle Appointment
             model.appointment.Appointment appointment = new model.appointment.Appointment();
             appointment.setCustomerID(customerID);
-            appointment.setVehicleID(vehicleID);
             java.time.LocalDateTime dateTime = java.time.LocalDateTime.parse(dateStr);
             appointment.setAppointmentDate(dateTime);
             appointment.setDescription(description);

@@ -12,7 +12,7 @@ import java.util.List;
 public class SupportDAO extends DbContext {
 
 
-        public List<SupportFAQ> getAllFAQs() throws SQLException {
+    public List<SupportFAQ> getAllFAQs() throws SQLException {
             List<SupportFAQ> list = new ArrayList<>();
             String sql = "SELECT * FROM SupportFAQ WHERE IsActive = 1  ORDER BY FAQID DESC";
             try (
@@ -65,7 +65,6 @@ public class SupportDAO extends DbContext {
         return list;
     }
 
-
     public SupportFAQ getFAQById(int id) throws SQLException {
             String sql = "SELECT * FROM SupportFAQ WHERE FAQID = ?";
             try (
@@ -84,6 +83,143 @@ public class SupportDAO extends DbContext {
             return null;
         }
 
+    // Thêm các method sau vào class SupportFAQDAO của bạn
+
+    public void addFAQ(SupportFAQ faq) throws SQLException {
+        String sql = "INSERT INTO SupportFAQ (Question, Answer, IsActive) VALUES (?, ?, ?)";
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setString(1, faq.getQuestion());
+            ps.setString(2, faq.getAnswer());
+            ps.setBoolean(3, faq.isActive());
+            ps.executeUpdate();
+        }
+    }
+
+    public void updateFAQ(SupportFAQ faq) throws SQLException {
+        String sql = "UPDATE SupportFAQ SET Question = ?, Answer = ?, IsActive = ? WHERE FAQID = ?";
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setString(1, faq.getQuestion());
+            ps.setString(2, faq.getAnswer());
+            ps.setBoolean(3, faq.isActive());
+            ps.setInt(4, faq.getFAQId());
+            ps.executeUpdate();
+        }
+    }
+
+    public void deleteFAQ(int id) throws SQLException {
+        // Soft delete - set IsActive = 0
+        String sql = "UPDATE SupportFAQ SET IsActive = 0 WHERE FAQID = ?";
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        }
+
+        // Nếu muốn xóa vĩnh viễn, dùng câu này thay thế:
+        // String sql = "DELETE FROM SupportFAQ WHERE FAQID = ?";
+    }
+
+    public int getTotalFAQs() throws SQLException {
+        String sql = "SELECT COUNT(*) FROM SupportFAQ WHERE IsActive = 1";
+        try (PreparedStatement ps = getConnection().prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
+
+    public List<SupportFAQ> getFAQsPaginated(int page, int recordsPerPage) throws SQLException {
+        List<SupportFAQ> list = new ArrayList<>();
+        int offset = (page - 1) * recordsPerPage;
+
+        String sql = "SELECT FAQID, Question, Answer " +
+                "FROM SupportFAQ " +
+                "WHERE IsActive = 1 " +
+                "ORDER BY FAQID DESC " +
+                "LIMIT ? OFFSET ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, recordsPerPage);
+            ps.setInt(2, offset);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new SupportFAQ(
+                            rs.getInt("FAQID"),
+                            rs.getString("Question"),
+                            rs.getString("Answer")
+                    ));
+                }
+            }
+        }
+        return list;
+    }
+
+    public int getTotalSearchResults(String keyword) throws SQLException {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM SupportFAQ WHERE IsActive = 1");
+
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        if (hasKeyword) {
+            sql.append(" AND LOWER(Question) LIKE ?");
+        }
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql.toString())) {
+            if (hasKeyword) {
+                String kw = "%" + keyword.trim().toLowerCase() + "%";
+                ps.setString(1, kw);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
+
+    public List<SupportFAQ> searchFAQsPaginated(String keyword, int page, int recordsPerPage) throws SQLException {
+        List<SupportFAQ> list = new ArrayList<>();
+        int offset = (page - 1) * recordsPerPage;
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT FAQID, Question, Answer " +
+                        "FROM SupportFAQ " +
+                        "WHERE IsActive = 1 "
+        );
+
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        if (hasKeyword) {
+            sql.append("AND LOWER(Question) LIKE ? ");
+        }
+
+        sql.append("ORDER BY FAQID DESC LIMIT ? OFFSET ?");
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+
+            if (hasKeyword) {
+                String kw = "%" + keyword.trim().toLowerCase() + "%";
+                ps.setString(paramIndex++, kw);
+            }
+
+            ps.setInt(paramIndex++, recordsPerPage);
+            ps.setInt(paramIndex, offset);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new SupportFAQ(
+                            rs.getInt("FAQID"),
+                            rs.getString("Question"),
+                            rs.getString("Answer")
+                    ));
+                }
+            }
+        }
+
+        return list;
+    }
     public List<SupportCategory> getAllSupportCategories() throws SQLException {
         List<SupportCategory> list = new ArrayList<>();
         String sql = "SELECT CategoryID, CategoryName FROM SupportCategory ";
@@ -268,8 +404,19 @@ public class SupportDAO extends DbContext {
                     sr.setCustomerId(rs.getInt("CustomerID"));
                     sr.setCategoryId(rs.getInt("CategoryID"));
                     sr.setStatus(rs.getString("Status"));
-                    sr.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
-                    sr.setUpdatedAt(rs.getTimestamp("UpdatedAt").toLocalDateTime());
+                    java.sql.Timestamp createdAtTs = rs.getTimestamp("CreatedAt");
+                    if (createdAtTs != null) {
+                        sr.setCreatedAt(createdAtTs.toLocalDateTime());
+                    } else {
+                        sr.setCreatedAt(null);
+                    }
+
+                    java.sql.Timestamp updatedAtTs = rs.getTimestamp("UpdatedAt");
+                    if (updatedAtTs != null) {
+                        sr.setUpdatedAt(updatedAtTs.toLocalDateTime());
+                    } else {
+                        sr.setUpdatedAt(null);
+                    }
                     list.add(sr);
                 }
             }

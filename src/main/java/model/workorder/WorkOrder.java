@@ -12,6 +12,7 @@ public class WorkOrder {
     private BigDecimal estimateAmount;
     private Status status;
     private Timestamp createdAt;
+    private Timestamp updatedAt;
 
     // Relationships (lazy loaded)
     private List<WorkOrderDetail> workOrderDetails;
@@ -35,6 +36,8 @@ public class WorkOrder {
         this.estimateAmount = estimateAmount;
         this.status = Status.PENDING;
     }
+
+
 
     // Getters and Setters
     public int getWorkOrderId() {
@@ -85,6 +88,13 @@ public class WorkOrder {
         this.createdAt = createdAt;
     }
 
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
+    }
     // Relationships
     public List<WorkOrderDetail> getWorkOrderDetails() {
         return workOrderDetails;
