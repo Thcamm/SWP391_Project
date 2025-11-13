@@ -219,7 +219,10 @@ public class TechManagerService {
                 // Set source based on classification
                 wod.setSource(WorkOrderDetail.Source.valueOf(source));
                 wod.setDiagnosticId(null);
-                wod.setApprovalStatus(WorkOrderDetail.ApprovalStatus.PENDING);
+                // LUỒNG MỚI: Auto-approve when TM classifies source during approval
+                wod.setApprovalStatus(WorkOrderDetail.ApprovalStatus.APPROVED);
+                wod.setApprovedByUserId(techManagerId);
+                wod.setApprovedAt(new Timestamp(System.currentTimeMillis()));
                 wod.setTaskDescription(serviceDetail.getServiceName() +
                         (serviceDetail.getServiceDescription() != null ? " - " + serviceDetail.getServiceDescription()
                                 : ""));

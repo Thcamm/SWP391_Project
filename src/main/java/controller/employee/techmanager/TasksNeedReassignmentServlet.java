@@ -81,12 +81,14 @@ public class TasksNeedReassignmentServlet extends HttpServlet {
 
         String assignmentIdStr = request.getParameter("assignmentId");
         String newTechnicianIdStr = request.getParameter("newTechnicianId");
+        String taskDescription = request.getParameter("taskDescription");
         String plannedStartStr = request.getParameter("plannedStart");
         String plannedEndStr = request.getParameter("plannedEnd");
 
-        if (assignmentIdStr == null || newTechnicianIdStr == null) {
+        if (assignmentIdStr == null || newTechnicianIdStr == null ||
+                taskDescription == null || taskDescription.trim().isEmpty()) {
             response.sendRedirect(request.getContextPath() +
-                    "/techmanager/reassign-tasks?message=Missing required fields&type=error");
+                    "/techmanager/reassign-tasks?message=Missing required fields (assignmentId, technicianId, or taskDescription)&type=error");
             return;
         }
 
@@ -108,7 +110,7 @@ public class TasksNeedReassignmentServlet extends HttpServlet {
 
             // Perform reassignment via service
             String resultMessage = taskReassignmentService.reassignTask(
-                    assignmentId, newTechnicianId, plannedStart, plannedEnd);
+                    assignmentId, newTechnicianId, taskDescription, plannedStart, plannedEnd);
 
             // Encode message for URL
             String encodedMessage = URLEncoder.encode(resultMessage, StandardCharsets.UTF_8);

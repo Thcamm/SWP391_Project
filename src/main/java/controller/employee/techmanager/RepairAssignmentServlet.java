@@ -71,12 +71,14 @@ public class RepairAssignmentServlet extends HttpServlet {
 
         String detailIdStr = request.getParameter("detailId");
         String technicianIdStr = request.getParameter("technicianId");
+        String taskDescription = request.getParameter("taskDescription");
         String plannedStartStr = request.getParameter("plannedStart");
         String plannedEndStr = request.getParameter("plannedEnd");
 
-        if (detailIdStr == null || technicianIdStr == null) {
+        if (detailIdStr == null || technicianIdStr == null || taskDescription == null
+                || taskDescription.trim().isEmpty()) {
             response.sendRedirect(request.getContextPath() +
-                    "/techmanager/assign-repair?message=Missing required fields&type=error");
+                    "/techmanager/assign-repair?message=Missing required fields (detailId, technicianId, or taskDescription)&type=error");
             return;
         }
 
@@ -109,8 +111,8 @@ public class RepairAssignmentServlet extends HttpServlet {
             }
 
             // Assign repair task via service
-            String resultMessage = repairAssignmentService.assignRepairTask(detailId, technicianId, plannedStart,
-                    plannedEnd);
+            String resultMessage = repairAssignmentService.assignRepairTask(
+                    detailId, technicianId, taskDescription, plannedStart, plannedEnd);
 
             if (resultMessage.contains("successfully")) {
                 response.sendRedirect(request.getContextPath() +

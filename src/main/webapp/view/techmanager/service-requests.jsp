@@ -202,7 +202,7 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
                         <form
                           method="POST"
                           action="${pageContext.request.contextPath}/techmanager/service-requests"
-                          onsubmit="return validateClassification(${request.requestId})">
+                          onsubmit="return validateClassification('${request.requestId}')">
                           <div class="modal-body">
                             <input type="hidden" name="action" value="approve" />
                             <input type="hidden" name="requestId" value="${request.requestId}" />

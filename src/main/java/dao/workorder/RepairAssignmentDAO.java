@@ -80,12 +80,16 @@ public class RepairAssignmentDAO {
             }
 
             // STEP 4: Full query with all JOINs
+            // LUỒNG MỚI: Allow multiple TaskAssignments per WorkOrderDetail
+            // Removed NOT EXISTS check - TechManager can assign same detail multiple times
             String sql = "SELECT wod.DetailID as detailId, wod.WorkOrderID as workOrderId, " +
                     "wod.TaskDescription as taskDescription, " +
                     "wod.EstimateAmount as estimateAmount, wod.approved_at as approvedAt, " +
                     "wod.diagnostic_id as diagnosticId, wod.source as source, " +
                     "v.VehicleID as vehicleId, v.LicensePlate as licensePlate, v.Model as vehicleModel, " +
-                    "u.FullName as customerName, u.PhoneNumber as phoneNumber " +
+                    "u.FullName as customerName, u.PhoneNumber as phoneNumber, " +
+                    "(SELECT COUNT(*) FROM TaskAssignment ta WHERE ta.DetailID = wod.DetailID AND ta.task_type = 'REPAIR') as existingAssignments "
+                    +
                     "FROM WorkOrderDetail wod " +
                     "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
                     "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
@@ -94,10 +98,6 @@ public class RepairAssignmentDAO {
                     "JOIN User u ON c.UserID = u.UserID " +
                     "WHERE wod.approval_status = 'APPROVED' " +
                     "AND (wod.source = 'REQUEST' OR wod.source = 'DIAGNOSTIC') " +
-                    "AND NOT EXISTS ( " +
-                    "    SELECT 1 FROM TaskAssignment ta " +
-                    "    WHERE ta.DetailID = wod.DetailID AND ta.task_type = 'REPAIR' " +
-                    ") " +
                     "ORDER BY wod.approved_at DESC";
 
             System.out.println("\nSTEP 4: Executing full query with all JOINs...");
@@ -124,6 +124,7 @@ public class RepairAssignmentDAO {
                     Repair.setVehicleModel(rs.getString("vehicleModel"));
                     Repair.setCustomerName(rs.getString("customerName"));
                     Repair.setPhoneNumber(rs.getString("phoneNumber"));
+                    // Note: existingAssignments field may not exist in DTO yet
                     Repairs.add(Repair);
                 }
                 System.out.println("Total repairs found: " + count);
@@ -181,46 +182,51 @@ public class RepairAssignmentDAO {
     /**
      * Create repair task assignment (without scheduling)
      * 
-     * @deprecated Use createRepairTask(int, int, LocalDateTime, LocalDateTime) for
+     * @deprecated Use createRepairTask(int, int, String, LocalDateTime,
+     *             LocalDateTime) for
      *             new workflow
      */
     @Deprecated
     public boolean createRepairTask(int detailId, int technicianId) throws SQLException {
-        return createRepairTask(detailId, technicianId, null, null);
+        return createRepairTask(detailId, technicianId, "Task assignment", null, null);
     }
 
     /**
      * Create repair task assignment with scheduling support
      * 
-     * @param detailId     WorkOrderDetail ID
-     * @param technicianId Technician Employee ID
-     * @param plannedStart Scheduled start time (optional)
-     * @param plannedEnd   Scheduled end time (optional)
+     * @param detailId        WorkOrderDetail ID
+     * @param technicianId    Technician Employee ID
+     * @param taskDescription Specific task description for this technician
+     * @param plannedStart    Scheduled start time (optional)
+     * @param plannedEnd      Scheduled end time (optional)
      */
-    public boolean createRepairTask(int detailId, int technicianId,
+    public boolean createRepairTask(int detailId, int technicianId, String taskDescription,
             java.time.LocalDateTime plannedStart,
             java.time.LocalDateTime plannedEnd) throws SQLException {
         String sql = "INSERT INTO TaskAssignment " +
-                "(DetailID, AssignToTechID, task_type, Status, AssignedDate, planned_start, planned_end) " +
-                "VALUES (?, ?, 'REPAIR', 'ASSIGNED', NOW(), ?, ?)";
+                "(DetailID, AssignToTechID, TaskDescription, task_type, Status, AssignedDate, planned_start, planned_end) "
+                +
+                "VALUES (?, ?, ?, 'REPAIR', 'ASSIGNED', NOW(), ?, ?)";
 
         try (Connection conn = DbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, detailId);
             ps.setInt(2, technicianId);
+            ps.setString(3, taskDescription);
+            ps.setString(3, taskDescription);
 
             // Set scheduling times (nullable)
             if (plannedStart != null) {
-                ps.setObject(3, plannedStart);
+                ps.setObject(4, plannedStart);
             } else {
-                ps.setNull(3, java.sql.Types.TIMESTAMP);
+                ps.setNull(4, java.sql.Types.TIMESTAMP);
             }
 
             if (plannedEnd != null) {
-                ps.setObject(4, plannedEnd);
+                ps.setObject(5, plannedEnd);
             } else {
-                ps.setNull(4, java.sql.Types.TIMESTAMP);
+                ps.setNull(5, java.sql.Types.TIMESTAMP);
             }
 
             int rowsAffected = ps.executeUpdate();

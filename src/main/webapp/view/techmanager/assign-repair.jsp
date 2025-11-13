@@ -153,8 +153,8 @@
                         
                         <!-- Assignment Modal -->
                         <div class="modal fade" id="assignModal${repair.detailId}" tabindex="-1">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
+                            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg" style="max-height: 90vh;">
+                                <div class="modal-content" style="max-height: 100vh;">
                                     <div class="modal-header bg-primary text-white">
                                         <h5 class="modal-title">
                                             <i class="bi bi-person-plus"></i> Assign Repair Task
@@ -162,16 +162,26 @@
                                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                     </div>
                                     <form method="POST" action="${pageContext.request.contextPath}/techmanager/assign-repair">
-                                        <div class="modal-body">
+                                        <div class="modal-body" style="max-height: calc(90vh - 120px); overflow-y: auto;">
                                             <input type="hidden" name="detailId" value="${repair.detailId}">
                                             
                                             <div class="alert alert-info mb-3">
                                                 <strong>Vehicle:</strong> ${repair.vehicleModel} (${repair.licensePlate})<br>
-                                                <strong>Task:</strong> ${repair.taskDescription}<br>
+                                                <strong>Overall Task:</strong> ${repair.taskDescription}<br>
                                                 <strong>Estimate:</strong> 
                                                 <fmt:formatNumber value="${repair.estimateAmount}" 
                                                                 type="currency" 
                                                                 currencySymbol="₫"/>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <label class="form-label">Specific Task for This Technician <span class="text-danger">*</span></label>
+                                                <textarea name="taskDescription" 
+                                                          class="form-control" 
+                                                          rows="2" 
+                                                          required
+                                                          placeholder="E.g., 'Thay má phanh trước' or 'Vệ sinh họng ga'"></textarea>
+                                                <small class="text-muted">Describe what THIS technician will do (you can assign this detail to multiple technicians)</small>
                                             </div>
                                             
                                             <div class="mb-3">
@@ -197,17 +207,21 @@
                                                 <div class="card-body">
                                                     <div class="row">
                                                         <div class="col-md-6 mb-3">
-                                                            <label for="plannedStart_${repair.detailId}" class="form-label">Planned Start</label>
+                                                            <label for="plannedStart_${repair.detailId}" class="form-label">
+                                                                Planned Start <span class="text-danger">*</span>
+                                                            </label>
                                                             <input type="datetime-local" class="form-control" 
                                                                    name="plannedStart" id="plannedStart_${repair.detailId}"
-                                                                   onchange="loadSchedule('${repair.detailId}')">
-                                                            <small class="text-muted">When to start</small>
+                                                                   required
+                                                                   onchange="loadSchedule('${repair.detailId}'); validatePlannedTimes('${repair.detailId}')">
+                                                            <small class="text-muted">When to start (required)</small>
                                                         </div>
                                                         <div class="col-md-6 mb-3">
                                                             <label for="plannedEnd_${repair.detailId}" class="form-label">Planned End</label>
                                                             <input type="datetime-local" class="form-control" 
-                                                                   name="plannedEnd" id="plannedEnd_${repair.detailId}">
-                                                            <small class="text-muted">Expected finish</small>
+                                                                   name="plannedEnd" id="plannedEnd_${repair.detailId}"
+                                                                   onchange="validatePlannedTimes('${repair.detailId}')">
+                                                            <small class="text-muted">Expected finish (optional)</small>
                                                         </div>
                                                     </div>
                                                     
@@ -260,55 +274,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Load technician schedule via AJAX
-        function loadSchedule(detailId) {
-            const technicianId = document.getElementById('technicianId_' + detailId).value;
-            const plannedStart = document.getElementById('plannedStart_' + detailId).value;
-            
-            if (!technicianId || !plannedStart) return;
-            
-            const date = plannedStart.split('T')[0];
-            const url = '${pageContext.request.contextPath}/techmanager/technician-schedule?technicianId=' + technicianId + '&date=' + date;
-            
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        displaySchedule(detailId, data);
-                    } else {
-                        console.error('Failed to load schedule:', data.error);
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-        }
-        
-        function displaySchedule(detailId, data) {
-            const schedulePreview = document.getElementById('schedulePreview_' + detailId);
-            const scheduleContent = document.getElementById('scheduleContent_' + detailId);
-            
-            if (data.totalTasks === 0) {
-                scheduleContent.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> No tasks scheduled. Technician is available!</span>';
-            } else {
-                let html = '<div class="table-responsive"><table class="table table-sm table-bordered">';
-                html += '<thead><tr><th>Time</th><th>Type</th><th>Vehicle</th><th>Status</th></tr></thead><tbody>';
-                data.tasks.forEach(task => {
-                    const statusBadge = task.isOverdue ? '<span class="badge bg-danger">Overdue</span>' : '<span class="badge bg-info">Scheduled</span>';
-                    html += '<tr><td>' + task.plannedStart + ' - ' + task.plannedEnd + '</td>';
-                    html += '<td>' + task.taskType + '</td>';
-                    html += '<td>' + task.vehicleInfo + '</td>';
-                    html += '<td>' + statusBadge + '</td></tr>';
-                });
-                html += '</tbody></table></div>';
-                scheduleContent.innerHTML = html;
-            }
-            
-            schedulePreview.classList.remove('d-none');
-        }
-        
-        function refreshSchedule(detailId) {
-            loadSchedule(detailId);
-        }
-    </script>
+    <script src="${pageContext.request.contextPath}/assets/js/techmanager/assign-repair.js"></script>
 </body>
 </html>

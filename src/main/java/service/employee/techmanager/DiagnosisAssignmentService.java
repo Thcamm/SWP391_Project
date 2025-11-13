@@ -77,17 +77,23 @@ public class DiagnosisAssignmentService {
     /**
      * Assign diagnosis task to technician with validation.
      * 
-     * @param detailId     work order detail ID
-     * @param technicianId technician ID
-     * @param priority     task priority
-     * @param notes        task notes (nullable)
-     * @param plannedStart planned start time (nullable)
-     * @param plannedEnd   planned end time (nullable)
+     * @param detailId        work order detail ID
+     * @param technicianId    technician ID
+     * @param taskDescription specific task description for this technician
+     * @param priority        task priority
+     * @param notes           task notes (nullable)
+     * @param plannedStart    planned start time (nullable)
+     * @param plannedEnd      planned end time (nullable)
      * @return assignment ID if successful, -1 if failed
      * @throws SQLException if database error occurs
      */
-    public int assignDiagnosisTask(int detailId, int technicianId, String priority, String notes,
-            LocalDateTime plannedStart, LocalDateTime plannedEnd) throws SQLException {
+    public int assignDiagnosisTask(int detailId, int technicianId, String taskDescription,
+            String priority, String notes, LocalDateTime plannedStart, LocalDateTime plannedEnd) throws SQLException {
+
+        // Validate task description
+        if (taskDescription == null || taskDescription.trim().isEmpty()) {
+            throw new IllegalArgumentException("Task description is required for each assignment");
+        }
 
         // Validate time range if provided
         if (plannedStart != null && plannedEnd != null) {
@@ -101,7 +107,7 @@ public class DiagnosisAssignmentService {
         task.setDetailID(detailId);
         task.setAssignToTechID(technicianId);
         task.setAssignedDate(LocalDateTime.now());
-        task.setTaskDescription("Diagnose vehicle condition and identify issues");
+        task.setTaskDescription(taskDescription); // Use user-provided description
         task.setTaskType(TaskAssignment.TaskType.DIAGNOSIS);
         task.setStatus(TaskAssignment.TaskStatus.ASSIGNED);
 

@@ -56,15 +56,21 @@ public class RepairAssignmentService {
     /**
      * Assign repair task to technician with validation.
      * 
-     * @param detailId     work order detail ID
-     * @param technicianId technician ID
-     * @param plannedStart planned start time (nullable)
-     * @param plannedEnd   planned end time (nullable)
+     * @param detailId        work order detail ID
+     * @param technicianId    technician ID
+     * @param taskDescription specific task description for this technician
+     * @param plannedStart    planned start time (nullable)
+     * @param plannedEnd      planned end time (nullable)
      * @return success message or error message
      * @throws SQLException if database error occurs
      */
-    public String assignRepairTask(int detailId, int technicianId,
+    public String assignRepairTask(int detailId, int technicianId, String taskDescription,
             LocalDateTime plannedStart, LocalDateTime plannedEnd) throws SQLException {
+
+        // Validate task description
+        if (taskDescription == null || taskDescription.trim().isEmpty()) {
+            return "Task description is required for each assignment";
+        }
 
         // Validate time range if provided
         if (plannedStart != null && plannedEnd != null) {
@@ -73,13 +79,15 @@ public class RepairAssignmentService {
             }
         }
 
-        // Check if already assigned
-        if (repairAssignmentDAO.hasRepairTaskAssigned(detailId)) {
-            return "This task has already been assigned";
-        }
+        // LUỒNG MỚI: Allow multiple assignments per WorkOrderDetail
+        // Removed hasRepairTaskAssigned check - TechManager can assign same detail to
+        // multiple technicians
+        // Each assignment represents a separate task (e.g., "Thay phanh" vs "Vệ sinh
+        // ga")
 
         // Create repair task assignment
-        boolean success = repairAssignmentDAO.createRepairTask(detailId, technicianId, plannedStart, plannedEnd);
+        boolean success = repairAssignmentDAO.createRepairTask(
+                detailId, technicianId, taskDescription, plannedStart, plannedEnd);
 
         if (success) {
             return "Repair task assigned successfully";
