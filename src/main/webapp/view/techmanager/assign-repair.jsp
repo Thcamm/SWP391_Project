@@ -28,13 +28,9 @@
                     <div>
                         <h2 class="mb-1">
                             <i class="bi bi-tools text-primary"></i>
-                            GĐ5: Assign Repair Tasks
+                            Assign Repair Tasks
                         </h2>
-                        <p class="text-muted mb-0">
-                            <strong>LUỒNG MỚI:</strong> Repairs from 
-                            <span class="badge bg-success">REQUEST</span> (direct from GĐ2) + 
-                            <span class="badge bg-info">DIAGNOSTIC</span> (from GĐ4 Quote)
-                        </p>
+                        
                     </div>
                     <button type="button" class="btn btn-outline-secondary" onclick="window.location.reload();">
                         <i class="bi bi-arrow-clockwise"></i> Refresh
@@ -86,71 +82,68 @@
                     </div>
                 </c:when>
                 <c:otherwise>
+                    <c:set var="currentWorkOrderId" value="" />
+                    <c:set var="workOrderDetailsMap" value="${applicationScope.tempMap = {}; applicationScope.tempMap}" />
+                    
                     <c:forEach var="repair" items="${approvedRepairs}">
-                        <div class="card mb-3" style="border-left: 4px solid #0d6efd;">
-                            <div class="card-body">
-                                <div class="row">
-                                    <!-- Repair Info -->
-                                    <div class="col-md-8">
-                                        <h5 class="card-title">
-                                            <i class="bi bi-car-front"></i>
-                                            ${repair.vehicleModel}
-                                            <span class="badge bg-success ms-2">
-                                                <i class="bi bi-check-circle"></i> Approved
-                                            </span>
+                        <c:if test="${repair.workOrderId != currentWorkOrderId}">
+                            <c:if test="${currentWorkOrderId != ''}">
+                                </div></div></div>
+                            </c:if>
+                            
+                            <div class="card mb-3" style="border-left: 4px solid #0d6efd;">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center" 
+                                     style="cursor: pointer;" 
+                                     data-bs-toggle="collapse" 
+                                     data-bs-target="#wo${repair.workOrderId}">
+                                    <div>
+                                        <h5 class="mb-1">
+                                            <i class="bi bi-file-earmark-text"></i>
+                                            <strong>Work Order #${repair.workOrderId}</strong>
+                                            <span class="badge bg-success ms-2">Approved</span>
                                         </h5>
-                                        
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="mb-2">
-                                                    <strong>License Plate:</strong>
-                                                    <span class="text-primary">${repair.licensePlate}</span>
-                                                </div>
-                                                <div class="mb-2">
-                                                    <strong>Customer:</strong> ${repair.customerName}
-                                                </div>
-                                                <div class="mb-2">
-                                                    <strong>Phone:</strong> ${repair.phoneNumber}
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="mb-2">
-                                                    <strong>Work Order:</strong> #${repair.workOrderId}
-                                                </div>
-                                                <div class="mb-2">
-                                                    <strong>Approved At:</strong>
-                                                    <fmt:formatDate value="${repair.approvedAt}" pattern="dd/MM/yyyy HH:mm" />
-                                                </div>
-                                                <div class="mb-2">
-                                                    <strong>Estimate Amount:</strong>
-                                                    <h5 class="d-inline text-success">
-                                                        <fmt:formatNumber value="${repair.estimateAmount}" 
-                                                                        type="currency" 
-                                                                        currencySymbol="$"/>
-                                                    </h5>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="mt-3">
-                                            <strong>Task Description:</strong>
-                                            <p class="mb-0">${repair.taskDescription}</p>
+                                        <div class="text-muted small">
+                                            <i class="bi bi-car-front"></i> ${repair.vehicleModel} (${repair.licensePlate}) |
+                                            <i class="bi bi-person"></i> ${repair.customerName} |
+                                            <i class="bi bi-telephone"></i> ${repair.phoneNumber}
                                         </div>
                                     </div>
-
-                                    <!-- Assign Button -->
-                                    <div class="col-md-4 text-end">
-                                        <button type="button" 
-                                                class="btn btn-primary btn-lg w-100"
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#assignModal${repair.detailId}">
-                                            <i class="bi bi-person-plus"></i> Assign Technician
-                                        </button>
+                                    <i class="bi bi-chevron-down"></i>
+                                </div>
+                                <div id="wo${repair.workOrderId}" class="collapse show">
+                                    <div class="card-body">
+                            <c:set var="currentWorkOrderId" value="${repair.workOrderId}" />
+                        </c:if>
+                        
+                        <!-- Individual Detail -->
+                        <div class="border rounded p-3 mb-3 bg-white" style="border-left: 3px solid #0dcaf0 !important;">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="text-primary mb-0">
+                                            <i class="bi bi-wrench"></i> Detail #${repair.detailId}
+                                        </h6>
+                                        <span class="badge bg-info">
+                                            <fmt:formatNumber value="${repair.estimateAmount}" type="currency" currencySymbol="$"/>
+                                        </span>
                                     </div>
+                                    <div class="mb-2">
+                                        <strong>Task:</strong> ${repair.taskDescription}
+                                    </div>
+                                    <div class="text-muted small">
+                                        <i class="bi bi-clock"></i> Approved: <fmt:formatDate value="${repair.approvedAt}" pattern="dd/MM/yyyy HH:mm" />
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <button type="button" 
+                                            class="btn btn-primary w-100"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#assignModal${repair.detailId}">
+                                        <i class="bi bi-person-plus"></i> Assign Technician
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                        
                         <!-- Assignment Modal -->
                         <div class="modal fade" id="assignModal${repair.detailId}" tabindex="-1">
                             <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg" style="max-height: 90vh;">
@@ -180,7 +173,7 @@
                                                           class="form-control" 
                                                           rows="2" 
                                                           required
-                                                          placeholder="E.g., 'Thay má phanh trước' or 'Vệ sinh họng ga'"></textarea>
+                                                          placeholder="E.g., Repair front brake pads"></textarea>
                                                 <small class="text-muted">Describe what THIS technician will do (you can assign this detail to multiple technicians)</small>
                                             </div>
                                             
@@ -265,6 +258,9 @@
                             </div>
                         </div>
                     </c:forEach>
+                    <c:if test="${not empty approvedRepairs}">
+                        </div></div></div>
+                    </c:if>
                 </c:otherwise>
             </c:choose>
 

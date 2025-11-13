@@ -84,77 +84,93 @@
                             </div>
                         </c:when>
                         <c:otherwise>
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Task ID</th>
-                                            <th>Type</th>
-                                            <th>Cancel Reason</th>
-                                            <th>Vehicle</th>
-                                            <th>Customer</th>
-                                            <th>Previous Tech</th>
-                                            <th>Original Schedule</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <c:forEach items="${cancelledTasks}" var="task">
-                                            <tr>
-                                                <td><strong>#${task.assignmentId}</strong></td>
-                                                <td>
-                                                    <span class="badge bg-primary">${task.taskType}</span>
-                                                </td>
-                                                <td>
-                                                    <c:choose>
-                                                        <c:when test="${task.cancelReasonType == 'DECLINED'}">
-                                                            <span class="badge bg-warning">
-                                                                <i class="bi bi-hand-thumbs-down"></i> Declined
-                                                            </span>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="badge bg-danger">
-                                                                <i class="bi bi-clock"></i> Overdue
-                                                            </span>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </td>
-                                                <td>
-                                                    <i class="bi bi-car-front"></i> ${task.vehicleInfo}
-                                                </td>
-                                                <td>
+                            <c:set var="currentWOId" value="" />
+                            <c:forEach items="${cancelledTasks}" var="task">
+                                <c:if test="${task.workOrderId != currentWOId}">
+                                    <c:if test="${currentWOId != ''}">
+                                        </tbody></table></div></div></div></div>
+                                    </c:if>
+                                    <div class="card mb-3" style="border-left: 4px solid #dc3545;">
+                                        <div class="card-header bg-light d-flex justify-content-between" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#woCancel${task.workOrderId}">
+                                            <div>
+                                                <h6 class="mb-1">
+                                                    <i class="bi bi-file-earmark-x"></i>
+                                                    <strong>Work Order #${task.workOrderId}</strong>
+                                                    <span class="badge bg-danger ms-2">Has Cancelled Tasks</span>
+                                                </h6>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-car-front"></i> ${task.vehicleInfo} |
                                                     <i class="bi bi-person"></i> ${task.customerName}
-                                                </td>
-                                                <td>
-                                                    <i class="bi bi-person-badge"></i> ${task.technicianName}
-                                                </td>
-                                                <td>
-                                                    <small>
-                                                        <i class="bi bi-clock"></i>
-                                                        ${task.plannedStart}<br>
-                                                        → ${task.plannedEnd}
-                                                    </small>
-                                                </td>
-                                                <td>
-                                                    <button type="button" 
-                                                            class="btn btn-sm btn-primary" 
-                                                            data-bs-toggle="modal" 
-                                                            data-bs-target="#reassignModal${task.assignmentId}">
-                                                        <i class="bi bi-arrow-repeat"></i> Reassign
-                                                    </button>
-                                                    
-                                                    <c:if test="${task.cancelReasonType == 'DECLINED'}">
-                                                        <button type="button" 
-                                                                class="btn btn-sm btn-outline-warning" 
-                                                                data-bs-toggle="modal" 
-                                                                data-bs-target="#reasonModal${task.assignmentId}">
-                                                            <i class="bi bi-chat-text"></i> Reason
-                                                        </button>
-                                                    </c:if>
-                                                </td>
-                                            </tr>
-
-                                            <!-- Reassignment Modal -->
+                                                </small>
+                                            </div>
+                                            <i class="bi bi-chevron-down"></i>
+                                        </div>
+                                        <div id="woCancel${task.workOrderId}" class="collapse show">
+                                            <div class="card-body p-0">
+                                                <div class="table-responsive">
+                                                    <table class="table table-hover mb-0">
+                                                        <thead class="table-light">
+                                                            <tr>
+                                                                <th>Detail #</th>
+                                                                <th>Assignment #</th>
+                                                                <th>Type</th>
+                                                                <th>Cancel Reason</th>
+                                                                <th>Previous Tech</th>
+                                                                <th>Original Schedule</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                    <c:set var="currentWOId" value="${task.workOrderId}" />
+                                </c:if>
+                                <tr>
+                                    <td><strong class="text-primary">#${task.detailId}</strong></td>
+                                    <td><strong>#${task.assignmentId}</strong></td>
+                                    <td>
+                                        <span class="badge bg-primary">${task.taskType}</span>
+                                    </td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${task.cancelReasonType == 'DECLINED'}">
+                                                <span class="badge bg-warning">
+                                                    <i class="bi bi-hand-thumbs-down"></i> Declined
+                                                </span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="badge bg-danger">
+                                                    <i class="bi bi-clock"></i> Overdue
+                                                </span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-person-badge"></i> ${task.technicianName}
+                                    </td>
+                                    <td>
+                                        <small>
+                                            <i class="bi bi-clock"></i>
+                                            ${task.plannedStart}<br>
+                                            → ${task.plannedEnd}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <button type="button" 
+                                                class="btn btn-sm btn-primary" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#reassignModal${task.assignmentId}">
+                                            <i class="bi bi-arrow-repeat"></i> Reassign
+                                        </button>
+                                        
+                                        <c:if test="${task.cancelReasonType == 'DECLINED'}">
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-outline-warning" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#reasonModal${task.assignmentId}">
+                                                <i class="bi bi-chat-text"></i> Reason
+                                            </button>
+                                        </c:if>
+                                    </td>
+                                </tr>                                            <!-- Reassignment Modal -->
                                             <div class="modal fade" id="reassignModal${task.assignmentId}" tabindex="-1">
                                                 <div class="modal-dialog modal-lg">
                                                     <div class="modal-content">
@@ -175,7 +191,7 @@
                                                                     <strong>Task Information:</strong><br>
                                                                     <strong>Vehicle:</strong> ${task.vehicleInfo}<br>
                                                                     <strong>Customer:</strong> ${task.customerName}<br>
-                                                                    <strong>Task:</strong> ${task.taskDescription}<br>
+                                                                    <strong>Previous Task:</strong> ${task.taskDescription}<br>
                                                                     <strong>Previous Tech:</strong> ${task.technicianName}<br>
                                                                     <strong>Cancel Reason:</strong>
                                                                     <c:choose>
@@ -194,6 +210,19 @@
                                                                         <p class="mb-0 mt-1">${task.declineReason}</p>
                                                                     </div>
                                                                 </c:if>
+
+                                                                <!-- NEW: Task Description for Reassignment -->
+                                                                <div class="mb-3">
+                                                                    <label class="form-label">
+                                                                        New Task Description <span class="text-danger">*</span>
+                                                                    </label>
+                                                                    <textarea name="taskDescription" 
+                                                                              class="form-control" 
+                                                                              rows="2" 
+                                                                              required
+                                                                              placeholder="Describe the specific task for the new technician..."></textarea>
+                                                                    <small class="text-muted">You can assign different tasks to different technicians for the same WorkOrderDetail</small>
+                                                                </div>
 
                                                                 <!-- Select New Technician -->
                                                                 <div class="mb-3">
@@ -299,12 +328,12 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </c:if>
-                                        </c:forEach>
-                                    </tbody>
-                                </table>
-                            </div>
+                                    </div>
+                                </c:if>
+                            </c:forEach>
+                            <c:if test="${not empty cancelledTasks}">
+                                </tbody></table></div></div></div></div>
+                            </c:if>
                         </c:otherwise>
                     </c:choose>
                 </div>
@@ -314,47 +343,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/techmanager/reassign-tasks.js"></script>
-    
-    <script>
-        // Handle form submission with loading state
-        function handleReassignSubmit(form, taskId) {
-            const submitBtn = document.getElementById('submitBtn' + taskId);
-            const loadingBtn = document.getElementById('loadingBtn' + taskId);
-            
-            // Validate technician selection
-            const techSelect = document.getElementById('techSelect_' + taskId);
-            if (!techSelect.value) {
-                alert('Please select a technician');
-                return false;
-            }
-            
-            // Show loading state
-            submitBtn.classList.add('d-none');
-            loadingBtn.classList.remove('d-none');
-            
-            // Disable form inputs
-            const inputs = form.querySelectorAll('input, select, button');
-            inputs.forEach(input => input.disabled = true);
-            
-            return true; // Allow form submission
-        }
-        
-        // Auto-scroll to message on page load
-        window.addEventListener('DOMContentLoaded', function() {
-            const alertElement = document.querySelector('.alert');
-            if (alertElement) {
-                alertElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // Auto-dismiss success messages after 5 seconds
-                if (alertElement.classList.contains('alert-success')) {
-                    setTimeout(() => {
-                        const closeBtn = alertElement.querySelector('.btn-close');
-                        if (closeBtn) closeBtn.click();
-                    }, 5000);
-                }
-            }
-        });
-    </script>
     
     <%@ include file="footer-techmanager.jsp" %>
 </body>

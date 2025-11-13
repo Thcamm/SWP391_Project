@@ -32,9 +32,10 @@ public class GarageJobScheduler {
     private final VehicleDiagnosticDAO diagnosticDAO;
 
     // Configuration constants
-    private static final int TASK_TIMEOUT_MINUTES = 10; // TASK 3: KTV must start within 10 minutes
-    private static final int QUOTE_TIMEOUT_MINUTES = 10; // TASK 4: Customer must respond within 10 minutes
-    private static final int SCHEDULE_INTERVAL_MINUTES = 1; // Run every 1 minute
+    private static final int TASK_TIMEOUT_MINUTES = 120; // TASK 3: KTV must start within 2 hours (was 10 min - too
+                                                         // strict)
+    private static final int QUOTE_TIMEOUT_MINUTES = 30; // TASK 4: Customer must respond within 30 minutes
+    private static final int SCHEDULE_INTERVAL_MINUTES = 5; // Run every 5 minutes (was 1 min - too frequent)
 
     public GarageJobScheduler() {
         this.scheduler = Executors.newScheduledThreadPool(2);
@@ -105,11 +106,12 @@ public class GarageJobScheduler {
                 "WHERE ta.Status = 'ASSIGNED' " +
                 "AND ta.StartAt IS NULL " +
                 "AND ta.planned_start IS NOT NULL " +
-                "AND ta.planned_start < (NOW() - INTERVAL ? MINUTE)";
+                "AND NOW() > DATE_ADD(ta.planned_start, INTERVAL ? MINUTE)";
 
         String updateSql = "UPDATE TaskAssignment " +
                 "SET Status = 'CANCELLED', " +
-                "notes = CONCAT(COALESCE(notes, ''), '\\n[AUTO-CANCELLED] Technician did not start within 10 minutes of planned start time.') " +
+                "notes = CONCAT(COALESCE(notes, ''), '\\n[AUTO-CANCELLED] Technician did not start within 2 hours of planned start time.') "
+                +
                 "WHERE AssignmentID = ?";
 
         try (Connection conn = DbContext.getConnection();
@@ -139,8 +141,8 @@ public class GarageJobScheduler {
                             notification.setUserId(techManagerUserId);
                             notification.setTitle("Task Auto-Cancelled");
                             notification.setBody(String.format(
-                                    "Task #%d (WorkOrder #%d) was automatically cancelled because the technician did not start within %d minutes of the planned start time.",
-                                    assignmentId, workOrderId, TASK_TIMEOUT_MINUTES));
+                                    "Task #%d (WorkOrder #%d) was automatically cancelled because the technician did not start within %d minutes (%d hours) of the planned start time.",
+                                    assignmentId, workOrderId, TASK_TIMEOUT_MINUTES, TASK_TIMEOUT_MINUTES / 60));
                             notification.setEntityType("TASK_ASSIGNMENT");
                             notification.setEntityId(assignmentId);
 
@@ -173,19 +175,18 @@ public class GarageJobScheduler {
      * 
      * Rejects VehicleDiagnostic quotes that meet ALL criteria:
      * 1. Status = 'SUBMITTED'
-     * 2. CreatedAt < (NOW() - INTERVAL 10 MINUTE)
+     * 2. NOW() > CreatedAt + 30 MINUTE
      * 
      * Sets the quote to REJECTED and adds a RejectReason.
      * 
-     * Note: 10 minutes is very strict for production. This interval may be
-     * changed to 24-48 hours later, but the logic remains the same.
+     * Note: Changed from 10 minutes (too strict) to 30 minutes for production.
      */
     private void autoRejectExpiredQuotes() {
         String updateSql = "UPDATE VehicleDiagnostic " +
                 "SET Status = 'REJECTED', " +
-                "RejectReason = 'Auto-rejected due to customer non-response within 10 minutes.' " +
+                "RejectReason = 'Auto-rejected due to customer non-response within 30 minutes.' " +
                 "WHERE Status = 'SUBMITTED' " +
-                "AND CreatedAt < (NOW() - INTERVAL ? MINUTE)";
+                "AND NOW() > DATE_ADD(CreatedAt, INTERVAL ? MINUTE)";
 
         try (Connection conn = DbContext.getConnection();
                 PreparedStatement updatePs = conn.prepareStatement(updateSql)) {

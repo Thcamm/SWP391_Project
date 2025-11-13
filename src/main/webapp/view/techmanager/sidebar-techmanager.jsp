@@ -29,13 +29,13 @@ prefix="c" %> <%-- Get active menu parameter --%>
       </div>
     </div>
 
-    <div class="nav-section-title">Workflow (LUỒNG 4.0)</div>
+    <div class="nav-section-title">Workflow</div>
     <div class="nav-item">
       <a
         href="${pageContext.request.contextPath}/techmanager/service-requests"
         class="nav-link ${activeMenu == 'service-requests' ? 'active' : ''}">
         <i class="bi bi-clipboard-check"></i>
-        <span>GĐ1+2: Approve & Classify</span>
+        <span>Approve & Classify</span>
       </a>
     </div>
     <div class="nav-item">
@@ -43,7 +43,7 @@ prefix="c" %> <%-- Get active menu parameter --%>
         href="${pageContext.request.contextPath}/techmanager/assign-diagnosis"
         class="nav-link ${activeMenu == 'assign-diagnosis' ? 'active' : ''}">
         <i class="bi bi-person-plus"></i>
-        <span>GĐ3: Assign Diagnosis</span>
+        <span>Assign Diagnosis</span>
       </a>
     </div>
 
@@ -52,7 +52,7 @@ prefix="c" %> <%-- Get active menu parameter --%>
         href="${pageContext.request.contextPath}/techmanager/assign-repair"
         class="nav-link ${activeMenu == 'assign-repair' ? 'active' : ''}">
         <i class="bi bi-tools"></i>
-        <span>GĐ5: Assign Repair Tasks</span>
+        <span>Assign Repair Tasks</span>
       </a>
     </div>
 
@@ -61,7 +61,7 @@ prefix="c" %> <%-- Get active menu parameter --%>
         href="${pageContext.request.contextPath}/techmanager/close-workorders"
         class="nav-link ${activeMenu == 'close-workorders' ? 'active' : ''}">
         <i class="bi bi-check-circle"></i>
-        <span>GĐ7: Complete WorkOrders</span>
+        <span>Complete WorkOrders</span>
       </a>
     </div>
 
@@ -79,15 +79,6 @@ prefix="c" %> <%-- Get active menu parameter --%>
 
     <div class="nav-item">
       <a
-        href="${pageContext.request.contextPath}/techmanager/overdue-tasks"
-        class="nav-link ${activeMenu == 'overdue-tasks' ? 'active' : ''}">
-        <i class="bi bi-exclamation-octagon text-danger"></i>
-        <span>Overdue Tasks</span>
-      </a>
-    </div>
-
-    <div class="nav-item">
-      <a
         href="${pageContext.request.contextPath}/techmanager/declined-tasks"
         class="nav-link ${activeMenu == 'declined-tasks' ? 'active' : ''}">
         <i class="bi bi-person-x text-warning"></i>
@@ -101,15 +92,6 @@ prefix="c" %> <%-- Get active menu parameter --%>
         class="nav-link ${activeMenu == 'reassign-tasks' ? 'active' : ''}">
         <i class="bi bi-arrow-repeat text-info"></i>
         <span>Reassign Tasks</span>
-      </a>
-    </div>
-
-    <div class="nav-item">
-      <a
-        href="${pageContext.request.contextPath}/techmanager/rejected-tasks"
-        class="nav-link ${activeMenu == 'rejected-tasks' ? 'active' : ''}">
-        <i class="bi bi-x-circle text-danger"></i>
-        <span>Rejected Tasks</span>
       </a>
     </div>
   </nav>
