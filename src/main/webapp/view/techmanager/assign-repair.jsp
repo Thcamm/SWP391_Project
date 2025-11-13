@@ -124,7 +124,7 @@
                                             <i class="bi bi-wrench"></i> Detail #${repair.detailId}
                                         </h6>
                                         <span class="badge bg-info">
-                                            <fmt:formatNumber value="${repair.estimateAmount}" type="currency" currencySymbol="$"/>
+                                            <fmt:formatNumber value="${repair.estimateAmount}" type="currency" currencySymbol="₫"/>
                                         </span>
                                     </div>
                                     <div class="mb-2">

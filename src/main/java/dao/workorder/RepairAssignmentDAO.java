@@ -36,7 +36,7 @@ public class RepairAssignmentDAO {
         String testSql = "SELECT wod.DetailID, wod.WorkOrderID, wod.approval_status, wod.source " +
                 "FROM WorkOrderDetail wod " +
                 "WHERE wod.approval_status = 'APPROVED' " +
-                "AND (wod.source = 'REQUEST' OR wod.source = 'DIAGNOSTIC')";
+                "AND wod.source = 'REQUEST'"; // Only REQUEST (direct repair), not DIAGNOSTIC
 
         try (Connection conn = DbContext.getConnection()) {
             System.out.println("STEP 1: Testing simple query (WOD only)...");
@@ -97,7 +97,7 @@ public class RepairAssignmentDAO {
                     "JOIN Customer c ON v.CustomerID = c.CustomerID " +
                     "JOIN User u ON c.UserID = u.UserID " +
                     "WHERE wod.approval_status = 'APPROVED' " +
-                    "AND (wod.source = 'REQUEST' OR wod.source = 'DIAGNOSTIC') " +
+                    "AND wod.source = 'REQUEST' " + // Only REQUEST source for direct repair assignment
                     "ORDER BY wod.approved_at DESC";
 
             System.out.println("\nSTEP 4: Executing full query with all JOINs...");

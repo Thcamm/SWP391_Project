@@ -1,4 +1,4 @@
-package service;
+package service.tracking;
 
 import dao.customer.RepairJourneyDAO;
 import model.dto.DiagnosticPartView;
@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-
 public class RepairJourneyService {
 
     private final RepairJourneyDAO dao;
@@ -35,18 +34,17 @@ public class RepairJourneyService {
         this.dao = dao;
     }
 
-
     public RepairJourneyView getFullJourney(int requestId, Integer customerId) throws SQLException {
 
         RepairJourneyView view = dao.getRepairJourneyByRequestID(requestId);
-        if (view == null) return null;
-
+        if (view == null)
+            return null;
 
         if (customerId != null) {
             boolean ok = dao.verifyRequestOwnership(requestId, customerId);
-            if (!ok) throw new SecurityException("Không có quyền truy cập hành trình này.");
+            if (!ok)
+                throw new SecurityException("Không có quyền truy cập hành trình này.");
         }
-
 
         Integer woId = dao.getWorkOrderIDByRequestID(requestId);
         view.setWorkOrderID(woId);
@@ -55,26 +53,22 @@ public class RepairJourneyService {
 
             List<WorkOrderDetailView> details = dao.getWorkOrderDetails(woId);
 
-
             for (WorkOrderDetailView d : details) {
-                dao.populateTaskAssignment(d);            // Assignment + technician
-                dao.populateVehicleDiagnostic(d);         // Diagnostic core
+                dao.populateTaskAssignment(d); // Assignment + technician
+                dao.populateVehicleDiagnostic(d); // Diagnostic core
                 if (d.getVehicleDiagnosticID() != null) {
                     List<DiagnosticPartView> parts = dao.getDiagnosticParts(d.getVehicleDiagnosticID());
                     d.setDiagnosticParts(parts);
-                    d.calculateApprovedPartsCost();       // tính approvedPartsCost, counts
+                    d.calculateApprovedPartsCost(); // tính approvedPartsCost, counts
                 }
             }
 
             view.setWorkOrderDetails(details);
 
-
             calcTotals(view);
         }
 
-
         flattenTopLevelFields(view);
-
 
         buildTimeline(view);
         computeFeedbackWindow(view);
@@ -85,12 +79,13 @@ public class RepairJourneyService {
     /**
      * Approve/Unapprove hàng loạt parts trong một vehicleDiagnostic.
      * Có verify quyền sở hữu theo customer.
-     * Trả về danh sách parts mới sau cập nhật (đã sort như trong DAO) và số liệu tổng.
+     * Trả về danh sách parts mới sau cập nhật (đã sort như trong DAO) và số liệu
+     * tổng.
      */
     public UpdatePartsResult updateDiagnosticPartsApproval(int vehicleDiagnosticId,
-                                                           List<Integer> diagnosticPartIds,
-                                                           boolean approve,
-                                                           Integer customerId) throws SQLException {
+            List<Integer> diagnosticPartIds,
+            boolean approve,
+            Integer customerId) throws SQLException {
         if (diagnosticPartIds == null || diagnosticPartIds.isEmpty()) {
             return UpdatePartsResult.empty();
         }
@@ -98,11 +93,13 @@ public class RepairJourneyService {
         // Verify ownership (nếu là customer portal)
         if (customerId != null) {
             boolean ok = dao.verifyDiagnosticOwnership(vehicleDiagnosticId, customerId);
-            if (!ok) throw new SecurityException("Bạn không thể cập nhật parts của chẩn đoán này.");
+            if (!ok)
+                throw new SecurityException("Bạn không thể cập nhật parts của chẩn đoán này.");
         }
 
         boolean success = dao.updateMultipleDiagnosticParts(diagnosticPartIds, approve);
-        if (!success) return UpdatePartsResult.empty();
+        if (!success)
+            return UpdatePartsResult.empty();
 
         // Reload lại danh sách parts để trả về giao diện
         List<DiagnosticPartView> parts = dao.getDiagnosticParts(vehicleDiagnosticId);
@@ -112,18 +109,20 @@ public class RepairJourneyService {
         tmp.setDiagnosticParts(parts);
         tmp.calculateApprovedPartsCost();
 
-        return new UpdatePartsResult(parts, tmp.getApprovedPartsCost(), tmp.getApprovedPartsCount(), tmp.getTotalPartsCount());
+        return new UpdatePartsResult(parts, tmp.getApprovedPartsCost(), tmp.getApprovedPartsCount(),
+                tmp.getTotalPartsCount());
     }
 
     /**
      * Lấy danh sách tóm tắt theo trang cho 1 khách hàng.
      */
     public PaginatedResult<RepairJourneySummaryDTO> getCustomerJourneySummaries(int customerId,
-                                                                                int currentPage,
-                                                                                int itemsPerPage) throws SQLException {
+            int currentPage,
+            int itemsPerPage) throws SQLException {
         int total = dao.countJourneySummaries(customerId);
         PaginationUtils.PaginationCalculation calc = PaginationUtils.calculateParams(total, currentPage, itemsPerPage);
-        List<RepairJourneySummaryDTO> items = dao.getPaginatedJourneySummaries(customerId, Math.max(1, itemsPerPage), calc.getOffset());
+        List<RepairJourneySummaryDTO> items = dao.getPaginatedJourneySummaries(customerId, Math.max(1, itemsPerPage),
+                calc.getOffset());
         return new PaginatedResult<>(items, calc.getSafePage(), Math.max(1, itemsPerPage), total);
     }
 
@@ -239,12 +238,14 @@ public class RepairJourneyService {
                 // Nếu có Diagnostic -> show trạng thái + parts
                 if (d.getVehicleDiagnosticID() != null) {
                     s.addStep(step("Kết quả chẩn đoán: " + safe(d.getDiagnosticStatus()),
-                            ts(wo.getUpdatedAt()), iconByStatus(d.getDiagnosticStatus()), colorByStatus(d.getDiagnosticStatus()),
+                            ts(wo.getUpdatedAt()), iconByStatus(d.getDiagnosticStatus()),
+                            colorByStatus(d.getDiagnosticStatus()),
                             isDone(d.getDiagnosticStatus())));
 
                     String partsSummary = String.format("Parts đã duyệt: %d/%d (%,.0f)",
                             d.getApprovedPartsCount(), d.getTotalPartsCount(), d.getApprovedPartsCost());
-                    s.addStep(step(partsSummary, ts(wo.getUpdatedAt()), "boxes", "secondary", d.getApprovedPartsCount() > 0));
+                    s.addStep(step(partsSummary, ts(wo.getUpdatedAt()), "boxes", "secondary",
+                            d.getApprovedPartsCount() > 0));
                 }
             }
 
@@ -272,10 +273,12 @@ public class RepairJourneyService {
                     "FEEDBACK", "Đánh giá dịch vụ", "bi-chat-heart");
 
             if (fb != null) {
-                s.addStep(step("Khách đã gửi đánh giá", ts(fb.getFeedbackDate() == null ? null : Timestamp.valueOf(fb.getFeedbackDate())),
+                s.addStep(step("Khách đã gửi đánh giá",
+                        ts(fb.getFeedbackDate() == null ? null : Timestamp.valueOf(fb.getFeedbackDate())),
                         "hand-thumbs-up", "success", true));
                 if (fb.getReplyDate() != null) {
-                    s.addStep(step("Đã phản hồi khách", ts(Timestamp.valueOf(fb.getReplyDate())), "reply", "secondary", true));
+                    s.addStep(step("Đã phản hồi khách", ts(Timestamp.valueOf(fb.getReplyDate())), "reply", "secondary",
+                            true));
                 }
                 s.setOverallStatus("completed");
             } else {
@@ -331,17 +334,19 @@ public class RepairJourneyService {
     // ============================
 
     private RepairJourneyView.TimelineStep step(String text, String ts,
-                                                String icon, String color, boolean done) {
+            String icon, String color, boolean done) {
         return new RepairJourneyView.TimelineStep(text, ts, icon, color, done);
     }
 
     private String ts(Timestamp ts) {
-        if (ts == null) return null;
+        if (ts == null)
+            return null;
         return tsFmt.format(ts.toInstant());
     }
 
     private String statusVN(String status) {
-        if (status == null) return "";
+        if (status == null)
+            return "";
         return switch (status) {
             case "PENDING" -> "Đang chờ";
             case "APPROVE", "APPROVED" -> "Đã chấp nhận";
@@ -353,7 +358,8 @@ public class RepairJourneyService {
     }
 
     private String iconByStatus(String status) {
-        if (status == null) return "clock";
+        if (status == null)
+            return "clock";
         return switch (status) {
             case "PENDING" -> "clock";
             case "APPROVE", "APPROVED", "COMPLETE", "COMPLETED" -> "check-circle";
@@ -364,7 +370,8 @@ public class RepairJourneyService {
     }
 
     private String colorByStatus(String status) {
-        if (status == null) return "secondary";
+        if (status == null)
+            return "secondary";
         return switch (status) {
             case "PENDING" -> "warning";
             case "APPROVE", "APPROVED", "COMPLETE", "COMPLETED" -> "success";
@@ -375,7 +382,8 @@ public class RepairJourneyService {
     }
 
     private String iconByPayment(String paymentStatus) {
-        if (paymentStatus == null) return "cash-coin";
+        if (paymentStatus == null)
+            return "cash-coin";
         return switch (paymentStatus) {
             case "PAID" -> "check-circle";
             case "UNPAID" -> "cash-coin";
@@ -385,7 +393,8 @@ public class RepairJourneyService {
     }
 
     private String colorByPayment(String paymentStatus) {
-        if (paymentStatus == null) return "secondary";
+        if (paymentStatus == null)
+            return "secondary";
         return switch (paymentStatus) {
             case "PAID" -> "success";
             case "UNPAID" -> "warning";
@@ -395,7 +404,8 @@ public class RepairJourneyService {
     }
 
     private boolean isDone(String status) {
-        if (status == null) return false;
+        if (status == null)
+            return false;
         return switch (status) {
             case "APPROVE", "APPROVED", "COMPLETE", "COMPLETED", "PAID" -> true;
             default -> false;
@@ -403,7 +413,8 @@ public class RepairJourneyService {
     }
 
     private String overallBy(String status) {
-        if (status == null) return "active";
+        if (status == null)
+            return "active";
         return switch (status) {
             case "REJECTED", "DECLINED" -> "rejected";
             case "COMPLETE", "COMPLETED", "PAID" -> "completed";
@@ -411,7 +422,9 @@ public class RepairJourneyService {
         };
     }
 
-    private String safe(String s) { return s == null ? "" : s; }
+    private String safe(String s) {
+        return s == null ? "" : s;
+    }
 
     // ============================
     // DTOs phụ trợ cho Service
@@ -451,23 +464,28 @@ public class RepairJourneyService {
         }
     }
 
-
     public int acceptDiagnosticAndCreateWorkDetail(int vehicleDiagnosticId, Integer customerId) throws SQLException {
         // Verify ownership theo customer (nếu có)
         if (customerId != null) {
             boolean ok = dao.verifyDiagnosticOwnership(vehicleDiagnosticId, customerId);
-            if (!ok) throw new SecurityException("Bạn không có quyền chốt chẩn đoán này.");
+            if (!ok)
+                throw new SecurityException("Bạn không có quyền chốt chẩn đoán này.");
         }
 
         // Xác định WorkOrder cha
         Integer woId = dao.getWorkOrderIdByDiagnostic(vehicleDiagnosticId);
-        if (woId == null) throw new IllegalStateException("Không tìm thấy WorkOrder cha cho VehicleDiagnostic " + vehicleDiagnosticId);
+        if (woId == null)
+            throw new IllegalStateException(
+                    "Không tìm thấy WorkOrder cha cho VehicleDiagnostic " + vehicleDiagnosticId);
 
         // Lấy danh sách parts & lọc parts đã duyệt
         List<DiagnosticPartView> parts = dao.getDiagnosticParts(vehicleDiagnosticId);
         List<DiagnosticPartView> approved = new ArrayList<>();
-        for (DiagnosticPartView p : parts) if (p.getIsApproved() == 1) approved.add(p);
-        if (approved.isEmpty()) throw new IllegalStateException("Chưa có part nào được duyệt, không thể chốt chẩn đoán.");
+        for (DiagnosticPartView p : parts)
+            if (p.getIsApproved() == 1)
+                approved.add(p);
+        if (approved.isEmpty())
+            throw new IllegalStateException("Chưa có part nào được duyệt, không thể chốt chẩn đoán.");
 
         // Tính tổng estimate
         BigDecimal partsTotal = BigDecimal.ZERO;
@@ -476,7 +494,8 @@ public class RepairJourneyService {
             BigDecimal qty = BigDecimal.valueOf(Math.max(0, p.getQuantityNeeded()));
             partsTotal = partsTotal.add(unit.multiply(qty));
         }
-        BigDecimal diagnosticFee = BigDecimal.ZERO; // nếu muốn cộng thêm phí chẩn đoán, đọc từ VehicleDiagnostic.EstimateCost
+        BigDecimal diagnosticFee = BigDecimal.ZERO; // nếu muốn cộng thêm phí chẩn đoán, đọc từ
+                                                    // VehicleDiagnostic.EstimateCost
         BigDecimal estimateAmount = partsTotal.add(diagnosticFee);
 
         try {
@@ -494,8 +513,7 @@ public class RepairJourneyService {
                     "APPROVED",
                     taskDescription,
                     estimateAmount,
-                    "PENDING"
-            );
+                    "PENDING");
 
             // 3) Materialize WorkOrderPart từ parts đã duyệt
             for (DiagnosticPartView p : approved) {
@@ -505,8 +523,7 @@ public class RepairJourneyService {
                         p.getQuantityNeeded(),
                         p.getUnitPrice() == null ? BigDecimal.ZERO : p.getUnitPrice(),
                         p.getTotalPrice() == null ? BigDecimal.ZERO : p.getTotalPrice(),
-                        "DIAGNOSTIC"
-                );
+                        "DIAGNOSTIC");
             }
 
             dao.commitTx();

@@ -121,7 +121,8 @@ public class DashboardServlet extends HttpServlet {
 
             // ===== Cảnh báo Quản lý (Xử lý Ngoại lệ) =====
             stats.put("declinedTasksCount", declinedTaskService.countDeclinedTasks());
-            stats.put("overdueTasks", techManagerService.countOverdueTasks());
+            // overdueTasks removed - system auto-cancels them, TechManager only needs
+            // tasksNeedReassignment
             stats.put("declinedTasks", techManagerService.countDeclinedTasks());
             stats.put("tasksNeedReassignment", techManagerService.countTasksNeedReassignment());
 
