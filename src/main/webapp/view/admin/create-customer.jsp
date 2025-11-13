@@ -212,19 +212,17 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   <!-- Right Column -->
                   <div class="col-md-6">
                     <div class="mb-3">
-                      <label for="gender" class="form-label">Giới tính</label>
+                      <label for="gender" class="form-label">Genders</label>
                       <select class="form-select" id="gender" name="gender">
-                        <option value="">-- Chọn giới tính --</option>
-                        <option value="Male">Nam</option>
-                        <option value="Female">Nữ</option>
-                        <option value="Other">Khác</option>
+                        <option value="">-- Choose genders --</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
                       </select>
                     </div>
 
                     <div class="mb-3">
-                      <label for="birthDate" class="form-label"
-                        >Ngày sinh</label
-                      >
+                      <label for="birthDate" class="form-label">Birth Date</label>
                       <input
                         type="date"
                         class="form-control"
@@ -234,26 +232,25 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                     </div>
 
                     <div class="mb-3">
-                      <label for="address" class="form-label">Địa chỉ</label>
+                      <label for="address" class="form-label">Address</label>
                       <textarea
                         class="form-control"
                         id="address"
                         name="address"
                         rows="3"
-                        placeholder="Nhập địa chỉ"
+                        placeholder="Enter address"
                       ></textarea>
                     </div>
 
                     <!-- Customer Info Box -->
                     <div class="alert alert-info">
                       <h6 class="alert-heading">
-                        <i class="bi bi-info-circle"></i> Thông tin Customer:
+                        <i class="bi bi-info-circle"></i> Customer Information:
                       </h6>
                       <ul class="mb-0">
-                        <li><strong>Role:</strong> Customer (tự động)</li>
-                        <li><strong>Mật khẩu:</strong> 123456 (mặc định)</li>
-                        <li><strong>Loyalty Points:</strong> 0 (initialized)</li>
-                        <li><strong>Trạng thái:</strong> Active</li>
+                        <li><strong>Role:</strong> Customer (automatically)</li>
+                        <li><strong>Password:</strong>Random created</li>
+                        <li><strong>Status:</strong> Active</li>
                       </ul>
                     </div>
                   </div>
@@ -265,38 +262,31 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                     <div class="card bg-light">
                       <div class="card-body">
                         <h5 class="text-primary">
-                          <i class="bi bi-star"></i> Tính năng dành cho Customer
+                          <i class="bi bi-star"></i> Customer-Specific Features
                         </h5>
                         <div class="row">
                           <div class="col-md-6">
                             <ul class="list-unstyled">
                               <li>
                                 <i class="bi bi-check-circle text-success"></i>
-                                Đặt lịch hẹn dịch vụ
+                                Booking service appointments
                               </li>
                               <li>
                                 <i class="bi bi-check-circle text-success"></i>
-                                Xem lịch sử dịch vụ
+                                Access service history
                               </li>
-                              <li>
-                                <i class="bi bi-check-circle text-success"></i>
-                                Theo dõi trạng thái xe
-                              </li>
+
                             </ul>
                           </div>
                           <div class="col-md-6">
                             <ul class="list-unstyled">
                               <li>
                                 <i class="bi bi-check-circle text-success"></i>
-                                Quản lý thông tin xe
+                                  Vehicle information management
                               </li>
                               <li>
                                 <i class="bi bi-check-circle text-success"></i>
-                                Tích lũy điểm thưởng
-                              </li>
-                              <li>
-                                <i class="bi bi-check-circle text-success"></i>
-                                Nhận thông báo dịch vụ
+                                    Receive promotions and updates
                               </li>
                             </ul>
                           </div>
@@ -315,7 +305,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                         href="${pageContext.request.contextPath}/admin/users/choose-type"
                         class="btn btn-secondary"
                       >
-                        <i class="bi bi-arrow-left"></i> Quay lại
+                        <i class="bi bi-arrow-left"></i> Back
                       </a>
 
                       <div class="btn-group">
