@@ -336,7 +336,7 @@ public class RepairJourneyDAO extends DbContext {
     }
     // Thêm các phương thức này vào JourneyDAO
 
-    public int countFilteredTracking(String fullName, String vehicle) throws SQLException {
+    public int countFilteredTracking(String fullName, Integer vehicleId) throws SQLException {
         StringBuilder sql = new StringBuilder(
                 "SELECT COUNT(DISTINCT sr.RequestID) FROM servicerequest sr " +
                         "LEFT JOIN appointment a ON sr.AppointmentID = a.AppointmentID " +
@@ -353,9 +353,9 @@ public class RepairJourneyDAO extends DbContext {
             params.add("%" + fullName.trim() + "%");
         }
 
-        if (vehicle != null && !vehicle.trim().isEmpty()) {
-            sql.append(" AND v.LisencePlate LIKE ?");
-            params.add("%" + vehicle.trim() + "%");
+        if (vehicleId != null) {
+            sql.append(" AND sr.VehicleID = ?");
+            params.add(vehicleId);
         }
 
         int count = 0;
@@ -376,7 +376,7 @@ public class RepairJourneyDAO extends DbContext {
     }
 
     public List<RepairJourneySummaryDTO> getFilteredTracking(
-            String fullName, String vehicle, String sortBy, int limit, int offset) throws SQLException {
+            String fullName, Integer vehicleId, String sortBy, int limit, int offset) throws SQLException {
 
         List<RepairJourneySummaryDTO> list = new ArrayList<>();
 
@@ -415,9 +415,9 @@ public class RepairJourneyDAO extends DbContext {
             params.add("%" + fullName.trim() + "%");
         }
 
-        if (vehicle != null && !vehicle.trim().isEmpty()) {
-            sql.append(" AND v.LicensePlate LIKE ?");
-            params.add("%" + fullName.trim() + "%");
+        if (vehicleId != null) {
+            sql.append(" AND sr.VehicleID = ?");
+            params.add(vehicleId);
         }
 
         // Áp dụng sort

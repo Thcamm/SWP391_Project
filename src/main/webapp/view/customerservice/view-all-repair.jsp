@@ -231,204 +231,239 @@
 <jsp:include page="footer.jsp"/>
 
 <script>
-    // Debounce utility
-    function debounce(func, delay) {
-        let timeoutId;
-        return function(...args) {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => func.apply(this, args), delay);
-        };
-    }
+    (function() {
+        'use strict';
 
-    // Customer search with autocomplete
-    const customerNameInput = document.getElementById('customerName');
-    const customerSuggestionsDiv = document.getElementById('customerSuggestions');
-    const customerIdHidden = document.getElementById('customerIdHidden');
-    const customerNameHidden = document.getElementById('customerNameHidden');
-    const selectedCustomerInfo = document.getElementById('selectedCustomerInfo');
-
-    const searchCustomers = debounce(async function() {
-        const query = customerNameInput.value.trim();
-
-        if (query.length < 2) {
-            customerSuggestionsDiv.style.display = 'none';
-            return;
+        // Debounce utility
+        function debounce(func, delay) {
+            let timeoutId;
+            return function(...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => func.apply(this, args), delay);
+            };
         }
 
-        try {
-            const ctx = '<%= request.getContextPath() %>'; // chỉ lấy contextPath từ JSP
-            const response = await fetch(
-                ctx + "/customerservice/customer-search?name=" + encodeURIComponent(query) + "&limit=10"
-            );
+        // ============= CUSTOMER SEARCH =============
+        const customerNameInput = document.getElementById('customerName');
+        const customerSuggestionsDiv = document.getElementById('customerSuggestions');
+        const customerIdHidden = document.getElementById('customerIdHidden');
+        const customerNameHidden = document.getElementById('customerNameHidden');
+        const selectedCustomerInfo = document.getElementById('selectedCustomerInfo');
 
-            const customers = await response.json();
+        const searchCustomers = debounce(function() {
+            const query = customerNameInput.value.trim();
 
-            if (customers.length > 0) {
-                customerSuggestionsDiv.innerHTML = customers.map(c => {
-                    const customerId = c.customerId ?? '';
-                    const fullName = String(c.fullName ?? 'N/A');
-                    const phone = String(c.phoneNumber ?? 'N/A');
-                    const email = String(c.email ?? 'N/A');
-
-                    return `
-        <div class="autocomplete-item"
-             data-customer-id="${customerId}"
-             data-customer-name="${fullName}"
-             data-phone="${phone}"
-             data-email="${email}">
-            <div class="customer-name">${fullName}</div>
-            <div class="customer-details">
-                📞 ${phone} | 📧 ${email}
-            </div>
-        </div>
-    `;
-                }).join('');
-
-                customerSuggestionsDiv.style.display = 'block';
-
-                // Add click handlers
-                document.querySelectorAll('#customerSuggestions .autocomplete-item').forEach(item => {
-                    item.addEventListener('click', function() {
-                        const customerId = this.dataset.customerId;
-                        const customerName = this.dataset.customerName;
-
-                        customerNameInput.value = customerName;
-                        customerIdHidden.value = customerId;
-                        customerNameHidden.value = customerName;
-                        selectedCustomerInfo.innerHTML = `
-                            <span class="text-success">
-                                <i class="bi bi-check-circle"></i> Selected: ${customerName}
-                            </span>
-                        `;
-                        customerSuggestionsDiv.style.display = 'none';
-
-                        // Reset vehicle selection and fetch vehicles for this customer
-                        document.getElementById('vehicleSearch').value = '';
-                        document.getElementById('vehicleIdInput').value = '';
-                        document.getElementById('selectedVehicleInfo').innerHTML = `
-                            <span class="text-muted">Search vehicles for this customer...</span>
-                        `;
-                    });
-                });
-            } else {
+            if (query.length < 2) {
                 customerSuggestionsDiv.style.display = 'none';
+                return;
             }
-        } catch (error) {
-            console.error('Error fetching customers:', error);
+
+            const ctx = '<%= request.getContextPath() %>';
+            const url = ctx + "/customerservice/customer-search?name=" + encodeURIComponent(query) + "&limit=10";
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('HTTP ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(customers => {
+                    displayCustomerSuggestions(customers);
+                })
+                .catch(error => {
+                    console.error('Error fetching customers:', error);
+                    customerSuggestionsDiv.innerHTML = '<div class="autocomplete-item text-danger">Error: ' + error.message + '</div>';
+                    customerSuggestionsDiv.style.display = 'block';
+                });
+        }, 300);
+
+        function displayCustomerSuggestions(customers) {
+            customerSuggestionsDiv.innerHTML = '';
+
+            if (!Array.isArray(customers) || customers.length === 0) {
+                customerSuggestionsDiv.style.display = 'none';
+                return;
+            }
+
+            customers.forEach(function(c) {
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item';
+
+                // Utiliser customerID avec I majuscule
+                const customerId = c.customerID || c.customerId || '';
+                const fullName = c.fullName || 'N/A';
+                const phone = c.phoneNumber || 'N/A';
+                const email = c.email || 'N/A';
+
+                // Stocker les données
+                item.dataset.customerId = customerId;
+                item.dataset.customerName = fullName;
+
+                // Créer le nom
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'customer-name';
+                nameDiv.textContent = fullName;
+                item.appendChild(nameDiv);
+
+                // Créer les détails
+                const detailsDiv = document.createElement('div');
+                detailsDiv.className = 'customer-details';
+                detailsDiv.textContent = '📞 ' + phone + ' | 📧 ' + email;
+                item.appendChild(detailsDiv);
+
+                // Ajouter le click handler
+                item.addEventListener('mousedown', function() {
+                    const selectedId = this.dataset.customerId;
+                    const selectedName = this.dataset.customerName;
+
+                    customerNameInput.value = selectedName;
+                    customerIdHidden.value = selectedId;
+                    customerNameHidden.value = selectedName;
+
+                    selectedCustomerInfo.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Selected: ' + selectedName + '</span>';
+                    customerSuggestionsDiv.style.display = 'none';
+
+                    // Reset vehicle selection
+                    document.getElementById('vehicleSearch').value = '';
+                    document.getElementById('vehicleIdInput').value = '';
+                    document.getElementById('selectedVehicleInfo').innerHTML = '<span class="text-muted">Search vehicles for this customer...</span>';
+                });
+
+                customerSuggestionsDiv.appendChild(item);
+            });
+
+            customerSuggestionsDiv.style.display = 'block';
         }
-    }, 300);
 
-    customerNameInput.addEventListener('input', searchCustomers);
+        customerNameInput.addEventListener('input', searchCustomers);
 
-    // Vehicle search with autocomplete
-    const vehicleSearchInput = document.getElementById('vehicleSearch');
-    const vehicleSuggestionsDiv = document.getElementById('vehicleSuggestions');
-    const vehicleIdInput = document.getElementById('vehicleIdInput');
-    const selectedVehicleInfo = document.getElementById('selectedVehicleInfo');
+        // ============= VEHICLE SEARCH =============
+        const vehicleSearchInput = document.getElementById('vehicleSearch');
+        const vehicleSuggestionsDiv = document.getElementById('vehicleSuggestions');
+        const vehicleIdInput = document.getElementById('vehicleIdInput');
+        const selectedVehicleInfo = document.getElementById('selectedVehicleInfo');
 
-    const searchVehicles = debounce(async function() {
-        const query = vehicleSearchInput.value.trim();
+        const searchVehicles = debounce(function() {
+            const query = vehicleSearchInput.value.trim();
 
-        if (query.length < 1) {
-            vehicleSuggestionsDiv.style.display = 'none';
-            return;
-        }
+            if (query.length < 1) {
+                vehicleSuggestionsDiv.style.display = 'none';
+                return;
+            }
 
-        try {
             const customerId = customerIdHidden.value;
-            const ctx = '<%= request.getContextPath() %>'; // chỉ lấy contextPath từ JSP
-
+            const ctx = '<%= request.getContextPath() %>';
             let url = ctx + "/customerservice/vehicles-search?query=" + encodeURIComponent(query);
 
-            // If customer is selected, add customer ID to filter vehicles
             if (customerId) {
-                url += `&id=${customerId}`;
+                url += "&id=" + customerId;
             }
 
-            const response = await fetch(url);
-            const vehicles = await response.json();
-
-            if (vehicles.length > 0) {
-                vehicleSuggestionsDiv.innerHTML = vehicles.map(v => {
-                    const vehicleId = v.vehicleID ?? '';
-                    const licensePlate = String(v.licensePlate ?? 'N/A');
-                    const model = String(v.model ?? 'N/A');
-                    const brand = String(v.brand ?? 'N/A');
-
-                    return `
-        <div class="autocomplete-item"
-             data-vehicle-id="${vehicleId}"
-             data-license-plate="${licensePlate}">
-            <div class="customer-name">${licensePlate}</div>
-            <div class="customer-details">${model} | ${brand}</div>
-        </div>
-    `;
-                }).join('');
-
-                vehicleSuggestionsDiv.style.display = 'block';
-
-                // Add click handlers
-                document.querySelectorAll('#vehicleSuggestions .autocomplete-item').forEach(item => {
-                    item.addEventListener('click', function() {
-                        const vehicleId = this.dataset.vehicleId;
-                        const licensePlate = this.dataset.licensePlate;
-
-                        vehicleSearchInput.value = licensePlate;
-                        vehicleIdInput.value = vehicleId;
-                        selectedVehicleInfo.innerHTML = `
-                            <span class="text-success">
-                                <i class="bi bi-check-circle"></i> Selected: ${licensePlate}
-                            </span>
-                        `;
-                        vehicleSuggestionsDiv.style.display = 'none';
-                    });
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('HTTP ' + response.status);
+                    }
+                    return response.json();
+                })
+                .then(vehicles => {
+                    displayVehicleSuggestions(vehicles);
+                })
+                .catch(error => {
+                    console.error('Error fetching vehicles:', error);
+                    vehicleSuggestionsDiv.innerHTML = '<div class="autocomplete-item text-danger">Error: ' + error.message + '</div>';
+                    vehicleSuggestionsDiv.style.display = 'block';
                 });
-            } else {
-                vehicleSuggestionsDiv.innerHTML = `
-                    <div class="autocomplete-item">
-                        <div class="customer-details text-center">No vehicles found</div>
-                    </div>
-                `;
+        }, 300);
+
+        function displayVehicleSuggestions(vehicles) {
+            vehicleSuggestionsDiv.innerHTML = '';
+
+            if (!Array.isArray(vehicles)) {
+                console.error('Invalid vehicles data:', vehicles);
+                vehicleSuggestionsDiv.innerHTML = '<div class="autocomplete-item text-danger">Invalid data received</div>';
                 vehicleSuggestionsDiv.style.display = 'block';
+                return;
             }
-        } catch (error) {
-            console.error('Error fetching vehicles:', error);
+
+            if (vehicles.length === 0) {
+                vehicleSuggestionsDiv.innerHTML = '<div class="autocomplete-item text-muted">No vehicles found</div>';
+                vehicleSuggestionsDiv.style.display = 'block';
+                return;
+            }
+
+            vehicles.forEach(function(v) {
+                const item = document.createElement('div');
+                item.className = 'autocomplete-item';
+
+                const vehicleId = v.vehicleID || '';
+                const licensePlate = v.licensePlate || 'N/A';
+                const brand = v.brand || '';
+                const model = v.model || '';
+                const year = v.yearManufacture || '';
+
+                // Stocker les données
+                item.dataset.vehicleId = vehicleId;
+                item.dataset.licensePlate = licensePlate;
+
+                // Créer la plaque
+                const plateDiv = document.createElement('div');
+                plateDiv.className = 'customer-name';
+                plateDiv.textContent = licensePlate;
+                item.appendChild(plateDiv);
+
+                // Créer les détails
+                const detailsDiv = document.createElement('div');
+                detailsDiv.className = 'customer-details';
+                detailsDiv.textContent = brand + ' ' + model + (year ? ' (' + year + ')' : '');
+                item.appendChild(detailsDiv);
+
+                // Ajouter le click handler
+                item.addEventListener('mousedown', function() {
+                    const selectedId = this.dataset.vehicleId;
+                    const selectedPlate = this.dataset.licensePlate;
+
+                    vehicleSearchInput.value = selectedPlate;
+                    vehicleIdInput.value = selectedId;
+
+                    selectedVehicleInfo.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Selected: ' + selectedPlate + '</span>';
+                    vehicleSuggestionsDiv.style.display = 'none';
+                });
+
+                vehicleSuggestionsDiv.appendChild(item);
+            });
+
+            vehicleSuggestionsDiv.style.display = 'block';
         }
-    }, 300);
 
-    vehicleSearchInput.addEventListener('input', searchVehicles);
+        vehicleSearchInput.addEventListener('input', searchVehicles);
 
-    // Hide dropdowns when clicking outside
-    document.addEventListener('click', function(e) {
-        if (!customerNameInput.contains(e.target) && !customerSuggestionsDiv.contains(e.target)) {
-            customerSuggestionsDiv.style.display = 'none';
-        }
-        if (!vehicleSearchInput.contains(e.target) && !vehicleSuggestionsDiv.contains(e.target)) {
-            vehicleSuggestionsDiv.style.display = 'none';
-        }
-    });
+        // ============= HIDE DROPDOWNS ON OUTSIDE CLICK =============
+        document.addEventListener('click', function(e) {
+            if (!customerNameInput.contains(e.target) && !customerSuggestionsDiv.contains(e.target)) {
+                customerSuggestionsDiv.style.display = 'none';
+            }
+            if (!vehicleSearchInput.contains(e.target) && !vehicleSuggestionsDiv.contains(e.target)) {
+                vehicleSuggestionsDiv.style.display = 'none';
+            }
+        });
 
-    // Clear filter button
-    document.getElementById('clearFilter').addEventListener('click', function() {
-        customerNameInput.value = '';
-        customerIdHidden.value = '';
-        customerNameHidden.value = '';
-        vehicleSearchInput.value = '';
-        vehicleIdInput.value = '';
-        document.getElementById('sortBySelect').value = 'newest';
+        // ============= CLEAR FILTER BUTTON =============
+        document.getElementById('clearFilter').addEventListener('click', function() {
+            customerNameInput.value = '';
+            customerIdHidden.value = '';
+            customerNameHidden.value = '';
+            vehicleSearchInput.value = '';
+            vehicleIdInput.value = '';
+            document.getElementById('sortBySelect').value = 'newest';
 
-        selectedCustomerInfo.innerHTML = '<span class="text-muted">Start typing to search...</span>';
-        selectedVehicleInfo.innerHTML = '<span class="text-muted">Start typing to search...</span>';
+            selectedCustomerInfo.innerHTML = '<span class="text-muted">Start typing to search...</span>';
+            selectedVehicleInfo.innerHTML = '<span class="text-muted">Start typing to search...</span>';
 
-        // Clear URL and reload
-        window.location.href = '${pageContext.request.contextPath}/customerservice/view-all-repairs';
-    });
-
-    // Form submit - normal form submission (not AJAX)
-    document.getElementById('filterForm').addEventListener('submit', function(e) {
-        // Let the form submit normally - no preventDefault
-        // The form will submit with all the hidden inputs containing the selected values
-    });
+            window.location.href = '${pageContext.request.contextPath}/customerservice/view-all-repairs';
+        });
+    })();
 </script>
 </body>
 </html>

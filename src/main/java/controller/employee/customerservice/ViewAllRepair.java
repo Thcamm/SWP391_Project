@@ -43,16 +43,24 @@ public class ViewAllRepair extends HttpServlet {
         if (fullName != null && fullName.trim().isEmpty()) {
             fullName = null;
         }
-        if (vehicleIdParam != null && vehicleIdParam.trim().isEmpty()) {
-            vehicleIdParam = null;
-        }
+
         if (sortBy == null || sortBy.trim().isEmpty()) {
             sortBy = "newest"; // default
+        }
+        Integer vehicleId = null;
+
+        if (vehicleIdParam != null && !vehicleIdParam.trim().isEmpty()) {
+            try {
+                vehicleId = Integer.parseInt(vehicleIdParam);
+            } catch (NumberFormatException e) {
+                // Invalid vehicleId passed, you can log or ignore
+                vehicleId = null;
+            }
         }
 
         try {
             // Count total items with filters
-            int totalItems = repairListService.countFilteredTracker(fullName, vehicleIdParam);
+            int totalItems = repairListService.countFilteredTracker(fullName, vehicleId);
 
             // Calculate pagination
             PaginationUtils.PaginationCalculation calc =
@@ -63,7 +71,7 @@ public class ViewAllRepair extends HttpServlet {
 
             // Get filtered data
             List<RepairJourneySummaryDTO> repairJourneySummaryDTOList =
-                    repairListService.getFilteredTracker(fullName, vehicleIdParam, sortBy, itemsPerPage, offset);
+                    repairListService.getFilteredTracker(fullName, vehicleId, sortBy, itemsPerPage, offset);
 
             // Create pagination result
             PaginationUtils.PaginationResult<RepairJourneySummaryDTO> result =
