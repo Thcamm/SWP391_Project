@@ -2,7 +2,7 @@ package service.employee.techmanager;
 
 import dao.workorder.RepairAssignmentDAO;
 import model.employee.techmanager.ApprovedRepairDTO;
-import model.employee.techmanager.TechnicianDTO;
+import model.dto.TechnicianDTO;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -14,8 +14,8 @@ import java.util.List;
  * 
  * LUỒNG MỚI (Triage Workflow):
  * - Handles WODs from BOTH sources:
- *   1. REQUEST: Direct from GĐ2 Triage (skip diagnosis)
- *   2. DIAGNOSTIC: From GĐ4 Quote Approval (customer approved)
+ * 1. REQUEST: Direct from GĐ2 Triage (skip diagnosis)
+ * 2. DIAGNOSTIC: From GĐ4 Quote Approval (customer approved)
  * 
  * @author SWP391 Team
  * @version 2.0 (Updated for LUỒNG MỚI)

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import model.employee.techmanager.ApprovedRepairDTO;
-import model.employee.techmanager.TechnicianDTO;
+import model.dto.TechnicianDTO;
 import service.employee.techmanager.RepairAssignmentService;
 
 /**
@@ -43,7 +43,9 @@ public class RepairAssignmentServlet extends HttpServlet {
             // Get available technicians for repair
             List<TechnicianDTO> availableTechnicians = repairAssignmentService.getAvailableTechnicians();
 
-            request.setAttribute("approvedRepair", approvedRepairs);
+            System.out.println("[RepairAssignmentServlet] Found " + approvedRepairs.size() + " approved repairs");
+
+            request.setAttribute("approvedRepairs", approvedRepairs); // Use consistent naming: approvedRepairs
             request.setAttribute("availableTechnicians", availableTechnicians);
 
             // Handle messages

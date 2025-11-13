@@ -42,20 +42,18 @@ public class DashboardDAO {
     }
 
     /**
-     * LUỒNG MỚI - GĐ 2: Count WorkOrderDetails awaiting Triage (source=NULL)
-     * These are WODs created after approval but not yet classified by TM.
+     * DEPRECATED: Triage step removed - Classification now happens during approval.
+     * Kept for backward compatibility only.
      * 
-     * @return count of details awaiting triage
+     * @return always returns 0
      * @throws SQLException if database error occurs
+     * @deprecated Direct Classification workflow - Remove after confirming no
+     *             dependencies
      */
+    @Deprecated
     public int countPendingTriageDetails() throws SQLException {
-        String sql = "SELECT COUNT(*) FROM WorkOrderDetail WHERE source IS NULL";
-
-        try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
-            return rs.next() ? rs.getInt(1) : 0;
-        }
+        // Feature deprecated - Direct Classification in approval step
+        return 0;
     }
 
     /**
@@ -92,7 +90,8 @@ public class DashboardDAO {
     }
 
     /**
-     * Count WorkOrderDetails (from DIAGNOSTIC source) that need diagnosis assignment.
+     * Count WorkOrderDetails (from DIAGNOSTIC source) that need diagnosis
+     * assignment.
      * DEPRECATED: Use countAssignedDiagnosisForManager() instead to get accurate
      * count.
      * This method counts ALL unassigned details regardless of TechManager.
@@ -207,17 +206,59 @@ public class DashboardDAO {
      * @throws SQLException if database error occurs
      */
     public int countUnassignedWorkOrderDetails() throws SQLException {
+        // DEBUG: Also get details to compare with RepairAssignmentDAO
+        String debugSql = "SELECT wod.DetailID, wod.approval_status, wod.source, " +
+                "(SELECT COUNT(*) FROM TaskAssignment ta WHERE ta.DetailID = wod.DetailID AND ta.task_type = 'REPAIR') as hasRepair "
+                +
+                "FROM WorkOrderDetail wod " +
+                "WHERE (wod.source = 'REQUEST' OR wod.source = 'DIAGNOSTIC')";
+
         String sql = "SELECT COUNT(*) FROM WorkOrderDetail wod " +
-                "WHERE (wod.source = 'REQUEST' OR wod.source = 'DIAGNOSTIC') " + // CHANGED: Both sources
+                "WHERE wod.approval_status = 'APPROVED' " + // CRITICAL: Must match RepairAssignmentDAO filter
+                "AND (wod.source = 'REQUEST' OR wod.source = 'DIAGNOSTIC') " + // CHANGED: Both sources
                 "AND NOT EXISTS (" +
                 "    SELECT 1 FROM TaskAssignment ta " +
                 "    WHERE ta.DetailID = wod.DetailID AND ta.task_type = 'REPAIR'" +
                 ")";
 
-        try (Connection conn = DbContext.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()) {
-            return rs.next() ? rs.getInt(1) : 0;
+        try (Connection conn = DbContext.getConnection()) {
+            // DEBUG: Log all WODs with REQUEST/DIAGNOSTIC source
+            System.out.println("\n=== [DashboardDAO.countUnassignedWorkOrderDetails] DEBUG ===");
+            try (PreparedStatement debugPs = conn.prepareStatement(debugSql);
+                    ResultSet debugRs = debugPs.executeQuery()) {
+                int totalCount = 0;
+                int approvedCount = 0;
+                int notApprovedCount = 0;
+                while (debugRs.next()) {
+                    totalCount++;
+                    int detailId = debugRs.getInt("DetailID");
+                    String approval = debugRs.getString("approval_status");
+                    String source = debugRs.getString("source");
+                    int hasRepair = debugRs.getInt("hasRepair");
+
+                    if ("APPROVED".equals(approval) && hasRepair == 0) {
+                        approvedCount++;
+                        System.out.println("  ✓ DetailID=" + detailId + ", source=" + source + ", approval=" + approval
+                                + ", hasRepair=" + hasRepair);
+                    } else {
+                        notApprovedCount++;
+                        System.out.println("  ✗ DetailID=" + detailId + ", source=" + source + ", approval=" + approval
+                                + ", hasRepair=" + hasRepair + " (FILTERED OUT)");
+                    }
+                }
+                System.out.println("Total WODs with REQUEST/DIAGNOSTIC: " + totalCount);
+                System.out.println("APPROVED + No Repair: " + approvedCount);
+                System.out.println("Not matching criteria: " + notApprovedCount);
+            }
+
+            // Actual count query
+            try (PreparedStatement ps = conn.prepareStatement(sql);
+                    ResultSet rs = ps.executeQuery()) {
+                int count = rs.next() ? rs.getInt(1) : 0;
+                System.out.println("Final COUNT result: " + count);
+                System.out.println("=== [DashboardDAO] DEBUG END ===\n");
+                return count;
+            }
         }
     }
 

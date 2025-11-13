@@ -45,8 +45,14 @@ public class DashboardService {
      * @return count of details awaiting triage
      * @throws SQLException if database error occurs
      */
+    /**
+     * DEPRECATED: Triage step removed - Classification now happens during approval.
+     * 
+     * @deprecated Use Direct Classification workflow instead
+     */
+    @Deprecated
     public int countPendingTriageDetails() throws SQLException {
-        return dashboardDAO.countPendingTriageDetails();
+        return 0; // Always return 0 - feature deprecated
     }
 
     /**

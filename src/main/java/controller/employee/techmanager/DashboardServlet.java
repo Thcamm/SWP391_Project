@@ -84,8 +84,9 @@ public class DashboardServlet extends HttpServlet {
             // ===== GĐ0→1: Tiếp nhận & Duyệt Yêu cầu =====
             stats.put("pendingRequests", dashboardService.countPendingServiceRequests());
 
-            // ===== LUỒNG MỚI - GĐ2: Phân loại (Triage) =====
-            stats.put("pendingTriage", dashboardService.countPendingTriageDetails());
+            // ===== LUỔNG MỚI - GĐ2: Phân loại DEPRECATED (Direct Classification in
+            // Approval) =====
+            // pendingTriage REMOVED - Classification happens during approval step
 
             // ===== GĐ1→3: Phân công Chẩn đoán (DIAGNOSTIC only) =====
             // FIX: Use TechManager-specific count instead of global count

@@ -98,7 +98,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
           <!-- Quick Stats -->
           <div class="row mb-4">
-            <div class="col-md-3">
+            <div class="col-md-4">
               <div class="card bg-primary text-white">
                 <div class="card-body text-center">
                   <h4>${stats.pendingRequests}</h4>
@@ -106,65 +106,19 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                 </div>
               </div>
             </div>
-            <div class="col-md-3">
-              <div
-                class="card bg-purple text-white"
-                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
-                <div class="card-body text-center">
-                  <h4>${stats.pendingTriage}</h4>
-                  <small>🎯 Awaiting Triage</small>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
               <div class="card bg-info text-white">
                 <div class="card-body text-center">
                   <h4>${stats.unassignedWorkOrderDetails}</h4>
-                  <small>Need Assignment</small>
+                  <small>Task Need Assignment</small>
                 </div>
               </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
               <div class="card bg-warning text-white">
                 <div class="card-body text-center">
                   <h4>${stats.activeRepairs}</h4>
                   <small>Active Repairs</small>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Second Row Stats -->
-          <div class="row mb-4">
-            <div class="col-md-3">
-              <div class="card bg-success text-white">
-                <div class="card-body text-center">
-                  <h4>${stats.workOrdersReadyForClosure}</h4>
-                  <small>Ready to Close</small>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="card bg-secondary text-white">
-                <div class="card-body text-center">
-                  <h4>${stats.assignedDiagnosis}</h4>
-                  <small>Need Diagnosis Assignment</small>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="card bg-dark text-white">
-                <div class="card-body text-center">
-                  <h4>${stats.pendingQuotes}</h4>
-                  <small>Pending Customer Approval</small>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="card bg-light text-dark">
-                <div class="card-body text-center">
-                  <h4>${stats.totalWorkOrders}</h4>
-                  <small>Total Work Orders</small>
                 </div>
               </div>
             </div>
@@ -183,34 +137,19 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                 <div class="card-body">
                   <div class="row g-3">
                     <!-- GĐ1: Service Requests -->
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                       <a
                         href="${pageContext.request.contextPath}/techmanager/service-requests"
                         class="btn btn-outline-primary w-100 p-3">
                         <i class="bi bi-clipboard-check fs-3 d-block mb-2"></i>
-                        <strong>GĐ1: Service Requests</strong>
-                        <small class="text-muted d-block">Approve & Create WODs</small>
+                        <strong>GĐ1: Approve & Classify</strong>
+                        <small class="text-muted d-block">Service Requests (Direct Classification)</small>
                         <span class="badge bg-primary d-block mt-2">${stats.pendingRequests} Pending</span>
                       </a>
                     </div>
-                    
-                    <!-- GĐ2: Triage (NEW) -->
-                    <div class="col-md-3">
-                      <a
-                        href="${pageContext.request.contextPath}/techmanager/dashboard"
-                        class="btn btn-outline-purple w-100 p-3"
-                        style="border-color: #764ba2; color: #764ba2;">
-                        <i class="bi bi-funnel-fill fs-3 d-block mb-2"></i>
-                        <strong>GĐ2: Triage (Phân Loại)</strong>
-                        <small class="text-muted d-block">Classify Services</small>
-                        <span class="badge d-block mt-2" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                          ${stats.pendingTriage} Awaiting
-                        </span>
-                      </a>
-                    </div>
-                    
+
                     <!-- GĐ3: Assign Diagnosis -->
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                       <a
                         href="${pageContext.request.contextPath}/techmanager/assign-diagnosis"
                         class="btn btn-outline-info w-100 p-3">
@@ -222,9 +161,9 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                         </span>
                       </a>
                     </div>
-                    
+
                     <!-- GĐ5: Assign Repair -->
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                       <a
                         href="${pageContext.request.contextPath}/techmanager/assign-repair"
                         class="btn btn-outline-warning w-100 p-3">

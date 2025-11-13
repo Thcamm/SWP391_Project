@@ -57,9 +57,9 @@
                     <div class="card bg-primary text-white">
                         <div class="card-body">
                             <h5 class="card-title">
-                                <i class="bi bi-check-circle"></i> Approved Quotes
+                                <i class="bi bi-check-circle"></i> Approved Repairs
                             </h5>
-                            <h2 class="mb-0">${approvedQuotes.size()}</h2>
+                            <h2 class="mb-0">${approvedRepairs.size()}</h2>
                             <small>Ready for assignment</small>
                         </div>
                     </div>
@@ -77,24 +77,24 @@
                 </div>
             </div>
 
-            <!-- Approved Quotes List -->
+            <!-- Approved Repairs List -->
             <c:choose>
-                <c:when test="${empty approvedQuotes}">
+                <c:when test="${empty approvedRepairs}">
                     <div class="alert alert-info">
                         <i class="bi bi-info-circle"></i>
-                        No approved quotes waiting for repair assignment at this time.
+                        No approved repairs waiting for repair assignment at this time.
                     </div>
                 </c:when>
                 <c:otherwise>
-                    <c:forEach var="quote" items="${approvedQuotes}">
+                    <c:forEach var="repair" items="${approvedRepairs}">
                         <div class="card mb-3" style="border-left: 4px solid #0d6efd;">
                             <div class="card-body">
                                 <div class="row">
-                                    <!-- Quote Info -->
+                                    <!-- Repair Info -->
                                     <div class="col-md-8">
                                         <h5 class="card-title">
                                             <i class="bi bi-car-front"></i>
-                                            ${quote.vehicleModel}
+                                            ${repair.vehicleModel}
                                             <span class="badge bg-success ms-2">
                                                 <i class="bi bi-check-circle"></i> Approved
                                             </span>
@@ -104,27 +104,27 @@
                                             <div class="col-md-6">
                                                 <div class="mb-2">
                                                     <strong>License Plate:</strong>
-                                                    <span class="text-primary">${quote.licensePlate}</span>
+                                                    <span class="text-primary">${repair.licensePlate}</span>
                                                 </div>
                                                 <div class="mb-2">
-                                                    <strong>Customer:</strong> ${quote.customerName}
+                                                    <strong>Customer:</strong> ${repair.customerName}
                                                 </div>
                                                 <div class="mb-2">
-                                                    <strong>Phone:</strong> ${quote.phoneNumber}
+                                                    <strong>Phone:</strong> ${repair.phoneNumber}
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="mb-2">
-                                                    <strong>Work Order:</strong> #${quote.workOrderId}
+                                                    <strong>Work Order:</strong> #${repair.workOrderId}
                                                 </div>
                                                 <div class="mb-2">
                                                     <strong>Approved At:</strong>
-                                                    <fmt:formatDate value="${quote.approvedAt}" pattern="dd/MM/yyyy HH:mm" />
+                                                    <fmt:formatDate value="${repair.approvedAt}" pattern="dd/MM/yyyy HH:mm" />
                                                 </div>
                                                 <div class="mb-2">
                                                     <strong>Estimate Amount:</strong>
                                                     <h5 class="d-inline text-success">
-                                                        <fmt:formatNumber value="${quote.estimateAmount}" 
+                                                        <fmt:formatNumber value="${repair.estimateAmount}" 
                                                                         type="currency" 
                                                                         currencySymbol="$"/>
                                                     </h5>
@@ -134,7 +134,7 @@
                                         
                                         <div class="mt-3">
                                             <strong>Task Description:</strong>
-                                            <p class="mb-0">${quote.taskDescription}</p>
+                                            <p class="mb-0">${repair.taskDescription}</p>
                                         </div>
                                     </div>
 
@@ -143,7 +143,7 @@
                                         <button type="button" 
                                                 class="btn btn-primary btn-lg w-100"
                                                 data-bs-toggle="modal" 
-                                                data-bs-target="#assignModal${quote.detailId}">
+                                                data-bs-target="#assignModal${repair.detailId}">
                                             <i class="bi bi-person-plus"></i> Assign Technician
                                         </button>
                                     </div>
@@ -152,7 +152,7 @@
                         </div>
                         
                         <!-- Assignment Modal -->
-                        <div class="modal fade" id="assignModal${quote.detailId}" tabindex="-1">
+                        <div class="modal fade" id="assignModal${repair.detailId}" tabindex="-1">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header bg-primary text-white">
@@ -163,25 +163,24 @@
                                     </div>
                                     <form method="POST" action="${pageContext.request.contextPath}/techmanager/assign-repair">
                                         <div class="modal-body">
-                                            <input type="hidden" name="detailId" value="${quote.detailId}">
+                                            <input type="hidden" name="detailId" value="${repair.detailId}">
                                             
                                             <div class="alert alert-info mb-3">
-                                                <strong>Vehicle:</strong> ${quote.vehicleModel} (${quote.licensePlate})<br>
-                                                <strong>Task:</strong> ${quote.taskDescription}<br>
+                                                <strong>Vehicle:</strong> ${repair.vehicleModel} (${repair.licensePlate})<br>
+                                                <strong>Task:</strong> ${repair.taskDescription}<br>
                                                 <strong>Estimate:</strong> 
-                                                <fmt:formatNumber value="${quote.estimateAmount}" 
+                                                <fmt:formatNumber value="${repair.estimateAmount}" 
                                                                 type="currency" 
-                                                                currencySymbol="$"/>
+                                                                currencySymbol="₫"/>
                                             </div>
                                             
                                             <div class="mb-3">
                                                 <label class="form-label">Select Technician <span class="text-danger">*</span></label>
-                                                <select name="technicianId" id="technicianId_${quote.detailId}" class="form-select" required onchange="loadSchedule('${quote.detailId}')">
+                                                <select name="technicianId" id="technicianId_${repair.detailId}" class="form-select" required onchange="loadSchedule('${repair.detailId}')">
                                                     <option value="">-- Select Technician --</option>
                                                     <c:forEach var="tech" items="${availableTechnicians}">
-                                                        <option value="${tech.employeeId}">
-                                                            ${tech.fullName} 
-                                                            (Active Tasks: ${tech.activeTasks})
+                                                        <option value="${tech.employeeID}">
+                                                            ${tech.fullName}
                                                         </option>
                                                     </c:forEach>
                                                 </select>
@@ -198,25 +197,25 @@
                                                 <div class="card-body">
                                                     <div class="row">
                                                         <div class="col-md-6 mb-3">
-                                                            <label for="plannedStart_${quote.detailId}" class="form-label">Planned Start</label>
+                                                            <label for="plannedStart_${repair.detailId}" class="form-label">Planned Start</label>
                                                             <input type="datetime-local" class="form-control" 
-                                                                   name="plannedStart" id="plannedStart_${quote.detailId}"
-                                                                   onchange="loadSchedule('${quote.detailId}')">
+                                                                   name="plannedStart" id="plannedStart_${repair.detailId}"
+                                                                   onchange="loadSchedule('${repair.detailId}')">
                                                             <small class="text-muted">When to start</small>
                                                         </div>
                                                         <div class="col-md-6 mb-3">
-                                                            <label for="plannedEnd_${quote.detailId}" class="form-label">Planned End</label>
+                                                            <label for="plannedEnd_${repair.detailId}" class="form-label">Planned End</label>
                                                             <input type="datetime-local" class="form-control" 
-                                                                   name="plannedEnd" id="plannedEnd_${quote.detailId}">
+                                                                   name="plannedEnd" id="plannedEnd_${repair.detailId}">
                                                             <small class="text-muted">Expected finish</small>
                                                         </div>
                                                     </div>
                                                     
                                                     <!-- Schedule Preview -->
-                                                    <div id="schedulePreview_${quote.detailId}" class="alert alert-light d-none">
+                                                    <div id="schedulePreview_${repair.detailId}" class="alert alert-light d-none">
                                                         <strong><i class="bi bi-clock-history"></i> Technician's Schedule:</strong>
-                                                        <div id="scheduleContent_${quote.detailId}" class="mt-2"></div>
-                                                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="refreshSchedule('${quote.detailId}')">
+                                                        <div id="scheduleContent_${repair.detailId}" class="mt-2"></div>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="refreshSchedule('${repair.detailId}')">
                                                             <i class="bi bi-arrow-clockwise"></i> Refresh
                                                         </button>
                                                     </div>

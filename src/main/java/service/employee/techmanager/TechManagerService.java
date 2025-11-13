@@ -21,7 +21,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * REFACTORED - LUỒNG MỚI (Triage Workflow)
@@ -90,16 +92,39 @@ public class TechManagerService {
     }
 
     /**
-     * Alias method for approveServiceRequestAndCreateWorkOrder (for servlet
+     * Alias method for approveServiceRequestAndCreateWorkOrder (backward
      * compatibility).
      * 
      * @param requestId     Service Request ID
      * @param techManagerId TechManager Employee ID
      * @return WorkOrder ID if successful, -1 if failed
      * @throws SQLException if database error occurs
+     * @deprecated Use approveServiceRequest(int, int, Map) with source
+     *             classifications instead
      */
+    @Deprecated
     public int approveServiceRequest(int requestId, int techManagerId) throws SQLException {
-        return approveServiceRequestAndCreateWorkOrder(requestId, techManagerId);
+        throw new UnsupportedOperationException(
+                "Use approveServiceRequest(requestId, techManagerId, sourceClassifications) instead");
+    }
+
+    /**
+     * Approve ServiceRequest and create WorkOrder with source classification
+     * 
+     * @param requestId             ServiceRequest ID
+     * @param techManagerId         TechManager's Employee ID
+     * @param sourceClassifications Map of service detail IDs to their source
+     *                              classification
+     * @return WorkOrder ID
+     */
+    public int approveServiceRequest(int requestId, int techManagerId, Map<Integer, String> sourceClassifications)
+            throws SQLException {
+        try {
+            return approveServiceRequestAndCreateWorkOrder(requestId, techManagerId, sourceClassifications);
+        } catch (Exception e) {
+            System.err.println("Error approving service request: " + e.getMessage());
+            throw new SQLException("Failed to approve service request: " + e.getMessage(), e);
+        }
     }
 
     // =========================================================================
@@ -107,29 +132,29 @@ public class TechManagerService {
     // =========================================================================
 
     /**
-     * GĐ 1: Approve Service Request and Create N WorkOrderDetails (LUỒNG MỚI)
+     * GĐ 1: Approve Service Request and Create N WorkOrderDetails with source
+     * classification
      * 
-     * NEW LOGIC - Triage Workflow:
+     * NEW LOGIC - Direct Classification Workflow:
      * 1. Update ServiceRequest status = "APPROVE"
      * 2. Create 1 WorkOrder
      * 3. Get N ServiceRequestDetails
-     * 4. Create N WorkOrderDetails (each with source=NULL,
-     * approval_status='PENDING')
-     * 5. Return WorkOrderID to redirect to Triage screen (GĐ 2)
-     * 
-     * DELETED OLD LOGIC:
-     * - No more single "Chẩn đoán tổng quát" WOD
-     * - Each service becomes a separate WOD awaiting classification
+     * 4. Create N WorkOrderDetails (each with source=REQUEST|DIAGNOSTIC based on TM
+     * classification)
+     * 5. Return WorkOrderID
      * 
      * Transaction: ALL-or-NOTHING
      * 
-     * @param requestId     Service Request ID to approve
-     * @param techManagerId ID of the approving Technical Manager
+     * @param requestId             Service Request ID to approve
+     * @param techManagerId         ID of the approving Technical Manager
+     * @param sourceClassifications Map of serviceDetailId to source ("REQUEST" or
+     *                              "DIAGNOSTIC")
      * @return WorkOrderID if success, -1 if failed
      */
-    public int approveServiceRequestAndCreateWorkOrder(
+    private int approveServiceRequestAndCreateWorkOrder(
             int requestId,
-            int techManagerId) throws SQLException {
+            int techManagerId,
+            Map<Integer, String> sourceClassifications) throws SQLException {
 
         Connection conn = null;
         try {
@@ -178,14 +203,23 @@ public class TechManagerService {
             }
             System.out.println("[STEP 4] ✓ WorkOrder created: ID=" + workOrderId + ", EstimateAmount=" + totalEstimate);
 
-            // === STEP 5: Create N WorkOrderDetails (source=NULL for Triage) ===
+            // === STEP 5: Create N WorkOrderDetails with source classification ===
             int createdCount = 0;
             for (ServiceRequestDetail serviceDetail : serviceDetails) {
+                // Get source classification from map
+                String source = sourceClassifications.get(serviceDetail.getDetailId());
+                if (source == null || (!source.equals("REQUEST") && !source.equals("DIAGNOSTIC"))) {
+                    throw new SQLException(
+                            "Invalid source classification for service detail #" + serviceDetail.getDetailId());
+                }
+
                 WorkOrderDetail wod = new WorkOrderDetail();
                 wod.setWorkOrderId(workOrderId);
-                // source=NULL by default (awaiting Triage classification in GĐ 2)
+
+                // Set source based on classification
+                wod.setSource(WorkOrderDetail.Source.valueOf(source));
                 wod.setDiagnosticId(null);
-                wod.setApprovalStatus(WorkOrderDetail.ApprovalStatus.PENDING); // Awaiting TM decision
+                wod.setApprovalStatus(WorkOrderDetail.ApprovalStatus.PENDING);
                 wod.setTaskDescription(serviceDetail.getServiceName() +
                         (serviceDetail.getServiceDescription() != null ? " - " + serviceDetail.getServiceDescription()
                                 : ""));
@@ -200,10 +234,10 @@ public class TechManagerService {
                 }
                 createdCount++;
                 System.out.println("  [5." + createdCount + "] ✓ Created WOD #" + detailId + ": " +
-                        serviceDetail.getServiceName() + " (source=NULL, awaiting Triage)");
+                        serviceDetail.getServiceName() + " (source=" + source + ")");
             }
 
-            System.out.println("[STEP 5] ✓ Created " + createdCount + " WorkOrderDetail(s) awaiting Triage");
+            System.out.println("[STEP 5] ✓ Created " + createdCount + " WorkOrderDetail(s) with source classification");
 
             // === COMMIT TRANSACTION ===
             conn.commit();
@@ -480,172 +514,20 @@ public class TechManagerService {
     }
 
     // =========================================================================
-    // LUỒNG 4.0: APPROVE + CLASSIFY (MERGED GĐ1 + GĐ2)
+    // GĐ 3: GET PENDING TRIAGE WORKORDERDETAILS
     // =========================================================================
 
     /**
-     * NEW METHOD - LUỒNG 4.0: Approve ServiceRequest AND Classify services in ONE
-     * transaction
+     * Get all WorkOrderDetails awaiting Triage classification
+     * (source IS NULL and approval_status='PENDING')
      * 
-     * Combines:
-     * - approveServiceRequestAndCreateWorkOrder (GĐ1)
-     * - triageWorkOrderDetails (GĐ2)
+     * DEPRECATED: Classification now happens during approval
      * 
-     * Into a single atomic operation:
-     * 1. Approve ServiceRequest
-     * 2. Create WorkOrder + N WorkOrderDetails
-     * 3. Immediately classify each WOD source (REQUEST or DIAGNOSTIC)
-     * 
-     * Benefits:
-     * - Single transaction (atomicity)
-     * - No intermediate state (no WODs with source=NULL)
-     * - Faster workflow (no redirect to Triage page)
-     * 
-     * @param requestId       ServiceRequest ID to approve
-     * @param techManagerId   TechManager Employee ID
-     * @param classifications Map<ServiceID, Source> - Classification for each
-     *                        service
-     *                        Key: ServiceID (from ServiceRequestDetail)
-     *                        Value: "REQUEST" or "DIAGNOSTIC"
-     * @return WorkOrder ID
-     * @throws SQLException if transaction fails
+     * @param workOrderId WorkOrder ID
+     * @return List of WorkOrderDetail awaiting triage
+     * @throws SQLException if database error
      */
-    public int approveAndClassifyServiceRequest(
-            int requestId,
-            int techManagerId,
-            java.util.Map<String, String> classifications) throws SQLException {
-
-        Connection conn = null;
-        try {
-            // === START TRANSACTION ===
-            conn = DbContext.getConnection();
-            conn.setAutoCommit(false);
-            System.out.println("=== [LUỒNG 4.0] START Approve + Classify for ServiceRequest #" + requestId + " ===");
-
-            // === STEP 1: Validate ServiceRequest ===
-            ServiceRequest request = requestDAO.getServiceRequestForUpdate(conn, requestId);
-            if (request == null) {
-                throw new IllegalArgumentException("ServiceRequest not found: " + requestId);
-            }
-            System.out.println("[STEP 1] ✓ ServiceRequest found: ID=" + requestId + ", Status=" + request.getStatus());
-
-            // === STEP 2: Get all ServiceRequestDetails (N services) ===
-            List<ServiceRequestDetail> serviceDetails = requestDAO.getServiceRequestDetails(conn, requestId);
-            if (serviceDetails == null || serviceDetails.isEmpty()) {
-                throw new SQLException("No service details found for ServiceRequest #" + requestId);
-            }
-            System.out.println("[STEP 2] ✓ Found " + serviceDetails.size() + " service(s)");
-
-            // === STEP 3: Validate classifications ===
-            if (classifications == null || classifications.size() != serviceDetails.size()) {
-                throw new IllegalArgumentException("Classification count mismatch: expected " +
-                        serviceDetails.size() + " but got " +
-                        (classifications == null ? 0 : classifications.size()));
-            }
-
-            // === STEP 4: Update ServiceRequest Status ===
-            boolean updated = requestDAO.updateServiceRequestStatus(conn, requestId, "APPROVE");
-            if (!updated) {
-                throw new SQLException("Failed to update ServiceRequest status");
-            }
-            System.out.println("[STEP 4] ✓ ServiceRequest status: PENDING → APPROVE");
-
-            // Verify update
-            ServiceRequest verifyRequest = requestDAO.getServiceRequestForUpdate(conn, requestId);
-            System.out.println(
-                    "[STEP 4 VERIFY] Status in DB: " + (verifyRequest != null ? verifyRequest.getStatus() : "NULL"));
-
-            // === STEP 5: Create WorkOrder ===
-            WorkOrder workOrder = new WorkOrder();
-            workOrder.setRequestId(requestId);
-            workOrder.setTechManagerId(techManagerId);
-            workOrder.setStatus(WorkOrder.Status.PENDING);
-
-            // Calculate total estimate amount
-            BigDecimal totalEstimate = serviceDetails.stream()
-                    .map(ServiceRequestDetail::getServiceUnitPrice)
-                    .filter(price -> price != null)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-            workOrder.setEstimateAmount(totalEstimate);
-
-            int workOrderId = workOrderDAO.createWorkOrder(conn, workOrder);
-            if (workOrderId <= 0) {
-                throw new SQLException("Failed to create WorkOrder");
-            }
-            System.out.println("[STEP 5] ✓ WorkOrder created: ID=" + workOrderId);
-
-            // === STEP 6: Create N WorkOrderDetails WITH immediate classification ===
-            int createdCount = 0;
-            for (ServiceRequestDetail serviceDetail : serviceDetails) {
-                String serviceIdStr = String.valueOf(serviceDetail.getServiceId());
-                String sourceStr = classifications.get(serviceIdStr);
-
-                if (sourceStr == null) {
-                    throw new IllegalArgumentException("Missing classification for service ID: " + serviceIdStr);
-                }
-
-                WorkOrderDetail.Source source;
-                try {
-                    source = WorkOrderDetail.Source.valueOf(sourceStr.toUpperCase());
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException("Invalid source value '" + sourceStr +
-                            "' for service ID " + serviceIdStr + ". Must be REQUEST or DIAGNOSTIC.");
-                }
-
-                // Create WOD with source already set
-                WorkOrderDetail wod = new WorkOrderDetail();
-                wod.setWorkOrderId(workOrderId);
-                wod.setSource(source); // CRITICAL: Set immediately
-                wod.setDiagnosticId(null);
-                wod.setApprovalStatus(WorkOrderDetail.ApprovalStatus.APPROVED); // Pre-approved by TM
-                wod.setTaskDescription(serviceDetail.getServiceName() +
-                        (serviceDetail.getServiceDescription() != null ? " - " + serviceDetail.getServiceDescription()
-                                : ""));
-                wod.setEstimateHours(BigDecimal.valueOf(2.0));
-                wod.setEstimateAmount(serviceDetail.getServiceUnitPrice() != null ? serviceDetail.getServiceUnitPrice()
-                        : BigDecimal.ZERO);
-
-                int detailId = detailDAO.createWorkOrderDetail(conn, wod);
-                if (detailId <= 0) {
-                    throw new SQLException(
-                            "Failed to create WorkOrderDetail for service: " + serviceDetail.getServiceName());
-                }
-                createdCount++;
-                System.out.println("  [6." + createdCount + "] ✓ WOD #" + detailId + ": " +
-                        serviceDetail.getServiceName() + " → source=" + source);
-            }
-
-            System.out.println("[STEP 6] ✓ Created + Classified " + createdCount + " WorkOrderDetail(s)");
-
-            // === COMMIT TRANSACTION ===
-            conn.commit();
-            System.out.println("=== [LUỒNG 4.0] ✓ COMMIT SUCCESS: WorkOrder #" + workOrderId +
-                    " with " + createdCount + " classified WOD(s) ===");
-            return workOrderId;
-
-        } catch (Exception e) {
-            System.err.println("=== [LUỒNG 4.0] ✗ TRANSACTION FAILED ===");
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace();
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                    System.err.println("✓ Transaction rolled back");
-                } catch (SQLException rollbackEx) {
-                    System.err.println("✗ Rollback failed: " + rollbackEx.getMessage());
-                }
-            }
-            throw new SQLException("Approve + Classify failed: " + e.getMessage(), e);
-
-        } finally {
-            if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (SQLException closeEx) {
-                    System.err.println("Connection close failed: " + closeEx.getMessage());
-                }
-            }
-        }
+    public List<WorkOrderDetail> getPendingTriageDetails(int workOrderId) throws SQLException {
+        return detailDAO.getPendingTriageDetails(workOrderId);
     }
 }
