@@ -6,7 +6,6 @@ public class ServiceRequest {
     private int requestID;
     private int customerID;
     private int vehicleID;
-    private int serviceID;
     private Integer appointmentID; // Dùng Integer để có thể nhận giá trị null
     private Timestamp requestDate;
     private String status;
@@ -21,7 +20,6 @@ public class ServiceRequest {
         this.requestID = requestID;
         this.customerID = customerID;
         this.vehicleID = vehicleID;
-        this.serviceID = serviceID;
         this.appointmentID = appointmentID;
         this.requestDate = requestDate;
         this.status = status;
@@ -55,13 +53,6 @@ public class ServiceRequest {
         this.vehicleID = vehicleID;
     }
 
-    public int getServiceID() {
-        return serviceID;
-    }
-
-    public void setServiceID(int serviceID) {
-        this.serviceID = serviceID;
-    }
 
     public Integer getAppointmentID() {
         return appointmentID;

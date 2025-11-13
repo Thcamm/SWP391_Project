@@ -27,7 +27,7 @@ public class ViewAllRepair extends HttpServlet {
         int currentPage = 1;
         int itemsPerPage = 10;
 
-        // Lấy số trang hiện tại
+        // Get parameters
         String pageParam = request.getParameter("page");
         if (pageParam != null) {
             try {
@@ -35,21 +35,37 @@ public class ViewAllRepair extends HttpServlet {
             } catch (NumberFormatException ignored) {}
         }
 
-        try {
-            int totalItems = repairListService.countAllTracker();
+        String fullName = request.getParameter("fullName");
+        String vehicleIdParam = request.getParameter("vehicleId");
+        String sortBy = request.getParameter("sortBy");
 
-            // Tính toán phân trang
+        // Clean up empty parameters
+        if (fullName != null && fullName.trim().isEmpty()) {
+            fullName = null;
+        }
+        if (vehicleIdParam != null && vehicleIdParam.trim().isEmpty()) {
+            vehicleIdParam = null;
+        }
+        if (sortBy == null || sortBy.trim().isEmpty()) {
+            sortBy = "newest"; // default
+        }
+
+        try {
+            // Count total items with filters
+            int totalItems = repairListService.countFilteredTracker(fullName, vehicleIdParam);
+
+            // Calculate pagination
             PaginationUtils.PaginationCalculation calc =
                     PaginationUtils.calculateParams(totalItems, currentPage, itemsPerPage);
 
             int offset = calc.getOffset();
             int safePage = calc.getSafePage();
 
-            // Lấy danh sách dữ liệu theo phân trang
+            // Get filtered data
             List<RepairJourneySummaryDTO> repairJourneySummaryDTOList =
-                    repairListService.getAllTracker(itemsPerPage, offset);
+                    repairListService.getFilteredTracker(fullName, vehicleIdParam, sortBy, itemsPerPage, offset);
 
-            // Đóng gói kết quả phân trang
+            // Create pagination result
             PaginationUtils.PaginationResult<RepairJourneySummaryDTO> result =
                     new PaginationUtils.PaginationResult<>(
                             repairJourneySummaryDTOList,
@@ -59,13 +75,17 @@ public class ViewAllRepair extends HttpServlet {
                             itemsPerPage
                     );
 
-            // Gửi sang JSP
+            // Set attributes for JSP
             request.setAttribute("journeyList", result);
+            request.setAttribute("selectedVehicleId", vehicleIdParam);
+            request.setAttribute("selectedSortBy", sortBy);
+
+            // Forward to JSP
             request.getRequestDispatcher("/view/customerservice/view-all-repair.jsp")
                     .forward(request, response);
 
         } catch (SQLException e) {
-            throw new ServletException("Lỗi truy vấn danh sách sửa chữa: " + e.getMessage(), e);
+            throw new ServletException("Error querying repair list: " + e.getMessage(), e);
         }
     }
 }

@@ -2,7 +2,9 @@ package service.vehicle;
 
 import common.DbContext;
 import common.constant.MessageConstants;
+import common.constant.MessageType;
 import common.message.ServiceResult;
+import common.message.SystemMessage;
 import common.utils.PaginationUtils;
 import dao.vehicle.VehicleDiagnosticDAO;
 import model.inventory.DiagnosticPart;
@@ -21,6 +23,30 @@ public class VehicleDiagnosticService {
     private final VehicleDiagnosticDAO diagnosticDAO = new VehicleDiagnosticDAO();
     private final PartService partService = new PartService();
 
+    public ServiceResult approveDiagnosticManual(int diagnosticId) {
+        try {
+            return diagnosticDAO.approveDiagnosticManual(diagnosticId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ServiceResult.error(new SystemMessage(
+                    "DIAG_ERR", MessageType.ERROR, "Diagnostic",
+                    "Có lỗi khi duyệt chẩn đoán."
+            ));
+        }
+    }
+
+
+    public ServiceResult rejectDiagnosticManual(int diagnosticId, String reason) {
+        try {
+            return diagnosticDAO.rejectDiagnosticManual(diagnosticId, reason); // nếu bạn có DAO này
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ServiceResult.error(new SystemMessage(
+                    "DIAG_REJ_ERR", MessageType.ERROR, "Diagnostic",
+                    "Có lỗi khi từ chối chẩn đoán."
+            ));
+        }
+    }
 
     public static  class DiagnosticPageView {
 

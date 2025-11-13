@@ -174,7 +174,7 @@ public class ServiceRequestDAO extends DbContext {
                     sr.setRequestID(rs.getInt("RequestID"));
                     sr.setCustomerID(rs.getInt("CustomerID"));
                     sr.setVehicleID(rs.getInt("VehicleID"));
-                    // sr.setServiceID(...) // BỎ: cột đã xóa
+                
                     sr.setAppointmentID(rs.getObject("AppointmentID", Integer.class));
                     sr.setRequestDate(rs.getTimestamp("RequestDate"));
                     sr.setStatus(rs.getString("Status"));
@@ -243,6 +243,51 @@ public class ServiceRequestDAO extends DbContext {
         }
         return requestList;
     }
+    public List<String> getServiceNamesByRequestId(int requestId) throws SQLException {
+        List<String> serviceNames = new ArrayList<>();
+
+        String sql = """
+        SELECT st.ServiceName
+        FROM servicerequestdetail srd
+        JOIN service_type st ON srd.ServiceID = st.ServiceID
+        WHERE srd.RequestID = ?
+    """;
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, requestId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    serviceNames.add(rs.getString("ServiceName"));
+                }
+            }
+        }
+
+        return serviceNames;
+    }
+    public ServiceRequest getServiceRequestById(int requestId) throws SQLException {
+        String sql = "SELECT * FROM ServiceRequest WHERE RequestID = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)){
+                ps.setInt(1, requestId);
+
+             ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ServiceRequest sr = new ServiceRequest();
+                sr.setRequestID(rs.getInt("RequestID"));
+                sr.setCustomerID(rs.getInt("CustomerID"));
+                sr.setVehicleID(rs.getInt("VehicleID"));
+                sr.setAppointmentID(rs.getInt("AppointmentID"));
+                sr.setRequestDate(rs.getTimestamp("RequestDate"));
+                sr.setStatus(rs.getString("Status"));
+                return sr;
+            }
+
+
+        }
+        return null;
 
     /**
      * LUỒNG MỚI - GĐ 1: Get all ServiceRequestDetail for a given RequestID

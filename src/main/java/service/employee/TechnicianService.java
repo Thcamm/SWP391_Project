@@ -33,12 +33,12 @@ public class TechnicianService {
     }
 
     public ServiceResult getTechnicianByUserId(int userId) {
-        if(userId <= 0) {
+        if (userId <= 0) {
             return ServiceResult.error(MessageConstants.ERR003); //invalid input
         }
 
         Employee technician = technicianDAO.getTechnicianByUserId(userId);
-        if(technician == null) {
+        if (technician == null) {
 
             return ServiceResult.error(MessageConstants.ERR002); //data not found
         }
@@ -46,13 +46,13 @@ public class TechnicianService {
         return ServiceResult.success(null, technician);
     }
 
-    public  ServiceResult getTaskStatistics(int technicianId) {
-        if(technicianId <= 0) {
+    public ServiceResult getTaskStatistics(int technicianId) {
+        if (technicianId <= 0) {
             return ServiceResult.error(MessageConstants.ERR003); //invalid input
         }
 
         var stats = technicianDAO.getTaskStatistics(technicianId);
-        if(stats == null) {
+        if (stats == null) {
             return ServiceResult.error(MessageConstants.ERR002); //data not found
         }
 
@@ -77,8 +77,8 @@ public class TechnicianService {
 
     //task list with pagination
 
-    public PaginationResponse<TaskAssignment> getNewAssignedTasks (int technicianId, int page, int itemsPerPage) {
-        if(technicianId <= 0) {
+    public PaginationResponse<TaskAssignment> getNewAssignedTasks(int technicianId, int page, int itemsPerPage) {
+        if (technicianId <= 0) {
             return createEmptyPaginationResponse(page, itemsPerPage);
         }
 
@@ -98,7 +98,7 @@ public class TechnicianService {
 
     //Lay danh sach task dang lam vc
     public PaginationResponse<TaskAssignment> getInProgressTasks(int technicianId, int page, int itemsPerPage) {
-        if(technicianId <= 0) {
+        if (technicianId <= 0) {
             return createEmptyPaginationResponse(page, itemsPerPage);
         }
 
@@ -117,7 +117,7 @@ public class TechnicianService {
     }
 
     public PaginationResponse<TaskAssignment> getAllTasks(int technicianId, int page, int itemsPerPage) {
-        if(technicianId <= 0) {
+        if (technicianId <= 0) {
             return createEmptyPaginationResponse(page, itemsPerPage);
         }
 
@@ -166,11 +166,11 @@ public class TechnicianService {
 
 
     public ServiceResult getAllTasksStatistics(int technicianId) {
-        if(technicianId <= 0) {
+        if (technicianId <= 0) {
             return ServiceResult.error(MessageConstants.ERR003);
         }
         TaskStatistics stats = technicianDAO.getAllTasksStatistics(technicianId);
-        if(stats == null) {
+        if (stats == null) {
             return ServiceResult.error(MessageConstants.ERR002);
         }
 
@@ -220,7 +220,6 @@ public class TechnicianService {
                     System.out.println("Loi over lap chua chuan");
                     return ServiceResult.error(MessageConstants.TASK013);
                 }
-
 
 
                 // 4) Check deadline accept (<= 10 phút sau planned_start)
@@ -274,10 +273,16 @@ public class TechnicianService {
                 return ServiceResult.success(MessageConstants.TASK001);
 
             } catch (SQLException ex) {
-                try { conn.rollback(); } catch (SQLException ignore) {}
+                try {
+                    conn.rollback();
+                } catch (SQLException ignore) {
+                }
                 return ServiceResult.error(MessageConstants.TASK005);
             } finally {
-                try { conn.setAutoCommit(true); } catch (SQLException ignore) {}
+                try {
+                    conn.setAutoCommit(true);
+                } catch (SQLException ignore) {
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -286,8 +291,7 @@ public class TechnicianService {
     }
 
 
-
-    public ServiceResult rejectTask (int technicianId, int assignmentId, String reason) {
+    public ServiceResult rejectTask(int technicianId, int assignmentId, String reason) {
         if (technicianId <= 0 || assignmentId <= 0 || reason == null || reason.trim().isEmpty()) {
             return ServiceResult.error(MessageConstants.ERR003);//invalid input
         }
@@ -299,8 +303,7 @@ public class TechnicianService {
         }
 
         TaskAssignment task = technicianDAO.findByIdForUpdate(assignmentId);
-        if (task == null)
-        {
+        if (task == null) {
             System.out.println("Ko tim thay task");
             return ServiceResult.error(MessageConstants.ERR002);
         }
@@ -377,8 +380,6 @@ public class TechnicianService {
         }
 
 
-
-
 //        if (workOrderDetailDAO.hasPendingApprovalOrOpenWorkOrder(assignmentId)) {
 //            return ServiceResult.error(MessageConstants.WO_PENDING);
 //        }
@@ -401,7 +402,7 @@ public class TechnicianService {
 
 
     public PaginationResponse<TechnicianActivity> getRecentActivities(int technicianId, int page, int itemsPerPage) {
-        if(technicianId <= 0) {
+        if (technicianId <= 0) {
             return createEmptyPaginationResponse(page, itemsPerPage);
         }
 
@@ -416,7 +417,6 @@ public class TechnicianService {
                 result.getTotalItems(),
                 result.getTotalPages()
         );
-
 
 
     }
@@ -440,4 +440,10 @@ public class TechnicianService {
             e.printStackTrace();
         }
     }
+
+    public List<TaskAssignment> getTaskAssignmentsByWorkOrder(int workOrderId) throws SQLException {
+
+        return technicianDAO.getTaskAssignmentByWorkOrderId(workOrderId); 
+    }
+
 }
