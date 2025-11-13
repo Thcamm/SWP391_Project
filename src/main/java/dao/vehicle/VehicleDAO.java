@@ -361,35 +361,56 @@ public class VehicleDAO {
 
 
 
-    public List<Vehicle> searchVehicles(String keyword, int customerId, int limit, int offset) throws SQLException {
+    public List<Vehicle> searchVehicles(String keyword, Integer customerId, int limit, int offset) throws SQLException {
         List<Vehicle> list = new ArrayList<>();
-        String sql = "SELECT * FROM Vehicle " +
-                "WHERE customerID = ? AND (licensePlate LIKE ? OR brand LIKE ? OR model LIKE ?) " +
-                "LIMIT ? OFFSET ?";
-        try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            String kw = "%" + keyword + "%";
-            ps.setInt(1, customerId);
-            ps.setString(2, kw);
-            ps.setString(3, kw);
-            ps.setString(4, kw);
-            ps.setInt(5, limit);
-            ps.setInt(6, offset);
+        StringBuilder sql = new StringBuilder("SELECT * FROM Vehicle WHERE 1=1");
+        List<Object> params = new ArrayList<>();
 
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Vehicle v = new Vehicle();
-                v.setVehicleID(rs.getInt("vehicleID"));
-                v.setLicensePlate(rs.getString("licensePlate"));
-                v.setBrand(rs.getString("brand"));
-                v.setModel(rs.getString("model"));
-                v.setYearManufacture(rs.getInt("yearManufacture"));
-                list.add(v);
+        // Filter by customerId if provided
+        if (customerId != null) {
+            sql.append(" AND customerID = ?");
+            params.add(customerId);
+        }
+
+        // Filter by keyword if provided
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            sql.append(" AND (licensePlate LIKE ? OR brand LIKE ? OR model LIKE ?)");
+            String kw = "%" + keyword.trim() + "%";
+            params.add(kw);
+            params.add(kw);
+            params.add(kw);
+        }
+
+        // Add LIMIT and OFFSET
+        sql.append(" LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            // Set parameters dynamically
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Vehicle v = new Vehicle();
+                    v.setVehicleID(rs.getInt("vehicleID"));
+                    v.setLicensePlate(rs.getString("licensePlate"));
+                    v.setBrand(rs.getString("brand")); // Changed from brand
+                    v.setModel(rs.getString("model"));
+                    v.setYearManufacture(rs.getInt("yearManufacture"));
+                    v.setCustomerID(rs.getInt("customerID"));
+                    list.add(v);
+                }
             }
         }
+
+        // Return empty list instead of null
         return list;
-    }
-    public List<Vehicle> searchVehiclesByCustomerAndKeyword(int customerId, String keyword) throws SQLException {
+    }public List<Vehicle> searchVehiclesByCustomerAndKeyword(int customerId, String keyword) throws SQLException {
         List<Vehicle> list = new ArrayList<>();
         String sql = "SELECT VehicleID, Brand, Model, LicensePlate FROM Vehicle "
                 + "WHERE CustomerID=? AND (Brand LIKE ? OR Model LIKE ? OR LicensePlate LIKE ?)";

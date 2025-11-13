@@ -305,7 +305,7 @@ document.addEventListener("DOMContentLoaded", () => {
         async function fetchVehicles(inputEl, hiddenField, orderEl) {
             const keyword = inputEl.value.trim();
             try {
-                const res = await fetch(`${contextPath}/vehicles/search?query=${encodeURIComponent(keyword)}&customerId=${customerId}`);
+                const res = await fetch(`${contextPath}/customerservice/vehicles-search?query=${encodeURIComponent(keyword)}&customerId=${customerId}`);
                 const data = await res.json();
 
                 const mapped = data.length === 0
@@ -381,7 +381,7 @@ document.addEventListener("DOMContentLoaded", () => {
         async function fetchServices(inputEl, selectedServiceIDs, selectedTable, orderEl, index) {
             const keyword = inputEl.value.trim();
             try {
-                const res = await fetch(`${contextPath}/services/search?query=${encodeURIComponent(keyword)}`);
+                const res = await fetch(`${contextPath}/customerservice/services-search?query=${encodeURIComponent(keyword)}`);
                 const data = await res.json();
 
                 const mapped = data.map(s => ({

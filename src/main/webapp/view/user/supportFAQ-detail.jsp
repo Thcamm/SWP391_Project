@@ -18,10 +18,7 @@
 <div class="help-widget">
     <button id="helpToggle" class="help-btn">💡</button>
     <div id="helpOptions" class="help-options">
-        <a href="#" title="Chatbot">💬 Chatbot</a>
-        <a href="tel:19001234" title="Hotline">📞 Hotline</a>
-        <a href="mailto:support@garage.vn" title="Send Email">📧 Send Email</a>
-        <a href="${pageContext.request.contextPath}/customer/create-support-request" title="Submit Request">❓ Submit Request</a>
+        <a href="${pageContext.request.contextPath}/customer/create-support-request" title="Submit Request"> Submit Request</a>
     </div>
 </div>
 

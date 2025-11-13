@@ -158,7 +158,7 @@ public class CreateServiceRequest extends HttpServlet {
 
             session.setAttribute("message", "Service orders created successfully!");
             session.setAttribute("messageType", "success");
-            response.sendRedirect(request.getContextPath() + "/customerservice/requests");
+            response.sendRedirect(request.getContextPath() + "/customerservice/view-all-repairs");
 
         } catch (SQLException | NumberFormatException e) {
             e.printStackTrace();

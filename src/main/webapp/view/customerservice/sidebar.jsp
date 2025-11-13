@@ -93,8 +93,8 @@
             <div class="menu-title">Main Menu</div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link ${fn:contains(currentURI, '/home') ? 'active' : ''}"
-                       href="${pageContext.request.contextPath}/customerservice/home">
+                    <a class="nav-link ${fn:contains(currentURI, '/#') ? 'active' : ''}"
+                       href="${pageContext.request.contextPath}/customerservice/#">
                         <i class="bi bi-house-door"></i>
                         <span>Dashboard</span>
                     </a>
@@ -175,7 +175,7 @@
         </nav>
 
         <div class="sidebar-footer">
-            <a href="${pageContext.request.contextPath}/support" class="btn-support">
+            <a href="${pageContext.request.contextPath}/#" class="btn-support">
                 <i class="bi bi-question-circle"></i>
                 <span>Help & Support</span>
             </a>

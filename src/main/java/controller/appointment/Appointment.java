@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import model.user.User;
 import model.vehicle.Vehicle;
 import service.vehicle.VehicleService;
+import util.MailService;
 
 import java.io.IOException;
 
@@ -44,28 +45,11 @@ public class Appointment extends HttpServlet {
             return; // Stop execution immediately
         }
 
-        // 2. Get necessary parameters
-        String carBrand = request.getParameter("carBrand");
-        String licensePlate = request.getParameter("licensePlate");
         String dateStr = request.getParameter("appointmentDate");
         String description = request.getParameter("description");
 
         CustomerDAO customerDAO = new CustomerDAO();
-        VehicleDAO vehicleDAO = new VehicleDAO(); // Cần có VehicleDAO
         AppointmentDAO appointmentDAO = new AppointmentDAO(); // Hoặc dùng Service
-        VehicleService vehicleService = new VehicleService(vehicleDAO);
-
-        // (Optional) Validation: Check required fields are not empty
-        if (licensePlate == null || licensePlate.trim().isEmpty() || dateStr == null || dateStr.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "License plate and date are required.");
-            request.getRequestDispatcher("/view/customer/appointment-scheduling.jsp").forward(request, response);
-            return;
-        }
-        if (!vehicleService.validateLicensePlateFormat(licensePlate)) {
-            request.setAttribute("errorMessage", "Invalid license plate format.");
-            request.getRequestDispatcher("/view/customer/appointment-scheduling.jsp").forward(request, response);
-            return;
-        }
 
         try {
             // 4. Get CustomerID from UserID
@@ -83,11 +67,10 @@ public class Appointment extends HttpServlet {
             java.time.LocalDateTime dateTime = java.time.LocalDateTime.parse(dateStr);
             appointment.setAppointmentDate(dateTime);
             appointment.setDescription(description);
-            appointment.setStatus("PENDING"); // Set initial status
 
             // 7. Save to database
             appointmentDAO.insertAppointment(appointment);
-
+            MailService.sendEmail(user.getEmail(),  "AppointmentService scheduled successfully","AppointmentService scheduled successfully");
             // 8. Redirect after success (PRG Pattern)
             request.setAttribute("successMessage", "AppointmentService scheduled successfully!");
             request.getRequestDispatcher("/view/customer/appointment-scheduling.jsp").forward(request, response);

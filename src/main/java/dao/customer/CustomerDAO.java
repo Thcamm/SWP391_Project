@@ -3,6 +3,7 @@ package dao.customer;
 import common.DbContext;
 import dao.vehicle.VehicleDAO;
 import model.customer.Customer;
+import model.dto.RepairJourneySummaryDTO;
 import model.vehicle.Vehicle;
 
 import java.sql.*;
@@ -471,5 +472,48 @@ public Customer getCustomerById(int customerId) throws SQLException {
             ps.executeUpdate();
         }
     }
+    public List<Customer> getCustomerByName(String name, int limit, int offset) throws SQLException {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT c.CustomerID, u.UserID, u.FullName, u.Email, u.PhoneNumber ");
+        sql.append("FROM customer c JOIN user u ON c.userID = u.userid WHERE 1=1");
 
+        List<Object> params = new ArrayList<>();
+
+        // Apply filter
+        if (name != null && !name.trim().isEmpty()) {
+            sql.append(" AND u.FullName LIKE ?");
+            params.add("%" + name.trim() + "%");
+        }
+
+        // Add LIMIT and OFFSET
+        sql.append(" LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        List<Customer> customers = new ArrayList<>();
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            // Set parameters
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Customer customer = new Customer();
+                    customer.setCustomerId(rs.getInt("CustomerID"));
+                    customer.setUserId(rs.getInt("UserID"));
+                    customer.setFullName(rs.getString("FullName"));
+                    customer.setEmail(rs.getString("Email"));
+                    customer.setPhoneNumber(rs.getString("PhoneNumber"));
+                    customers.add(customer);
+                }
+            }
+        }
+
+        // Return empty list instead of null
+        return customers;
+    }
 }
