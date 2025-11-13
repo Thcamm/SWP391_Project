@@ -132,17 +132,17 @@ public class AppointmentDAO extends DbContext {
     }
 
     public void insertAppointment(Appointment appointment) {
-        String sql = "INSERT INTO Appointment (CustomerID, AppointmentDate, Status, Description) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Appointment (CustomerID, AppointmentDate, Description) VALUES (?, ?, ?)";
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
             st.setInt(1, appointment.getCustomerID());
             // Kiểm tra null và set date an toàn
             if (appointment.getAppointmentDate() != null) {
-                st.setTimestamp(3, java.sql.Timestamp.valueOf(appointment.getAppointmentDate()));
+                st.setTimestamp(2, java.sql.Timestamp.valueOf(appointment.getAppointmentDate()));
             } else {
                 throw new IllegalArgumentException("AppointmentService date cannot be null");
             }
-            st.setString(4, appointment.getStatus());
-            st.setString(5, appointment.getDescription());
+
+            st.setString(3, appointment.getDescription());
             st.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace(); // Hiển thị chi tiết lỗi SQL
@@ -495,4 +495,63 @@ public class AppointmentDAO extends DbContext {
             return false;
         }
     }
+
+    public List<Map<String, Object>> getAcceptedAppointmentsWithinDays(int daysBefore) throws SQLException {
+        String sql = """
+        SELECT * FROM Appointment a
+                 JOIN Customer c ON a.CustomerID = c.CustomerID
+                 JOIN User u ON c.UserID = u.UserID
+        WHERE Status = 'ACCEPTED'
+          AND DATEDIFF(AppointmentDate, NOW()) = ?
+    """;
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
+        try ( PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, daysBefore);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String,Object> map = new HashMap<>();
+                Appointment appointment = new Appointment();
+                appointment.setAppointmentID(rs.getInt("AppointmentID"));
+                appointment.setCustomerID(rs.getInt("CustomerID"));
+
+                Timestamp scheduledTs = rs.getTimestamp("AppointmentDate");
+                if (scheduledTs != null) {
+                    appointment.setAppointmentDate(scheduledTs.toLocalDateTime());
+                }
+
+                Timestamp createdTs = rs.getTimestamp("CreatedAt");
+                if (createdTs != null) {
+                    appointment.setCreatedAt(createdTs.toLocalDateTime());
+                }
+                appointment.setStatus(rs.getString("Status"));
+                appointment.setDescription(rs.getString("Description"));
+                appointment.setRescheduleCount(rs.getInt("RescheduleCount"));
+                Timestamp updatedTs = rs.getTimestamp("UpdatedAt");
+                if (updatedTs != null) {
+                    appointment.setUpdatedAt(updatedTs.toLocalDateTime());
+                }
+                map.put("appointment", appointment);
+                map.put("customerName", rs.getString("fullName"));
+                map.put("customerEmail", rs.getString("Email"));
+                resultList.add(map);
+            }
+        }
+        return resultList;
+    }
+
+    public int autoRejectNoShowAppointments() throws SQLException {
+        String sql = """
+        UPDATE Appointment a
+        LEFT JOIN ServiceRequest s ON a.AppointmentID = s.AppointmentID
+        SET a.Status = 'REJECTED'
+        WHERE a.Status = 'ACCEPTED'
+          AND a.AppointmentDate < NOW()
+          AND s.AppointmentID IS NULL
+    """;
+        try ( PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            return ps.executeUpdate();
+        }
+    }
+
 }

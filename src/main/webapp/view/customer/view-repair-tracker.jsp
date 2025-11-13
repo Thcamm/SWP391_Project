@@ -3,10 +3,10 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Theo Dõi Quy Trình Sửa Chữa</title>
+    <title>Tracking the Repair Process</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
@@ -20,7 +20,7 @@
             padding: 20px 0;
         }
 
-        /* Đường kẻ dọc của timeline */
+        /* Vertical line of the timeline */
         .timeline::before {
             content: '';
             position: absolute;
@@ -31,7 +31,7 @@
             background: #dee2e6;
         }
 
-        /* Mỗi stage trong timeline */
+        /* Each stage in timeline */
         .timeline-stage {
             position: relative;
             padding-left: 70px;
@@ -41,7 +41,7 @@
             padding-bottom: 0;
         }
 
-        /* Icon chính của stage */
+        /* Main icon of stage */
         .stage-icon {
             position: absolute;
             left: 12px;
@@ -61,7 +61,7 @@
         .stage-icon.active { background: #0d6efd; }
         .stage-icon.rejected { background: #dc3545; }
 
-        /* Container của stage */
+        /* Stage container */
         .stage-content {
             background: white;
             border: 1px solid #dee2e6;
@@ -80,14 +80,14 @@
             gap: 8px;
         }
 
-        /* Container cho các steps */
+        /* Steps container */
         .stage-steps {
             margin-left: 15px;
             border-left: 2px solid #e9ecef;
             padding-left: 20px;
         }
 
-        /* Mỗi step nhỏ */
+        /* Each small step */
         .step-item {
             position: relative;
             padding: 12px 0;
@@ -168,7 +168,7 @@
             border-top: 1px solid #e9ecef;
         }
 
-        /* Highlight cho stage đang active */
+        /* Highlight for active stage */
         .timeline-stage.active-stage .stage-content {
             border-color: #0d6efd;
             box-shadow: 0 4px 12px rgba(13, 110, 253, 0.15);
@@ -193,30 +193,63 @@
 <div class="container py-5">
     <c:set var="journey" value="${requestScope.journey}" />
 
-    <h2 class="mb-4 text-center">Theo Dõi Quy Trình Sửa Chữa</h2>
-    <h5 class="text-center text-muted mb-5">Yêu Cầu #${journey.serviceRequest.requestID}</h5>
+    <h2 class="mb-4 text-center" style="color: #5a6268">Tracking the Repair Process</h2>
+    <h5 class="text-center text-muted mb-5">Request #${journey.serviceRequest.requestID}</h5>
+
+    <div class="card mb-5 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="bi bi-car-front-fill"></i> Vehicle & Services Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h6 class="text-muted">Vehicle Information</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li><strong>Brand:</strong> ${vehicle.brand}</li>
+                        <li><strong>Model:</strong> ${vehicle.model}</li>
+                        <li><strong>License Plate:</strong> ${vehicle.licensePlate}</li>
+                    </ul>
+                </div>
+
+                <div class="col-md-6">
+                    <h6 class="text-muted">Requested Services</h6>
+                    <ul class="list-group list-group-flush">
+                        <c:forEach var="name" items="${serviceName}">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span><i class="bi bi-wrench-adjustable-circle text-primary"></i> ${name}</span>
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            </li>
+                        </c:forEach>
+                        <c:if test="${empty serviceName}">
+                            <li class="list-group-item text-muted">No services listed</li>
+                        </c:if>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="timeline">
 
-                <%-- Lặp qua tất cả các stages --%>
+                <%-- Loop through all stages --%>
                 <c:forEach var="stage" items="${journey.stages}" varStatus="status">
                     <div class="timeline-stage ${stage.overallStatus == 'active' ? 'active-stage' : ''}">
 
-                            <%-- Icon của stage --%>
+                            <%-- Stage icon --%>
                         <div class="stage-icon ${stage.overallStatus}">
                             <i class="${stage.icon}"></i>
                         </div>
 
-                            <%-- Nội dung của stage --%>
+                            <%-- Stage content --%>
                         <div class="stage-content">
                             <div class="stage-title">
                                 <i class="${stage.icon}"></i>
                                     ${stage.stageTitle}
                             </div>
 
-                                <%-- Danh sách các steps --%>
+                                <%-- List of steps --%>
                             <div class="stage-steps">
                                 <c:forEach var="step" items="${stage.steps}">
                                     <div class="step-item ${step.completed ? 'completed' : 'active'}">
@@ -235,7 +268,7 @@
                                 </c:forEach>
                             </div>
 
-                                <%-- Action buttons cho các stage cụ thể --%>
+                                <%-- Action buttons for specific stages --%>
                             <c:choose>
 
                                 <c:when test="${stage.stageType == 'WORK_ORDER'}">
@@ -247,38 +280,39 @@
                                         </a>
                                     </div>
                                 </c:when>
-                                <%-- Invoice: Xem chi tiết hóa đơn --%>
+                                
+                                <%-- Invoice: View invoice details --%>
                                 <c:when test="${stage.stageType == 'INVOICE' && journey.invoice != null &&
                                               (journey.invoice.paymentStatus == 'UNPAID' ||
                                                journey.invoice.paymentStatus == 'PARTIALLY_PAID')}">
                                     <div class="stage-actions">
                                         <a href="${pageContext.request.contextPath}/customer/invoice?id=${journey.invoice.invoiceID}"
                                            class="btn btn-primary btn-sm">
-                                            <i class="bi bi-eye"></i> Xem Chi Tiết Hóa Đơn
+                                            <i class="bi bi-eye"></i> View Invoice Details
                                         </a>
                                     </div>
                                 </c:when>
 
-                                <%-- Feedback: Gửi đánh giá --%>
+                                <%-- Feedback: Submit feedback --%>
                                 <c:when test="${stage.stageType == 'FEEDBACK'}">
                                     <div class="stage-actions">
                                         <c:choose>
                                             <c:when test="${journey.feedbackAction == 'ALLOW_FEEDBACK'}">
                                                 <a href="${pageContext.request.contextPath}/customer/send-feedback?workOrderID=${journey.workOrder.workOrderId}"
                                                    class="btn btn-success btn-sm">
-                                                    <i class="bi bi-pencil"></i> Gửi Đánh Giá Ngay
+                                                    <i class="bi bi-pencil"></i> Submit Feedback Now
                                                 </a>
                                                 <c:if test="${journey.feedbackDaysLeft != null}">
                                                     <span class="countdown-badge">
                                                         <i class="bi bi-hourglass-split"></i>
-                                                        Còn ${journey.feedbackDaysLeft} ngày
+                                                        ${journey.feedbackDaysLeft} days left
                                                     </span>
                                                 </c:if>
                                             </c:when>
                                             <c:when test="${journey.feedbackAction == 'HAS_FEEDBACK'}">
                                                 <a href="${pageContext.request.contextPath}/customer/view-feedback?feedbackId=${journey.feedback.feedbackID}"
                                                    class="btn btn-primary btn-sm">
-                                                    <i class="bi bi-eye"></i> Xem Đánh Giá Của Bạn
+                                                    <i class="bi bi-eye"></i> View Your Feedback
                                                 </a>
                                             </c:when>
                                         </c:choose>
@@ -292,8 +326,12 @@
             </div>
 
             <div class="text-center mt-5">
-                <a href="${pageContext.request.contextPath}/customer/repair-list" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> Quay Lại Danh Sách
+                <a href="${pageContext.request.contextPath}/customer/repair-list?
+          <c:if test='${not empty vehicleId}'>vehicleId=${vehicleId}&</c:if>
+          <c:if test='${not empty sortBy}'>sortBy=${sortBy}&</c:if>
+          <c:if test='${not empty page}'>page=${page}</c:if>"
+                   class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Repair List
                 </a>
             </div>
         </div>

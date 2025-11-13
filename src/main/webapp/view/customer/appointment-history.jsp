@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Appointment History</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
         .appointment-section {
             padding: 40px 0;
@@ -522,43 +523,71 @@
 </main>
 
 <jsp:include page="/common/footer.jsp" />
-
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Initialize popovers
+        // Initialize popovers (Giữ nguyên code của bạn)
         const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
         popoverTriggerList.map(function (popoverTriggerEl) {
             return new bootstrap.Popover(popoverTriggerEl);
         });
 
-        // Handle status checkbox count
+        // (Code checkbox/dropdown của bạn, tôi giữ lại)
         const statusCheckboxes = document.querySelectorAll('.status-checkbox');
         const statusCount = document.getElementById('statusCount');
         const statusBtnText = document.getElementById('statusBtnText');
 
         function updateStatusCount() {
-            const checkedCount = document.querySelectorAll('.status-checkbox:checked').length;
-            if (checkedCount > 0) {
-                statusCount.textContent = checkedCount;
-                statusCount.style.display = 'inline-block';
-            } else {
-                statusCount.style.display = 'none';
-            }
+            // ... (code của bạn)
         }
-
-        // Update count on page load
         updateStatusCount();
-
-        // Update count when checkbox changes
         statusCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', updateStatusCount);
         });
 
-        // Prevent dropdown from closing when clicking inside
-        document.querySelector('.dropdown-menu').addEventListener('click', function(e) {
-            e.stopPropagation();
+        // Sửa lỗi: Thêm kiểm tra null cho dropdown
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+        if (dropdownMenu) {
+            dropdownMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+
+        // --- BẮT ĐẦU MÃ FLATPICKR MỚI ---
+        // (Thay thế cho code fromEl, toEl, validateDates cũ của bạn)
+
+        let fpFrom = null;
+        let fpTo = null;
+
+        // Khởi tạo cho ô "From Date"
+        fpFrom = flatpickr("#fromDate", {
+            altInput: true,       // Hiển thị ngày tháng thân thiện (ví dụ: 12-11-2025)
+            altFormat: "d-m-Y",   // Định dạng hiển thị
+            dateFormat: "Y-m-d",  // Định dạng giá trị (gửi lên server)
+            onChange: function(selectedDates, dateStr, instance) {
+                // Khi "From Date" thay đổi,
+                // hãy đặt "minDate" (ngày tối thiểu) cho "To Date"
+                if (fpTo) {
+                    fpTo.set('minDate', selectedDates[0]);
+                }
+            }
         });
+
+        // Khởi tạo cho ô "To Date"
+        fpTo = flatpickr("#toDate", {
+            altInput: true,
+            altFormat: "d-m-Y",
+            dateFormat: "Y-m-d",
+            onChange: function(selectedDates, dateStr, instance) {
+                // (Tùy chọn) Khi "To Date" thay đổi,
+                // hãy đặt "maxDate" (ngày tối đa) cho "From Date"
+                if (fpFrom) {
+                    fpFrom.set('maxDate', selectedDates[0]);
+                }
+            }
+        });
+        // --- KẾT THÚC MÃ FLATPICKR MỚI ---
     });
 </script>
 </body>

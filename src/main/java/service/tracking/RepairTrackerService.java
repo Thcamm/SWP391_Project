@@ -27,17 +27,17 @@ public class RepairTrackerService {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy");
     private CustomerDiagnosticService diagnosticService = new CustomerDiagnosticService();
     /**
-     * Lấy và xử lý hành trình thành timeline có cấu trúc
+     * Get and process the journey into a timeline structure
      */
     public RepairJourneyView getProcessedJourney( int customerId, int requestId) throws SQLException {
 
-        RepairJourneyView journey = journeyDAO.getRepairJourneyByRequestID( requestId);
+        RepairJourneyView journey = journeyDAO.getRepairJourneyByRequestID(requestId);
 
         if (journey == null) {
             return null;
         }
 
-        // Xây dựng timeline theo thứ tự
+        // Build timeline in order
         buildTimeline(journey);
 
         CustomerDiagnosticsView diagView = diagnosticService.getDiagnosticsForRequest(customerId, requestId);
@@ -47,7 +47,7 @@ public class RepairTrackerService {
     }
 
     /**
-     * Xây dựng timeline chi tiết - CHỈ hiển thị stage đã xảy ra
+     * Build detailed timeline - ONLY show stages that have occurred
      */
     private void buildTimeline(RepairJourneyView journey) {
         Appointment appointment = journey.getAppointment();
@@ -56,61 +56,61 @@ public class RepairTrackerService {
         Invoice invoice = journey.getInvoice();
         Feedback feedback = journey.getFeedback();
 
-        // 1. APPOINTMENT STAGE (nếu có)
+        // 1. APPOINTMENT STAGE (if exists)
         if (appointment != null) {
             TimelineStage apptStage = buildAppointmentStage(appointment);
             journey.getStages().add(apptStage);
 
-            // Nếu appointment bị reject/cancel → DỪNG timeline
+            // If appointment rejected/cancelled → STOP timeline
             if ("REJECTED".equals(appointment.getStatus()) ||
                     "CANCELLED".equals(appointment.getStatus())) {
                 return;
             }
         }
 
-        // 2. SERVICE REQUEST STAGE (luôn có)
+        // 2. SERVICE REQUEST STAGE (always exists)
         if (serviceRequest != null) {
             TimelineStage srStage = buildServiceRequestStage(serviceRequest);
             journey.getStages().add(srStage);
 
-            // Nếu SR bị reject → DỪNG timeline
+            // If service request rejected → STOP timeline
             if ("REJECTED".equals(serviceRequest.getStatus())) {
                 return;
             }
 
-            // Nếu SR vẫn pending → DỪNG timeline
+            // If service request is still pending → STOP timeline
             if ("PENDING".equals(serviceRequest.getStatus())) {
                 return;
             }
         }
 
-        // 3. WORK ORDER STAGE (nếu có)
+        // 3. WORK ORDER STAGE (if exists)
         if (workOrder != null) {
             TimelineStage woStage = buildWorkOrderStage(workOrder);
             journey.getStages().add(woStage);
 
-            // Nếu WO chưa complete → DỪNG timeline
+            // If work order not complete → STOP timeline
             if (workOrder.getStatus() != WorkOrder.Status.COMPLETE) {
                 return;
             }
         } else {
-            return; // Chưa có WO → dừng
+            return; // No work order yet → stop
         }
 
-        // 4. INVOICE STAGE (nếu có)
+        // 4. INVOICE STAGE (if exists)
         if (invoice != null) {
             TimelineStage invStage = buildInvoiceStage(invoice);
             journey.getStages().add(invStage);
 
-            // Nếu invoice chưa paid hoặc bị void → DỪNG timeline
+            // If invoice not paid or void → STOP timeline
             if (!"PAID".equals(invoice.getPaymentStatus())) {
                 return;
             }
         } else {
-            return; // Chưa có invoice → dừng
+            return; // No invoice yet → stop
         }
 
-        // 5. FEEDBACK STAGE (chỉ khi invoice đã paid)
+        // 5. FEEDBACK STAGE (only when invoice is paid)
         if ("PAID".equals(invoice.getPaymentStatus())) {
             TimelineStage fbStage = buildFeedbackStage(invoice, feedback, journey);
             journey.getStages().add(fbStage);
@@ -118,26 +118,26 @@ public class RepairTrackerService {
     }
 
     /**
-     * Xây dựng Appointment Stage
+     * Build Appointment Stage
      */
     private TimelineStage buildAppointmentStage(Appointment appt) {
-        TimelineStage stage = new TimelineStage("APPOINTMENT", "Đặt Lịch Hẹn", "bi-calendar-check");
+        TimelineStage stage = new TimelineStage("APPOINTMENT", "Appointment", "bi-calendar-check");
 
         String status = appt.getStatus();
 
-        // Bước 1: Tạo lịch hẹn (luôn có)
+        // Step 1: Create appointment (always exists)
         stage.addStep(new TimelineStep(
-                "Đã tạo lịch hẹn",
+                "Appointment created",
                 formatDateTime(appt.getCreatedAt()),
                 "check-circle",
                 "success",
                 true
         ));
 
-        // Bước 2: Trạng thái hiện tại
+        // Step 2: Current status
         if ("ACCEPTED".equals(status)) {
             stage.addStep(new TimelineStep(
-                    "Lịch hẹn đã được chấp nhận",
+                    "Appointment accepted",
                     formatDateTime(appt.getUpdatedAt()),
                     "check-circle",
                     "success",
@@ -146,7 +146,7 @@ public class RepairTrackerService {
             stage.setOverallStatus("completed");
         } else if ("REJECTED".equals(status)) {
             stage.addStep(new TimelineStep(
-                    "Lịch hẹn đã bị từ chối",
+                    "Appointment rejected",
                     formatDateTime(appt.getUpdatedAt()),
                     "x-circle",
                     "danger",
@@ -155,7 +155,7 @@ public class RepairTrackerService {
             stage.setOverallStatus("rejected");
         } else if ("CANCELLED".equals(status)) {
             stage.addStep(new TimelineStep(
-                    "Bạn đã hủy lịch hẹn",
+                    "Appointment cancelled by customer",
                     formatDateTime(appt.getUpdatedAt()),
                     "dash-circle",
                     "secondary",
@@ -164,7 +164,7 @@ public class RepairTrackerService {
             stage.setOverallStatus("rejected");
         } else { // PENDING
             stage.addStep(new TimelineStep(
-                    "Đang chờ xác nhận lịch hẹn",
+                    "Waiting for appointment confirmation",
                     "",
                     "clock",
                     "warning",
@@ -177,26 +177,26 @@ public class RepairTrackerService {
     }
 
     /**
-     * Xây dựng Service Request Stage
+     * Build Service Request Stage
      */
     private TimelineStage buildServiceRequestStage(ServiceRequest sr) {
-        TimelineStage stage = new TimelineStage("SERVICE_REQUEST", "Yêu Cầu Dịch Vụ", "bi-file-earmark-text");
+        TimelineStage stage = new TimelineStage("SERVICE_REQUEST", "Service Request", "bi-file-earmark-text");
 
         String status = sr.getStatus();
 
-        // Bước 1: Tiếp nhận yêu cầu (luôn có)
+        // Step 1: Receive request (always exists)
         stage.addStep(new TimelineStep(
-                "Đã tiếp nhận yêu cầu dịch vụ",
+                "Service request received",
                 formatDateTime(sr.getRequestDate()),
                 "check-circle",
                 "success",
                 true
         ));
 
-        // Bước 2: Trạng thái hiện tại
+        // Step 2: Current status
         if ("APPROVE".equals(status)) {
             stage.addStep(new TimelineStep(
-                    "Yêu cầu đã được chấp thuận",
+                    "Service request approved",
                     formatDateTime(sr.getUpdatedAt()),
                     "check-circle",
                     "success",
@@ -205,7 +205,7 @@ public class RepairTrackerService {
             stage.setOverallStatus("completed");
         } else if ("REJECTED".equals(status)) {
             stage.addStep(new TimelineStep(
-                    "Yêu cầu dịch vụ đã bị từ chối",
+                    "Service request rejected",
                     formatDateTime(sr.getUpdatedAt()),
                     "x-circle",
                     "danger",
@@ -214,7 +214,7 @@ public class RepairTrackerService {
             stage.setOverallStatus("rejected");
         } else { // PENDING
             stage.addStep(new TimelineStep(
-                    "Đang chờ xem xét yêu cầu",
+                    "Service request pending review",
                     "",
                     "clock",
                     "warning",
@@ -227,26 +227,26 @@ public class RepairTrackerService {
     }
 
     /**
-     * Xây dựng Work Order Stage
+     * Build Work Order Stage
      */
     private TimelineStage buildWorkOrderStage(WorkOrder wo) {
-        TimelineStage stage = new TimelineStage("WORK_ORDER", "Quá Trình Sửa Chữa", "bi-tools");
+        TimelineStage stage = new TimelineStage("WORK_ORDER", "Repair Process", "bi-tools");
 
         WorkOrder.Status status = wo.getStatus();
 
-        // Bước 1: Bắt đầu sửa chữa (luôn có)
+        // Step 1: Start repair (always exists)
         stage.addStep(new TimelineStep(
-                "Đã tiếp nhận xe và bắt đầu kiểm tra",
+                "Vehicle received and inspection started",
                 formatDateTime(wo.getCreatedAt()),
                 "check-circle",
                 "success",
                 true
         ));
 
-        // Bước 2: Trạng thái hiện tại
+        // Step 2: Current status
         if (status == WorkOrder.Status.COMPLETE) {
             stage.addStep(new TimelineStep(
-                    "Đã hoàn thành sửa chữa",
+                    "Repair completed",
                     formatDateTime(wo.getUpdatedAt()),
                     "check-circle",
                     "success",
@@ -255,7 +255,7 @@ public class RepairTrackerService {
             stage.setOverallStatus("completed");
         } else if (status == WorkOrder.Status.IN_PROCESS) {
             stage.addStep(new TimelineStep(
-                    "Đang trong quá trình sửa chữa",
+                    "Repair in progress",
                     formatDateTime(wo.getUpdatedAt()),
                     "gear",
                     "primary",
@@ -264,7 +264,7 @@ public class RepairTrackerService {
             stage.setOverallStatus("active");
         } else { // PENDING
             stage.addStep(new TimelineStep(
-                    "Chờ bắt đầu sửa chữa",
+                    "Waiting to start repair",
                     "",
                     "clock",
                     "warning",
@@ -277,26 +277,26 @@ public class RepairTrackerService {
     }
 
     /**
-     * Xây dựng Invoice Stage
+     * Build Invoice Stage
      */
     private TimelineStage buildInvoiceStage(Invoice inv) {
-        TimelineStage stage = new TimelineStage("INVOICE", "Hóa Đơn", "bi-receipt");
+        TimelineStage stage = new TimelineStage("INVOICE", "Invoice", "bi-receipt");
 
         String status = inv.getPaymentStatus();
 
-        // Bước 1: Xuất hóa đơn (luôn có)
+        // Step 1: Issue invoice (always exists)
         stage.addStep(new TimelineStep(
-                "Đã xuất hóa đơn",
+                "Invoice issued",
                 formatDateTime(inv.getCreatedAt()),
                 "check-circle",
                 "success",
                 true
         ));
 
-        // Bước 2: Trạng thái thanh toán
+        // Step 2: Payment status
         if ("PAID".equals(status)) {
             stage.addStep(new TimelineStep(
-                    "Đã thanh toán thành công",
+                    "Payment successful",
                     formatDateTime(inv.getUpdatedAt()),
                     "check-circle",
                     "success",
@@ -305,7 +305,7 @@ public class RepairTrackerService {
             stage.setOverallStatus("completed");
         } else if ("VOID".equals(status)) {
             stage.addStep(new TimelineStep(
-                    "Hóa đơn đã bị hủy",
+                    "Invoice voided",
                     formatDateTime(inv.getUpdatedAt()),
                     "x-circle",
                     "secondary",
@@ -314,7 +314,7 @@ public class RepairTrackerService {
             stage.setOverallStatus("rejected");
         } else { // UNPAID or PARTIALLY_PAID
             stage.addStep(new TimelineStep(
-                    "Chờ thanh toán để nhận xe",
+                    "Awaiting payment to collect vehicle",
                     "",
                     "exclamation-triangle",
                     "warning",
@@ -327,15 +327,15 @@ public class RepairTrackerService {
     }
 
     /**
-     * Xây dựng Feedback Stage
+     * Build Feedback Stage
      */
     private TimelineStage buildFeedbackStage(Invoice inv, Feedback fb, RepairJourneyView journey) {
-        TimelineStage stage = new TimelineStage("FEEDBACK", "Đánh Giá Dịch Vụ", "bi-star-fill");
+        TimelineStage stage = new TimelineStage("FEEDBACK", "Service Feedback", "bi-star-fill");
 
         if (fb != null) {
-            // Đã có feedback
+            // Feedback already submitted
             stage.addStep(new TimelineStep(
-                    "Đã gửi đánh giá",
+                    "Feedback submitted",
                     formatDateTime(fb.getFeedbackDate()),
                     "check-circle",
                     "success",
@@ -344,7 +344,7 @@ public class RepairTrackerService {
             stage.setOverallStatus("completed");
             journey.setFeedbackAction("HAS_FEEDBACK");
         } else {
-            // Chưa có feedback - kiểm tra 7 ngày
+            // No feedback yet - check 7-day window
             Timestamp paidTimestamp = inv.getUpdatedAt();
             LocalDateTime paidDate = paidTimestamp.toLocalDateTime();
             long daysSincePayment = Duration.between(paidDate, LocalDateTime.now()).toDays();
@@ -352,7 +352,7 @@ public class RepairTrackerService {
 
             if (daysLeft > 0) {
                 stage.addStep(new TimelineStep(
-                        "Bạn có thể gửi đánh giá (Còn " + daysLeft + " ngày)",
+                        "You can submit feedback (" + daysLeft + " days left)",
                         "",
                         "pencil",
                         "primary",
@@ -363,7 +363,7 @@ public class RepairTrackerService {
                 journey.setFeedbackDaysLeft((int) daysLeft);
             } else {
                 stage.addStep(new TimelineStep(
-                        "Thời gian gửi đánh giá đã hết hạn",
+                        "Feedback period expired",
                         "",
                         "clock-history",
                         "secondary",
@@ -391,18 +391,38 @@ public class RepairTrackerService {
     }
 
     /**
-     * Lấy danh sách tóm tắt cho trang List
+     * Get summary list for the customer list page
      */
-// SỬA ĐỔI phương thức này (đổi tên, thêm tham số)
-    public List<RepairJourneySummaryDTO> getPaginatedSummariesForCustomer(int customerId, int limit, int offset) throws SQLException {
-        // Gọi phương thức DAO đã được phân trang
+// Thêm vào RepairTrackerService.java
+
+    /**
+     * Get summary list with sort order
+     */
+    public List<RepairJourneySummaryDTO> getPaginatedSummariesForCustomer(
+            int customerId, int limit, int offset) throws SQLException {
         return journeyDAO.getPaginatedJourneySummaries(customerId, limit, offset);
     }
 
-    // Thêm phương thức MỚI này để đếm
+    /**
+     * Get summary list filtered by vehicle
+     */
+    public List<RepairJourneySummaryDTO> getPaginatedSummariesForCustomerByVehicle(
+            int customerId, int vehicleId, String sortBy, int limit, int offset) throws SQLException {
+        return journeyDAO.getPaginatedJourneySummariesByVehicle(customerId, vehicleId, sortBy, limit, offset);
+    }
+
+    /**
+     * Count summaries filtered by vehicle
+     */
+    public int countSummariesForCustomerByVehicle(int customerId, int vehicleId) throws SQLException {
+        return journeyDAO.countJourneySummariesByVehicle(customerId, vehicleId);
+    }
+
+    // New method to count summaries
     public int countSummariesForCustomer(int customerId) throws SQLException {
         return journeyDAO.countJourneySummaries(customerId);
     }
+
     public List<RepairJourneySummaryDTO> getAllTracker(int limit, int offset) throws SQLException {
         return journeyDAO.getPaginatedTracking(limit, offset);
     }
@@ -410,5 +430,14 @@ public class RepairTrackerService {
     public int countAllTracker() throws SQLException {
         return journeyDAO.countAllTracking();
     }
+// Thêm các phương thức này vào RepairTrackerService
 
+    public List<RepairJourneySummaryDTO> getFilteredTracker(
+            String fullName, String vehicle, String sortBy, int limit, int offset) throws SQLException {
+        return journeyDAO.getFilteredTracking(fullName, vehicle, sortBy, limit, offset);
+    }
+
+    public int countFilteredTracker(String fullName,  String vehicle) throws SQLException {
+        return journeyDAO.countFilteredTracking(fullName,vehicle);
+    }
 }

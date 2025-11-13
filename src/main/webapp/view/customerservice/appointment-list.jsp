@@ -95,7 +95,7 @@
 </head>
 
 <body>
-<jsp:include page="/view/customerservice/result.jsp" />
+
 <jsp:include page="header.jsp"/>
 
 <div class="container-fluid p-0">

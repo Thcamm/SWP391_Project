@@ -131,16 +131,24 @@ public class RepairJourneyDAO extends DbContext {
      * Dùng cho trang "Lịch sử sửa chữa" (trang List).
      */
 // Thêm phương thức MỚI này vào JourneyDAO
-    public int countJourneySummaries(int customerId) throws SQLException {
-        // Câu SQL này chỉ cần đếm trên bảng chính (servicerequest)
-        // với cùng điều kiện WHERE
-        String sql = "SELECT COUNT(sr.RequestID) FROM servicerequest sr WHERE sr.CustomerID = ?";
-        int count = 0;
+// Cập nhật trong RepairJourneyDAO.java
 
+    public int countJourneySummariesByVehicle(int customerId, Integer vehicleId) throws SQLException {
+        StringBuilder sql = new StringBuilder("SELECT COUNT(sr.RequestID) FROM servicerequest sr WHERE sr.CustomerID = ?");
+
+        if (vehicleId != null) {
+            sql.append(" AND sr.VehicleID = ?");
+        }
+
+        int count = 0;
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
             ps.setInt(1, customerId);
+            if (vehicleId != null) {
+                ps.setInt(2, vehicleId);
+            }
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     count = rs.getInt(1);
@@ -150,16 +158,21 @@ public class RepairJourneyDAO extends DbContext {
         return count;
     }
 
-    // SỬA ĐỔI phương thức getJourneySummaries hiện tại
-// Đổi tên và thêm tham số limit, offset
-    public List<RepairJourneySummaryDTO> getPaginatedJourneySummaries(int customerId, int limit, int offset) throws SQLException {
+    // Overload để backward compatible
+    public int countJourneySummaries(int customerId) throws SQLException {
+        return countJourneySummariesByVehicle(customerId, null);
+    }
+
+    public List<RepairJourneySummaryDTO> getPaginatedJourneySummariesByVehicle(
+            int customerId, Integer vehicleId, String sortBy, int limit, int offset) throws SQLException {
+
         List<RepairJourneySummaryDTO> list = new ArrayList<>();
 
-        // SQL giữ nguyên, chỉ thêm LIMIT ? OFFSET ? ở cuối
-        String sql = """
+        StringBuilder sql = new StringBuilder("""
         SELECT
             sr.RequestID,
             sr.VehicleID,
+            v.LicensePlate,
             CASE
                 WHEN a.AppointmentID IS NOT NULL THEN 'Appointment'
                 ELSE 'Walk-in'
@@ -175,23 +188,54 @@ public class RepairJourneyDAO extends DbContext {
         LEFT JOIN appointment a ON sr.AppointmentID = a.AppointmentID
         LEFT JOIN workorder wo ON sr.RequestID = wo.RequestID
         LEFT JOIN invoice i ON wo.WorkOrderID = i.WorkOrderID
+        LEFT JOIN vehicle v ON sr.VehicleID = v.VehicleID
         WHERE sr.CustomerID = ?
-        ORDER BY sr.RequestDate DESC
-        LIMIT ? OFFSET ? 
-    """; // Thêm LIMIT và OFFSET
+    """);
+
+        // Add vehicle filter if provided
+        if (vehicleId != null) {
+            sql.append(" AND sr.VehicleID = ?");
+        }
+
+        // Add sort order
+        sql.append(" ORDER BY ");
+        switch (sortBy) {
+            case "oldest":
+                sql.append("sr.RequestDate ASC");
+                break;
+            case "status":
+                sql.append("LatestStatus ASC, sr.RequestDate DESC");
+                break;
+            case "stage":
+                sql.append("LatestStage DESC, sr.RequestDate DESC");
+                break;
+            case "newest":
+            default:
+                sql.append("sr.RequestDate DESC");
+                break;
+        }
+
+        sql.append(" LIMIT ? OFFSET ?");
 
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
-            ps.setInt(1, customerId);
-            ps.setInt(2, limit);   // Tham số mới
-            ps.setInt(3, offset);  // Tham số mới
+            int paramIndex = 1;
+            ps.setInt(paramIndex++, customerId);
+
+            if (vehicleId != null) {
+                ps.setInt(paramIndex++, vehicleId);
+            }
+
+            ps.setInt(paramIndex++, limit);
+            ps.setInt(paramIndex, offset);
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     RepairJourneySummaryDTO summary = new RepairJourneySummaryDTO();
                     summary.setRequestID(rs.getInt("RequestID"));
                     summary.setVehicleID(rs.getInt("VehicleID"));
+                    summary.setVehicleLicensePlate(rs.getString("LicensePlate"));
                     summary.setEntryType(rs.getString("EntryType"));
                     summary.setEntryDate(rs.getTimestamp("EntryDate"));
                     summary.setLatestStage(rs.getString("LatestStage"));
@@ -201,6 +245,12 @@ public class RepairJourneyDAO extends DbContext {
             }
         }
         return list;
+    }
+
+    // Overload để backward compatible
+    public List<RepairJourneySummaryDTO> getPaginatedJourneySummaries(
+            int customerId, int limit, int offset) throws SQLException {
+        return getPaginatedJourneySummariesByVehicle(customerId, null, "newest", limit, offset);
     }
     public int countAllTracking() throws SQLException {
         // Câu lệnh SQL chỉ cần đếm trên bảng chính
@@ -226,6 +276,8 @@ public class RepairJourneyDAO extends DbContext {
         SELECT
             sr.RequestID,
             sr.VehicleID,
+            u.FullName,
+            v.LicensePlate,
 
             -- 1. Logic cho "Loại hình"
             CASE
@@ -250,6 +302,9 @@ public class RepairJourneyDAO extends DbContext {
         LEFT JOIN appointment a ON sr.AppointmentID = a.AppointmentID
         LEFT JOIN workorder wo ON sr.RequestID = wo.RequestID
         LEFT JOIN invoice i ON wo.WorkOrderID = i.WorkOrderID
+        LEFT JOIN customer c ON sr.CustomerID = c.CustomerID
+        LEFT JOIN user u ON c.UserID = u.UserID
+        LEFT JOIN vehicle v ON sr.VehicleID = v.VehicleID
         ORDER BY sr.RequestDate DESC
         LIMIT ? OFFSET ?
     """; // Thêm LIMIT và OFFSET
@@ -266,6 +321,8 @@ public class RepairJourneyDAO extends DbContext {
                     RepairJourneySummaryDTO summary = new RepairJourneySummaryDTO();
                     summary.setRequestID(rs.getInt("RequestID"));
                     summary.setVehicleID(rs.getInt("VehicleID"));
+                    summary.setFullName(rs.getString("FullName"));
+                    summary.setVehicleLicensePlate(rs.getString("LicensePlate"));
                     summary.setEntryType(rs.getString("EntryType"));
                     summary.setEntryDate(rs.getTimestamp("EntryDate"));
                     summary.setLatestStage(rs.getString("LatestStage"));
@@ -643,4 +700,127 @@ public class RepairJourneyDAO extends DbContext {
 
 
 
+    // Thêm các phương thức này vào JourneyDAO
+
+    public int countFilteredTracking(String fullName, String vehicle) throws SQLException {
+        StringBuilder sql = new StringBuilder(
+                "SELECT COUNT(DISTINCT sr.RequestID) FROM servicerequest sr " +
+                        "LEFT JOIN appointment a ON sr.AppointmentID = a.AppointmentID " +
+                        "LEFT JOIN customer c ON sr.CustomerID = c.CustomerID " +
+                        "LEFT JOIN user u ON c.UserID = u.UserID " +
+                        "LEFT JOIN vehicle v ON sr.VehicleID = v.VehicleID " +
+                        "WHERE 1=1"
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        if (fullName != null && !fullName.trim().isEmpty()) {
+            sql.append(" AND u.FullName LIKE ?");
+            params.add("%" + fullName.trim() + "%");
+        }
+
+        if (vehicle != null && !vehicle.trim().isEmpty()) {
+            sql.append(" AND v.LisencePlate LIKE ?");
+            params.add("%" + vehicle.trim() + "%");
+        }
+
+        int count = 0;
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
+            }
+        }
+        return count;
+    }
+
+    public List<RepairJourneySummaryDTO> getFilteredTracking(
+            String fullName, String vehicle, String sortBy, int limit, int offset) throws SQLException {
+
+        List<RepairJourneySummaryDTO> list = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder("""
+        SELECT
+            sr.RequestID,
+            sr.VehicleID,
+            u.FullName,
+            v.LicensePlate,
+            CASE
+                WHEN a.AppointmentID IS NOT NULL THEN 'Appointment'
+                ELSE 'Walk-in'
+            END AS EntryType,
+            COALESCE(a.AppointmentDate, sr.RequestDate) AS EntryDate,
+            CASE
+                WHEN i.InvoiceID IS NOT NULL THEN 'Invoice'
+                WHEN wo.WorkOrderID IS NOT NULL THEN 'Work Order'
+                ELSE 'Service Request'
+            END AS LatestStage,
+            COALESCE(i.PaymentStatus, wo.Status, sr.Status) AS LatestStatus
+        FROM servicerequest sr
+        LEFT JOIN appointment a ON sr.AppointmentID = a.AppointmentID
+        LEFT JOIN workorder wo ON sr.RequestID = wo.RequestID
+        LEFT JOIN invoice i ON wo.WorkOrderID = i.WorkOrderID
+        LEFT JOIN customer c ON sr.CustomerID = c.CustomerID
+        LEFT JOIN user u ON c.UserID = u.UserID
+        LEFT JOIN vehicle v ON sr.VehicleID = v.VehicleID
+        WHERE 1=1
+    """);
+
+        List<Object> params = new ArrayList<>();
+
+        // Áp dụng filter
+        if (fullName != null && !fullName.trim().isEmpty()) {
+            sql.append(" AND u.FullName LIKE ?");
+            params.add("%" + fullName.trim() + "%");
+        }
+
+        if (vehicle != null && !vehicle.trim().isEmpty()) {
+            sql.append(" AND v.LicensePlate LIKE ?");
+            params.add("%" + fullName.trim() + "%");
+        }
+
+        // Áp dụng sort
+        if ("oldest".equals(sortBy)) {
+            sql.append(" ORDER BY sr.RequestDate ASC");
+        } else {
+            sql.append(" ORDER BY sr.RequestDate DESC");
+        }
+
+        // Áp dụng pagination
+        sql.append(" LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            // Set parameters
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    RepairJourneySummaryDTO summary = new RepairJourneySummaryDTO();
+                    summary.setRequestID(rs.getInt("RequestID"));
+                    summary.setVehicleID(rs.getInt("VehicleID"));
+                    summary.setFullName(rs.getString("FullName"));
+                    summary.setVehicleLicensePlate(rs.getString("LicensePlate"));
+                    summary.setEntryType(rs.getString("EntryType"));
+                    summary.setEntryDate(rs.getTimestamp("EntryDate"));
+                    summary.setLatestStage(rs.getString("LatestStage"));
+                    summary.setLatestStatus(rs.getString("LatestStatus"));
+                    list.add(summary);
+                }
+            }
+        }
+        return list;
+    }
 }

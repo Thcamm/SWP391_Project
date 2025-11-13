@@ -23,7 +23,6 @@ import java.util.*;
 @WebServlet(urlPatterns = {"/customerservice/customer-detail"})
 public class EditCustomer extends HttpServlet {
     private static final int VEHICLES_PER_PAGE = 5;
-    private static final int JOURNEYS_PER_PAGE = 10;
 
     private final PendingChangeDAO pendingChangeDAO = new PendingChangeDAO();
     private final CustomerDAO customerDAO = new CustomerDAO();
@@ -77,41 +76,10 @@ public class EditCustomer extends HttpServlet {
 
             List<Vehicle> vehicles = vehicleDAO.getVehiclesByCustomerIdPaginated(
                     customerId, VEHICLES_PER_PAGE, vehicleCalc.getOffset());
-
+            request.setAttribute("totalVehicles", totalVehicles);
             request.setAttribute("vehicles", vehicles);
             request.setAttribute("vehicleTotalPages", vehicleCalc.getTotalPages());
             request.setAttribute("vehicleCurrentPage", vehicleCalc.getSafePage());
-
-            // === PHÂN TRANG HÀNH TRÌNH SỬA CHỮA (JOURNEY) ===
-            int journeyCurrentPage = 1;
-            String journeyPageParam = request.getParameter("journeyPage");
-            if (journeyPageParam != null) {
-                try {
-                    journeyCurrentPage = Math.max(1, Integer.parseInt(journeyPageParam));
-                } catch (NumberFormatException ignored) {}
-            }
-
-            int totalJourneys = repairTrackerService.countSummariesForCustomer(customerId);
-            PaginationUtils.PaginationCalculation journeyCalc =
-                    PaginationUtils.calculateParams(totalJourneys, journeyCurrentPage, JOURNEYS_PER_PAGE);
-
-            int offset = journeyCalc.getOffset();
-            List<RepairJourneySummaryDTO> journeyData =
-                    repairTrackerService.getPaginatedSummariesForCustomer(customerId, JOURNEYS_PER_PAGE, offset);
-
-            PaginationUtils.PaginationResult<RepairJourneySummaryDTO> journeyResult =
-                    new PaginationUtils.PaginationResult<>(
-                            journeyData,
-                            totalJourneys,
-                            journeyCalc.getTotalPages(),
-                            journeyCalc.getSafePage(),
-                            JOURNEYS_PER_PAGE
-                    );
-
-            request.setAttribute("journeyList", journeyResult);
-            request.setAttribute("journeyTotalPages", journeyCalc.getTotalPages());
-            request.setAttribute("journeyCurrentPage", journeyCalc.getSafePage());
-
             // === DỮ LIỆU HÃNG XE ===
             List<CarBrand> brands = carDAO.getAllBrands();
             request.setAttribute("brands", brands);
