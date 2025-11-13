@@ -5,7 +5,7 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GĐ1: Service Request Approval - Tech Manager</title>
+    <title>Service Request Approval - Tech Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
   </head>
@@ -23,7 +23,7 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
         <div class="page-header">
           <h1 class="h2">
             <i class="bi bi-clipboard-check text-primary"></i>
-            GĐ 1: Service Request Approval
+            Service Request Approval
           </h1>
           <p class="text-muted">
             Review and approve pending service requests. After approval, you will classify services in GĐ 2 (Triage).
@@ -35,12 +35,9 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
             <div>
               <h2 class="mb-1">
                 <i class="bi bi-clipboard-check text-primary"></i>
-                GĐ1 + GĐ2: Service Requests & Triage
+                Service Requests & Triage
               </h2>
-              <p class="text-muted mb-0">
-                <strong>LUỒNG MỚI:</strong>
-                Approve & Classify services in one step
-              </p>
+              <p class="text-muted mb-0">Approve & Classify services in one step</p>
             </div>
             <button type="button" class="btn btn-outline-secondary" onclick="window.location.reload();">
               <i class="bi bi-arrow-clockwise"></i>
@@ -164,11 +161,11 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
                                       <td><small class="text-muted">${service.serviceDescription}</small></td>
                                       <td class="text-end">
                                         <strong class="text-primary">
-                                          $
                                           <fmt:formatNumber
                                             value="${service.serviceUnitPrice}"
                                             type="number"
                                             groupingUsed="true" />
+                                          ₫
                                         </strong>
                                       </td>
                                       <td class="text-center">
@@ -240,11 +237,11 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
                                       <td><small class="text-muted">${service.serviceDescription}</small></td>
                                       <td class="text-end">
                                         <strong>
-                                          $
                                           <fmt:formatNumber
                                             value="${service.serviceUnitPrice}"
                                             type="number"
                                             groupingUsed="true" />
+                                          ₫
                                         </strong>
                                       </td>
                                       <td class="text-center">

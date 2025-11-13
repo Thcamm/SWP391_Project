@@ -52,8 +52,45 @@ function refreshTechSchedule(taskId) {
   loadTechSchedule(taskId);
 }
 
+// Handle form submission with loading state
+function handleReassignSubmit(form, taskId) {
+  const submitBtn = document.getElementById('submitBtn' + taskId);
+  const loadingBtn = document.getElementById('loadingBtn' + taskId);
+
+  // Validate technician selection
+  const techSelect = document.getElementById('techSelect_' + taskId);
+  if (!techSelect.value) {
+    alert('Please select a technician');
+    return false;
+  }
+
+  // Show loading state
+  submitBtn.classList.add('d-none');
+  loadingBtn.classList.remove('d-none');
+
+  // Disable form inputs
+  const inputs = form.querySelectorAll('input, select, button');
+  inputs.forEach((input) => (input.disabled = true));
+
+  return true; // Allow form submission
+}
+
 // Initialize event listeners when DOM is ready
 document.addEventListener('DOMContentLoaded', function () {
+  // Auto-scroll to message on page load
+  const alertElement = document.querySelector('.alert');
+  if (alertElement) {
+    alertElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    // Auto-dismiss success messages after 5 seconds
+    if (alertElement.classList.contains('alert-success')) {
+      setTimeout(() => {
+        const closeBtn = alertElement.querySelector('.btn-close');
+        if (closeBtn) closeBtn.click();
+      }, 5000);
+    }
+  }
+
   // Auto-dismiss alerts after 5 seconds
   setTimeout(function () {
     const alerts = document.querySelectorAll('.alert-dismissible');

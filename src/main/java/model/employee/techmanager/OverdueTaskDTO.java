@@ -9,6 +9,8 @@ package model.employee.techmanager;
  */
 public class OverdueTaskDTO {
     private int assignmentId;
+    private int workOrderId;
+    private int detailId;
     private String taskType;
     private String plannedStart;
     private String plannedEnd;
@@ -26,6 +28,22 @@ public class OverdueTaskDTO {
 
     public void setAssignmentId(int assignmentId) {
         this.assignmentId = assignmentId;
+    }
+
+    public int getWorkOrderId() {
+        return workOrderId;
+    }
+
+    public void setWorkOrderId(int workOrderId) {
+        this.workOrderId = workOrderId;
+    }
+
+    public int getDetailId() {
+        return detailId;
+    }
+
+    public void setDetailId(int detailId) {
+        this.detailId = detailId;
     }
 
     public String getTaskType() {
