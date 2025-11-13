@@ -10,45 +10,44 @@ import java.util.ArrayList;
 public class WorkOrderDetail {
     private int detailId;
     private int workOrderId;
-    private Source source;
+    private String source;
     private Integer diagnosticId;
-    private ApprovalStatus approvalStatus;
+    private String approvalStatus;
     private Integer approvedByUserId;
     private Timestamp approvedAt;
     private String taskDescription;
     private BigDecimal estimateHours;
     private BigDecimal estimateAmount;
     private BigDecimal actualHours;
+    private String detailStatus;
 
     // Relationships
     private List<TaskAssignment> taskAssignments;
 
-    public void setSource(String s) {
-    }
-
-    public enum Source {
-        REQUEST, DIAGNOSTIC
-    }
-
-    public enum ApprovalStatus {
-        PENDING, APPROVED, DECLINED
-    }
 
     public WorkOrderDetail() {
         this.taskAssignments = new ArrayList<>();
     }
 
-    public WorkOrderDetail(int workOrderId, Source source, String taskDescription) {
+    public WorkOrderDetail(int workOrderId, String source, String taskDescription) {
         this();
         this.workOrderId = workOrderId;
         this.source = source;
         this.taskDescription = taskDescription;
-        this.approvalStatus = ApprovalStatus.PENDING;
+        this.approvalStatus = approvalStatus;
     }
 
     // Getters and Setters
     public int getDetailId() {
         return detailId;
+    }
+
+    public String getDetailStatus() {
+        return detailStatus;
+    }
+
+    public void setDetailStatus(String detailStatus) {
+        this.detailStatus = detailStatus;
     }
 
     public void setDetailId(int detailId) {
@@ -63,11 +62,11 @@ public class WorkOrderDetail {
         this.workOrderId = workOrderId;
     }
 
-    public Source getSource() {
+    public String getSource() {
         return source;
     }
 
-    public void setSource(Source source) {
+    public void setSource(String source) {
         this.source = source;
     }
 
@@ -79,11 +78,11 @@ public class WorkOrderDetail {
         this.diagnosticId = diagnosticId;
     }
 
-    public ApprovalStatus getApprovalStatus() {
+    public String getApprovalStatus() {
         return approvalStatus;
     }
 
-    public void setApprovalStatus(ApprovalStatus approvalStatus) {
+    public void setApprovalStatus(String approvalStatus) {
         this.approvalStatus = approvalStatus;
     }
 
@@ -135,14 +134,4 @@ public class WorkOrderDetail {
         this.actualHours = actualHours;
     }
 
-    // Business methods
-    public boolean isApproved() {
-        return ApprovalStatus.APPROVED.equals(this.approvalStatus);
-    }
-
-    public void approve(int approvedByUserId) {
-        this.approvalStatus = ApprovalStatus.APPROVED;
-        this.approvedByUserId = approvedByUserId;
-        this.approvedAt = new Timestamp(System.currentTimeMillis());
-    }
 }

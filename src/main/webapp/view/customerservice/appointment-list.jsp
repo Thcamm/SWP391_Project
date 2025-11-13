@@ -268,22 +268,36 @@
                                                     </td>
 
                                                         <%-- CỘT 6: SO (Action riêng, thêm onclick stopPropagation) --%>
-                                                    <td class="text-center" onclick="event.stopPropagation();">
-                                                        <c:choose>
-                                                            <c:when test="${apm.status eq 'ACCEPTED'}">
-                                                                <a href="${pageContext.request.contextPath}/customerservice/createRequest?appointmentId=${apm.appointmentID}&customerId=${apm.customerID}"
-                                                                   class="btn btn-sm btn-success" title="Create Service Order">
-                                                                    <i class="bi bi-plus-circle"></i> SO
-                                                                </a>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <a class="btn btn-sm btn-success disabled" tabindex="-1" aria-disabled="true"
-                                                                   style="opacity: 0.5; pointer-events: none;">
-                                                                    <i class="bi bi-plus-circle"></i> SO
-                                                                </a>
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </td>
+                                                            <td class="text-center" onclick="event.stopPropagation();">
+                                                                <c:choose>
+                                                                    <%-- Chỉ hiển thị nút active khi ACCEPTED VÀ chưa có ServiceRequest --%>
+                                                                    <c:when test="${apm.status eq 'ACCEPTED' && !row.hasServiceRequest}">
+                                                                        <a href="${pageContext.request.contextPath}/customerservice/createRequest?appointmentId=${apm.appointmentID}&customerId=${apm.customerID}"
+                                                                           class="btn btn-sm btn-success" title="Create Service Order">
+                                                                            <i class="bi bi-plus-circle"></i> SO
+                                                                        </a>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <%-- Hiển thị nút disabled với tooltip phù hợp --%>
+                                                                        <c:choose>
+                                                                            <c:when test="${row.hasServiceRequest}">
+                                                                                <button class="btn btn-sm btn-success" disabled
+                                                                                        title="Service Order already created"
+                                                                                        style="opacity: 0.5; cursor: not-allowed;">
+                                                                                    <i class="bi bi-check-circle"></i> Created
+                                                                                </button>
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                <button class="btn btn-sm btn-success" disabled
+                                                                                        title="Only ACCEPTED appointments can create Service Order"
+                                                                                        style="opacity: 0.5; cursor: not-allowed;">
+                                                                                    <i class="bi bi-plus-circle"></i> SO
+                                                                                </button>
+                                                                            </c:otherwise>
+                                                                        </c:choose>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </td>
                                                 </tr>
                                             </c:forEach>
                                         </c:otherwise>

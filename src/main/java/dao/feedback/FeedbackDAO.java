@@ -248,4 +248,30 @@ public class FeedbackDAO extends DbContext {
     private java.time.LocalDateTime toLocalDateTime(Timestamp ts) {
         return ts != null ? ts.toLocalDateTime() : null;
     }
+    public Feedback getFeedbackByRequestId( int requestId) throws SQLException {
+        String sql = "SELECT f.* FROM Feedback f " +
+                "INNER JOIN WorkOrder wo ON f.WorkOrderID = wo.WorkOrderID " +
+                "WHERE wo.RequestID = ?";
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, requestId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Feedback fb = new Feedback();
+                    fb.setFeedbackID(rs.getInt("FeedbackID"));
+                    fb.setWorkOrderID(rs.getInt("WorkOrderID"));
+                    fb.setCustomerID(rs.getInt("CustomerID"));
+                    fb.setRating(rs.getObject("Rating") != null ? rs.getInt("Rating") : null);
+                    fb.setFeedbackText(rs.getString("FeedbackText"));
+                    fb.setAnonymous(rs.getBoolean("IsAnonymous"));
+                    fb.setFeedbackDate(rs.getTimestamp("FeedbackDate").toLocalDateTime());
+                    fb.setReplyText(rs.getString("ReplyText"));
+                    Timestamp replyTs = rs.getTimestamp("ReplyDate");
+                    fb.setReplyDate(replyTs != null ? replyTs.toLocalDateTime() : null);
+                    fb.setReplyBy(rs.getObject("RepliedBy") != null ? rs.getInt("RepliedBy") : null);
+                    return fb;
+                }
+            }
+        }
+        return null;
+    }
 }

@@ -165,12 +165,12 @@ public class ServiceRequestApprovalServlet extends HttpServlet {
             // Step 4: Create initial DIAGNOSIS WorkOrderDetail
             WorkOrderDetail diagnosisDetail = new WorkOrderDetail();
             diagnosisDetail.setWorkOrderId(workOrderId);
-            diagnosisDetail.setSource(WorkOrderDetail.Source.REQUEST);
+            diagnosisDetail.setSource("REQUEST");
             diagnosisDetail.setTaskDescription(
                     taskDescription != null && !taskDescription.trim().isEmpty()
                             ? taskDescription
                             : "Chẩn đoán tổng quát tình trạng xe");
-            diagnosisDetail.setApprovalStatus(WorkOrderDetail.ApprovalStatus.APPROVED);
+            diagnosisDetail.setApprovalStatus("APPROVED");
             diagnosisDetail.setEstimateHours(BigDecimal.valueOf(1.0));
             diagnosisDetail.setEstimateAmount(BigDecimal.ZERO);
 

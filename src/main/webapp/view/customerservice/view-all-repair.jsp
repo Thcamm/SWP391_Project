@@ -57,7 +57,7 @@
                         padding: 2.5rem;
                          min-height: calc(100vh - 64px - 1.25rem);">
                     <div class="container py-5">
-                        <h2 class="mb-4 text-center">Lịch Sử Sửa Chữa</h2>
+                        <h2 class="mb-4 text-center">Repair History</h2>
 
                         <div class="card mb-4">
                             <div class="card-body">
@@ -83,22 +83,11 @@
                                                        value="${param.fullName != null ? param.fullName : ''}">
                                                 <input type="hidden"
                                                        id="customerIdHidden"
-                                                       value="">
+                                                       value="${param.customerId != null ? param.customerId : ''}">
 
                                                 <div id="customerSuggestions" class="autocomplete-dropdown w-100 mt-1" style="display: none;"></div>
                                             </div>
-                                            <small class="d-block mt-1" id="selectedCustomerInfo">
-                                                <c:choose>
-                                                    <c:when test="${not empty param.fullName}">
-                                                        <span class="text-success">
-                                                            <i class="bi bi-check-circle"></i> Selected: ${param.fullName}
-                                                        </span>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="text-muted">Start typing to search...</span>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </small>
+
                                         </div>
 
                                         <!-- Vehicle Filter -->
@@ -109,7 +98,8 @@
                                                        class="form-control"
                                                        id="vehicleSearch"
                                                        placeholder="Type to search license plate..."
-                                                       autocomplete="off">
+                                                       autocomplete="off"
+                                                       value="${licensePlate != null ? licensePlate : ''}">
                                                 <input type="hidden"
                                                        name="vehicleId"
                                                        id="vehicleIdInput"
@@ -118,18 +108,7 @@
                                                 <div id="vehicleSuggestions" class="autocomplete-dropdown w-100 mt-1" style="display: none;"></div>
                                             </div>
 
-                                            <small class="d-block mt-1" id="selectedVehicleInfo">
-                                                <c:choose>
-                                                    <c:when test="${not empty param.vehicleId}">
-                                                        <span class="text-success">
-                                                            <i class="bi bi-check-circle"></i> Filtering by Vehicle ID: ${param.vehicleId}
-                                                        </span>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <span class="text-muted">Start typing to search...</span>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </small>
+
                                         </div>
 
                                         <!-- Sort Order -->
@@ -156,6 +135,7 @@
                             </div>
                         </div>
 
+                        <!-- Table / Empty State -->
                         <c:choose>
                             <c:when test="${not empty journeyList.paginatedData}">
                                 <div class="table-responsive">
@@ -196,7 +176,11 @@
                                                     <span class="badge bg-dark">${journey.latestStage}-${journey.latestStatus}</span>
                                                 </td>
                                                 <td class="text-center">
-                                                    <a href="${pageContext.request.contextPath}/customerservice/repair-detail?id=${journey.requestID}"
+                                                    <a href="${pageContext.request.contextPath}/customerservice/repair-detail?id=${journey.requestID}
+                        <c:if test='${not empty fullName}'> &fullName=${fullName}</c:if>
+                     <c:if test='${not empty vehicleId}'> &vehicleId=${vehicleId}</c:if>
+                     <c:if test='${not empty sortBy}'> &sortBy=${sortBy}</c:if>
+                     <c:if test='${not empty page}'> &page=${page}</c:if>"
                                                        class="btn btn-primary btn-sm">
                                                         Tracking
                                                     </a>
@@ -234,7 +218,6 @@
     (function() {
         'use strict';
 
-        // Debounce utility
         function debounce(func, delay) {
             let timeoutId;
             return function(...args) {
@@ -243,17 +226,23 @@
             };
         }
 
-        // ============= CUSTOMER SEARCH =============
+        // ====== CUSTOMER SEARCH ======
         const customerNameInput = document.getElementById('customerName');
-        const customerSuggestionsDiv = document.getElementById('customerSuggestions');
         const customerIdHidden = document.getElementById('customerIdHidden');
         const customerNameHidden = document.getElementById('customerNameHidden');
-        const selectedCustomerInfo = document.getElementById('selectedCustomerInfo');
+        const customerSuggestionsDiv = document.getElementById('customerSuggestions');
+
+        // Flag để tránh trigger search khi đang chọn từ dropdown
+        let isSelectingCustomer = false;
 
         const searchCustomers = debounce(function() {
-            const query = customerNameInput.value.trim();
+            // Skip search nếu đang chọn từ dropdown
+            if(isSelectingCustomer) {
+                return;
+            }
 
-            if (query.length < 2) {
+            const query = customerNameInput.value.trim();
+            if(query.length < 2){
                 customerSuggestionsDiv.style.display = 'none';
                 return;
             }
@@ -262,72 +251,71 @@
             const url = ctx + "/customerservice/customer-search?name=" + encodeURIComponent(query) + "&limit=10";
 
             fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('HTTP ' + response.status);
-                    }
-                    return response.json();
-                })
+                .then(res => res.ok ? res.json() : Promise.reject('HTTP ' + res.status))
                 .then(customers => {
-                    displayCustomerSuggestions(customers);
+                    // Kiểm tra lại flag trước khi hiển thị kết quả
+                    if(!isSelectingCustomer) {
+                        displayCustomerSuggestions(customers);
+                    }
                 })
-                .catch(error => {
-                    console.error('Error fetching customers:', error);
-                    customerSuggestionsDiv.innerHTML = '<div class="autocomplete-item text-danger">Error: ' + error.message + '</div>';
-                    customerSuggestionsDiv.style.display = 'block';
+                .catch(err => {
+                    console.error(err);
+                    if(!isSelectingCustomer) {
+                        customerSuggestionsDiv.innerHTML = '<div class="autocomplete-item text-danger">Error</div>';
+                        customerSuggestionsDiv.style.display = 'block';
+                    }
                 });
         }, 300);
 
-        function displayCustomerSuggestions(customers) {
+        function displayCustomerSuggestions(customers){
             customerSuggestionsDiv.innerHTML = '';
-
-            if (!Array.isArray(customers) || customers.length === 0) {
+            if(!Array.isArray(customers) || customers.length === 0){
                 customerSuggestionsDiv.style.display = 'none';
                 return;
             }
 
-            customers.forEach(function(c) {
+            customers.forEach(c => {
                 const item = document.createElement('div');
                 item.className = 'autocomplete-item';
-
-                // Utiliser customerID avec I majuscule
                 const customerId = c.customerID || c.customerId || '';
                 const fullName = c.fullName || 'N/A';
                 const phone = c.phoneNumber || 'N/A';
                 const email = c.email || 'N/A';
-
-                // Stocker les données
                 item.dataset.customerId = customerId;
                 item.dataset.customerName = fullName;
 
-                // Créer le nom
                 const nameDiv = document.createElement('div');
                 nameDiv.className = 'customer-name';
                 nameDiv.textContent = fullName;
                 item.appendChild(nameDiv);
 
-                // Créer les détails
                 const detailsDiv = document.createElement('div');
                 detailsDiv.className = 'customer-details';
-                detailsDiv.textContent = '📞 ' + phone + ' | 📧 ' + email;
+                detailsDiv.textContent = 'Phone '+phone+' | Email '+email;
                 item.appendChild(detailsDiv);
 
-                // Ajouter le click handler
-                item.addEventListener('mousedown', function() {
-                    const selectedId = this.dataset.customerId;
-                    const selectedName = this.dataset.customerName;
+                item.addEventListener('mousedown', function(e){
+                    e.preventDefault();
 
-                    customerNameInput.value = selectedName;
-                    customerIdHidden.value = selectedId;
-                    customerNameHidden.value = selectedName;
+                    // Set flag TRƯỚC KHI set giá trị
+                    isSelectingCustomer = true;
 
-                    selectedCustomerInfo.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Selected: ' + selectedName + '</span>';
+                    // Ẩn dropdown ngay lập tức
                     customerSuggestionsDiv.style.display = 'none';
 
-                    // Reset vehicle selection
+                    // Set giá trị
+                    customerIdHidden.value = this.dataset.customerId;
+                    customerNameHidden.value = this.dataset.customerName;
+                    customerNameInput.value = this.dataset.customerName;
+
+                    // reset vehicle
                     document.getElementById('vehicleSearch').value = '';
                     document.getElementById('vehicleIdInput').value = '';
-                    document.getElementById('selectedVehicleInfo').innerHTML = '<span class="text-muted">Search vehicles for this customer...</span>';
+
+                    // Reset flag sau thời gian đủ lâu
+                    setTimeout(() => {
+                        isSelectingCustomer = false;
+                    }, 500);
                 });
 
                 customerSuggestionsDiv.appendChild(item);
@@ -338,97 +326,102 @@
 
         customerNameInput.addEventListener('input', searchCustomers);
 
-        // ============= VEHICLE SEARCH =============
+        customerNameInput.addEventListener('blur', function(){
+            setTimeout(()=>{
+                if(!customerIdHidden.value || customerNameInput.value !== customerNameHidden.value){
+                    customerNameInput.value = '';
+                    customerIdHidden.value = '';
+                    customerNameHidden.value = '';
+                }
+                customerSuggestionsDiv.style.display = 'none';
+            }, 200);
+        });
+
+        // ====== VEHICLE SEARCH ======
         const vehicleSearchInput = document.getElementById('vehicleSearch');
-        const vehicleSuggestionsDiv = document.getElementById('vehicleSuggestions');
         const vehicleIdInput = document.getElementById('vehicleIdInput');
-        const selectedVehicleInfo = document.getElementById('selectedVehicleInfo');
+        const vehicleSuggestionsDiv = document.getElementById('vehicleSuggestions');
 
-        const searchVehicles = debounce(function() {
+        // Flag để tránh trigger search khi đang chọn từ dropdown
+        let isSelectingVehicle = false;
+
+        const searchVehicles = debounce(function(){
+            // Skip search nếu đang chọn từ dropdown
+            if(isSelectingVehicle) {
+                return;
+            }
+
             const query = vehicleSearchInput.value.trim();
+            if(query.length < 1){
+                vehicleSuggestionsDiv.style.display = 'none';
+                return;
+            }
+            const customerId = customerIdHidden.value;
+            const ctx = '<%= request.getContextPath() %>';
+            let url = ctx+"/customerservice/vehicles-search?query="+encodeURIComponent(query);
+            if(customerId) url += "&id="+customerId;
 
-            if (query.length < 1) {
+            fetch(url)
+                .then(res => res.ok ? res.json() : Promise.reject('HTTP '+res.status))
+                .then(vehicles => {
+                    // Kiểm tra lại flag trước khi hiển thị kết quả
+                    if(!isSelectingVehicle) {
+                        displayVehicleSuggestions(vehicles);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    if(!isSelectingVehicle) {
+                        vehicleSuggestionsDiv.innerHTML = '<div class="autocomplete-item text-danger">Error</div>';
+                        vehicleSuggestionsDiv.style.display = 'block';
+                    }
+                });
+        }, 300);
+
+        function displayVehicleSuggestions(vehicles){
+            vehicleSuggestionsDiv.innerHTML = '';
+            if(!Array.isArray(vehicles) || vehicles.length === 0){
                 vehicleSuggestionsDiv.style.display = 'none';
                 return;
             }
 
-            const customerId = customerIdHidden.value;
-            const ctx = '<%= request.getContextPath() %>';
-            let url = ctx + "/customerservice/vehicles-search?query=" + encodeURIComponent(query);
-
-            if (customerId) {
-                url += "&id=" + customerId;
-            }
-
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('HTTP ' + response.status);
-                    }
-                    return response.json();
-                })
-                .then(vehicles => {
-                    displayVehicleSuggestions(vehicles);
-                })
-                .catch(error => {
-                    console.error('Error fetching vehicles:', error);
-                    vehicleSuggestionsDiv.innerHTML = '<div class="autocomplete-item text-danger">Error: ' + error.message + '</div>';
-                    vehicleSuggestionsDiv.style.display = 'block';
-                });
-        }, 300);
-
-        function displayVehicleSuggestions(vehicles) {
-            vehicleSuggestionsDiv.innerHTML = '';
-
-            if (!Array.isArray(vehicles)) {
-                console.error('Invalid vehicles data:', vehicles);
-                vehicleSuggestionsDiv.innerHTML = '<div class="autocomplete-item text-danger">Invalid data received</div>';
-                vehicleSuggestionsDiv.style.display = 'block';
-                return;
-            }
-
-            if (vehicles.length === 0) {
-                vehicleSuggestionsDiv.innerHTML = '<div class="autocomplete-item text-muted">No vehicles found</div>';
-                vehicleSuggestionsDiv.style.display = 'block';
-                return;
-            }
-
-            vehicles.forEach(function(v) {
+            vehicles.forEach(v => {
                 const item = document.createElement('div');
                 item.className = 'autocomplete-item';
-
-                const vehicleId = v.vehicleID || '';
+                const vehicleId = v.vehicleID || v.vehicleId || '';
                 const licensePlate = v.licensePlate || 'N/A';
-                const brand = v.brand || '';
-                const model = v.model || '';
-                const year = v.yearManufacture || '';
-
-                // Stocker les données
+                const model = v.model || 'N/A';
+                const brand = v.brand || 'N/A';
                 item.dataset.vehicleId = vehicleId;
                 item.dataset.licensePlate = licensePlate;
 
-                // Créer la plaque
                 const plateDiv = document.createElement('div');
                 plateDiv.className = 'customer-name';
                 plateDiv.textContent = licensePlate;
                 item.appendChild(plateDiv);
 
-                // Créer les détails
                 const detailsDiv = document.createElement('div');
                 detailsDiv.className = 'customer-details';
-                detailsDiv.textContent = brand + ' ' + model + (year ? ' (' + year + ')' : '');
+                detailsDiv.textContent = brand + ' ' + model;
                 item.appendChild(detailsDiv);
 
-                // Ajouter le click handler
-                item.addEventListener('mousedown', function() {
-                    const selectedId = this.dataset.vehicleId;
-                    const selectedPlate = this.dataset.licensePlate;
+                item.addEventListener('mousedown', function(e){
+                    e.preventDefault();
 
-                    vehicleSearchInput.value = selectedPlate;
-                    vehicleIdInput.value = selectedId;
+                    // Set flag TRƯỚC KHI set giá trị
+                    isSelectingVehicle = true;
 
-                    selectedVehicleInfo.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Selected: ' + selectedPlate + '</span>';
+                    // Ẩn dropdown ngay lập tức
                     vehicleSuggestionsDiv.style.display = 'none';
+
+                    // Set giá trị
+                    vehicleIdInput.value = this.dataset.vehicleId;
+                    vehicleSearchInput.value = this.dataset.licensePlate;
+
+                    // Reset flag sau thời gian đủ lâu
+                    setTimeout(() => {
+                        isSelectingVehicle = false;
+                    }, 500);
                 });
 
                 vehicleSuggestionsDiv.appendChild(item);
@@ -439,27 +432,33 @@
 
         vehicleSearchInput.addEventListener('input', searchVehicles);
 
-        // ============= HIDE DROPDOWNS ON OUTSIDE CLICK =============
-        document.addEventListener('click', function(e) {
-            if (!customerNameInput.contains(e.target) && !customerSuggestionsDiv.contains(e.target)) {
+        vehicleSearchInput.addEventListener('blur', function(){
+            setTimeout(()=>{
+                if(!vehicleIdInput.value){
+                    vehicleSearchInput.value = '';
+                }
+                vehicleSuggestionsDiv.style.display = 'none';
+            }, 200);
+        });
+
+        // ====== OUTSIDE CLICK HIDE DROPDOWN ======
+        document.addEventListener('click', function(e){
+            if(!customerNameInput.contains(e.target) && !customerSuggestionsDiv.contains(e.target)){
                 customerSuggestionsDiv.style.display = 'none';
             }
-            if (!vehicleSearchInput.contains(e.target) && !vehicleSuggestionsDiv.contains(e.target)) {
+            if(!vehicleSearchInput.contains(e.target) && !vehicleSuggestionsDiv.contains(e.target)){
                 vehicleSuggestionsDiv.style.display = 'none';
             }
         });
 
-        // ============= CLEAR FILTER BUTTON =============
-        document.getElementById('clearFilter').addEventListener('click', function() {
+        // ====== CLEAR FILTER ======
+        document.getElementById('clearFilter').addEventListener('click', function(){
             customerNameInput.value = '';
             customerIdHidden.value = '';
             customerNameHidden.value = '';
             vehicleSearchInput.value = '';
             vehicleIdInput.value = '';
             document.getElementById('sortBySelect').value = 'newest';
-
-            selectedCustomerInfo.innerHTML = '<span class="text-muted">Start typing to search...</span>';
-            selectedVehicleInfo.innerHTML = '<span class="text-muted">Start typing to search...</span>';
 
             window.location.href = '${pageContext.request.contextPath}/customerservice/view-all-repairs';
         });

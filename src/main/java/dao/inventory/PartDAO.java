@@ -2,6 +2,7 @@ package dao.inventory;
 
 import common.DbContext;
 import model.inventory.CharacteristicValue;
+import model.inventory.Part;
 import model.inventory.PartDetail;
 
 import java.sql.*;
@@ -158,7 +159,38 @@ public class PartDAO extends DbContext {
 
         return list;
     }
+    public Part getPartById(int partDetailId) throws SQLException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
+        String sql = "SELECT p.* " +
+                "FROM PartDetail pd " +
+                "INNER JOIN Part p ON pd.PartID = p.PartID " +
+                "WHERE pd.PartDetailID = ?";
+        Part part = new Part();
+        try {
+            conn = getConnection();
+            ps = conn.prepareStatement(sql);
+            ps.setInt(1, partDetailId);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                part.setPartId(rs.getInt("PartID"));
+                part.setPartCode(rs.getString("PartCode"));
+                part.setPartName(rs.getString("PartName"));
+                part.setCategory(rs.getString("Category"));
+                part.setDescription(rs.getString("Description"));
+                part.setBaseUnitId(rs.getInt("base_unit_id"));
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return part;
+
+    }
     public List<PartDetail> getLowStockItems() throws SQLException {
         List<PartDetail> list = new ArrayList<>();
         Connection conn = null;

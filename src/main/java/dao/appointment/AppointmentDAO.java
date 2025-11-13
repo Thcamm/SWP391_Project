@@ -26,11 +26,13 @@ public class AppointmentDAO extends DbContext {
         return 0;
     }
     public List<Map<String, Object>> getAllAppointmentsWithLimit(int limit, int offset) {
-        String sql = "SELECT a.AppointmentID, a.CustomerID,a.AppointmentDate, a.CreatedAt, a.Status, a.Description,a.RescheduleCount,a.UpdatedAt, " +
-                "u.FullName AS customerName " +
+        String sql = "SELECT a.AppointmentID, a.CustomerID, a.AppointmentDate, a.CreatedAt, a.Status, a.Description, a.RescheduleCount, a.UpdatedAt, " +
+                "u.FullName AS customerName, " +
+                "CASE WHEN sr.RequestID IS NULL THEN 0 ELSE 1 END AS hasServiceRequest " +
                 "FROM Appointment a " +
                 "JOIN Customer c ON a.CustomerID = c.CustomerID " +
                 "JOIN User u ON c.UserID = u.UserID " +
+                "LEFT JOIN ServiceRequest sr ON a.AppointmentID = sr.AppointmentID " +
                 "ORDER BY a.CreatedAt DESC LIMIT ? OFFSET ?";
 
         List<Map<String, Object>> resultList = new ArrayList<>();
@@ -65,6 +67,7 @@ public class AppointmentDAO extends DbContext {
                 }
                 row.put("appointment", appointment);
                 row.put("customerName", rs.getString("customerName"));
+                row.put("hasServiceRequest", rs.getInt("hasServiceRequest") == 1);
                 resultList.add(row);
             }
 
@@ -75,7 +78,6 @@ public class AppointmentDAO extends DbContext {
 
         return resultList;
     }
-
     public List<String> getAllStatuses() throws SQLException {
         List<String> statuses = new ArrayList<>();
         String sql = "SHOW COLUMNS FROM Appointment LIKE 'Status'";
@@ -394,6 +396,7 @@ public class AppointmentDAO extends DbContext {
 
         return 0;
     }
+
     public List<Map<String, Object>> searchAppointmentWithLimit(
             String customerName, String fromDate, String toDate,
             String[] statusList, String sortOrder, int limit, int offset) throws SQLException {
@@ -402,10 +405,12 @@ public class AppointmentDAO extends DbContext {
 
         StringBuilder sql = new StringBuilder(
                 "SELECT a.AppointmentID, a.CustomerID, a.AppointmentDate, a.Status, a.Description, a.RescheduleCount, a.CreatedAt, a.UpdatedAt, " +
-                        "u.FullName AS customerName " +
+                        "u.FullName AS customerName, " +
+                        "CASE WHEN sr.RequestID IS NULL THEN 0 ELSE 1 END AS hasServiceRequest " +
                         "FROM Appointment a " +
                         "JOIN Customer c ON a.CustomerID = c.CustomerID " +
                         "JOIN User u ON c.UserID = u.UserID " +
+                        "LEFT JOIN ServiceRequest sr ON a.AppointmentID = sr.AppointmentID " +
                         "WHERE 1=1 ");
 
         if (customerName != null && !customerName.isEmpty())
@@ -469,6 +474,7 @@ public class AppointmentDAO extends DbContext {
                 }
                 row.put("appointment", appointment);
                 row.put("customerName", rs.getString("customerName"));
+                row.put("hasServiceRequest", rs.getInt("hasServiceRequest") == 1);
                 resultList.add(row);
             }
         } catch (SQLException e) {
@@ -476,10 +482,8 @@ public class AppointmentDAO extends DbContext {
             throw new RuntimeException("Lỗi khi tìm kiếm cuộc hẹn với tên khách hàng", e);
         }
 
-
         return resultList;
     }
-
     public boolean updateStatus(int appointmentID, String status) {
         String sql = "UPDATE Appointment SET Status = ?  WHERE AppointmentID = ?";
         try (

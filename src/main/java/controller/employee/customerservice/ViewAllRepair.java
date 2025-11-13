@@ -2,12 +2,14 @@ package controller.employee.customerservice;
 
 import common.utils.PaginationUtils;
 import dao.customer.CustomerDAO;
+import dao.vehicle.VehicleDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.dto.RepairJourneySummaryDTO;
+import model.vehicle.Vehicle;
 import service.tracking.RepairTrackerService;
 
 import java.io.IOException;
@@ -19,6 +21,7 @@ public class ViewAllRepair extends HttpServlet {
 
     private final RepairTrackerService repairListService = new RepairTrackerService();
     private final CustomerDAO customerDAO = new CustomerDAO();
+    private final VehicleDAO vehicleDAO = new VehicleDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -82,10 +85,16 @@ public class ViewAllRepair extends HttpServlet {
                             safePage,
                             itemsPerPage
                     );
-
+            String licensePlate = "";
+            if (vehicleId != null) {
+                Vehicle vehicle = vehicleDAO.getVehicleById(vehicleId);
+                if(vehicle != null){
+                    licensePlate = vehicle.getLicensePlate();
+                }
+            }
             // Set attributes for JSP
             request.setAttribute("journeyList", result);
-            request.setAttribute("selectedVehicleId", vehicleIdParam);
+            request.setAttribute("licensePlate", licensePlate);
             request.setAttribute("selectedSortBy", sortBy);
 
             // Forward to JSP

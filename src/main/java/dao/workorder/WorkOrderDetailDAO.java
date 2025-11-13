@@ -20,13 +20,13 @@ public class WorkOrderDetailDAO {
         try (Connection conn = DbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, detail.getWorkOrderId());
-            ps.setString(2, detail.getSource().name());
+            ps.setString(2, detail.getSource());
             if (detail.getDiagnosticId() != null) {
                 ps.setInt(3, detail.getDiagnosticId());
             } else {
                 ps.setNull(3, java.sql.Types.INTEGER);
             }
-            ps.setString(4, detail.getApprovalStatus().name());
+            ps.setString(4, detail.getApprovalStatus());
             ps.setString(5, detail.getTaskDescription());
             ps.setBigDecimal(6, detail.getEstimateHours());
             ps.setBigDecimal(7, detail.getEstimateAmount());
@@ -51,13 +51,13 @@ public class WorkOrderDetailDAO {
         String sql = "INSERT INTO WorkOrderDetail (WorkOrderID, source, diagnostic_id, approval_status, TaskDescription, EstimateHours, EstimateAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, detail.getWorkOrderId());
-            ps.setString(2, detail.getSource().name());
+            ps.setString(2, detail.getSource());
             if (detail.getDiagnosticId() != null) {
                 ps.setInt(3, detail.getDiagnosticId());
             } else {
                 ps.setNull(3, java.sql.Types.INTEGER);
             }
-            ps.setString(4, detail.getApprovalStatus().name());
+            ps.setString(4, detail.getApprovalStatus());
             ps.setString(5, detail.getTaskDescription());
             ps.setBigDecimal(6, detail.getEstimateHours());
             ps.setBigDecimal(7, detail.getEstimateAmount());
@@ -129,7 +129,7 @@ public class WorkOrderDetailDAO {
         String sql = "UPDATE WorkOrderDetail SET approval_status = ?, approved_by_user_id = ?, approved_at = CURRENT_TIMESTAMP WHERE DetailID = ?";
         try (Connection conn = DbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, WorkOrderDetail.ApprovalStatus.APPROVED.name());
+            ps.setString(1,"APPROVED");
             ps.setInt(2, approvedByUserId);
             ps.setInt(3, detailId);
             return ps.executeUpdate() > 0;
@@ -141,7 +141,7 @@ public class WorkOrderDetailDAO {
         String sql = "UPDATE WorkOrderDetail SET approval_status = ?, approved_by_user_id = ?, approved_at = CURRENT_TIMESTAMP WHERE DetailID = ?";
         try (Connection conn = DbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, WorkOrderDetail.ApprovalStatus.DECLINED.name());
+            ps.setString(1, "DECLINED");
             ps.setInt(2, approvedByUserId);
             ps.setInt(3, detailId);
             return ps.executeUpdate() > 0;
@@ -153,14 +153,14 @@ public class WorkOrderDetailDAO {
         WorkOrderDetail detail = new WorkOrderDetail();
         detail.setDetailId(rs.getInt("DetailID"));
         detail.setWorkOrderId(rs.getInt("WorkOrderID"));
-        detail.setSource(WorkOrderDetail.Source.valueOf(rs.getString("source")));
+        detail.setSource(rs.getString("source"));
 
         int diagnosticId = rs.getInt("diagnostic_id");
         if (!rs.wasNull()) {
             detail.setDiagnosticId(diagnosticId);
         }
 
-        detail.setApprovalStatus(WorkOrderDetail.ApprovalStatus.valueOf(rs.getString("approval_status")));
+        detail.setApprovalStatus(rs.getString("approval_status"));
 
         int approvedByUserId = rs.getInt("approved_by_user_id");
         if (!rs.wasNull()) {
@@ -175,7 +175,20 @@ public class WorkOrderDetailDAO {
 
         return detail;
     }
-
+    public List<WorkOrderDetail> getDetailsByWorkOrderId(int workOrderId) throws SQLException {
+        String sql = "SELECT * FROM WorkOrderDetail WHERE WorkOrderID = ?";
+        List<WorkOrderDetail> details = new ArrayList<>();
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, workOrderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    details.add(extractWorkOrderDetail(rs));
+                }
+            }
+        }
+        return details;
+    }
     public void recomputeActualHoursAndMaybeMarkComplete(int assignmentId) {
         String sql = """
         SELECT DetailID
