@@ -2,79 +2,67 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <style>
-    /* Định nghĩa Bảng màu "Trang trọng & Nhã nhặn"
-    */
+    /* -------------------------------------------
+       Elegant & Professional Color Palette
+    ------------------------------------------- */
     :root {
-        --theme-navy: #2c3e50;      /* Một màu xanh navy đậm, chuyên nghiệp */
-        --theme-soft-bg: #f8f9fa;  /* Màu nền xám/xanh rất nhạt (Bootstrap bg-light) */
-        --theme-text-dark: #343a40; /* Màu văn bản chính */
-        --theme-border-light: #e9ecef; /* Màu viền tinh tế */
+        --theme-navy: #2c3e50;       /* Deep professional navy blue */
+        --theme-soft-bg: #f8f9fa;    /* Very light grayish background (Bootstrap bg-light) */
+        --theme-text-dark: #343a40;  /* Main text color */
+        --theme-border-light: #e9ecef; /* Subtle border color */
     }
 
-    /* 1. Tinh chỉnh Thẻ Wrapper chính
-    */
+    /* 1. Card Wrapper */
     .card.shadow-sm {
-        /* Dùng shadow nhẹ hơn thay vì mặc định */
         box-shadow: 0 .1rem .4rem rgba(0,0,0,0.05) !important;
-        border: none; /* Bỏ viền thẻ mặc định */
+        border: none;
     }
 
-    /* 2. Header chính (chứa nút "Thêm xe mới")
-    */
+    /* 2. Card Header (contains "Add New Vehicle" button) */
     .card-header {
-        background-color: #ffffff; /* Nền trắng sạch sẽ */
+        background-color: #ffffff;
         border-bottom: 1px solid var(--theme-border-light);
     }
 
     .card-header h5 {
-        color: var(--theme-navy); /* Áp dụng màu navy cho tiêu đề */
+        color: var(--theme-navy);
     }
 
-    /* 3. Thẻ xe riêng lẻ
-    */
+    /* 3. Individual Vehicle Card */
     .vehicle-card {
         border: 1px solid var(--theme-border-light);
-        /* Thay thế viền xanh dương bằng viền navy tinh tế */
         border-left: 4px solid var(--theme-navy);
         transition: all 0.2s ease-in-out;
-        box-shadow: none; /* Bắt đầu không có shadow */
+        box-shadow: none;
     }
     .vehicle-card:hover {
-        /* Hiệu ứng nhấc lên khi di chuột qua */
         transform: translateY(-2px);
         box-shadow: 0 .2rem .5rem rgba(0,0,0,0.06);
     }
 
-    /* 4. Chế độ XEM (Read View)
-    */
+    /* 4. READ Mode (Display) */
     .vehicle-display .card-title {
-        color: var(--theme-navy); /* Màu navy cho Biển số xe */
-        font-weight: 600; /* Làm nó đậm hơn một chút */
+        color: var(--theme-navy);
+        font-weight: 600;
     }
 
-    /* 5. Chế độ SỬA (Edit View)
-    */
+    /* 5. EDIT Mode */
     .vehicle-form {
-        background-color: var(--theme-soft-bg); /* Nền nhã nhặn cho form sửa */
-        padding: 1.25rem; /* Thêm đệm */
-
-        /* Kỹ thuật để làm form full-width bên trong card-body */
+        background-color: var(--theme-soft-bg);
+        padding: 1.25rem;
         margin: -1.25rem;
         margin-top: 1rem;
-
-        /* Bo góc cho đẹp */
         border-bottom-left-radius: 0.375rem;
         border-bottom-right-radius: 0.375rem;
     }
 
     .vehicle-form h6 {
-        color: var(--theme-navy); /* Tiêu đề "Chỉnh sửa" */
+        color: var(--theme-navy);
         border-bottom: 1px solid var(--theme-border-light);
         padding-bottom: 10px;
     }
 
-    /* 6. Nút "Sửa" (Ghi đè màu primary)
-    */
+    /* 6. “Edit” Button */
     .btn-outline-primary {
         color: var(--theme-navy);
         border-color: var(--theme-navy);
@@ -88,18 +76,18 @@
 <div class="card shadow-sm mb-4">
     <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
         <button type="button" class="btn btn-primary" id="btnAddNewVehicle">
-            <i class="bi bi-plus-circle"></i> Thêm xe mới
+            <i class="bi bi-plus-circle"></i> Add New Vehicle
         </button>
     </div>
 
     <div class="card-body">
 
         <c:if test="${empty vehicles}">
-            <p class="text-center text-muted mb-0">Khách hàng này chưa có xe nào.</p>
+            <p class="text-center text-muted mb-0">This customer has no vehicles.</p>
         </c:if>
-
+        <a>Total Vehicles: ${totalVehicles}</a>
         <c:forEach var="vehicle" items="${vehicles}">
-            <%-- Tính toán brandId (Không đổi) --%>
+            <%-- Determine brandId (unchanged) --%>
             <c:set var="currentBrandId" value="0"/>
             <c:forEach var="brand" items="${brands}">
                 <c:if test="${brand.brandName == vehicle.brand}">
@@ -127,35 +115,35 @@
                             <div class="vehicle-controls-edit">
                                 <button type="button" class="btn btn-outline-primary btn-sm btn-edit"
                                         data-vehicle-id="${vehicle.vehicleID}">
-                                    <i class="bi bi-pencil-fill"></i> Sửa
+                                    <i class="bi bi-pencil-fill"></i> Edit
                                 </button>
                             </div>
                         </div>
                         <p class="mb-0" style="font-size: 0.9rem;">
-                            <strong>Năm sản xuất:</strong>
+                            <strong>Year of Manufacture:</strong>
                             <span class="display-year">${vehicle.yearManufacture}</span>
                         </p>
                     </div>
 
                     <div class="vehicle-form" style="display:none;">
-                        <h6 class="mb-3">Chỉnh sửa thông tin xe</h6>
+                        <h6 class="mb-3">Edit Vehicle Information</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Biển số xe</label>
+                                <label class="form-label">License Plate</label>
                                 <input type="text" class="form-control vehicle-field vehicle-license-plate"
                                        value="${vehicle.licensePlate}">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Năm sản xuất</label>
+                                <label class="form-label">Year of Manufacture</label>
                                 <input type="number" class="form-control vehicle-field vehicle-year"
                                        value="${vehicle.yearManufacture}">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Hãng xe</label>
+                                <label class="form-label">Brand</label>
                                 <select class="form-select vehicle-field vehicle-brand">
-                                    <option value="">-- Chọn hãng xe --</option>
+                                    <option value="">-- Select Brand --</option>
                                     <c:forEach var="brand" items="${brands}">
                                         <option value="${brand.brandId}" ${brand.brandId == currentBrandId ? 'selected' : ''}>
                                                 ${brand.brandName}
@@ -173,9 +161,9 @@
 
                         <div class="text-end vehicle-controls-save">
                             <button type="button" class="btn btn-secondary btn-sm btn-cancel"
-                                    data-vehicle-id="${vehicle.vehicleID}">Hủy</button>
+                                    data-vehicle-id="${vehicle.vehicleID}">Cancel</button>
                             <button type="button" class="btn btn-success btn-sm btn-save"
-                                    data-vehicle-id="${vehicle.vehicleID}">Lưu thay đổi</button>
+                                    data-vehicle-id="${vehicle.vehicleID}">Save Changes</button>
                         </div>
                     </div>
 
@@ -188,37 +176,38 @@
             <jsp:param name="currentPage" value="${vehicleCurrentPage}" />
             <jsp:param name="baseUrl" value="/customerservice/customer-detail" />
             <jsp:param name="paramName" value="vehiclePage" />
-            <jsp:param name="queryString" value="&id=${customer.customerId}&journeyPage=${journeyCurrentPage}" />
+            <jsp:param name="queryString" value="&id=${customer.customerId}" />
         </jsp:include>
 
     </div>
 </div>
 
+<!-- Modal: Add Vehicle -->
 <div class="modal fade" id="addVehicleModal" tabindex="-1" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <form id="addVehicleForm">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addVehicleModalLabel">Thêm xe mới</h5>
+                    <h5 class="modal-title" id="addVehicleModalLabel">Add New Vehicle</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="customerId" value="${customer.customerId}">
 
                     <div class="mb-3">
-                        <label class="form-label">Biển số xe</label>
+                        <label class="form-label">License Plate</label>
                         <input type="text" name="licensePlate" class="form-control" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Năm sản xuất</label>
+                        <label class="form-label">Year of Manufacture</label>
                         <input type="number" name="yearManufacture" class="form-control" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Hãng xe</label>
+                        <label class="form-label">Brand</label>
                         <select name="brandId" id="addBrandSelect" class="form-select" required>
-                            <option value="">-- Chọn hãng xe --</option>
+                            <option value="">-- Select Brand --</option>
                             <c:forEach var="brand" items="${brands}">
                                 <option value="${brand.brandId}">${brand.brandName}</option>
                             </c:forEach>
@@ -228,52 +217,50 @@
                     <div class="mb-3">
                         <label class="form-label">Model</label>
                         <select name="modelName" id="addModelSelect" class="form-select" required>
-                            <option value="">-- Chọn model --</option>
+                            <option value="">-- Select Model --</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                    <button type="submit" class="btn btn-primary">Thêm xe</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Vehicle</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
 <script>
     (function () {
         'use strict';
         const contextPath = "${pageContext.request.contextPath}";
         const originalVehicleValues = {};
 
-        // ===================================
-        // XỬ LÝ MODAL (Giữ nguyên)
-        // ===================================
+        // ==============================
+        // MODAL HANDLING
+        // ==============================
         document.getElementById('btnAddNewVehicle').addEventListener('click', () => {
-            // Đảm bảo form được reset mỗi khi mở
             const form = document.getElementById('addVehicleForm');
             form.reset();
             const modelSelect = document.getElementById('addModelSelect');
-            modelSelect.innerHTML = "<option value=''>-- Chọn model --</option>";
-
-            // Hiển thị modal
+            modelSelect.innerHTML = "<option value=''>-- Select Model --</option>";
             new bootstrap.Modal(document.getElementById('addVehicleModal')).show();
         });
 
-        // Load models khi chọn brand trong modal (Giữ nguyên)
+        // Load models when selecting brand
         document.getElementById('addBrandSelect').addEventListener('change', function() {
             const brandId = this.value;
             const modelSelect = document.getElementById('addModelSelect');
             if (!brandId) {
-                modelSelect.innerHTML = "<option value=''>-- Chọn hãng xe trước --</option>";
+                modelSelect.innerHTML = "<option value=''>-- Select Brand First --</option>";
                 return;
             }
-            modelSelect.innerHTML = "<option>Đang tải...</option>";
+            modelSelect.innerHTML = "<option>Loading...</option>";
             fetch(contextPath + '/customerservice/addVehicle?action=getModels&brandId=' + encodeURIComponent(brandId))
                 .then(res => res.json())
                 .then(models => {
-                    modelSelect.innerHTML = "<option value=''>-- Chọn model --</option>";
+                    modelSelect.innerHTML = "<option value=''>-- Select Model --</option>";
                     models.forEach(m => {
                         const op = document.createElement("option");
                         op.value = m.name;
@@ -282,12 +269,12 @@
                     });
                 })
                 .catch(err => {
-                    modelSelect.innerHTML = "<option>Lỗi khi tải</option>";
+                    modelSelect.innerHTML = "<option>Error loading</option>";
                     console.error(err);
                 });
         });
 
-        // Submit form thêm xe (Giữ nguyên)
+        // Submit add vehicle form
         document.getElementById('addVehicleForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = new URLSearchParams(new FormData(this));
@@ -300,35 +287,32 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Thêm xe thành công!');
+                        alert('Vehicle added successfully!');
                         window.location.reload();
                     } else {
-                        alert('Lỗi: ' + (data.message || 'Không xác định'));
+                        alert('Error: ' + (data.message || 'Unknown error'));
                     }
                 })
-                .catch(err => alert('Lỗi hệ thống: ' + err.message));
+                .catch(err => alert('System error: ' + err.message));
         });
 
         // =================================================
-        // (CẬP NHẬT) XỬ LÝ EDIT / SAVE / CANCEL
+        // EDIT / SAVE / CANCEL HANDLING
         // =================================================
 
-        /**
-         * (CẬP NHẬT) Hàm load models cho form SỬA
-         */
         function loadModelsForEdit(brandSelect, modelSelect, selectedModelName) {
             const brandId = brandSelect.value;
             if (!brandId) {
-                modelSelect.innerHTML = "<option value=''>-- Chọn hãng xe trước --</option>";
+                modelSelect.innerHTML = "<option value=''>-- Select Brand First --</option>";
                 modelSelect.disabled = true;
                 return;
             }
             modelSelect.disabled = false;
-            modelSelect.innerHTML = "<option>Đang tải...</option>";
+            modelSelect.innerHTML = "<option>Loading...</option>";
             fetch(contextPath + '/customerservice/addVehicle?action=getModels&brandId=' + encodeURIComponent(brandId))
                 .then(res => res.json())
                 .then(models => {
-                    modelSelect.innerHTML = "<option value=''>-- Chọn model --</option>";
+                    modelSelect.innerHTML = "<option value=''>-- Select Model --</option>";
                     models.forEach(m => {
                         const op = document.createElement('option');
                         op.value = m.name;
@@ -341,29 +325,23 @@
                 });
         }
 
-        /**
-         * (CẬP NHẬT) Bật chế độ SỬA
-         */
         function enableVehicleEdit(vehicleID) {
             const card = document.getElementById('vehicle-card-' + vehicleID);
             const displayView = card.querySelector('.vehicle-display');
             const formView = card.querySelector('.vehicle-form');
 
-            // 1. Lưu trữ giá trị gốc *trước khi* người dùng thay đổi
             originalVehicleValues[vehicleID] = {};
             formView.querySelectorAll('.vehicle-field').forEach(f => {
                 const fieldKey = Array.from(f.classList).find(c => c.startsWith('vehicle-') && c !== 'vehicle-field');
                 originalVehicleValues[vehicleID][fieldKey] = f.value;
             });
 
-            // 2. Tải Model cho form (dựa trên Brand đã chọn)
             const brandSelect = formView.querySelector('.vehicle-brand');
             const modelSelect = formView.querySelector('.vehicle-model');
             const currentModelName = originalVehicleValues[vehicleID]['vehicle-model'];
 
             loadModelsForEdit(brandSelect, modelSelect, currentModelName);
 
-            // 3. Thêm sự kiện 'change' cho BrandSelect *chỉ* trong form này
             const newBrandSelect = brandSelect.cloneNode(true);
             brandSelect.parentNode.replaceChild(newBrandSelect, brandSelect);
             newBrandSelect.value = originalVehicleValues[vehicleID]['vehicle-brand'];
@@ -371,21 +349,16 @@
                 loadModelsForEdit(newBrandSelect, modelSelect, null);
             });
 
-            // 4. Ẩn view "Xem", Hiện view "Sửa"
             displayView.style.display = 'none';
             formView.style.display = 'block';
         }
 
-        /**
-         * (CẬP NHẬT) Hủy bỏ SỬA
-         */
         function cancelVehicleEdit(vehicleID) {
             const card = document.getElementById('vehicle-card-' + vehicleID);
             const displayView = card.querySelector('.vehicle-display');
             const formView = card.querySelector('.vehicle-form');
             const values = originalVehicleValues[vehicleID];
 
-            // 1. Khôi phục giá trị gốc cho các trường trong form
             if (values) {
                 formView.querySelectorAll('.vehicle-field').forEach(f => {
                     const fieldKey = Array.from(f.classList).find(c => c.startsWith('vehicle-') && c !== 'vehicle-field');
@@ -398,14 +371,10 @@
                 modelSelect.innerHTML = `<option value="${values['vehicle-model']}" selected>${values['vehicle-model']}</option>`;
             }
 
-            // 2. Ẩn view "Sửa", Hiện view "Xem"
             formView.style.display = 'none';
             displayView.style.display = 'block';
         }
 
-        /**
-         * (CẬP NHẬT) Lưu thay đổi
-         */
         function saveVehicleEdit(vehicleID) {
             const card = document.getElementById('vehicle-card-' + vehicleID);
             const formView = card.querySelector('.vehicle-form');
@@ -428,18 +397,15 @@
                 .then(res => res.json())
                 .then(result => {
                     if (result.success) {
-                        alert('Cập nhật thành công!');
+                        alert('Vehicle updated successfully!');
                         window.location.reload();
                     } else {
-                        alert('Lỗi: ' + (result.message || "Không xác định"));
+                        alert('Error: ' + (result.message || "Unknown error"));
                     }
                 })
-                .catch(err => alert('Lỗi hệ thống: ' + err.message));
+                .catch(err => alert('System error: ' + err.message));
         }
 
-        /**
-         * (CẬP NHẬT) Gán sự kiện
-         */
         document.querySelectorAll('.btn-edit').forEach(btn =>
             btn.addEventListener('click', () => enableVehicleEdit(btn.dataset.vehicleId))
         );

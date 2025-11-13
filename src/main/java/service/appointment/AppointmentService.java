@@ -2,6 +2,11 @@ package service.appointment;
 
 import dao.appointment.AppointmentDAO;
 import model.appointment.Appointment;
+import util.MailService;
+
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 public class AppointmentService {
     private AppointmentDAO appointmentDAO;
@@ -63,6 +68,39 @@ public class AppointmentService {
             default:
                 return false;
         }
+    }
+    public void processReminders() throws SQLException {
+        List<Map<String, Object>> upcoming = appointmentDAO.getAcceptedAppointmentsWithinDays(2);
+
+        for (Map<String, Object> record : upcoming) {
+            Appointment app = (Appointment) record.get("appointment");
+            String customerName = (String) record.get("customerName");
+            String customerEmail = (String) record.get("customerEmail");
+
+            String subject = "Nhắc hẹn mang xe đến sửa chữa";
+            String message = String.format("""
+            Xin chào %s,
+            Đây là lời nhắc từ Garage: bạn có lịch hẹn vào ngày %s.
+            Vui lòng mang xe đến đúng giờ để đảm bảo lịch sửa chữa.
+            """, customerName, app.getAppointmentDate().toLocalDate());
+
+            try {
+                MailService.sendEmail(customerEmail, subject, message);
+                System.out.println("Sent reminder to " + customerEmail);
+            } catch (Exception e) {
+                System.err.println(" Failed to send reminder to " + customerEmail);
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println(" Reminder emails sent for " + upcoming.size() + " appointments.");
+    }
+
+
+    // Tự động reject các appointment quá hạn chưa đến
+    public void processAutoReject() throws SQLException {
+        int updated = appointmentDAO.autoRejectNoShowAppointments();
+        System.out.println(" Auto-rejected " + updated + " appointments (no ServiceOrder).");
     }
 
 }

@@ -1,7 +1,9 @@
 package controller.customer;
 
+import dao.carservice.ServiceRequestDAO;
 import dao.customer.CustomerDAO; // DAO để lấy CustomerID
-import model.dto.RepairJourneyView;     // DTO
+import dao.vehicle.VehicleDAO;
+import model.dto.RepairJourneyView; // DTO
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -9,10 +11,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.user.User;
+import service.diagnostic.CustomerDiagnosticService;
+import model.vehicle.Vehicle;
 import service.tracking.RepairTrackerService; // Service mới
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @WebServlet("/customer/repair-tracker")
 public class CustomerRepairTrackerServlet extends HttpServlet {
@@ -20,6 +27,7 @@ public class CustomerRepairTrackerServlet extends HttpServlet {
     // Khởi tạo Service và DAO cần thiết
     private final RepairTrackerService trackerService = new RepairTrackerService();
     private final CustomerDAO customerDAO = new CustomerDAO(); // Giả sử bạn có DAO này
+    private final CustomerDiagnosticService diagnosticService = new CustomerDiagnosticService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -46,9 +54,15 @@ public class CustomerRepairTrackerServlet extends HttpServlet {
             }
 
             int requestID = Integer.parseInt(idParam);
-
+            ServiceRequestDAO serviceRequestDAO = new ServiceRequestDAO();
+            List<String> serviceName = serviceRequestDAO.getServiceNamesByRequestId(requestID);
             // 3. Gọi Service (KHÔNG gọi DAO) để lấy DTO (đã xử lý logic)
-            RepairJourneyView journey = trackerService.getProcessedJourney( requestID);
+            RepairJourneyView journey = trackerService.getProcessedJourney(customerID, requestID);
+
+            Vehicle vehicle = new Vehicle();
+            VehicleDAO vehicleDAO = new VehicleDAO();
+            int vehicleID = serviceRequestDAO.getServiceRequestById(requestID).getVehicleID();
+            Vehicle vehicleInfo = vehicleDAO.getVehicleById(vehicleID);
 
             // 4. Kiểm tra kết quả
             if (journey == null) {
@@ -58,7 +72,9 @@ public class CustomerRepairTrackerServlet extends HttpServlet {
             }
 
             // 5. Gửi DTO sang JSP
+            request.setAttribute("serviceName", serviceName);
             request.setAttribute("journey", journey);
+            request.setAttribute("vehicle", vehicleInfo);
             request.getRequestDispatcher("/view/customer/view-repair-tracker.jsp")
                     .forward(request, response);
 

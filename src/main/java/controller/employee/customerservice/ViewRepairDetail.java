@@ -25,9 +25,14 @@ public class ViewRepairDetail extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        HttpSession session = request.getSession(false);
+        User user = (session != null) ? (User) session.getAttribute("user") : null;
+
 
 
         try {
+
+            int customerID = customerDAO.getCustomerIdByUserId(user.getUserId());
 
 
             String idParam = request.getParameter("id");
@@ -39,7 +44,7 @@ public class ViewRepairDetail extends HttpServlet {
             int requestID = Integer.parseInt(idParam);
 
             // 3. Gọi Service (KHÔNG gọi DAO) để lấy DTO (đã xử lý logic)
-            RepairJourneyView journey = trackerService.getProcessedJourney(requestID);
+            RepairJourneyView journey = trackerService.getProcessedJourney(customerID, requestID);
 
             // 4. Kiểm tra kết quả
             if (journey == null) {

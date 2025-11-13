@@ -1,10 +1,14 @@
 package model.dto;
 
 import model.appointment.Appointment;
+import model.customer.CustomerDiagnosticsView;
 import model.workorder.ServiceRequest;
 import model.workorder.WorkOrder;
 import model.invoice.Invoice;
 import model.feedback.Feedback;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,12 +17,57 @@ import java.util.List;
  */
 public class RepairJourneyView {
 
+    private int requestID;
+    private Timestamp requestDate;
+    private String requestStatus; // PENDING, APPROVE, REJECTED
+    private String note;
+
+    private int customerID;
+    private String customerName;
+
+    private int vehicleID;
+    private String licensePlate;
+    private String vehicleBrand;
+    private String vehicleModel;
+    private int vehicleYear;
+
+
+    private Integer workOrderID;
+    private String workOrderStatus; // PENDING, IN_PROCESS, COMPLETE
+    private BigDecimal estimateAmount;
+    private Timestamp workOrderCreatedAt;
+
+
+    private List<WorkOrderDetailView> workOrderDetails = new ArrayList<>();
+
+    private BigDecimal totalServiceCost = BigDecimal.ZERO;
+    private BigDecimal totalPartsCost = BigDecimal.ZERO;
+    private BigDecimal grandTotal = BigDecimal.ZERO;
+
+
     // Dữ liệu gốc từ DB
     private Appointment appointment;
     private ServiceRequest serviceRequest;
     private WorkOrder workOrder;
     private Invoice invoice;
     private Feedback feedback;
+
+    private CustomerDiagnosticsView diagnosticsView;
+
+    public CustomerDiagnosticsView getDiagnosticsView() {
+        return diagnosticsView;
+    }
+
+    public void setDiagnosticsView(CustomerDiagnosticsView diagnosticsView) {
+        this.diagnosticsView = diagnosticsView;
+    }
+
+
+    public boolean hasDiagnostics() {
+        return diagnosticsView != null && !diagnosticsView.services.isEmpty();
+    }
+
+
 
     // Timeline stages (được xử lý bởi Service)
     private List<TimelineStage> stages = new ArrayList<>();
@@ -60,6 +109,161 @@ public class RepairJourneyView {
         public void addStep(TimelineStep step) {
             this.steps.add(step);
         }
+    }
+
+    public RepairJourneyView() {
+    }
+
+    public int getRequestID() {
+        return requestID;
+    }
+
+    public void setRequestID(int requestID) {
+        this.requestID = requestID;
+    }
+
+    public Timestamp getRequestDate() {
+        return requestDate;
+    }
+
+    public void setRequestDate(Timestamp requestDate) {
+        this.requestDate = requestDate;
+    }
+
+    public String getRequestStatus() {
+        return requestStatus;
+    }
+
+    public void setRequestStatus(String requestStatus) {
+        this.requestStatus = requestStatus;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public int getCustomerID() {
+        return customerID;
+    }
+
+    public void setCustomerID(int customerID) {
+        this.customerID = customerID;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public int getVehicleID() {
+        return vehicleID;
+    }
+
+    public void setVehicleID(int vehicleID) {
+        this.vehicleID = vehicleID;
+    }
+
+    public String getLicensePlate() {
+        return licensePlate;
+    }
+
+    public void setLicensePlate(String licensePlate) {
+        this.licensePlate = licensePlate;
+    }
+
+    public String getVehicleBrand() {
+        return vehicleBrand;
+    }
+
+    public void setVehicleBrand(String vehicleBrand) {
+        this.vehicleBrand = vehicleBrand;
+    }
+
+    public String getVehicleModel() {
+        return vehicleModel;
+    }
+
+    public void setVehicleModel(String vehicleModel) {
+        this.vehicleModel = vehicleModel;
+    }
+
+    public int getVehicleYear() {
+        return vehicleYear;
+    }
+
+    public void setVehicleYear(int vehicleYear) {
+        this.vehicleYear = vehicleYear;
+    }
+
+    public Integer getWorkOrderID() {
+        return workOrderID;
+    }
+
+    public void setWorkOrderID(Integer workOrderID) {
+        this.workOrderID = workOrderID;
+    }
+
+    public String getWorkOrderStatus() {
+        return workOrderStatus;
+    }
+
+    public void setWorkOrderStatus(String workOrderStatus) {
+        this.workOrderStatus = workOrderStatus;
+    }
+
+    public BigDecimal getEstimateAmount() {
+        return estimateAmount;
+    }
+
+    public void setEstimateAmount(BigDecimal estimateAmount) {
+        this.estimateAmount = estimateAmount;
+    }
+
+    public Timestamp getWorkOrderCreatedAt() {
+        return workOrderCreatedAt;
+    }
+
+    public void setWorkOrderCreatedAt(Timestamp workOrderCreatedAt) {
+        this.workOrderCreatedAt = workOrderCreatedAt;
+    }
+
+    public List<WorkOrderDetailView> getWorkOrderDetails() {
+        return workOrderDetails;
+    }
+
+    public void setWorkOrderDetails(List<WorkOrderDetailView> workOrderDetails) {
+        this.workOrderDetails = workOrderDetails;
+    }
+
+    public BigDecimal getTotalServiceCost() {
+        return totalServiceCost;
+    }
+
+    public void setTotalServiceCost(BigDecimal totalServiceCost) {
+        this.totalServiceCost = totalServiceCost;
+    }
+
+    public BigDecimal getTotalPartsCost() {
+        return totalPartsCost;
+    }
+
+    public void setTotalPartsCost(BigDecimal totalPartsCost) {
+        this.totalPartsCost = totalPartsCost;
+    }
+
+    public BigDecimal getGrandTotal() {
+        return grandTotal;
+    }
+
+    public void setGrandTotal(BigDecimal grandTotal) {
+        this.grandTotal = grandTotal;
     }
 
     // Inner class để represent mỗi bước nhỏ trong stage

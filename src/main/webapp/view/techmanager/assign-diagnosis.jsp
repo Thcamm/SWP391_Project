@@ -182,15 +182,6 @@
                                         <td><strong class="text-primary">#${detail.detailId}</strong></td>
                                         <td>${detail.taskDescription}</td>
                                         <td>${detail.estimateHours} hrs</td>
-                                                        <i class="bi bi-car-front"></i>
-                                                        ${detail.vehicleInfo}
-                                                    </td>
-                                                    <td>
-                                                        <i class="bi bi-person"></i>
-                                                        ${detail.customerName}
-                                                    </td>
-                                                    <td>${detail.taskDescription}</td>
-                                                    <td>${detail.estimateHours} hrs</td>
                                                     <td>
                                                         <fmt:formatDate value="${detail.workOrderCreatedAt}" pattern="dd/MM/yyyy HH:mm" />
                                                     </td>

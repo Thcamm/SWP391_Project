@@ -10,7 +10,7 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/services/search")
+@WebServlet("/customerservice/services-search")
 public class SearchServiceType extends HttpServlet {
 
     private CarServiceDAO serviceDAO = new CarServiceDAO();

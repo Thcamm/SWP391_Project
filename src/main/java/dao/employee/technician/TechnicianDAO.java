@@ -372,7 +372,7 @@ public class TechnicianDAO {
         }
 
         sql.append("GROUP BY ta.AssignmentID ");
-        sql.append("ORDER BY ta.Priority DESC, ta.AssignedDate DESC ");
+        sql.append("ORDER BY ta.AssignedDate DESC ");
         sql.append("LIMIT ? OFFSET ?");
 
         params.add(limit);
@@ -961,4 +961,47 @@ public class TechnicianDAO {
             return false;
         }
     }
+
+    public List<TaskAssignment> getTaskAssignmentByWorkOrderId(int workOrderId) throws SQLException {
+        String sql = """
+        SELECT ta.*, 
+               wd.TaskDescription AS WorkOrderDetailDesc,
+               CONCAT(v.LicensePlate, ' - ', v.Brand, ' ', v.Model) AS VehicleInfo,
+               u.FullName AS TechnicianName,
+               u2.FullName AS CustomerName,
+               GROUP_CONCAT(DISTINCT st.ServiceName SEPARATOR ', ') AS ServiceNames
+        FROM TaskAssignment ta
+        JOIN WorkOrderDetail wd ON ta.DetailID = wd.DetailID
+        JOIN WorkOrder wo ON wd.WorkOrderID = wo.WorkOrderID
+        JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID
+        JOIN Vehicle v ON sr.VehicleID = v.VehicleID
+        JOIN Customer c ON v.CustomerID = c.CustomerID
+        JOIN `User` u2 ON c.UserID = u2.UserID
+        LEFT JOIN `User` u ON ta.TechnicianID = u.UserID
+        LEFT JOIN ServiceRequestDetail srd ON srd.RequestID = sr.RequestID
+        LEFT JOIN Service_Type st ON srd.ServiceID = st.ServiceID
+        WHERE wo.WorkOrderID = ?
+        GROUP BY ta.AssignmentID
+        ORDER BY ta.AssignmentID DESC
+    """;
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, workOrderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                List<TaskAssignment> list = new ArrayList<>();
+                while (rs.next()) {
+                    TaskAssignment task = mapResultSetToTask(rs);
+                    task.setServiceInfo(rs.getString("ServiceNames"));
+                    task.setVehicleInfo(rs.getString("VehicleInfo"));
+                    task.setCustomerName(rs.getString("CustomerName"));
+
+                    list.add(task);
+                }
+                return list;
+            }
+        }
+    }
+
+
 }

@@ -34,6 +34,7 @@ public class CustomerRepairListServlet extends HttpServlet {
             return;
         }
 
+        // Pagination parameters
         int currentPage = 1;
         int itemsPerPage = 10;
 
@@ -44,25 +45,52 @@ public class CustomerRepairListServlet extends HttpServlet {
             } catch (NumberFormatException ignored) {}
         }
 
+        // Filter parameters
+        String vehicleIdParam = request.getParameter("vehicleId");
+        String sortBy = request.getParameter("sortBy");
+
+        Integer vehicleId = null;
+        if (vehicleIdParam != null && !vehicleIdParam.trim().isEmpty()) {
+            try {
+                vehicleId = Integer.parseInt(vehicleIdParam);
+            } catch (NumberFormatException ignored) {}
+        }
+
+        // Default sort order
+        if (sortBy == null || sortBy.trim().isEmpty()) {
+            sortBy = "newest"; // Default: newest first
+        }
+
         try {
-            // 1️⃣ Lấy CustomerID
+            // Get CustomerID
             int customerID = customerDAO.getCustomerIdByUserId(user.getUserId());
 
-            // 2️⃣ Đếm tổng số bản ghi
-            int totalItems = repairListService.countSummariesForCustomer(customerID);
+            // Count total items (with filter if applied)
+            int totalItems;
+            if (vehicleId != null) {
+                totalItems = repairListService.countSummariesForCustomerByVehicle(customerID, vehicleId);
+            } else {
+                totalItems = repairListService.countSummariesForCustomer(customerID);
+            }
 
-            // 3️⃣ Tính toán phân trang
+            // Calculate pagination
             PaginationUtils.PaginationCalculation calc =
                     PaginationUtils.calculateParams(totalItems, currentPage, itemsPerPage);
 
             int offset = calc.getOffset();
             int safePage = calc.getSafePage();
 
-            // 4️⃣ Lấy danh sách phân trang (limit, offset)
-            List<RepairJourneySummaryDTO> repairJourneySummaryDTOList =
-                    repairListService.getPaginatedSummariesForCustomer(customerID, itemsPerPage, offset);
+            // Get paginated list (with filter and sort)
+            List<RepairJourneySummaryDTO> repairJourneySummaryDTOList;
+            if (vehicleId != null) {
+                repairJourneySummaryDTOList = repairListService.getPaginatedSummariesForCustomerByVehicle(
+                        customerID, vehicleId, sortBy, itemsPerPage, offset);
+            } else {
+                repairJourneySummaryDTOList = repairListService.getPaginatedSummariesForCustomer(
+                        customerID, itemsPerPage, offset);
+            }
 
-            // 5️⃣ Đóng gói PaginationResult
+            // Wrap in PaginationResult
             PaginationUtils.PaginationResult<RepairJourneySummaryDTO> result =
                     new PaginationUtils.PaginationResult<>(
                             repairJourneySummaryDTOList,
@@ -72,12 +100,15 @@ public class CustomerRepairListServlet extends HttpServlet {
                             itemsPerPage
                     );
 
-            // 6️⃣ Gửi sang JSP
+            // Set attributes for JSP
             request.setAttribute("journeyList", result);
+            request.setAttribute("selectedVehicleId", vehicleId);
+            request.setAttribute("selectedSortBy", sortBy);
+
             request.getRequestDispatcher("/view/customer/view-repair-list.jsp").forward(request, response);
 
         } catch (SQLException e) {
-            throw new ServletException("Lỗi truy vấn danh sách sửa chữa: " + e.getMessage(), e);
+            throw new ServletException("Error querying repair list: " + e.getMessage(), e);
         }
     }
 }

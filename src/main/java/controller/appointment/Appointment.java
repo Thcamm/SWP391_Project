@@ -75,7 +75,6 @@ public class Appointment extends HttpServlet {
 
             // 7. Save to database
             appointmentDAO.insertAppointment(appointment);
-
             MailService.sendEmail(user.getEmail(),  "AppointmentService scheduled successfully","AppointmentService scheduled successfully");
             // 8. Redirect after success (PRG Pattern)
             request.setAttribute("successMessage", "AppointmentService scheduled successfully!");

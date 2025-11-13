@@ -50,7 +50,8 @@ public class TaskReassignmentDAO {
                 "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
                 "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
                 "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
-                "JOIN User cust_user ON sr.CustomerID = cust_user.UserID " +
+                "JOIN Customer c ON v.CustomerID = c.CustomerID " +
+                "JOIN User cust_user ON c.UserID = cust_user.UserID " +
                 "JOIN Employee e ON ta.AssignToTechID = e.EmployeeID " +
                 "JOIN User tech_user ON e.UserID = tech_user.UserID " +
                 "WHERE ta.Status = 'CANCELLED' " +
