@@ -1,6 +1,10 @@
 package dao.vehicle;
 
 import common.DbContext;
+import common.constant.MessageType;
+import common.message.ServiceResult;
+import common.message.SystemMessage;
+import model.customer.CustomerDiagnosticsView;
 import model.inventory.DiagnosticPart;
 import model.vehicle.VehicleDiagnostic;
 import model.vehicle.VehicleDiagnostic.DiagnosticTechnician;
@@ -440,6 +444,53 @@ public class VehicleDiagnosticDAO {
         }
         return list;
     }
+
+    // Lấy danh sách diagnostic theo requestId (order mới → cũ)
+    public List<VehicleDiagnostic> getDiagnosticsByRequest(int requestId) throws SQLException {
+        String sql = """
+        SELECT vd.*
+        FROM VehicleDiagnostic vd
+        JOIN TaskAssignment ta   ON ta.AssignmentID = vd.AssignmentID
+        JOIN WorkOrderDetail wod ON wod.DetailID     = ta.DetailID
+        JOIN WorkOrder wo        ON wo.WorkOrderID   = wod.WorkOrderID
+        WHERE wo.RequestID = ?
+        ORDER BY vd.CreatedAt DESC, vd.VehicleDiagnosticID DESC
+    """;
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, requestId);
+            try (ResultSet rs = ps.executeQuery()) {
+                List<VehicleDiagnostic> out = new ArrayList<>();
+                while (rs.next()) out.add(mapDiagnostic(rs)); // dùng mapper bạn đã có
+                return out;
+            }
+        }
+    }
+
+    // Lấy full parts của 1 diagnostic (đã có ở phía technician)
+   // public List<DiagnosticPart> getPartsByDiagnostic(int diagnosticId) throws SQLException {... }
+
+    // Kiểm tra diagnostic có thuộc requestId không (để bảo vệ URL)
+    public boolean diagnosticBelongsToRequest(int diagnosticId, int requestId) throws SQLException {
+        String sql = """
+        SELECT 1
+        FROM VehicleDiagnostic vd
+        JOIN TaskAssignment ta   ON ta.AssignmentID = vd.AssignmentID
+        JOIN WorkOrderDetail wod ON wod.DetailID     = ta.DetailID
+        JOIN WorkOrder wo        ON wo.WorkOrderID   = wod.WorkOrderID
+        WHERE vd.VehicleDiagnosticID = ? AND wo.RequestID = ?
+        LIMIT 1
+    """;
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, diagnosticId);
+            ps.setInt(2, requestId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
 
     /**
      * Lấy diagnostics theo technician (technician xem lịch sử của mình)
@@ -1048,4 +1099,550 @@ public class VehicleDiagnosticDAO {
             return true;
         }
     }
+
+    public List<DiagnosticPart> getPartsByDiagnostic(int diagnosticId) throws SQLException {
+
+        Map<Integer, List<DiagnosticPart>> map =
+                getPartsForDiagnostics(java.util.List.of(diagnosticId));
+
+        return map.getOrDefault(diagnosticId, java.util.Collections.emptyList());
+    }
+
+    public ServiceResult approveDiagnosticManual(int diagnosticId) throws SQLException{
+        String selectSQL = """
+        SELECT vd.AssignmentID, vd.IssueFound, vd.EstimateCost,
+               ta.DetailID AS SourceDetailID, wod.WorkOrderID
+        FROM VehicleDiagnostic vd
+        JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID
+        JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID
+        WHERE vd.VehicleDiagnosticID = ?
+    """;
+
+        String sumAllPartsSQL = """
+        SELECT COALESCE(SUM(UnitPrice * QuantityNeeded), 0)
+        FROM DiagnosticPart WHERE VehicleDiagnosticID = ?
+    """;
+
+        String sumApprovedPartsSQL = """
+        SELECT COALESCE(SUM(UnitPrice * QuantityNeeded), 0)
+        FROM DiagnosticPart WHERE VehicleDiagnosticID = ? AND IsApproved = 1
+    """;
+
+        String insertDetailSQL = """
+        INSERT IGNORE INTO WorkOrderDetail
+          (WorkOrderID, source, diagnostic_id, approval_status, TaskDescription, EstimateAmount)
+        VALUES (?, 'DIAGNOSTIC', ?, 'APPROVED', ?, ?)
+    """;
+
+        String selectExistingDetailSQL = """
+        SELECT DetailID FROM WorkOrderDetail
+        WHERE diagnostic_id = ? LIMIT 1
+    """;
+
+        String updateDetailEstimateSQL = """
+        UPDATE WorkOrderDetail
+        SET EstimateAmount = ?
+        WHERE DetailID = ?
+    """;
+
+        String insertPartSQL = """
+        INSERT IGNORE INTO WorkOrderPart
+          (DetailID, PartDetailID, DiagnosticPartID, RequestedByID,
+           QuantityUsed, UnitPrice, request_status, requested_at)
+        SELECT ?, dp.PartDetailID, dp.DiagnosticPartID, wo.TechManagerID,
+               dp.QuantityNeeded, dp.UnitPrice, 'PENDING', NOW()
+        FROM DiagnosticPart dp
+        JOIN WorkOrderDetail wod_src ON wod_src.DetailID = ?
+        JOIN WorkOrder wo ON wo.WorkOrderID = wod_src.WorkOrderID
+        WHERE dp.VehicleDiagnosticID = ?
+          AND dp.IsApproved = 1
+    """;
+
+        try (Connection conn = DbContext.getConnection(false)) {
+            conn.setAutoCommit(false);
+
+            int workOrderId, sourceDetailId;
+            String issue;
+            BigDecimal estimateCost;
+
+            // 1) Lấy data gốc
+            try (PreparedStatement ps = conn.prepareStatement(selectSQL)) {
+                ps.setInt(1, diagnosticId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (!rs.next()) {
+                        DbContext.rollback(conn);
+                        return ServiceResult.error(new SystemMessage(
+                                "DIAG404", MessageType.ERROR, "Diagnostic",
+                                "Không tìm thấy diagnostic."
+                        ));
+                    }
+                    workOrderId     = rs.getInt("WorkOrderID");
+                    sourceDetailId  = rs.getInt("SourceDetailID");
+                    issue           = rs.getString("IssueFound");
+                    estimateCost    = rs.getBigDecimal("EstimateCost");
+                    if (estimateCost == null) estimateCost = BigDecimal.ZERO;
+                }
+            }
+
+            // 2) Tính lại estimate theo tick của KH
+            BigDecimal allPartsSum, approvedPartsSum;
+            try (PreparedStatement ps = conn.prepareStatement(sumAllPartsSQL)) {
+                ps.setInt(1, diagnosticId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    rs.next();
+                    allPartsSum = rs.getBigDecimal(1);
+                    if (allPartsSum == null) allPartsSum = BigDecimal.ZERO;
+                }
+            }
+            try (PreparedStatement ps = conn.prepareStatement(sumApprovedPartsSQL)) {
+                ps.setInt(1, diagnosticId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    rs.next();
+                    approvedPartsSum = rs.getBigDecimal(1);
+                    if (approvedPartsSum == null) approvedPartsSum = BigDecimal.ZERO;
+                }
+            }
+
+            BigDecimal laborCost = estimateCost.subtract(allPartsSum);
+            if (laborCost.compareTo(BigDecimal.ZERO) < 0) laborCost = BigDecimal.ZERO;
+
+            BigDecimal newEstimate = laborCost.add(approvedPartsSum);
+
+            // 3) Ghi WorkOrderDetail (EstimateAmount = newEstimate)
+            int detailId;
+            try (PreparedStatement ps = conn.prepareStatement(insertDetailSQL, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setInt(1, workOrderId);
+                ps.setInt(2, diagnosticId);
+                ps.setString(3, issue);
+                ps.setBigDecimal(4, newEstimate);
+                ps.executeUpdate();
+
+                try (ResultSet keys = ps.getGeneratedKeys()) {
+                    if (keys.next()) {
+                        detailId = keys.getInt(1);
+                    } else {
+                        // đã tồn tại -> lấy DetailID & update EstimateAmount cho đúng newEstimate
+                        try (PreparedStatement ps2 = conn.prepareStatement(selectExistingDetailSQL)) {
+                            ps2.setInt(1, diagnosticId);
+                            try (ResultSet rs2 = ps2.executeQuery()) {
+                                if (!rs2.next()) {
+                                    DbContext.rollback(conn);
+                                    return ServiceResult.error(new SystemMessage(
+                                            "WOD404", MessageType.ERROR, "WorkOrderDetail",
+                                            "Không thể tạo/lấy WorkOrderDetail."
+                                    ));
+                                }
+                                detailId = rs2.getInt(1);
+                            }
+                        }
+                        try (PreparedStatement ps3 = conn.prepareStatement(updateDetailEstimateSQL)) {
+                            ps3.setBigDecimal(1, newEstimate);
+                            ps3.setInt(2, detailId);
+                            ps3.executeUpdate();
+                        }
+                    }
+                }
+            }
+
+            // 4) Insert các WorkOrderPart chỉ cho part được KH duyệt
+            try (PreparedStatement ps = conn.prepareStatement(insertPartSQL)) {
+                ps.setInt(1, detailId);
+                ps.setInt(2, sourceDetailId);
+                ps.setInt(3, diagnosticId);
+                ps.executeUpdate();
+            }
+
+            // 5) Update lại EstimateCost & Status cho VehicleDiagnostic
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "UPDATE VehicleDiagnostic SET EstimateCost = ?, Status = 'APPROVED' WHERE VehicleDiagnosticID = ?")) {
+                ps.setBigDecimal(1, newEstimate);
+                ps.setInt(2, diagnosticId);
+                ps.executeUpdate();
+            }
+
+            conn.commit();
+            return ServiceResult.success(new SystemMessage(
+                    "DIAG200", MessageType.SUCCESS, "Diagnostic",
+                    "Đã duyệt diagnostic & tính lại chi phí theo phần KH chọn."
+            ));
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return ServiceResult.error(new SystemMessage(
+                    "DIAG500", MessageType.ERROR, "Database", e.getMessage()
+            ));
+        }
+    }
+
+
+    public ServiceResult rejectDiagnosticManual(int diagnosticId, String reason) throws SQLException {
+        String selectSQL = """
+        SELECT Status FROM VehicleDiagnostic
+        WHERE VehicleDiagnosticID = ?
+    """;
+
+        String updateSQL = """
+        UPDATE VehicleDiagnostic
+        SET Status = 'REJECTED', RejectReason = ?, UpdatedAt = NOW()
+        WHERE VehicleDiagnosticID = ?
+    """;
+
+        try (Connection conn = DbContext.getConnection()) {
+
+            // 1️⃣ Kiểm tra diagnostic có tồn tại không
+            try (PreparedStatement ps = conn.prepareStatement(selectSQL)) {
+                ps.setInt(1, diagnosticId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (!rs.next()) {
+                        return ServiceResult.error(new SystemMessage(
+                                "DIAG404", MessageType.ERROR, "Diagnostic",
+                                "Không tìm thấy diagnostic để từ chối."
+                        ));
+                    }
+
+                    String currentStatus = rs.getString("Status");
+                    if ("APPROVED".equalsIgnoreCase(currentStatus)) {
+                        return ServiceResult.error(new SystemMessage(
+                                "DIAG406", MessageType.WARNING, "Diagnostic",
+                                "Diagnostic đã được duyệt, không thể từ chối."
+                        ));
+                    }
+                    if ("REJECTED".equalsIgnoreCase(currentStatus)) {
+                        return ServiceResult.error(new SystemMessage(
+                                "DIAG407", MessageType.INFO, "Diagnostic",
+                                "Diagnostic này đã bị từ chối trước đó."
+                        ));
+                    }
+                }
+            }
+
+            // 2️⃣ Chuẩn hóa lý do
+            if (reason == null || reason.trim().isEmpty()) {
+                reason = "Khách hàng đã từ chối chẩn đoán.";
+            }
+
+            // 3️⃣ Cập nhật trạng thái và lý do
+            try (PreparedStatement ps = conn.prepareStatement(updateSQL)) {
+                ps.setString(1, reason);
+                ps.setInt(2, diagnosticId);
+                int updated = ps.executeUpdate();
+
+                if (updated == 0) {
+                    return ServiceResult.error(new SystemMessage(
+                            "DIAG500", MessageType.ERROR, "Diagnostic",
+                            "Không thể cập nhật trạng thái từ chối."
+                    ));
+                }
+            }
+
+            return ServiceResult.success(new SystemMessage(
+                    "DIAG200", MessageType.SUCCESS, "Diagnostic",
+                    "Đã từ chối diagnostic thành công."
+            ));
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return ServiceResult.error(new SystemMessage(
+                    "DIAG_SQL_ERR", MessageType.ERROR, "Database",
+                    e.getMessage()
+            ));
+        }
+    }
+
+    public Integer getDiagnosticIdByPartId(Connection conn, int diagnosticPartId) throws SQLException{
+        String sql = """
+        SELECT VehicleDiagnosticID
+        FROM DiagnosticPart
+        WHERE DiagnosticPartID = ?
+        LIMIT 1
+    """;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, diagnosticPartId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("VehicleDiagnosticID");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null; // không tìm thấy hoặc lỗi
+    }
+
+    public CustomerDiagnosticsView getRequestDiagnosticsTree(int requestId) throws SQLException{
+        CustomerDiagnosticsView view = new CustomerDiagnosticsView();
+
+        try (Connection c = DbContext.getConnection()) {
+
+            if (!loadRequestAndVehicle(c, requestId, view)) {
+                return null; //
+            }
+
+            loadRequestedServices(c, requestId, view);
+            loadServiceBlocks(c, view);
+
+            loadDiagnosticsForBlocks(c, view);
+
+            return view;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void loadRequestedServices(Connection c, int requestId, CustomerDiagnosticsView view)  throws SQLException {
+
+        final String sql = """
+        SELECT st.ServiceID, st.ServiceName, st.Category, st.UnitPrice
+        FROM ServiceRequestDetail srd
+        JOIN Service_Type st ON st.ServiceID = srd.ServiceID
+        WHERE srd.RequestID = ?
+    """;
+
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, requestId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    var info = new CustomerDiagnosticsView.ServiceTypeInfo();
+                    info.serviceId   = rs.getInt("ServiceID");
+                    info.serviceName = rs.getString("ServiceName");
+                    info.category    = rs.getString("Category");
+                    info.unitPrice   = rs.getDouble("UnitPrice");
+                    view.requestedServices.add(info);
+                }
+            }
+        }
+    }
+
+    private boolean loadRequestAndVehicle(Connection c, int requestId, CustomerDiagnosticsView view)
+            throws SQLException {
+
+        final String sql = """
+        SELECT 
+            sr.RequestID, sr.RequestDate, sr.Status AS RequestStatus, sr.Note,
+            wo.WorkOrderID,
+            c.CustomerID,
+            v.VehicleID, v.LicensePlate, v.Brand, v.Model, v.YearManufacture
+        FROM ServiceRequest sr
+        JOIN WorkOrder wo ON wo.RequestID = sr.RequestID
+        JOIN Customer c ON c.CustomerID = sr.CustomerID
+        JOIN Vehicle v ON v.VehicleID = sr.VehicleID
+        WHERE sr.RequestID = ?
+    """;
+
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, requestId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return false;
+
+                // Fill view
+                view.serviceRequestId = rs.getInt("RequestID");
+                view.workOrderId      = rs.getInt("WorkOrderID");
+                view.customerId       = rs.getInt("CustomerID");
+
+                // Request info
+                var ri = new CustomerDiagnosticsView.RequestInfo();
+                ri.requestId   = rs.getInt("RequestID");
+                ri.requestDate = rs.getTimestamp("RequestDate").toLocalDateTime();
+                ri.status      = rs.getString("RequestStatus");
+                ri.note        = rs.getString("Note");
+                view.request   = ri;
+
+                // Vehicle info
+                var vi = new CustomerDiagnosticsView.VehicleInfo();
+                vi.vehicleId       = rs.getInt("VehicleID");
+                vi.licensePlate    = rs.getString("LicensePlate");
+                vi.brand           = rs.getString("Brand");
+                vi.model           = rs.getString("Model");
+                vi.yearManufacture = rs.getInt("YearManufacture");
+                view.vehicle = vi;
+
+                return true;
+            }
+        }
+    }
+
+    private void loadServiceBlocks(Connection c, CustomerDiagnosticsView view)
+            throws SQLException {
+
+        final String sql = """
+        SELECT DetailID, TaskDescription
+        FROM WorkOrderDetail
+        WHERE WorkOrderID = ?
+        ORDER BY DetailID
+    """;
+
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, view.workOrderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    var block = new CustomerDiagnosticsView.ServiceBlock();
+                    block.detailId     = rs.getInt("DetailID");
+                    block.serviceLabel = rs.getString("TaskDescription"); // fallback label
+
+                    view.services.add(block);
+                }
+            }
+        }
+    }
+
+
+    private void loadDiagnosticsForBlocks(Connection c, CustomerDiagnosticsView view)
+            throws SQLException {
+
+        for (var block : view.services) {
+
+            // Lấy assignment trước
+            List<Integer> assignments = loadAssignments(c, block.detailId);
+            for (int assignmentId : assignments) {
+
+                // Lấy diagnostic của assignment
+                List<VehicleDiagnostic> diagnostics = loadDiagnostics(c, assignmentId);
+
+                for (var vd : diagnostics) {
+
+                    var row = new CustomerDiagnosticsView.DiagnosticRow();
+                    row.diagnostic = vd;
+
+                    // Lấy parts của từng diagnostic
+                    row.parts = loadDiagnosticParts(c, vd.getVehicleDiagnosticID());
+
+                    block.diagnostics.add(row);
+                }
+            }
+        }
+    }
+
+
+
+    private List<Integer> loadAssignments(Connection c, int detailId) throws SQLException {
+
+        final String sql = """
+        SELECT AssignmentID
+        FROM TaskAssignment
+        WHERE DetailID = ?
+    """;
+
+        List<Integer> list = new ArrayList<>();
+
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, detailId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(rs.getInt("AssignmentID"));
+                }
+            }
+        }
+        return list;
+    }
+
+
+    private List<VehicleDiagnostic> loadDiagnostics(Connection c, int assignmentId)
+            throws SQLException {
+
+        final String sql = """
+        SELECT *
+        FROM VehicleDiagnostic
+        WHERE AssignmentID = ?
+    """;
+
+        List<VehicleDiagnostic> list = new ArrayList<>();
+
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, assignmentId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapVehicleDiagnostic(rs));
+                }
+            }
+        }
+        return list;
+    }
+
+
+
+    private VehicleDiagnostic mapVehicleDiagnostic(ResultSet rs) throws SQLException {
+        var vd = new VehicleDiagnostic();
+        vd.setVehicleDiagnosticID(rs.getInt("VehicleDiagnosticID"));
+        vd.setAssignmentID(rs.getInt("AssignmentID"));
+        vd.setIssueFound(rs.getString("IssueFound"));
+        vd.setEstimateCost(rs.getBigDecimal("EstimateCost"));
+        vd.setStatusString(rs.getString("Status"));
+        vd.setRejectReason(rs.getString("RejectReason"));
+        vd.setCreatedAt(rs.getTimestamp("CreatedAt").toLocalDateTime());
+        return vd;
+    }
+
+    private List<DiagnosticPart> loadDiagnosticParts(Connection c, int vdId)
+            throws SQLException {
+
+        final String sql = """
+        SELECT 
+            dp.DiagnosticPartID,
+            dp.VehicleDiagnosticID,
+            dp.PartDetailID,
+            dp.QuantityNeeded,
+            dp.UnitPrice,
+            dp.PartCondition,
+            dp.ReasonForReplacement,
+            dp.IsApproved,
+
+            pd.SKU,
+            pd.Quantity AS CurrentStock,
+
+            p.PartCode,
+            p.PartName,
+            p.Category
+
+        FROM DiagnosticPart dp
+        JOIN PartDetail pd ON dp.PartDetailID = pd.PartDetailID
+        JOIN Part p        ON pd.PartID        = p.PartID
+        WHERE dp.VehicleDiagnosticID = ?
+        ORDER BY dp.DiagnosticPartID
+    """;
+
+        List<DiagnosticPart> list = new ArrayList<>();
+
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, vdId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    DiagnosticPart p = new DiagnosticPart();
+
+                    // bảng DiagnosticPart
+                    p.setDiagnosticPartID(rs.getInt("DiagnosticPartID"));
+                    p.setVehicleDiagnosticID(rs.getInt("VehicleDiagnosticID"));
+                    p.setPartDetailID(rs.getInt("PartDetailID"));
+                    p.setQuantityNeeded(rs.getInt("QuantityNeeded"));
+                    p.setUnitPrice(rs.getBigDecimal("UnitPrice"));
+                    p.setPartCondition(rs.getString("PartCondition"));
+                    p.setReasonForReplacement(rs.getString("ReasonForReplacement"));
+                    p.setApproved(rs.getBoolean("IsApproved"));
+
+                    // bảng PartDetail
+                    p.setSku(rs.getString("SKU"));
+                    p.setCurrentStock(rs.getInt("CurrentStock"));
+
+                    // bảng Part
+                    p.setPartCode(rs.getString("PartCode"));
+                    p.setPartName(rs.getString("PartName"));
+                    p.setCategory(rs.getString("Category"));
+
+                    list.add(p);
+                }
+            }
+        }
+
+        return list;
+    }
+
+
+
+
+
+
 }

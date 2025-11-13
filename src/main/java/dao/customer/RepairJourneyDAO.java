@@ -1,20 +1,19 @@
 package dao.customer;
 
 import common.DbContext; // Lớp DbContext của bạn
+import model.dto.DiagnosticPartView;
 import model.dto.RepairJourneySummaryDTO;
 import model.dto.RepairJourneyView;
 // Import các model của bạn
 import model.appointment.Appointment;
+import model.dto.WorkOrderDetailView;
 import model.feedback.Feedback;
 import model.invoice.Invoice;
 import model.workorder.ServiceRequest;
 import model.workorder.WorkOrder;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.math.BigDecimal;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -277,4 +276,371 @@ public class RepairJourneyDAO extends DbContext {
         }
         return list; // Trả về danh sách đã phân trang
     }
+
+    public Integer getWorkOrderIDByRequestID(int requestID) throws SQLException {
+        String sql = """
+            SELECT WorkOrderID, Status, EstimateAmount, CreatedAt
+            FROM WorkOrder 
+            WHERE RequestID = ?
+        """;
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, requestID);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt("WorkOrderID");
+            }
+        }
+        return null;
+    }
+
+    public List<WorkOrderDetailView> getWorkOrderDetails(int workOrderID) throws SQLException {
+        String sql = """
+            SELECT 
+                wod.DetailID,
+                wod.WorkOrderID,
+                wod.source,
+                wod.diagnostic_id,
+                wod.approval_status,
+                wod.TaskDescription,
+                wod.EstimateAmount,
+                wod.detail_status
+            FROM WorkOrderDetail wod
+            WHERE wod.WorkOrderID = ?
+            ORDER BY wod.DetailID
+        """;
+
+        List<WorkOrderDetailView> details = new ArrayList<>();
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, workOrderID);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                WorkOrderDetailView detail = new WorkOrderDetailView();
+                detail.setDetailID(rs.getInt("DetailID"));
+                detail.setWorkOrderID(rs.getInt("WorkOrderID"));
+                detail.setSource(rs.getString("source"));
+                detail.setDiagnosticID(rs.getObject("diagnostic_id", Integer.class));
+                detail.setApprovalStatus(rs.getString("approval_status"));
+                detail.setTaskDescription(rs.getString("TaskDescription"));
+                detail.setEstimateAmount(rs.getBigDecimal("EstimateAmount"));
+                detail.setDetailStatus(rs.getString("detail_status"));
+                details.add(detail);
+            }
+        }
+        return details;
+    }
+
+    public void populateTaskAssignment(WorkOrderDetailView detail) throws SQLException {
+        String sql = """
+            SELECT 
+                ta.AssignmentID,
+                ta.AssignToTechID,
+                u.FullName as TechnicianName,
+                ta.AssignedDate,
+                ta.StartAt,
+                ta.CompleteAt,
+                ta.Status,
+                ta.task_type
+            FROM TaskAssignment ta
+            INNER JOIN Employee e ON ta.AssignToTechID = e.EmployeeID
+            INNER JOIN User u ON e.UserID = u.UserID
+            WHERE ta.DetailID = ?
+            LIMIT 1
+        """;
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, detail.getDetailID());
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                detail.setAssignmentID(rs.getInt("AssignmentID"));
+                detail.setTechnicianID(rs.getInt("AssignToTechID"));
+                detail.setTechnicianName(rs.getString("TechnicianName"));
+                detail.setAssignedDate(rs.getTimestamp("AssignedDate"));
+                detail.setStartAt(rs.getTimestamp("StartAt"));
+                detail.setCompleteAt(rs.getTimestamp("CompleteAt"));
+                detail.setTaskStatus(rs.getString("Status"));
+            }
+        }
+    }
+
+
+    public void populateVehicleDiagnostic(WorkOrderDetailView detail) throws SQLException {
+        if (detail.getAssignmentID() == null) return;
+
+        String sql = """
+            SELECT 
+                VehicleDiagnosticID,
+                IssueFound,
+                EstimateCost,
+                Status,
+                RejectReason
+            FROM VehicleDiagnostic
+            WHERE AssignmentID = ?
+        """;
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, detail.getAssignmentID());
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                detail.setVehicleDiagnosticID(rs.getInt("VehicleDiagnosticID"));
+                detail.setIssueFound(rs.getString("IssueFound"));
+                detail.setDiagnosticEstimateCost(rs.getBigDecimal("EstimateCost"));
+                detail.setDiagnosticStatus(rs.getString("Status"));
+                detail.setRejectReason(rs.getString("RejectReason"));
+            }
+        }
+    }
+
+    public List<DiagnosticPartView> getDiagnosticParts(int vehicleDiagnosticID) throws SQLException {
+        String sql = """
+            SELECT 
+                dp.DiagnosticPartID,
+                dp.VehicleDiagnosticID,
+                dp.PartDetailID,
+                dp.QuantityNeeded,
+                dp.UnitPrice,
+                dp.PartCondition,
+                dp.ReasonForReplacement,
+                dp.IsApproved,
+                p.PartCode,
+                p.PartName,
+                pd.Manufacturer,
+                pd.Description,
+                pd.SKU,
+                pd.Quantity as AvailableStock
+            FROM DiagnosticPart dp
+            INNER JOIN PartDetail pd ON dp.PartDetailID = pd.PartDetailID
+            INNER JOIN Part p ON pd.PartID = p.PartID
+            WHERE dp.VehicleDiagnosticID = ?
+            ORDER BY 
+                CASE dp.PartCondition
+                    WHEN 'REQUIRED' THEN 1
+                    WHEN 'RECOMMENDED' THEN 2
+                    WHEN 'OPTIONAL' THEN 3
+                END,
+                dp.DiagnosticPartID
+        """;
+
+        List<DiagnosticPartView> parts = new ArrayList<>();
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, vehicleDiagnosticID);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                DiagnosticPartView part = new DiagnosticPartView();
+                part.setDiagnosticPartID(rs.getInt("DiagnosticPartID"));
+                part.setVehicleDiagnosticID(rs.getInt("VehicleDiagnosticID"));
+                part.setPartDetailID(rs.getInt("PartDetailID"));
+                part.setQuantityNeeded(rs.getInt("QuantityNeeded"));
+                part.setUnitPrice(rs.getBigDecimal("UnitPrice"));
+                part.setPartCondition(rs.getString("PartCondition"));
+                part.setReasonForReplacement(rs.getString("ReasonForReplacement"));
+                part.setIsApproved(rs.getInt("IsApproved"));
+                part.setPartCode(rs.getString("PartCode"));
+                part.setPartName(rs.getString("PartName"));
+                part.setManufacturer(rs.getString("Manufacturer"));
+                part.setDescription(rs.getString("Description"));
+                part.setSku(rs.getString("SKU"));
+                part.setAvailableStock(rs.getInt("AvailableStock"));
+                parts.add(part);
+            }
+        }
+        return parts;
+    }
+
+    public boolean updateMultipleDiagnosticParts(List<Integer> partIDs, boolean isApproved)
+            throws SQLException {
+        if (partIDs == null || partIDs.isEmpty()) return false;
+
+        StringBuilder sql = new StringBuilder("UPDATE DiagnosticPart SET IsApproved = ? WHERE DiagnosticPartID IN (");
+        for (int i = 0; i < partIDs.size(); i++) {
+            sql.append("?");
+            if (i < partIDs.size() - 1) sql.append(",");
+        }
+        sql.append(")");
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            ps.setInt(1, isApproved ? 1 : 0);
+            for (int i = 0; i < partIDs.size(); i++) {
+                ps.setInt(i + 2, partIDs.get(i));
+            }
+
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    public boolean verifyPartOwnership(int diagnosticPartID, int customerID) throws SQLException {
+        String sql = """
+            SELECT 1
+            FROM DiagnosticPart dp
+            INNER JOIN VehicleDiagnostic vd ON dp.VehicleDiagnosticID = vd.VehicleDiagnosticID
+            INNER JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID
+            INNER JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID
+            INNER JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID
+            INNER JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID
+            WHERE dp.DiagnosticPartID = ? AND sr.CustomerID = ?
+        """;
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, diagnosticPartID);
+            ps.setInt(2, customerID);
+            ResultSet rs = ps.executeQuery();
+
+            return rs.next();
+        }
+    }
+
+    public boolean verifyDetailOwnership(int detailID, int customerID) throws SQLException {
+        String sql = """
+            SELECT 1
+            FROM WorkOrderDetail wod
+            INNER JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID
+            INNER JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID
+            WHERE wod.DetailID = ? AND sr.CustomerID = ?
+        """;
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, detailID);
+            ps.setInt(2, customerID);
+            ResultSet rs = ps.executeQuery();
+
+            return rs.next();
+        }
+    }
+
+    public boolean verifyDiagnosticOwnership(int vehicleDiagnosticID, int customerID) throws SQLException {
+        String sql = """
+            SELECT 1
+            FROM VehicleDiagnostic vd
+            INNER JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID
+            INNER JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID
+            INNER JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID
+            INNER JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID
+            WHERE vd.VehicleDiagnosticID = ? AND sr.CustomerID = ?
+        """;
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, vehicleDiagnosticID);
+            ps.setInt(2, customerID);
+            ResultSet rs = ps.executeQuery();
+
+            return rs.next();
+        }
+    }
+
+    public boolean verifyRequestOwnership(int requestID, int customerID) throws SQLException {
+        String sql = "SELECT 1 FROM ServiceRequest WHERE RequestID = ? AND CustomerID = ?";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, requestID);
+            ps.setInt(2, customerID);
+            ResultSet rs = ps.executeQuery();
+
+            return rs.next();
+        }
+    }
+
+    // Transaction helpers
+    public void beginTx() throws SQLException { getConnection().setAutoCommit(false); }
+    public void commitTx() throws SQLException { getConnection().commit(); getConnection().setAutoCommit(true); }
+    public void rollbackTx() {
+        try { getConnection().rollback(); getConnection().setAutoCommit(true); } catch (SQLException ignored) {}
+    }
+
+    // Lấy WorkOrderID từ VehicleDiagnostic
+    public Integer getWorkOrderIdByDiagnostic(int vehicleDiagnosticId) throws SQLException {
+        String sql = """
+        SELECT wo.WorkOrderID
+        FROM VehicleDiagnostic vd
+        JOIN TaskAssignment ta ON vd.AssignmentID = ta.AssignmentID
+        JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID
+        JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID
+        WHERE vd.VehicleDiagnosticID = ?
+    """;
+        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, vehicleDiagnosticId);
+            try (ResultSet rs = ps.executeQuery()) { return rs.next() ? rs.getInt(1) : null; }
+        }
+    }
+
+    // Accept VehicleDiagnostic
+    public void acceptVehicleDiagnostic(int vehicleDiagnosticId) throws SQLException {
+        String sql = "UPDATE VehicleDiagnostic SET Status = 'APPROVED' WHERE VehicleDiagnosticID = ?";
+        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, vehicleDiagnosticId);
+            ps.executeUpdate();
+        }
+    }
+
+    // Tạo WorkOrderDetail mới từ diagnostic
+    public int insertWorkOrderDetail(int workOrderId, String source, Integer diagnosticId,
+                                     String approvalStatus, String taskDescription,
+                                     BigDecimal estimateAmount, String detailStatus) throws SQLException {
+        String sql = """
+        INSERT INTO WorkOrderDetail (WorkOrderID, source, diagnostic_id, approval_status, TaskDescription, EstimateAmount, detail_status)
+        VALUES (?,?,?,?,?,?,?)
+    """;
+        try (Connection c = getConnection();
+             PreparedStatement ps = c.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setInt(1, workOrderId);
+            ps.setString(2, source);
+            if (diagnosticId == null) ps.setNull(3, Types.INTEGER); else ps.setInt(3, diagnosticId);
+            ps.setString(4, approvalStatus);
+            ps.setString(5, taskDescription);
+            ps.setBigDecimal(6, estimateAmount);
+            ps.setString(7, detailStatus);
+            ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) { return rs.next() ? rs.getInt(1) : 0; }
+        }
+    }
+
+    // Tạo WorkOrderPart từ part đã duyệt
+    public void insertWorkOrderPart(int detailId, int partDetailId, int qty,
+                                    BigDecimal unitPrice, BigDecimal totalPrice, String source) throws SQLException {
+        String sql = """
+        INSERT INTO WorkOrderPart (DetailID, PartDetailID, Quantity, UnitPrice, TotalPrice, Source)
+        VALUES (?,?,?,?,?,?)
+    """;
+        try (Connection c = getConnection(); PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, detailId);
+            ps.setInt(2, partDetailId);
+            ps.setInt(3, qty);
+            ps.setBigDecimal(4, unitPrice);
+            ps.setBigDecimal(5, totalPrice);
+            ps.setString(6, source);
+            ps.executeUpdate();
+        }
+    }
+
+
+
+
+
+
 }

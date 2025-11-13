@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.user.User;
+import service.diagnostic.CustomerDiagnosticService;
 import service.tracking.RepairTrackerService; // Service mới
 
 import java.io.IOException;
@@ -20,6 +21,7 @@ public class CustomerRepairTrackerServlet extends HttpServlet {
     // Khởi tạo Service và DAO cần thiết
     private final RepairTrackerService trackerService = new RepairTrackerService();
     private final CustomerDAO customerDAO = new CustomerDAO(); // Giả sử bạn có DAO này
+    private final CustomerDiagnosticService diagnosticService = new CustomerDiagnosticService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -48,7 +50,7 @@ public class CustomerRepairTrackerServlet extends HttpServlet {
             int requestID = Integer.parseInt(idParam);
 
             // 3. Gọi Service (KHÔNG gọi DAO) để lấy DTO (đã xử lý logic)
-            RepairJourneyView journey = trackerService.getProcessedJourney( requestID);
+            RepairJourneyView journey = trackerService.getProcessedJourney(customerID, requestID);
 
             // 4. Kiểm tra kết quả
             if (journey == null) {

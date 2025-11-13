@@ -68,6 +68,10 @@
                                    class="btn btn-primary btn-sm">
                                     <i class="bi bi-eye"></i> Theo dõi
                                 </a>
+
+                                        <a href="${pageContext.request.contextPath}/customer/workorder-detail?workOrderId=${item.workOrderId}"
+                                           class="btn btn-info btn-sm">Chi tiết
+                                        </a>
                             </td>
                         </tr>
                     </c:forEach>

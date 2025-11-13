@@ -1,6 +1,7 @@
 package service.tracking;
 
 import dao.customer.RepairJourneyDAO;
+import model.customer.CustomerDiagnosticsView;
 import model.dto.RepairJourneySummaryDTO;
 import model.dto.RepairJourneyView;
 import model.dto.RepairJourneyView.TimelineStage;
@@ -10,6 +11,7 @@ import model.feedback.Feedback;
 import model.invoice.Invoice;
 import model.workorder.ServiceRequest;
 import model.workorder.WorkOrder;
+import service.diagnostic.CustomerDiagnosticService;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -23,11 +25,11 @@ public class RepairTrackerService {
     private final RepairJourneyDAO journeyDAO = new RepairJourneyDAO();
     private static final int FEEDBACK_EXPIRATION_DAYS = 7;
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm, dd/MM/yyyy");
-
+    private CustomerDiagnosticService diagnosticService = new CustomerDiagnosticService();
     /**
      * Lấy và xử lý hành trình thành timeline có cấu trúc
      */
-    public RepairJourneyView getProcessedJourney( int requestId) throws SQLException {
+    public RepairJourneyView getProcessedJourney( int customerId, int requestId) throws SQLException {
 
         RepairJourneyView journey = journeyDAO.getRepairJourneyByRequestID( requestId);
 
@@ -37,6 +39,9 @@ public class RepairTrackerService {
 
         // Xây dựng timeline theo thứ tự
         buildTimeline(journey);
+
+        CustomerDiagnosticsView diagView = diagnosticService.getDiagnosticsForRequest(customerId, requestId);
+        journey.setDiagnosticsView(diagView);
 
         return journey;
     }

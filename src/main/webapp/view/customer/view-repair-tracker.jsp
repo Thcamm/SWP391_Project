@@ -237,6 +237,16 @@
 
                                 <%-- Action buttons cho các stage cụ thể --%>
                             <c:choose>
+
+                                <c:when test="${stage.stageType == 'WORK_ORDER'}">
+                                    <div class="stage-actions">
+                                        <a href="${pageContext.request.contextPath}/customer/diagnostic/tree?requestId=${journey.serviceRequest.requestID}"
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-clipboard-check"></i>
+                                            Xem chi tiết chẩn đoán &amp; phụ tùng
+                                        </a>
+                                    </div>
+                                </c:when>
                                 <%-- Invoice: Xem chi tiết hóa đơn --%>
                                 <c:when test="${stage.stageType == 'INVOICE' && journey.invoice != null &&
                                               (journey.invoice.paymentStatus == 'UNPAID' ||
