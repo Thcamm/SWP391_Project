@@ -246,7 +246,7 @@
 
     <!-- Assignment Modal -->
     <div class="modal fade" id="assignModal" tabindex="-1">
-         <div class="modal-dialog modal-lg">
+         <div class="modal-dialog modal-lg" style="max-height: 90vh; overflow-y: auto;">
             <div class="modal-content">
                 <form method="post" action="${pageContext.request.contextPath}/techmanager/assign-diagnosis">
                     <div class="modal-header bg-primary text-white">
