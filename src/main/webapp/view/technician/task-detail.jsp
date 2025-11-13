@@ -55,7 +55,7 @@
                             </div>
                             <div class="info-item">
                                 <div class="info-label">Service</div>
-                                <div class="info-value">${task.serviceInfo}</div>
+                                <div class="info-value">${task.taskDescription}</div>
                             </div>
                             <div class="info-item">
                                 <div class="info-label">Assigned Date</div>
