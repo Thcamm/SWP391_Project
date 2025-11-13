@@ -43,7 +43,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           </div>
 
           <!-- Critical Alerts -->
-          <c:if test="${stats.tasksNeedReassignment > 0 || stats.overdueTasks > 0 || stats.declinedTasks > 0}">
+          <c:if test="${stats.tasksNeedReassignment > 0 || stats.declinedTasks > 0}">
             <div class="row mb-4">
               <div class="col-12">
                 <div class="card border-danger">
@@ -63,18 +63,6 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                         <a href="${pageContext.request.contextPath}/techmanager/reassign-tasks" class="btn btn-danger">
                           <i class="bi bi-arrow-right"></i>
                           Reassign
-                        </a>
-                      </div>
-                    </c:if>
-                    <c:if test="${stats.overdueTasks > 0}">
-                      <div class="alert alert-danger d-flex align-items-center mb-2">
-                        <i class="bi bi-exclamation-octagon me-3 fs-4"></i>
-                        <div class="flex-grow-1">
-                          <strong>${stats.overdueTasks} Overdue Task(s)</strong>
-                        </div>
-                        <a href="${pageContext.request.contextPath}/techmanager/overdue-tasks" class="btn btn-danger">
-                          <i class="bi bi-arrow-right"></i>
-                          View
                         </a>
                       </div>
                     </c:if>
@@ -136,13 +124,13 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                 </div>
                 <div class="card-body">
                   <div class="row g-3">
-                    <!-- GĐ1: Service Requests -->
+                    <!-- Approve & Classify Service Requests -->
                     <div class="col-md-4">
                       <a
                         href="${pageContext.request.contextPath}/techmanager/service-requests"
                         class="btn btn-outline-primary w-100 p-3">
                         <i class="bi bi-clipboard-check fs-3 d-block mb-2"></i>
-                        <strong>GĐ1: Approve & Classify</strong>
+                        <strong>Approve & Classify</strong>
                         <small class="text-muted d-block">Service Requests (Direct Classification)</small>
                         <span class="badge bg-primary d-block mt-2">${stats.pendingRequests} Pending</span>
                       </a>
@@ -154,7 +142,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                         href="${pageContext.request.contextPath}/techmanager/assign-diagnosis"
                         class="btn btn-outline-info w-100 p-3">
                         <i class="bi bi-person-plus fs-3 d-block mb-2"></i>
-                        <strong>GĐ3: Assign Diagnosis</strong>
+                        <strong>Assign Diagnosis</strong>
                         <small class="text-muted d-block">DIAGNOSTIC only</small>
                         <span class="badge bg-info d-block mt-2">
                           ${stats.assignedDiagnosis + stats.inProgressDiagnosis} Active
@@ -162,13 +150,12 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                       </a>
                     </div>
 
-                    <!-- GĐ5: Assign Repair -->
                     <div class="col-md-4">
                       <a
                         href="${pageContext.request.contextPath}/techmanager/assign-repair"
                         class="btn btn-outline-warning w-100 p-3">
                         <i class="bi bi-tools fs-3 d-block mb-2"></i>
-                        <strong>GĐ5: Assign Repair</strong>
+                        <strong>Assign Repair</strong>
                         <small class="text-muted d-block">REQUEST + DIAGNOSTIC</small>
                         <span class="badge bg-warning d-block mt-2">${stats.unassignedWorkOrderDetails} Waiting</span>
                       </a>
@@ -191,15 +178,6 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                 </div>
                 <div class="card-body">
                   <div class="row g-3">
-                    <div class="col-md-4">
-                      <a
-                        href="${pageContext.request.contextPath}/techmanager/overdue-tasks"
-                        class="btn btn-outline-danger w-100 p-3">
-                        <i class="bi bi-exclamation-octagon fs-3 d-block mb-2 text-danger"></i>
-                        <strong>Overdue Tasks</strong>
-                        <span class="badge bg-danger d-block mt-2">${stats.overdueTasks} Tasks</span>
-                      </a>
-                    </div>
                     <div class="col-md-4">
                       <a
                         href="${pageContext.request.contextPath}/techmanager/declined-tasks"

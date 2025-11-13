@@ -34,7 +34,8 @@ public class TaskReassignmentDAO {
     public List<TaskReassignmentDTO> getCancelledTasks() throws SQLException {
         List<TaskReassignmentDTO> tasks = new ArrayList<>();
 
-        String sql = "SELECT ta.AssignmentID, ta.task_type, ta.planned_start, ta.planned_end, " +
+        String sql = "SELECT ta.AssignmentID, ta.DetailID, wod.WorkOrderID, ta.task_type, ta.planned_start, ta.planned_end, "
+                +
                 "ta.TaskDescription, ta.AssignedDate, ta.declined_at, ta.decline_reason, " +
                 "CONCAT(v.Brand, ' ', v.Model, ' - ', v.LicensePlate) AS vehicle_info, " +
                 "tech_user.FullName AS technician_name, " +
@@ -55,7 +56,7 @@ public class TaskReassignmentDAO {
                 "WHERE ta.Status = 'CANCELLED' " +
                 "AND (ta.declined_at IS NOT NULL OR " +
                 "     (ta.planned_start IS NOT NULL AND ta.planned_start < NOW())) " +
-                "ORDER BY ta.AssignedDate DESC";
+                "ORDER BY wo.WorkOrderID, ta.AssignedDate DESC";
 
         try (Connection conn = DbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
@@ -64,6 +65,8 @@ public class TaskReassignmentDAO {
             while (rs.next()) {
                 TaskReassignmentDTO task = new TaskReassignmentDTO();
                 task.setAssignmentId(rs.getInt("AssignmentID"));
+                task.setDetailId(rs.getInt("DetailID"));
+                task.setWorkOrderId(rs.getInt("WorkOrderID"));
                 task.setTaskType(rs.getString("task_type"));
 
                 Timestamp plannedStartTs = rs.getTimestamp("planned_start");

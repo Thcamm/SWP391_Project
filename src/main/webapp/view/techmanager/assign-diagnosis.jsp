@@ -23,10 +23,10 @@
         <div class="content-wrapper">
             <div class="page-header">
                 <h1 class="h2">
-                    <i class="bi bi-person-check"></i> GĐ3: Assign Diagnosis Tasks
+                    <i class="bi bi-person-check"></i> Assign Diagnosis Tasks
                 </h1>
                 <p class="text-muted">
-                    <strong>LUỔNG MỚI:</strong> Only <span class="badge bg-info">DIAGNOSTIC</span> services (from GƯ2 Triage) appear here.<br>
+
                     <span class="badge bg-success">NEW:</span> You can assign the same WorkOrderDetail to <strong>multiple technicians</strong> for different diagnosis tasks.
                 </p>
                 <div class="btn-toolbar">
@@ -142,24 +142,46 @@
                                 </div>
                             </c:when>
                             <c:otherwise>
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>WO #</th>
-                                                <th>Vehicle</th>
-                                                <th>Customer</th>
-                                                <th>Task Description</th>
-                                                <th>Est. Hours</th>
-                                                <th>Created At</th>
-                                                <th>Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <c:forEach items="${pendingDetails}" var="detail">
-                                                <tr>
-                                                    <td><strong>#${detail.workOrderId}</strong></td>
-                                                    <td>
+                                <c:set var="currentWO" value="" />
+                                <c:forEach items="${pendingDetails}" var="detail">
+                                    <c:if test="${detail.workOrderId != currentWO}">
+                                        <c:if test="${currentWO != ''}">
+                                            </tbody></table></div></div></div>
+                                        </c:if>
+                                        <div class="card mb-3" style="border-left: 4px solid #0d6efd;">
+                                            <div class="card-header bg-light d-flex justify-content-between" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#woGroup${detail.workOrderId}">
+                                                <div>
+                                                    <h6 class="mb-1">
+                                                        <i class="bi bi-file-earmark-text"></i>
+                                                        <strong>Work Order #${detail.workOrderId}</strong>
+                                                    </h6>
+                                                    <small class="text-muted">
+                                                        <i class="bi bi-car-front"></i> ${detail.vehicleInfo} |
+                                                        <i class="bi bi-person"></i> ${detail.customerName}
+                                                    </small>
+                                                </div>
+                                                <i class="bi bi-chevron-down"></i>
+                                            </div>
+                                            <div id="woGroup${detail.workOrderId}" class="collapse show">
+                                                <div class="card-body p-0">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-hover mb-0">
+                                                            <thead class="table-light">
+                                                                <tr>
+                                                                    <th>Detail #</th>
+                                                                    <th>Task Description</th>
+                                                                    <th>Est. Hours</th>
+                                                                    <th>Created At</th>
+                                                                    <th>Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                        <c:set var="currentWO" value="${detail.workOrderId}" />
+                                    </c:if>
+                                    <tr>
+                                        <td><strong class="text-primary">#${detail.detailId}</strong></td>
+                                        <td>${detail.taskDescription}</td>
+                                        <td>${detail.estimateHours} hrs</td>
                                                         <i class="bi bi-car-front"></i>
                                                         ${detail.vehicleInfo}
                                                     </td>
@@ -224,7 +246,7 @@
 
     <!-- Assignment Modal -->
     <div class="modal fade" id="assignModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-scrollable">
+         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form method="post" action="${pageContext.request.contextPath}/techmanager/assign-diagnosis">
                     <div class="modal-header bg-primary text-white">

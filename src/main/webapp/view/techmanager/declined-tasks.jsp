@@ -75,56 +75,72 @@ prefix="c" %>
                 </div>
               </c:when>
               <c:otherwise>
-                <div class="table-responsive">
-                  <table class="table table-hover">
-                    <thead>
-                      <tr>
-                        <th>Task ID</th>
-                        <th>Type</th>
-                        <th>Vehicle</th>
-                        <th>Customer</th>
-                        <th>Declined By</th>
-                        <th>Declined At</th>
-                        <th>Reason</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <c:forEach items="${declinedTasks}" var="task">
-                        <tr>
-                          <td><strong>#${task.assignmentId}</strong></td>
-                          <td>
-                            <span class="badge bg-primary">${task.taskType}</span>
-                          </td>
-                          <td>
-                            <i class="bi bi-car-front"></i>
-                            ${task.vehicleInfo}
-                          </td>
-                          <td>
-                            <i class="bi bi-person"></i>
-                            ${task.customerName}
-                          </td>
-                          <td>
-                            <i class="bi bi-person-badge"></i>
-                            ${task.technicianName}
-                          </td>
-                          <td>
-                            <i class="bi bi-calendar-x text-warning"></i>
-                            ${task.declinedAt}
-                          </td>
-                          <td>
-                            <button
-                              type="button"
-                              class="btn btn-sm btn-outline-warning"
-                              data-bs-toggle="modal"
-                              data-bs-target="#reasonModal${task.assignmentId}">
-                              <i class="bi bi-chat-square-text"></i>
-                              View Reason
-                            </button>
-                          </td>
-                        </tr>
+                <c:set var="currentWOId" value="" />
+                <c:forEach items="${declinedTasks}" var="task">
+                  <c:if test="${task.workOrderId != currentWOId}">
+                    <c:if test="${currentWOId != ''}">
+                      </tbody></table></div></div></div></div>
+                    </c:if>
+                    <div class="card mb-3" style="border-left: 4px solid #ffc107;">
+                      <div class="card-header bg-light d-flex justify-content-between" style="cursor: pointer;" data-bs-toggle="collapse" data-bs-target="#woDecline${task.workOrderId}">
+                        <div>
+                          <h6 class="mb-1">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <strong>Work Order #${task.workOrderId}</strong>
+                            <span class="badge bg-warning text-dark ms-2">Has Declined Tasks</span>
+                          </h6>
+                          <small class="text-muted">
+                            <i class="bi bi-car-front"></i> ${task.vehicleInfo} |
+                            <i class="bi bi-person"></i> ${task.customerName}
+                          </small>
+                        </div>
+                        <i class="bi bi-chevron-down"></i>
+                      </div>
+                      <div id="woDecline${task.workOrderId}" class="collapse show">
+                        <div class="card-body p-0">
+                          <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                              <thead class="table-light">
+                                <tr>
+                                  <th>Detail #</th>
+                                  <th>Assignment #</th>
+                                  <th>Type</th>
+                                  <th>Declined By</th>
+                                  <th>Declined At</th>
+                                  <th>Reason</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                    <c:set var="currentWOId" value="${task.workOrderId}" />
+                  </c:if>
+                  <tr>
+                    <td><strong class="text-primary">#${task.detailId}</strong></td>
+                    <td><strong>#${task.assignmentId}</strong></td>
+                    <td>
+                      <span class="badge bg-primary">${task.taskType}</span>
+                    </td>
+                    <td>
+                      <i class="bi bi-person-badge"></i>
+                      ${task.technicianName}
+                    </td>
+                    <td>
+                      <i class="bi bi-calendar-x text-warning"></i>
+                      ${task.declinedAt}
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-outline-warning"
+                        data-bs-toggle="modal"
+                        data-bs-target="#reasonModal${task.assignmentId}">
+                        <i class="bi bi-chat-square-text"></i>
+                        View Reason
+                      </button>
+                    </td>
+                  </tr>
 
-                        <!-- Reason Modal for each task -->
-                        <div class="modal fade" id="reasonModal${task.assignmentId}" tabindex="-1">
+                  <!-- Reason Modal for each task -->
+                  <div class="modal fade" id="reasonModal${task.assignmentId}" tabindex="-1">
                           <div class="modal-dialog">
                             <div class="modal-content">
                               <div class="modal-header bg-warning text-dark">
@@ -188,10 +204,11 @@ prefix="c" %>
                             </div>
                           </div>
                         </div>
-                      </c:forEach>
-                    </tbody>
-                  </table>
-                </div>
+                      </div>
+                </c:forEach>
+                <c:if test="${not empty declinedTasks}">
+                  </tbody></table></div></div></div></div>
+                </c:if>
 
                 <!-- Info Box -->
                 <div class="alert alert-info mt-3">

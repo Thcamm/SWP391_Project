@@ -34,7 +34,8 @@ public class DeclinedTaskDAO {
     public List<DeclinedTaskDTO> getDeclinedTasks() throws SQLException {
         List<DeclinedTaskDTO> tasks = new ArrayList<>();
 
-        String sql = "SELECT ta.AssignmentID, ta.task_type, ta.planned_start, ta.planned_end, " +
+        String sql = "SELECT ta.AssignmentID, ta.DetailID, wod.WorkOrderID, ta.task_type, ta.planned_start, ta.planned_end, "
+                +
                 "ta.TaskDescription, ta.AssignedDate, ta.declined_at, ta.decline_reason, " +
                 "COALESCE(CONCAT(v.Brand, ' ', v.Model, ' - ', v.LicensePlate), 'N/A') AS vehicle_info, " +
                 "tech_user.FullName AS technician_name, " +
@@ -50,7 +51,7 @@ public class DeclinedTaskDAO {
                 "JOIN User tech_user ON e.UserID = tech_user.UserID " +
                 "WHERE ta.declined_at IS NOT NULL " +
                 "AND ta.Status = 'DECLINED' " +
-                "ORDER BY ta.declined_at DESC";
+                "ORDER BY wo.WorkOrderID, ta.declined_at DESC";
 
         System.out.println("[DeclinedTaskDAO] ===== Executing query =====");
         System.out.println("[DeclinedTaskDAO] SQL: " + sql);
@@ -70,6 +71,8 @@ public class DeclinedTaskDAO {
 
                     DeclinedTaskDTO task = new DeclinedTaskDTO();
                     task.setAssignmentId(rs.getInt("AssignmentID"));
+                    task.setDetailId(rs.getInt("DetailID"));
+                    task.setWorkOrderId(rs.getInt("WorkOrderID"));
                     task.setTaskType(rs.getString("task_type"));
 
                     Timestamp plannedStartTs = rs.getTimestamp("planned_start");

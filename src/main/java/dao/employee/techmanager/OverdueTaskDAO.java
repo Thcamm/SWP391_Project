@@ -14,7 +14,8 @@ import java.util.List;
 
 /**
  * DAO for Overdue Task operations.
- * Handles database queries for tasks that violated SLA (past planned_start time).
+ * Handles database queries for tasks that violated SLA (past planned_start
+ * time).
  * 
  * @author SWP391 Team
  * @version 1.0
@@ -33,7 +34,8 @@ public class OverdueTaskDAO {
     public List<OverdueTaskDTO> getOverdueTasks() throws SQLException {
         List<OverdueTaskDTO> tasks = new ArrayList<>();
 
-        String sql = "SELECT ta.AssignmentID, ta.task_type, ta.planned_start, ta.planned_end, " +
+        String sql = "SELECT ta.AssignmentID, ta.DetailID, wod.WorkOrderID, ta.task_type, ta.planned_start, ta.planned_end, "
+                +
                 "ta.TaskDescription, ta.AssignedDate, " +
                 "CONCAT(v.Brand, ' ', v.Model, ' - ', v.LicensePlate) AS vehicle_info, " +
                 "u_tech.FullName AS technician_name, " +
@@ -51,15 +53,17 @@ public class OverdueTaskDAO {
                 "AND ta.StartAt IS NULL " +
                 "AND ta.planned_start IS NOT NULL " +
                 "AND ta.planned_start < NOW() " +
-                "ORDER BY ta.planned_start ASC";
+                "ORDER BY wo.WorkOrderID, ta.planned_start ASC";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 OverdueTaskDTO task = new OverdueTaskDTO();
                 task.setAssignmentId(rs.getInt("AssignmentID"));
+                task.setDetailId(rs.getInt("DetailID"));
+                task.setWorkOrderId(rs.getInt("WorkOrderID"));
                 task.setTaskType(rs.getString("task_type"));
 
                 Timestamp plannedStartTs = rs.getTimestamp("planned_start");
@@ -102,7 +106,7 @@ public class OverdueTaskDAO {
         String sql = "UPDATE TaskAssignment SET Status = 'CANCELLED' WHERE AssignmentID = ?";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, assignmentId);
             int rowsAffected = ps.executeUpdate();
