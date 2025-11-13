@@ -4,6 +4,7 @@ import common.DbContext;
 import model.dto.ServiceHistoryDTO;
 import model.dto.ServiceRequestViewDTO;
 import model.workorder.ServiceRequest;
+import model.workorder.ServiceRequestDetail;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -287,5 +288,73 @@ public class ServiceRequestDAO extends DbContext {
 
         }
         return null;
+
+    /**
+     * LUỒNG MỚI - GĐ 1: Get all ServiceRequestDetail for a given RequestID
+     * Returns list of individual services to split into N WorkOrderDetails
+     * 
+     * @param requestId The ServiceRequest ID
+     * @return List of ServiceRequestDetail with service information
+     * @throws SQLException if query fails
+     */
+    public List<ServiceRequestDetail> getServiceRequestDetails(int requestId) throws SQLException {
+        List<ServiceRequestDetail> details = new ArrayList<>();
+        String sql = "SELECT srd.DetailID, srd.RequestID, srd.ServiceID, " +
+                     "       st.ServiceName, st.Category, st.UnitPrice " +
+                     "FROM ServiceRequestDetail srd " +
+                     "JOIN Service_Type st ON srd.ServiceID = st.ServiceID " +
+                     "WHERE srd.RequestID = ? " +
+                     "ORDER BY srd.DetailID";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, requestId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ServiceRequestDetail detail = new ServiceRequestDetail();
+                    detail.setDetailId(rs.getInt("DetailID"));
+                    detail.setRequestId(rs.getInt("RequestID"));
+                    detail.setServiceId(rs.getInt("ServiceID"));
+                    detail.setServiceName(rs.getString("ServiceName"));
+                    // Use Category as description (Service_Type table doesn't have Description column)
+                    detail.setServiceDescription(rs.getString("Category"));
+                    detail.setServiceUnitPrice(rs.getBigDecimal("UnitPrice"));
+                    details.add(detail);
+                }
+            }
+        }
+        return details;
+    }
+
+    /**
+     * LUỒNG MỚI - GĐ 1: Get ServiceRequestDetail with Connection (for transaction)
+     */
+    public List<ServiceRequestDetail> getServiceRequestDetails(Connection conn, int requestId) throws SQLException {
+        List<ServiceRequestDetail> details = new ArrayList<>();
+        String sql = "SELECT srd.DetailID, srd.RequestID, srd.ServiceID, " +
+                     "       st.ServiceName, st.Category, st.UnitPrice " +
+                     "FROM ServiceRequestDetail srd " +
+                     "JOIN Service_Type st ON srd.ServiceID = st.ServiceID " +
+                     "WHERE srd.RequestID = ? " +
+                     "ORDER BY srd.DetailID";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, requestId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ServiceRequestDetail detail = new ServiceRequestDetail();
+                    detail.setDetailId(rs.getInt("DetailID"));
+                    detail.setRequestId(rs.getInt("RequestID"));
+                    detail.setServiceId(rs.getInt("ServiceID"));
+                    detail.setServiceName(rs.getString("ServiceName"));
+                    // Use Category as description (Service_Type table doesn't have Description column)
+                    detail.setServiceDescription(rs.getString("Category"));
+                    detail.setServiceUnitPrice(rs.getBigDecimal("UnitPrice"));
+                    details.add(detail);
+                }
+            }
+        }
+        return details;
     }
 }

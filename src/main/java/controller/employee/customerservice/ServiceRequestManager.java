@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-@WebServlet( urlPatterns = {"/customerservice/requests"})
+@WebServlet(urlPatterns = { "/customerservice/requests" })
 public class ServiceRequestManager extends HttpServlet {
 
     @Override
@@ -79,7 +79,6 @@ public class ServiceRequestManager extends HttpServlet {
             session.setAttribute("errorMessage", "An error occurred while updating status.");
         }
 
-        response.sendRedirect(request.getContextPath() + "/customerservice/requests");
+        response.sendRedirect(request.getContextPath() + "/customerservice/requestRequests");
     }
 }
-

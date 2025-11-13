@@ -7,19 +7,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import model.dto.ServiceRequestViewDTO;
+import model.employee.techmanager.PendingServiceRequestDTO;
 import service.employee.techmanager.ServiceRequestApprovalService;
 import service.employee.techmanager.TechManagerService;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * TechManager: View and Approve Pending ServiceRequests (GĐ0 → GĐ1)
+ * TechManager: View and Approve Pending ServiceRequests (LUỒNG MỚI - GĐ 1)
  * 
  * @author SWP391 Team
- * @version 3.0 (Refactored to use TechManagerService for business logic)
+ * @version REFACTORED - Triage Workflow (GĐ 1 → Redirect to GĐ 2)
  */
 @WebServlet("/techmanager/service-requests")
 public class ServiceRequestApprovalServlet extends HttpServlet {
@@ -34,7 +36,9 @@ public class ServiceRequestApprovalServlet extends HttpServlet {
     }
 
     /**
-     * GET: Display pending service requests
+     * GET: Display pending service requests (LUỒNG MỚI - GĐ 1)
+     * 
+     * Simplified - No need to pre-load services (classification happens in GĐ 2)
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -42,7 +46,22 @@ public class ServiceRequestApprovalServlet extends HttpServlet {
 
         try {
             // Get pending service requests
-            List<ServiceRequestViewDTO> pendingRequests = serviceRequestApprovalService.getPendingServiceRequests();
+            List<PendingServiceRequestDTO> pendingRequests = serviceRequestApprovalService.getPendingServiceRequests();
+
+            System.out.println("=== [LUỒNG MỚI - GĐ 1] GET /service-requests ===");
+            System.out.println("Total pending requests: " + pendingRequests.size());
+            for (PendingServiceRequestDTO req : pendingRequests) {
+                System.out.println("  - Request #" + req.getRequestId() +
+                        " | Status: " + req.getStatus() +
+                        " | Customer: " + req.getCustomerName());
+
+                // Pre-load services for preview (read-only display)
+                List<model.workorder.ServiceRequestDetail> services = serviceRequestApprovalService
+                        .getServicesForRequest(req.getRequestId());
+                req.setServices(services);
+                System.out.println("    → Loaded " + services.size() + " service(s) for preview");
+            }
+            System.out.println("==============================================");
 
             request.setAttribute("pendingRequests", pendingRequests);
             request.setAttribute("totalPending", pendingRequests.size());
@@ -62,7 +81,7 @@ public class ServiceRequestApprovalServlet extends HttpServlet {
     /**
      * POST: Handle approval/rejection actions
      * 
-     * Thin controller: Extracts parameters, calls Service, redirects
+     * LUỒNG MỚI (GĐ 1): Approve → Redirect to Triage (GĐ 2)
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -77,69 +96,6 @@ public class ServiceRequestApprovalServlet extends HttpServlet {
             handleRejection(request, response);
         } else {
             response.sendRedirect(request.getContextPath() + "/techmanager/service-requests");
-        }
-    }
-
-    /**
-     * Handle Service Request Approval - NOW USES TechManagerService
-     * 
-     * Reduced from 90+ lines to 45 lines (50% reduction)
-     * Transaction management moved to Service layer
-     */
-    private void handleApproval(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
-
-        try {
-            // === STEP 1: Extract parameters ===
-            int requestId = Integer.parseInt(request.getParameter("requestId"));
-            String notes = request.getParameter("taskDescription"); // Optional notes
-
-            // Get current TechManager's EmployeeID from session
-            HttpSession session = request.getSession();
-            String userName = (String) session.getAttribute("userName");
-
-            if (userName == null) {
-                response.sendRedirect(request.getContextPath() + "/login");
-                return;
-            }
-
-            Integer techManagerEmployeeId = serviceRequestApprovalService.getTechManagerEmployeeId(userName);
-
-            if (techManagerEmployeeId == null) {
-                request.setAttribute("errorMessage", "TechManager employee record not found");
-                doGet(request, response);
-                return;
-            }
-
-            // === STEP 2: Call Service layer (handles transaction internally) ===
-            int workOrderId = techManagerService.approveServiceRequestAndCreateWorkOrder(
-                    requestId,
-                    techManagerEmployeeId,
-                    notes);
-
-            // === STEP 3: Redirect with success message ===
-            response.sendRedirect(request.getContextPath() +
-                    "/techmanager/service-requests?message=" +
-                    java.net.URLEncoder.encode("Service Request approved. WorkOrder #" + workOrderId + " created.",
-                            "UTF-8")
-                    +
-                    "&type=success");
-
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            // Business logic errors (validation failures)
-            response.sendRedirect(request.getContextPath() +
-                    "/techmanager/service-requests?message=" +
-                    java.net.URLEncoder.encode(e.getMessage(), "UTF-8") +
-                    "&type=warning");
-
-        } catch (Exception e) {
-            // Unexpected errors
-            System.err.println("Error approving service request: " + e.getMessage());
-            e.printStackTrace();
-            response.sendRedirect(request.getContextPath() +
-                    "/techmanager/service-requests?message=" +
-                    java.net.URLEncoder.encode("Error: " + e.getMessage(), "UTF-8") +
-                    "&type=error");
         }
     }
 
@@ -166,6 +122,119 @@ public class ServiceRequestApprovalServlet extends HttpServlet {
 
         } catch (Exception e) {
             System.err.println("Error rejecting service request: " + e.getMessage());
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() +
+                    "/techmanager/service-requests?message=" +
+                    java.net.URLEncoder.encode("Error: " + e.getMessage(), "UTF-8") +
+                    "&type=error");
+        }
+    }
+
+    /**
+     * LUỒNG MỚI (GĐ 1): Handle Approval → Redirect to Triage (GĐ 2)
+     * 
+     * OLD LOGIC DELETED:
+     * - No more immediate classification
+     * - No more staying on same page
+     * 
+     * NEW LOGIC (Direct Classification):
+     * 1. TechManager classifies each service (REQUEST/DIAGNOSTIC) during approval
+     * 2. Create WorkOrder with PENDING status
+     * 3. Create WorkOrderDetails with source set immediately
+     */
+    private void handleApproval(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        try {
+            int requestId = Integer.parseInt(request.getParameter("requestId"));
+
+            // Get current TechManager's EmployeeID from session
+            HttpSession session = request.getSession();
+            String userName = (String) session.getAttribute("userName");
+
+            if (userName == null) {
+                response.sendRedirect(request.getContextPath() + "/login");
+                return;
+            }
+
+            Integer techManagerEmployeeId = serviceRequestApprovalService.getTechManagerEmployeeId(userName);
+
+            if (techManagerEmployeeId == null) {
+                response.sendRedirect(request.getContextPath() +
+                        "/techmanager/service-requests?message=" +
+                        java.net.URLEncoder.encode("TechManager employee record not found", "UTF-8") +
+                        "&type=error");
+                return;
+            }
+
+            // === GĐ 1: Approve ServiceRequest & Create N WODs with source classification
+            // ===
+
+            // Parse source classifications from request
+            String totalServicesStr = request.getParameter("totalServices");
+            if (totalServicesStr == null) {
+                throw new IllegalArgumentException("Missing totalServices parameter");
+            }
+
+            int totalServices = Integer.parseInt(totalServicesStr);
+            Map<Integer, String> sourceClassifications = new HashMap<>();
+
+            for (int i = 0; i < totalServices; i++) {
+                String serviceDetailIdStr = request.getParameter("serviceDetailId_" + i);
+                String source = request.getParameter("source_" + i);
+
+                if (serviceDetailIdStr != null && source != null) {
+                    int serviceDetailId = Integer.parseInt(serviceDetailIdStr);
+
+                    if (!source.equals("REQUEST") && !source.equals("DIAGNOSTIC")) {
+                        throw new IllegalArgumentException("Invalid source value: " + source);
+                    }
+
+                    sourceClassifications.put(serviceDetailId, source);
+                    System.out.println("  [Classification] Service Detail #" + serviceDetailId + " → " + source);
+                }
+            }
+
+            if (sourceClassifications.isEmpty()) {
+                throw new IllegalArgumentException("No source classifications provided");
+            }
+
+            int workOrderId = techManagerService.approveServiceRequest(requestId, techManagerEmployeeId,
+                    sourceClassifications);
+
+            if (workOrderId <= 0) {
+                throw new SQLException("Failed to create WorkOrder");
+            }
+
+            System.out.println(
+                    "✓ [GĐ 1] ServiceRequest #" + requestId + " approved → WorkOrder #" + workOrderId + " created with "
+                            + sourceClassifications.size() + " classified services");
+
+            // === REDIRECT to service requests page with success message ===
+            response.sendRedirect(request.getContextPath() +
+                    "/techmanager/service-requests?message=" +
+                    java.net.URLEncoder.encode("ServiceRequest approved! WorkOrder #" + workOrderId + " created.",
+                            "UTF-8")
+                    +
+                    "&type=success");
+
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid request ID: " + e.getMessage());
+            response.sendRedirect(request.getContextPath() +
+                    "/techmanager/service-requests?message=" +
+                    java.net.URLEncoder.encode("Invalid request ID", "UTF-8") +
+                    "&type=error");
+
+        } catch (SQLException e) {
+            System.err.println("Error approving service request: " + e.getMessage());
+            e.printStackTrace();
+            response.sendRedirect(request.getContextPath() +
+                    "/techmanager/service-requests?message=" +
+                    java.net.URLEncoder.encode("Error: " + e.getMessage(), "UTF-8") +
+                    "&type=error");
+
+        } catch (Exception e) {
+            System.err.println("Unexpected error: " + e.getMessage());
             e.printStackTrace();
             response.sendRedirect(request.getContextPath() +
                     "/techmanager/service-requests?message=" +

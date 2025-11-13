@@ -39,15 +39,21 @@ public class TaskReassignmentService {
     /**
      * Reassign task to new technician with validation.
      * 
-     * @param assignmentId task assignment ID
+     * @param assignmentId    task assignment ID
      * @param newTechnicianId new technician ID
-     * @param plannedStart new planned start time (nullable)
-     * @param plannedEnd new planned end time (nullable)
+     * @param taskDescription new task description for the assignment
+     * @param plannedStart    new planned start time (nullable)
+     * @param plannedEnd      new planned end time (nullable)
      * @return success message or error message
      * @throws SQLException if database error occurs
      */
-    public String reassignTask(int assignmentId, int newTechnicianId,
-                                LocalDateTime plannedStart, LocalDateTime plannedEnd) throws SQLException {
+    public String reassignTask(int assignmentId, int newTechnicianId, String taskDescription,
+            LocalDateTime plannedStart, LocalDateTime plannedEnd) throws SQLException {
+
+        // Validate task description
+        if (taskDescription == null || taskDescription.trim().isEmpty()) {
+            return "Task description is required for reassignment";
+        }
 
         // Validate technician exists
         Employee technician = technicianDAO.getTechnicianById(newTechnicianId);
@@ -63,7 +69,8 @@ public class TaskReassignmentService {
         }
 
         // Perform reassignment
-        boolean success = taskReassignmentDAO.reassignTask(assignmentId, newTechnicianId, plannedStart, plannedEnd);
+        boolean success = taskReassignmentDAO.reassignTask(
+                assignmentId, newTechnicianId, taskDescription, plannedStart, plannedEnd);
 
         if (success) {
             return "Task reassigned successfully to " + technician.getFullName();

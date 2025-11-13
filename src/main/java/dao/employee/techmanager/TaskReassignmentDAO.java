@@ -58,8 +58,8 @@ public class TaskReassignmentDAO {
                 "ORDER BY ta.AssignedDate DESC";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 TaskReassignmentDTO task = new TaskReassignmentDTO();
@@ -106,21 +106,24 @@ public class TaskReassignmentDAO {
 
     /**
      * Reassign task to new technician with new scheduling.
-     * Updates: AssignToTechID, Status='ASSIGNED', planned_start, planned_end
+     * Updates: AssignToTechID, TaskDescription, Status='ASSIGNED', planned_start,
+     * planned_end
      * Clears: declined_at, decline_reason
      * 
-     * @param assignmentId task assignment ID
+     * @param assignmentId    task assignment ID
      * @param newTechnicianId new technician ID
-     * @param plannedStart new planned start time (nullable)
-     * @param plannedEnd new planned end time (nullable)
+     * @param taskDescription new task description
+     * @param plannedStart    new planned start time (nullable)
+     * @param plannedEnd      new planned end time (nullable)
      * @return true if reassignment successful
      * @throws SQLException if database error occurs
      */
-    public boolean reassignTask(int assignmentId, int newTechnicianId,
-                                 LocalDateTime plannedStart, LocalDateTime plannedEnd) throws SQLException {
+    public boolean reassignTask(int assignmentId, int newTechnicianId, String taskDescription,
+            LocalDateTime plannedStart, LocalDateTime plannedEnd) throws SQLException {
 
         String sql = "UPDATE TaskAssignment SET " +
                 "AssignToTechID = ?, " +
+                "TaskDescription = ?, " +
                 "Status = 'ASSIGNED', " +
                 "planned_start = ?, " +
                 "planned_end = ?, " +
@@ -130,23 +133,24 @@ public class TaskReassignmentDAO {
                 "WHERE AssignmentID = ?";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, newTechnicianId);
+            ps.setString(2, taskDescription);
 
             if (plannedStart != null) {
-                ps.setTimestamp(2, Timestamp.valueOf(plannedStart));
-            } else {
-                ps.setNull(2, java.sql.Types.TIMESTAMP);
-            }
-
-            if (plannedEnd != null) {
-                ps.setTimestamp(3, Timestamp.valueOf(plannedEnd));
+                ps.setTimestamp(3, Timestamp.valueOf(plannedStart));
             } else {
                 ps.setNull(3, java.sql.Types.TIMESTAMP);
             }
 
-            ps.setInt(4, assignmentId);
+            if (plannedEnd != null) {
+                ps.setTimestamp(4, Timestamp.valueOf(plannedEnd));
+            } else {
+                ps.setNull(4, java.sql.Types.TIMESTAMP);
+            }
+
+            ps.setInt(5, assignmentId);
 
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;

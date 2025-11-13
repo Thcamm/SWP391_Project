@@ -23,8 +23,12 @@
         <div class="content-wrapper">
             <div class="page-header">
                 <h1 class="h2">
-                    <i class="bi bi-person-check"></i> Assign Diagnosis Tasks
+                    <i class="bi bi-person-check"></i> GĐ3: Assign Diagnosis Tasks
                 </h1>
+                <p class="text-muted">
+                    <strong>LUỔNG MỚI:</strong> Only <span class="badge bg-info">DIAGNOSTIC</span> services (from GƯ2 Triage) appear here.<br>
+                    <span class="badge bg-success">NEW:</span> You can assign the same WorkOrderDetail to <strong>multiple technicians</strong> for different diagnosis tasks.
+                </p>
                 <div class="btn-toolbar">
                     <a href="${pageContext.request.contextPath}/techmanager/service-requests" class="btn btn-sm btn-outline-secondary">
                         <i class="bi bi-arrow-left"></i> Back to Requests
@@ -235,8 +239,16 @@
                             <small>
                                 <strong>WO:</strong> <span id="modalWorkOrderInfo"></span><br>
                                 <strong>Vehicle:</strong> <span id="modalVehicleInfo"></span><br>
-                                <strong>Task:</strong> <span id="modalTaskDesc"></span>
+                                <strong>Overall Task:</strong> <span id="modalTaskDesc"></span>
                             </small>
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="taskDescription" class="form-label small">Specific Task for This Technician <span class="text-danger">*</span></label>
+                            <textarea class="form-control form-control-sm" name="taskDescription" id="taskDescription" rows="2" 
+                                      required
+                                      placeholder="E.g., 'Kiểm tra hệ thống phanh' or 'Chẩn đoán động cơ'"></textarea>
+                            <small class="text-muted">Describe what THIS technician will diagnose (you can assign this detail to multiple technicians)</small>
                         </div>
 
                         <div class="mb-2">

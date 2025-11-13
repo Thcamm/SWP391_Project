@@ -5,8 +5,7 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="context-path" content="${pageContext.request.contextPath}" />
-    <title>Service Requests - Tech Manager</title>
+    <title>GĐ1: Service Request Approval - Tech Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet" />
   </head>
@@ -18,18 +17,30 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
 
       <!-- Main Content -->
       <div class="content-wrapper">
-        <!-- Header -->
         <jsp:include page="header-techmanager.jsp" />
 
         <!-- Page Header -->
         <div class="page-header">
+          <h1 class="h2">
+            <i class="bi bi-clipboard-check text-primary"></i>
+            GĐ 1: Service Request Approval
+          </h1>
+          <p class="text-muted">
+            Review and approve pending service requests. After approval, you will classify services in GĐ 2 (Triage).
+          </p>
+        </div>
+
+        <div class="d-none">
           <div class="d-flex justify-content-between align-items-center">
             <div>
               <h2 class="mb-1">
                 <i class="bi bi-clipboard-check text-primary"></i>
-                Pending Service Requests
+                GĐ1 + GĐ2: Service Requests & Triage
               </h2>
-              <p class="text-muted mb-0">Review and approve customer service requests</p>
+              <p class="text-muted mb-0">
+                <strong>LUỒNG MỚI:</strong>
+                Approve & Classify services in one step
+              </p>
             </div>
             <button type="button" class="btn btn-outline-secondary" onclick="window.location.reload();">
               <i class="bi bi-arrow-clockwise"></i>
@@ -40,239 +51,303 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
 
         <!-- Alert Messages -->
         <c:if test="${not empty param.message}">
-          <c:choose>
-            <c:when test="${param.type == 'success'}">
-              <div class="alert alert-success alert-dismissible fade show">
-                <i class="bi bi-check-circle"></i>
-                ${param.message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-              </div>
-            </c:when>
-            <c:when test="${param.type == 'warning'}">
-              <div class="alert alert-warning alert-dismissible fade show">
-                <i class="bi bi-exclamation-triangle"></i>
-                ${param.message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-              </div>
-            </c:when>
-            <c:otherwise>
-              <div class="alert alert-danger alert-dismissible fade show">
-                <i class="bi bi-x-circle"></i>
-                ${param.message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-              </div>
-            </c:otherwise>
-          </c:choose>
+          <div
+            class="alert alert-${param.type == 'success' ? 'success' : param.type == 'warning' ? 'warning' : 'danger'} alert-dismissible fade show">
+            <i class="bi bi-${param.type == 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+            ${param.message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
         </c:if>
 
-        <!-- Stats Card -->
+        <!-- Stats -->
         <div class="row mb-4">
-          <div class="col-md-3">
+          <div class="col-md-4">
             <div class="card bg-warning text-white">
               <div class="card-body">
-                <h5 class="card-title">
+                <h5>
                   <i class="bi bi-clipboard-check"></i>
                   Pending Requests
                 </h5>
                 <h2 class="mb-0">${totalPending}</h2>
-                <small>Awaiting approval</small>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Requests Table -->
-        <div class="card">
-          <div class="card-header bg-white">
-            <h5 class="mb-0">
-              <i class="bi bi-list-ul"></i>
-              Pending Service Requests
-            </h5>
-          </div>
-          <div class="card-body p-0">
+        <!-- Service Requests List -->
+        <div class="card shadow-sm">
+          <div class="card-body">
             <c:choose>
               <c:when test="${empty pendingRequests}">
-                <div class="text-center p-5">
+                <div class="text-center py-5">
                   <i class="bi bi-inbox display-1 text-muted"></i>
-                  <h5 class="text-muted mt-3">No Pending Requests</h5>
-                  <p class="text-muted">All service requests have been processed.</p>
+                  <p class="text-muted mt-3">No pending service requests</p>
                 </div>
               </c:when>
               <c:otherwise>
-                <div class="table-responsive">
-                  <table class="table table-hover mb-0">
-                    <thead class="table-light">
-                      <tr>
-                        <th>Request ID</th>
-                        <th>Date</th>
-                        <th>Customer</th>
-                        <th>Vehicle</th>
-                        <th>Service</th>
-                        <th>Price</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <c:forEach var="req" items="${pendingRequests}">
-                        <tr>
-                          <td>
-                            <span class="badge bg-info">#${req.requestId}</span>
-                          </td>
-                          <td>
-                            <fmt:formatDate value="${req.requestDate}" pattern="dd/MM/yyyy HH:mm" />
-                          </td>
-                          <td>
-                            <strong>${req.customerName}</strong>
-                          </td>
-                          <td>
-                            <small class="text-muted">${req.vehicleInfo}</small>
-                          </td>
-                          <td>${req.serviceName}</td>
-                          <td>
-                            <strong class="text-success">
-                              <fmt:formatNumber value="${req.servicePrice}" type="currency" currencySymbol="₫" />
-                            </strong>
-                          </td>
-                          <td>
-                            <button
-                              class="btn btn-sm btn-success"
-                              data-bs-toggle="modal"
-                              data-bs-target="#approveModal"
-                              data-request-id="${req.requestId}"
-                              data-customer="${req.customerName}"
-                              data-vehicle="${req.vehicleInfo}"
-                              data-service="${req.serviceName}">
+                <c:forEach var="request" items="${pendingRequests}">
+                  <div class="card mb-3 border">
+                    <div class="card-header bg-light">
+                      <div class="row align-items-center">
+                        <div class="col-md-8">
+                          <h5 class="mb-0">
+                            <i class="bi bi-file-text text-primary"></i>
+                            Request #${request.requestId}
+                          </h5>
+                          <small class="text-muted">
+                            <i class="bi bi-calendar"></i>
+                            <fmt:formatDate value="${request.requestDate}" pattern="dd/MM/yyyy HH:mm" />
+                          </small>
+                        </div>
+                        <div class="col-md-4 text-end">
+                          <button
+                            type="button"
+                            class="btn btn-success"
+                            data-bs-toggle="modal"
+                            data-bs-target="#approveModal${request.requestId}">
+                            <i class="bi bi-check-circle"></i>
+                            Approve & Classify
+                          </button>
+                          <button type="button" class="btn btn-danger" onclick="rejectRequest('${request.requestId}')">
+                            <i class="bi bi-x-circle"></i>
+                            Reject
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <p>
+                            <strong>Customer:</strong>
+                            ${request.customerName}
+                          </p>
+                          <p>
+                            <strong>Phone:</strong>
+                            ${request.phoneNumber}
+                          </p>
+                        </div>
+                        <div class="col-md-6">
+                          <p>
+                            <strong>Vehicle:</strong>
+                            ${request.vehicleBrand} ${request.vehicleModel}
+                          </p>
+                          <p>
+                            <strong>License:</strong>
+                            ${request.licensePlate}
+                          </p>
+                        </div>
+                      </div>
+
+                      <!-- Services List with Classification -->
+                      <div class="mt-3">
+                        <h6 class="text-muted">
+                          <i class="bi bi-gear"></i>
+                          Requested Services (${request.services.size()}):
+                        </h6>
+                        <c:choose>
+                          <c:when test="${not empty request.services}">
+                            <div class="table-responsive">
+                              <table class="table table-sm table-hover">
+                                <thead class="table-light">
+                                  <tr>
+                                    <th width="40%">Service</th>
+                                    <th width="30%">Description</th>
+                                    <th width="15%" class="text-end">Price</th>
+                                    <th width="15%" class="text-center">Type</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <c:forEach var="service" items="${request.services}" varStatus="status">
+                                    <tr>
+                                      <td><strong>${service.serviceName}</strong></td>
+                                      <td><small class="text-muted">${service.serviceDescription}</small></td>
+                                      <td class="text-end">
+                                        <strong class="text-primary">
+                                          $
+                                          <fmt:formatNumber
+                                            value="${service.serviceUnitPrice}"
+                                            type="number"
+                                            groupingUsed="true" />
+                                        </strong>
+                                      </td>
+                                      <td class="text-center">
+                                        <span class="badge bg-secondary">Pending</span>
+                                      </td>
+                                    </tr>
+                                  </c:forEach>
+                                </tbody>
+                              </table>
+                            </div>
+                          </c:when>
+                          <c:otherwise>
+                            <p class="text-muted">No services found</p>
+                          </c:otherwise>
+                        </c:choose>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Approve & Classify Modal -->
+                  <div class="modal fade" id="approveModal${request.requestId}" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                      <div class="modal-content">
+                        <div class="modal-header bg-success text-white">
+                          <h5 class="modal-title">
+                            <i class="bi bi-check-circle"></i>
+                            Approve & Classify Services - Request #${request.requestId}
+                          </h5>
+                          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form
+                          method="POST"
+                          action="${pageContext.request.contextPath}/techmanager/service-requests"
+                          onsubmit="return validateClassification('${request.requestId}')">
+                          <div class="modal-body">
+                            <input type="hidden" name="action" value="approve" />
+                            <input type="hidden" name="requestId" value="${request.requestId}" />
+
+                            <div class="alert alert-info">
+                              <i class="bi bi-info-circle"></i>
+                              <strong>Instructions:</strong>
+                              Classify each service as either:
+                              <ul class="mb-0 mt-2">
+                                <li>
+                                  <strong>REQUEST:</strong>
+                                  Direct repair - Skip diagnosis (Go to GĐ5)
+                                </li>
+                                <li>
+                                  <strong>DIAGNOSTIC:</strong>
+                                  Needs inspection first (Go to GĐ1)
+                                </li>
+                              </ul>
+                            </div>
+
+                            <div class="table-responsive">
+                              <table class="table table-bordered">
+                                <thead class="table-light">
+                                  <tr>
+                                    <th width="40%">Service</th>
+                                    <th width="30%">Description</th>
+                                    <th width="15%" class="text-end">Price</th>
+                                    <th width="15%" class="text-center">Classification *</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <c:forEach var="service" items="${request.services}" varStatus="status">
+                                    <tr>
+                                      <td><strong>${service.serviceName}</strong></td>
+                                      <td><small class="text-muted">${service.serviceDescription}</small></td>
+                                      <td class="text-end">
+                                        <strong>
+                                          $
+                                          <fmt:formatNumber
+                                            value="${service.serviceUnitPrice}"
+                                            type="number"
+                                            groupingUsed="true" />
+                                        </strong>
+                                      </td>
+                                      <td class="text-center">
+                                        <input
+                                          type="hidden"
+                                          name="serviceDetailId_${status.index}"
+                                          value="${service.detailId}" />
+                                        <select
+                                          name="source_${status.index}"
+                                          class="form-select form-select-sm source-select-${request.requestId}"
+                                          required>
+                                          <option value="">-- Choose --</option>
+                                          <option value="REQUEST" style="background-color: #d1e7dd">
+                                            🔧 REQUEST (Direct Repair)
+                                          </option>
+                                          <option value="DIAGNOSTIC" style="background-color: #fff3cd">
+                                            🔍 DIAGNOSTIC (Needs Inspection)
+                                          </option>
+                                        </select>
+                                      </td>
+                                    </tr>
+                                  </c:forEach>
+                                </tbody>
+                              </table>
+                            </div>
+
+                            <input type="hidden" name="totalServices" value="${request.services.size()}" />
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-success">
                               <i class="bi bi-check-circle"></i>
-                              Approve
+                              Approve & Create WorkOrder
                             </button>
-                            <button
-                              class="btn btn-sm btn-outline-danger"
-                              data-bs-toggle="modal"
-                              data-bs-target="#rejectModal"
-                              data-request-id="${req.requestId}">
-                              <i class="bi bi-x-circle"></i>
-                              Reject
-                            </button>
-                          </td>
-                        </tr>
-                      </c:forEach>
-                    </tbody>
-                  </table>
-                </div>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </c:forEach>
               </c:otherwise>
             </c:choose>
           </div>
-        </div>
-
-        <!-- Footer -->
-        <jsp:include page="footer-techmanager.jsp" />
-      </div>
-    </div>
-
-    <!-- Approve Modal -->
-    <div class="modal fade" id="approveModal" tabindex="-1">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <form method="POST" action="${pageContext.request.contextPath}/techmanager/service-requests">
-            <div class="modal-header bg-success text-white">
-              <h5 class="modal-title">
-                <i class="bi bi-check-circle"></i>
-                Approve Service Request
-              </h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-              <input type="hidden" name="action" value="approve" />
-              <input type="hidden" name="requestId" id="approveRequestId" />
-
-              <div class="mb-3">
-                <label class="form-label"><strong>Customer:</strong></label>
-                <p id="approveCustomer" class="text-muted"></p>
-              </div>
-              <div class="mb-3">
-                <label class="form-label"><strong>Vehicle:</strong></label>
-                <p id="approveVehicle" class="text-muted"></p>
-              </div>
-              <div class="mb-3">
-                <label class="form-label"><strong>Service:</strong></label>
-                <p id="approveService" class="text-muted"></p>
-              </div>
-
-              <div class="mb-3">
-                <label for="taskDescription" class="form-label">Initial Task Description *</label>
-                <textarea
-                  class="form-control"
-                  id="taskDescription"
-                  name="taskDescription"
-                  rows="3"
-                  required
-                  placeholder="Describe the initial work to be done..."></textarea>
-                <small class="text-muted">This will create the first WorkOrderDetail for this request.</small>
-              </div>
-
-              <div class="alert alert-info">
-                <i class="bi bi-info-circle"></i>
-                <strong>Action:</strong>
-                This will create a WorkOrder and initial WorkOrderDetail (source=REQUEST).
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button type="submit" class="btn btn-success">
-                <i class="bi bi-check-circle"></i>
-                Approve & Create WorkOrder
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Reject Modal -->
-    <div class="modal fade" id="rejectModal" tabindex="-1">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <form method="POST" action="${pageContext.request.contextPath}/techmanager/service-requests">
-            <div class="modal-header bg-danger text-white">
-              <h5 class="modal-title">
-                <i class="bi bi-x-circle"></i>
-                Reject Service Request
-              </h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-              <input type="hidden" name="action" value="reject" />
-              <input type="hidden" name="requestId" id="rejectRequestId" />
-
-              <div class="mb-3">
-                <label for="rejectionReason" class="form-label">Reason for Rejection</label>
-                <textarea
-                  class="form-control"
-                  id="rejectionReason"
-                  name="rejectionReason"
-                  rows="3"
-                  placeholder="Why is this request being rejected?"></textarea>
-              </div>
-
-              <div class="alert alert-warning">
-                <i class="bi bi-exclamation-triangle"></i>
-                <strong>Warning:</strong>
-                This will mark the request as REJECTED. Customer will be notified.
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button type="submit" class="btn btn-danger">
-                <i class="bi bi-x-circle"></i>
-                Reject Request
-              </button>
-            </div>
-          </form>
         </div>
       </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="${pageContext.request.contextPath}/assets/js/techmanager/service-requests.js"></script>
+    <script>
+      const contextPath = '${pageContext.request.contextPath}';
+
+      // Validate classification before submit
+      function validateClassification(requestId) {
+        const selects = document.querySelectorAll('.source-select-' + requestId);
+        let allSelected = true;
+
+        selects.forEach((select) => {
+          if (!select.value) {
+            allSelected = false;
+            select.classList.add('is-invalid');
+          } else {
+            select.classList.remove('is-invalid');
+          }
+        });
+
+        if (!allSelected) {
+          alert('Please classify all services before approving!');
+          return false;
+        }
+        return true;
+      }
+
+      // Reject request
+      function rejectRequest(requestId) {
+        const reason = prompt('Enter rejection reason:');
+        if (reason) {
+          const form = document.createElement('form');
+          form.method = 'POST';
+          form.action = contextPath + '/techmanager/service-requests';
+
+          const actionInput = document.createElement('input');
+          actionInput.type = 'hidden';
+          actionInput.name = 'action';
+          actionInput.value = 'reject';
+
+          const idInput = document.createElement('input');
+          idInput.type = 'hidden';
+          idInput.name = 'requestId';
+          idInput.value = requestId;
+
+          const reasonInput = document.createElement('input');
+          reasonInput.type = 'hidden';
+          reasonInput.name = 'rejectionReason';
+          reasonInput.value = reason;
+
+          form.appendChild(actionInput);
+          form.appendChild(idInput);
+          form.appendChild(reasonInput);
+
+          document.body.appendChild(form);
+          form.submit();
+        }
+      }
+    </script>
   </body>
 </html>

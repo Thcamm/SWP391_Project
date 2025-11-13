@@ -46,18 +46,33 @@ public class WorkOrderDetailDAO {
     /**
      * Create WorkOrderDetail using provided connection (for transactions)
      * This is used when you need to create detail within an existing transaction
+     * 
+     * LUỒNG MỚI: Supports source=NULL for Triage workflow
      */
     public int createWorkOrderDetail(Connection conn, WorkOrderDetail detail) throws SQLException {
         String sql = "INSERT INTO WorkOrderDetail (WorkOrderID, source, diagnostic_id, approval_status, TaskDescription, EstimateHours, EstimateAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, detail.getWorkOrderId());
-            ps.setString(2, detail.getSource().name());
+            
+            // LUỒNG MỚI: Allow source=NULL for Triage
+            if (detail.getSource() != null) {
+                ps.setString(2, detail.getSource().name());
+            } else {
+                ps.setNull(2, java.sql.Types.VARCHAR);
+            }
+            
             if (detail.getDiagnosticId() != null) {
                 ps.setInt(3, detail.getDiagnosticId());
             } else {
                 ps.setNull(3, java.sql.Types.INTEGER);
             }
-            ps.setString(4, detail.getApprovalStatus().name());
+            
+            // LUỒNG MỚI: Allow approval_status=NULL or PENDING
+            if (detail.getApprovalStatus() != null) {
+                ps.setString(4, detail.getApprovalStatus().name());
+            } else {
+                ps.setNull(4, java.sql.Types.VARCHAR);
+            }
             ps.setString(5, detail.getTaskDescription());
             ps.setBigDecimal(6, detail.getEstimateHours());
             ps.setBigDecimal(7, detail.getEstimateAmount());
@@ -136,6 +151,61 @@ public class WorkOrderDetailDAO {
         }
     }
 
+    /**
+     * LUỒNG MỚI - GĐ 2: Update WorkOrderDetail source after Triage
+     * Used by TechManagerService.triageWorkOrderDetails()
+     * 
+     * @param conn Database connection (for transaction)
+     * @param detailId WorkOrderDetail ID
+     * @param source Source classification (REQUEST or DIAGNOSTIC)
+     * @param approvalStatus Approval status (usually APPROVED after Triage)
+     * @param approvedByUserId TechManager UserID
+     * @return true if update succeeded
+     * @throws SQLException if update fails
+     */
+    public boolean updateWorkOrderDetailSource(
+            Connection conn,
+            int detailId,
+            WorkOrderDetail.Source source,
+            WorkOrderDetail.ApprovalStatus approvalStatus,
+            int approvedByUserId) throws SQLException {
+        
+        String sql = "UPDATE WorkOrderDetail " +
+                     "SET source = ?, approval_status = ?, approved_by_user_id = ?, approved_at = CURRENT_TIMESTAMP " +
+                     "WHERE DetailID = ?";
+        
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, source.name());
+            ps.setString(2, approvalStatus.name());
+            ps.setInt(3, approvedByUserId);
+            ps.setInt(4, detailId);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * LUỒNG MỚI - GĐ 2: Get WorkOrderDetails awaiting Triage (source=NULL)
+     * 
+     * @param workOrderId WorkOrder ID
+     * @return List of WODs with source=NULL
+     * @throws SQLException if query fails
+     */
+    public List<WorkOrderDetail> getPendingTriageDetails(int workOrderId) throws SQLException {
+        String sql = "SELECT * FROM WorkOrderDetail WHERE WorkOrderID = ? AND source IS NULL ORDER BY DetailID";
+        List<WorkOrderDetail> details = new ArrayList<>();
+        
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, workOrderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    details.add(extractWorkOrderDetail(rs));
+                }
+            }
+        }
+        return details;
+    }
+
     public boolean declineWorkOrderDetail(int detailId, int approvedByUserId) throws SQLException {
         // Note: Column names: approval_status, approved_by_user_id, approved_at
         String sql = "UPDATE WorkOrderDetail SET approval_status = ?, approved_by_user_id = ?, approved_at = CURRENT_TIMESTAMP WHERE DetailID = ?";
@@ -149,18 +219,30 @@ public class WorkOrderDetailDAO {
     }
 
     // Helper method to map ResultSet to WorkOrderDetail
+    // LUỒNG MỚI: Support NULL values for source and approval_status
     private WorkOrderDetail extractWorkOrderDetail(ResultSet rs) throws SQLException {
         WorkOrderDetail detail = new WorkOrderDetail();
         detail.setDetailId(rs.getInt("DetailID"));
         detail.setWorkOrderId(rs.getInt("WorkOrderID"));
-        detail.setSource(WorkOrderDetail.Source.valueOf(rs.getString("source")));
+        
+        // LUỒNG MỚI: Handle NULL source (for Triage)
+        String sourceStr = rs.getString("source");
+        if (sourceStr != null) {
+            detail.setSource(WorkOrderDetail.Source.valueOf(sourceStr));
+        }
+        // If null, leave as default (no need to explicitly set null)
 
         int diagnosticId = rs.getInt("diagnostic_id");
         if (!rs.wasNull()) {
             detail.setDiagnosticId(diagnosticId);
         }
 
-        detail.setApprovalStatus(WorkOrderDetail.ApprovalStatus.valueOf(rs.getString("approval_status")));
+        // LUỒNG MỚI: Handle NULL approval_status
+        String approvalStatusStr = rs.getString("approval_status");
+        if (approvalStatusStr != null) {
+            detail.setApprovalStatus(WorkOrderDetail.ApprovalStatus.valueOf(approvalStatusStr));
+        }
+        // If null, leave as default (no need to explicitly set null)
 
         int approvedByUserId = rs.getInt("approved_by_user_id");
         if (!rs.wasNull()) {

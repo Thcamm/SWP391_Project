@@ -3,7 +3,15 @@ package model.employee.techmanager;
 import java.sql.Timestamp;
 
 /**
- * DTO for approved Repairs waiting for repair assignment
+ * DTO for approved Repairs waiting for repair assignment (GĐ5).
+ * 
+ * LUỒNG MỚI (Triage Workflow):
+ * - Contains WODs from BOTH sources:
+ *   1. REQUEST: Direct from GĐ2 Triage (classified as direct repair)
+ *   2. DIAGNOSTIC: From GĐ4 Quote Approval (customer approved quote)
+ * 
+ * @author SWP391 Team
+ * @version 2.0 (Updated for LUỒNG MỚI)
  */
 public class ApprovedRepairDTO {
     private int detailId;

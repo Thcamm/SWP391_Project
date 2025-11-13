@@ -1,40 +1,86 @@
 package model.workorder;
 
+/**
+ * Model for ServiceRequestDetail table
+ * Represents individual services within a Service Request
+ * 
+ * @author SWP391 Team - Refactored for Triage Workflow
+ */
 public class ServiceRequestDetail {
-    private int detailID;
-    private int requestID;
-    private int serviceID;
+    private int detailId;
+    private int requestId;
+    private int serviceId;
+    
+    // Transient fields for display (not in DB)
+    private String serviceName;
+    private String serviceDescription;
+    private java.math.BigDecimal serviceUnitPrice;
 
     public ServiceRequestDetail() {
     }
 
-    public ServiceRequestDetail(int detailID, int requestID, int serviceID) {
-        this.detailID = detailID;
-        this.requestID = requestID;
-        this.serviceID = serviceID;
+    public ServiceRequestDetail(int detailId, int requestId, int serviceId) {
+        this.detailId = detailId;
+        this.requestId = requestId;
+        this.serviceId = serviceId;
     }
 
-    public int getDetailID() {
-        return detailID;
+    // Getters and Setters
+    public int getDetailId() {
+        return detailId;
     }
 
-    public void setDetailID(int detailID) {
-        this.detailID = detailID;
+    public void setDetailId(int detailId) {
+        this.detailId = detailId;
     }
 
-    public int getRequestID() {
-        return requestID;
+    public int getRequestId() {
+        return requestId;
     }
 
-    public void setRequestID(int requestID) {
-        this.requestID = requestID;
+    public void setRequestId(int requestId) {
+        this.requestId = requestId;
     }
 
-    public int getServiceID() {
-        return serviceID;
+    public int getServiceId() {
+        return serviceId;
     }
 
-    public void setServiceID(int serviceID) {
-        this.serviceID = serviceID;
+    public void setServiceId(int serviceId) {
+        this.serviceId = serviceId;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public String getServiceDescription() {
+        return serviceDescription;
+    }
+
+    public void setServiceDescription(String serviceDescription) {
+        this.serviceDescription = serviceDescription;
+    }
+
+    public java.math.BigDecimal getServiceUnitPrice() {
+        return serviceUnitPrice;
+    }
+
+    public void setServiceUnitPrice(java.math.BigDecimal serviceUnitPrice) {
+        this.serviceUnitPrice = serviceUnitPrice;
+    }
+
+    @Override
+    public String toString() {
+        return "ServiceRequestDetail{" +
+                "detailId=" + detailId +
+                ", requestId=" + requestId +
+                ", serviceId=" + serviceId +
+                ", serviceName='" + serviceName + '\'' +
+                '}';
     }
 }
