@@ -1,15 +1,8 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> <%@ taglib
-uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %> <%@ page
-contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/functions"
+prefix="fn" %> <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<link
-  rel="stylesheet"
-  href="${pageContext.request.contextPath}/assets/css/techmanager/base-techmanager.css"
-/>
-<link
-  rel="stylesheet"
-  href="${pageContext.request.contextPath}/assets/css/techmanager/header-techmanager.css"
-/>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/techmanager/base-techmanager.css" />
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/techmanager/header-techmanager.css" />
 
 <header class="header techmanager-header">
   <div class="header-left">
@@ -24,8 +17,7 @@ contentType="text/html;charset=UTF-8" language="java" %>
       <li>
         <a
           href="${pageContext.request.contextPath}/techmanager/dashboard"
-          class="nav-link ${activeMenu == 'dashboard' ? 'active' : ''}"
-        >
+          class="nav-link ${activeMenu == 'dashboard' ? 'active' : ''}">
           <i class="bi bi-speedometer2"></i>
           Dashboard
         </a>
@@ -33,19 +25,9 @@ contentType="text/html;charset=UTF-8" language="java" %>
       <li>
         <a
           href="${pageContext.request.contextPath}/techmanager/service-requests"
-          class="nav-link ${activeMenu == 'service-requests' ? 'active' : ''}"
-        >
+          class="nav-link ${activeMenu == 'service-requests' ? 'active' : ''}">
           <i class="bi bi-clipboard-check"></i>
           Service Requests
-        </a>
-      </li>
-      <li>
-        <a
-          href="${pageContext.request.contextPath}/techmanager/diagnosis-review"
-          class="nav-link ${activeMenu == 'diagnosis-review' ? 'active' : ''}"
-        >
-          <i class="bi bi-file-earmark-text"></i>
-          Diagnosis Review
         </a>
       </li>
     </ul>
@@ -56,10 +38,7 @@ contentType="text/html;charset=UTF-8" language="java" %>
       <span class="user-name">${sessionScope.user.fullName}</span>
       <span class="user-role">Tech Manager</span>
     </div>
-    <a
-      href="${pageContext.request.contextPath}/Home?action=logout"
-      class="logout-btn"
-    >
+    <a href="${pageContext.request.contextPath}/Home?action=logout" class="logout-btn">
       <i class="bi bi-box-arrow-right"></i>
       Logout
     </a>

@@ -84,7 +84,11 @@ public class DashboardServlet extends HttpServlet {
             // ===== GĐ0→1: Tiếp nhận & Duyệt Yêu cầu =====
             stats.put("pendingRequests", dashboardService.countPendingServiceRequests());
 
-            // ===== GĐ1: Phân công Chẩn đoán =====
+            // ===== LUỔNG MỚI - GĐ2: Phân loại DEPRECATED (Direct Classification in
+            // Approval) =====
+            // pendingTriage REMOVED - Classification happens during approval step
+
+            // ===== GĐ1→3: Phân công Chẩn đoán (DIAGNOSTIC only) =====
             // FIX: Use TechManager-specific count instead of global count
             stats.put("assignedDiagnosis", dashboardService.countAssignedDiagnosisForManager(techManagerEmployeeId));
 
@@ -97,7 +101,7 @@ public class DashboardServlet extends HttpServlet {
             stats.put("pendingQuotes", dashboardService.countPendingCustomerApproval());
             stats.put("overdueDiagnostics", dashboardService.countOverdueDiagnostics()); // NEW: Báo giá quá hạn
 
-            // ===== GĐ4→5: Cầu nối Tự động → Chờ phân công Sửa chữa =====
+            // ===== GĐ4→5: Cầu nối Tự động → Chờ phân công Sửa chữa (BOTH sources) =====
             stats.put("unassignedWorkOrderDetails", dashboardService.countUnassignedWorkOrderDetails());
 
             // ===== GĐ5→6: Phân công & Thực hiện Sửa chữa =====

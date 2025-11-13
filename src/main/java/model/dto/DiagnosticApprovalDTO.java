@@ -4,11 +4,15 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 /**
- * DTO for VehicleDiagnostic records pending customer approval (GĐ3).
+ * DTO for VehicleDiagnostic records pending customer approval (GĐ4).
  * Used by Tech Manager to monitor quotes awaiting customer decision.
+ * 
+ * LUỒNG MỚI (Triage Workflow):
+ * - Only applies to DIAGNOSTIC services (from GĐ2 Triage → GĐ3 Diagnosis)
+ * - REQUEST services skip this step (go directly from GĐ2 to GĐ5)
  *
  * @author SWP391 Team
- * @version 1.0
+ * @version 2.0 (Updated for LUỒNG MỚI)
  */
 public class DiagnosticApprovalDTO {
     

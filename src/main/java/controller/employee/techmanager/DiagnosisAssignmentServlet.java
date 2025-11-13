@@ -102,8 +102,18 @@ public class DiagnosisAssignmentServlet extends HttpServlet {
             // Get parameters
             int detailId = Integer.parseInt(request.getParameter("detailId"));
             int technicianId = Integer.parseInt(request.getParameter("technicianId"));
+            String taskDescription = request.getParameter("taskDescription");
             String priority = request.getParameter("priority");
             String notes = request.getParameter("notes");
+
+            // Validate required fields
+            if (taskDescription == null || taskDescription.trim().isEmpty()) {
+                response.sendRedirect(request.getContextPath() +
+                        "/techmanager/assign-diagnosis?message=" +
+                        java.net.URLEncoder.encode("Task description is required.", "UTF-8") +
+                        "&type=error");
+                return;
+            }
 
             // Get scheduling parameters
             String plannedStartStr = request.getParameter("plannedStart");
@@ -141,7 +151,7 @@ public class DiagnosisAssignmentServlet extends HttpServlet {
             // Assign diagnosis task via service
             try {
                 int assignmentId = diagnosisAssignmentService.assignDiagnosisTask(
-                        detailId, technicianId, priority, notes, plannedStart, plannedEnd);
+                        detailId, technicianId, taskDescription, priority, notes, plannedStart, plannedEnd);
 
                 if (assignmentId > 0) {
                     response.sendRedirect(request.getContextPath() +

@@ -8,8 +8,10 @@ import dao.workorder.TaskAssignmentDAO;
 import dao.workorder.WorkOrderDAO;
 import dao.workorder.WorkOrderDetailDAO;
 import model.employee.Employee;
+import model.employee.techmanager.PendingServiceRequestDTO;
 import model.employee.technician.TaskAssignment;
 import model.workorder.ServiceRequest;
+import model.workorder.ServiceRequestDetail;
 import model.workorder.WorkOrder;
 import model.workorder.WorkOrderDetail;
 import service.notification.NotificationService;
@@ -19,29 +21,32 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
+ * REFACTORED - LUỒNG MỚI (Triage Workflow)
  * Business Logic Service for Technical Manager operations
- * Consolidates all Tech Manager workflows in one place
  * 
- * Main Responsibilities:
- * 1. Service Request Approval → WorkOrder creation (TODO: implement when DAOs
- * ready)
- * 2. Task Assignment (Diagnosis & Repair) (TODO: implement when DAOs ready)
- * 3. Task Reassignment & Overdue Management
- * 4. Exception Handling (counts for dashboard)
+ * NEW WORKFLOW (Luồng 4 - Phân loại):
+ * GĐ 1: Approve ServiceRequest → Create 1 WorkOrder + N WorkOrderDetails
+ * (source=NULL)
+ * GĐ 2: Triage → TM classifies each WOD as REQUEST or DIAGNOSTIC
+ * GĐ 3: Routing → WODs auto-route to assign-diagnosis or assign-repair
+ * GĐ 4: Quote Flow → Unchanged (for DIAGNOSTIC WODs)
+ * GĐ 5: Repair Assignment → Gets WODs from BOTH sources (REQUEST + DIAGNOSTIC)
  * 
- * Design Pattern: Service Layer (Business Logic)
- * Transaction Management: Handled in Service methods
+ * DELETED OLD LOGIC:
+ * - No more automatic "Chẩn đoán tổng quát" WorkOrderDetail creation
+ * - TM now has full control over service classification
  * 
- * @author An
- * 
- *         NOTE: Phase 2 - Skeleton created. Full implementations pending DAO
- *         method additions.
+ * @author SWP391 Team - Refactored 2024
  */
 public class TechManagerService {
 
-    private final ServiceRequestDAO requestDAO;
+    private final ServiceRequestDAO requestDAO; // For general ServiceRequest operations
+    private final dao.employee.techmanager.ServiceRequestDAO techManagerRequestDAO; // For TechManager-specific queries
     private final WorkOrderDAO workOrderDAO;
     private final WorkOrderDetailDAO detailDAO;
     private final TaskAssignmentDAO taskDAO;
@@ -52,6 +57,7 @@ public class TechManagerService {
     // === CONSTRUCTOR ===
     public TechManagerService() {
         this.requestDAO = new ServiceRequestDAO();
+        this.techManagerRequestDAO = new dao.employee.techmanager.ServiceRequestDAO();
         this.workOrderDAO = new WorkOrderDAO();
         this.detailDAO = new WorkOrderDetailDAO();
         this.taskDAO = new TaskAssignmentDAO();
@@ -75,36 +81,87 @@ public class TechManagerService {
         return employeeDAO.getEmployeeIdByUserName(userName);
     }
 
+    /**
+     * Get all pending service requests for TechManager review.
+     * 
+     * @return List of pending service requests
+     * @throws SQLException if database error occurs
+     */
+    public List<PendingServiceRequestDTO> getPendingServiceRequests() throws SQLException {
+        return techManagerRequestDAO.getPendingServiceRequests();
+    }
+
+    /**
+     * Alias method for approveServiceRequestAndCreateWorkOrder (backward
+     * compatibility).
+     * 
+     * @param requestId     Service Request ID
+     * @param techManagerId TechManager Employee ID
+     * @return WorkOrder ID if successful, -1 if failed
+     * @throws SQLException if database error occurs
+     * @deprecated Use approveServiceRequest(int, int, Map) with source
+     *             classifications instead
+     */
+    @Deprecated
+    public int approveServiceRequest(int requestId, int techManagerId) throws SQLException {
+        throw new UnsupportedOperationException(
+                "Use approveServiceRequest(requestId, techManagerId, sourceClassifications) instead");
+    }
+
+    /**
+     * Approve ServiceRequest and create WorkOrder with source classification
+     * 
+     * @param requestId             ServiceRequest ID
+     * @param techManagerId         TechManager's Employee ID
+     * @param sourceClassifications Map of service detail IDs to their source
+     *                              classification
+     * @return WorkOrder ID
+     */
+    public int approveServiceRequest(int requestId, int techManagerId, Map<Integer, String> sourceClassifications)
+            throws SQLException {
+        try {
+            return approveServiceRequestAndCreateWorkOrder(requestId, techManagerId, sourceClassifications);
+        } catch (Exception e) {
+            System.err.println("Error approving service request: " + e.getMessage());
+            throw new SQLException("Failed to approve service request: " + e.getMessage(), e);
+        }
+    }
+
     // =========================================================================
-    // MAIN BUSINESS LOGIC - UC-TM-01 to UC-TM-07
+    // GĐ 1: APPROVE & SPLIT - LUỒNG MỚI
     // =========================================================================
 
     /**
-     * UC-TM-01: Approve Service Request and Create WorkOrder
+     * GĐ 1: Approve Service Request and Create N WorkOrderDetails with source
+     * classification
      * 
-     * Business Flow:
-     * 1. Update ServiceRequest status = "APPROVED"
-     * 2. Create WorkOrder (TechManager assigned)
-     * 3. Create WorkOrderDetail from ServicePackage (if exists)
+     * NEW LOGIC - Direct Classification Workflow:
+     * 1. Update ServiceRequest status = "APPROVE"
+     * 2. Create 1 WorkOrder
+     * 3. Get N ServiceRequestDetails
+     * 4. Create N WorkOrderDetails (each with source=REQUEST|DIAGNOSTIC based on TM
+     * classification)
+     * 5. Return WorkOrderID
      * 
      * Transaction: ALL-or-NOTHING
      * 
-     * @param requestId     Service Request ID to approve
-     * @param techManagerId ID of the approving Technical Manager
-     * @param notes         Optional approval notes (not used currently)
+     * @param requestId             Service Request ID to approve
+     * @param techManagerId         ID of the approving Technical Manager
+     * @param sourceClassifications Map of serviceDetailId to source ("REQUEST" or
+     *                              "DIAGNOSTIC")
      * @return WorkOrderID if success, -1 if failed
      */
-    public int approveServiceRequestAndCreateWorkOrder(
+    private int approveServiceRequestAndCreateWorkOrder(
             int requestId,
             int techManagerId,
-            String notes) throws SQLException {
+            Map<Integer, String> sourceClassifications) throws SQLException {
 
         Connection conn = null;
         try {
             // === START TRANSACTION ===
             conn = DbContext.getConnection();
             conn.setAutoCommit(false);
-            System.out.println("=== [TechManagerService] START Transaction for ServiceRequest #" + requestId + " ===");
+            System.out.println("=== [LUỒNG MỚI - GĐ 1] START Transaction for ServiceRequest #" + requestId + " ===");
 
             // === STEP 1: Validate ServiceRequest ===
             ServiceRequest request = requestDAO.getServiceRequestForUpdate(conn, requestId);
@@ -113,60 +170,87 @@ public class TechManagerService {
             }
             System.out.println("[STEP 1] ✓ ServiceRequest found: ID=" + requestId + ", Status=" + request.getStatus());
 
-            // === STEP 2: Update ServiceRequest Status ===
-            // Note: Database uses 'APPROVE' (not 'APPROVED')
+            // === STEP 2: Get all ServiceRequestDetails (N services) ===
+            List<ServiceRequestDetail> serviceDetails = requestDAO.getServiceRequestDetails(conn, requestId);
+            if (serviceDetails == null || serviceDetails.isEmpty()) {
+                throw new SQLException("No service details found for ServiceRequest #" + requestId);
+            }
+            System.out.println("[STEP 2] ✓ Found " + serviceDetails.size() + " service(s) to split");
+
+            // === STEP 3: Update ServiceRequest Status ===
             boolean updated = requestDAO.updateServiceRequestStatus(conn, requestId, "APPROVE");
             if (!updated) {
                 throw new SQLException("Failed to update ServiceRequest status");
             }
-            System.out.println("[STEP 2] ✓ ServiceRequest status updated: PENDING → APPROVE");
+            System.out.println("[STEP 3] ✓ ServiceRequest status updated: PENDING → APPROVE");
 
-            // === STEP 3: Create WorkOrder ===
+            // === STEP 4: Create WorkOrder ===
             WorkOrder workOrder = new WorkOrder();
             workOrder.setRequestId(requestId);
             workOrder.setTechManagerId(techManagerId);
-            workOrder.setStatus(WorkOrder.Status.PENDING); // Initial status - waiting for diagnosis
-            workOrder.setEstimateAmount(BigDecimal.ZERO); // Updated later
+            workOrder.setStatus(WorkOrder.Status.PENDING);
+
+            // Calculate total estimate amount from all services
+            BigDecimal totalEstimate = serviceDetails.stream()
+                    .map(ServiceRequestDetail::getServiceUnitPrice)
+                    .filter(price -> price != null)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            workOrder.setEstimateAmount(totalEstimate);
 
             int workOrderId = workOrderDAO.createWorkOrder(conn, workOrder);
             if (workOrderId <= 0) {
                 throw new SQLException("Failed to create WorkOrder");
             }
-            System.out.println("[STEP 3] ✓ WorkOrder created: ID=" + workOrderId + ", TechManager=" + techManagerId
-                    + ", Status=PENDING");
+            System.out.println("[STEP 4] ✓ WorkOrder created: ID=" + workOrderId + ", EstimateAmount=" + totalEstimate);
 
-            // === STEP 4: Create initial DIAGNOSIS WorkOrderDetail ===
-            // This is required for TechManager to assign diagnosis tasks
-            WorkOrderDetail diagnosisDetail = new WorkOrderDetail();
-            diagnosisDetail.setWorkOrderId(workOrderId);
-            diagnosisDetail.setSource(WorkOrderDetail.Source.REQUEST);
-            diagnosisDetail.setTaskDescription(
-                    notes != null && !notes.trim().isEmpty()
-                            ? notes
-                            : "Chẩn đoán tổng quát tình trạng xe");
-            diagnosisDetail.setApprovalStatus(WorkOrderDetail.ApprovalStatus.APPROVED);
-            diagnosisDetail.setEstimateHours(BigDecimal.valueOf(1.0));
-            diagnosisDetail.setEstimateAmount(BigDecimal.ZERO);
+            // === STEP 5: Create N WorkOrderDetails with source classification ===
+            int createdCount = 0;
+            for (ServiceRequestDetail serviceDetail : serviceDetails) {
+                // Get source classification from map
+                String source = sourceClassifications.get(serviceDetail.getDetailId());
+                if (source == null || (!source.equals("REQUEST") && !source.equals("DIAGNOSTIC"))) {
+                    throw new SQLException(
+                            "Invalid source classification for service detail #" + serviceDetail.getDetailId());
+                }
 
-            System.out.println("[STEP 4] Creating WorkOrderDetail: WorkOrderID=" + workOrderId +
-                    ", Source=REQUEST, ApprovalStatus=APPROVED");
+                WorkOrderDetail wod = new WorkOrderDetail();
+                wod.setWorkOrderId(workOrderId);
 
-            int detailId = detailDAO.createWorkOrderDetail(conn, diagnosisDetail);
-            if (detailId <= 0) {
-                throw new SQLException("Failed to create initial WorkOrderDetail");
+                // Set source based on classification
+                wod.setSource(WorkOrderDetail.Source.valueOf(source));
+                wod.setDiagnosticId(null);
+                // LUỒNG MỚI: Auto-approve when TM classifies source during approval
+                wod.setApprovalStatus(WorkOrderDetail.ApprovalStatus.APPROVED);
+                wod.setApprovedByUserId(techManagerId);
+                wod.setApprovedAt(new Timestamp(System.currentTimeMillis()));
+                wod.setTaskDescription(serviceDetail.getServiceName() +
+                        (serviceDetail.getServiceDescription() != null ? " - " + serviceDetail.getServiceDescription()
+                                : ""));
+                wod.setEstimateHours(BigDecimal.valueOf(2.0)); // Default estimate
+                wod.setEstimateAmount(serviceDetail.getServiceUnitPrice() != null ? serviceDetail.getServiceUnitPrice()
+                        : BigDecimal.ZERO);
+
+                int detailId = detailDAO.createWorkOrderDetail(conn, wod);
+                if (detailId <= 0) {
+                    throw new SQLException(
+                            "Failed to create WorkOrderDetail for service: " + serviceDetail.getServiceName());
+                }
+                createdCount++;
+                System.out.println("  [5." + createdCount + "] ✓ Created WOD #" + detailId + ": " +
+                        serviceDetail.getServiceName() + " (source=" + source + ")");
             }
-            System.out.println("[STEP 4] ✓ WorkOrderDetail created: ID=" + detailId +
-                    ", TaskDescription='" + diagnosisDetail.getTaskDescription() + "'");
+
+            System.out.println("[STEP 5] ✓ Created " + createdCount + " WorkOrderDetail(s) with source classification");
 
             // === COMMIT TRANSACTION ===
             conn.commit();
-            System.out.println("=== [TechManagerService] ✓ COMMIT SUCCESS: WorkOrder #" + workOrderId +
-                    " with Detail #" + detailId + " ===");
+            System.out.println("=== [LUỒNG MỚI - GĐ 1] ✓ COMMIT SUCCESS: WorkOrder #" + workOrderId +
+                    " with " + createdCount + " WOD(s) ready for Triage ===");
             return workOrderId;
 
         } catch (Exception e) {
             // === ROLLBACK on Error ===
-            System.err.println("=== [TechManagerService] ✗ TRANSACTION FAILED ===");
+            System.err.println("=== [LUỒNG MỚI - GĐ 1] ✗ TRANSACTION FAILED ===");
             System.err.println("Error: " + e.getMessage());
             e.printStackTrace();
             if (conn != null) {
@@ -192,13 +276,86 @@ public class TechManagerService {
         }
     }
 
+    // =========================================================================
+    // GĐ 2: TRIAGE - LUỒNG MỚI
+    // =========================================================================
+
+    /**
+     * GĐ 2: Triage WorkOrderDetails - Classify each as REQUEST or DIAGNOSTIC
+     * 
+     * NEW FUNCTION - Core of Triage Workflow:
+     * - Receives Map<DetailID, Source> from TriageServlet
+     * - Updates each WorkOrderDetail: source + approval_status=APPROVED
+     * - After this, WODs auto-route to correct assignment screen (GĐ 3)
+     * 
+     * @param triageDecisions Map<DetailID, Source> - TM's classification decisions
+     * @param techManagerId   TechManager making the decision
+     * @return Number of WODs successfully triaged
+     * @throws SQLException if update fails
+     */
+    public int triageWorkOrderDetails(
+            java.util.Map<Integer, WorkOrderDetail.Source> triageDecisions,
+            int techManagerId) throws SQLException {
+
+        Connection conn = null;
+        try {
+            conn = DbContext.getConnection();
+            conn.setAutoCommit(false);
+            System.out.println("=== [LUỒNG MỚI - GĐ 2] START Triage for " + triageDecisions.size() + " WOD(s) ===");
+
+            int updatedCount = 0;
+            for (java.util.Map.Entry<Integer, WorkOrderDetail.Source> entry : triageDecisions.entrySet()) {
+                int detailId = entry.getKey();
+                WorkOrderDetail.Source source = entry.getValue();
+
+                // Update WorkOrderDetail: set source and approval_status=APPROVED
+                boolean updated = detailDAO.updateWorkOrderDetailSource(conn, detailId, source,
+                        WorkOrderDetail.ApprovalStatus.APPROVED, techManagerId);
+
+                if (updated) {
+                    updatedCount++;
+                    System.out.println("  [" + updatedCount + "] ✓ WOD #" + detailId + " → source=" + source);
+                } else {
+                    throw new SQLException("Failed to update WorkOrderDetail #" + detailId);
+                }
+            }
+
+            conn.commit();
+            System.out.println("=== [LUỒNG MỚI - GĐ 2] ✓ Triage COMPLETE: " + updatedCount + " WOD(s) classified ===");
+            return updatedCount;
+
+        } catch (Exception e) {
+            System.err.println("=== [LUỒNG MỚI - GĐ 2] ✗ Triage FAILED ===");
+            e.printStackTrace();
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    System.err.println("✗ Rollback failed: " + rollbackEx.getMessage());
+                }
+            }
+            throw new SQLException("Triage failed: " + e.getMessage(), e);
+
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException closeEx) {
+                    System.err.println("Connection close failed: " + closeEx.getMessage());
+                }
+            }
+        }
+    }
+
+    // =========================================================================
+    // GĐ 4 & GĐ 5: TASK ASSIGNMENT (Unchanged from old flow)
+    // =========================================================================
+
     /**
      * UC-TM-02: Assign Diagnosis Task to Technician
      * 
-     * Business Flow:
-     * 1. Validate WorkOrder exists
-     * 2. Create TaskAssignment (type=DIAGNOSIS)
-     * 3. Notify technician (TODO: implement when NotificationService ready)
+     * NOTE: This method is unchanged - still used for WODs with source='DIAGNOSTIC'
      * 
      * @param workOrderId  WorkOrder ID
      * @param detailId     WorkOrderDetail ID
@@ -235,17 +392,15 @@ public class TechManagerService {
             throw new SQLException("Failed to create TaskAssignment");
         }
 
-        // TODO: Send notification to technician when NotificationService supports
-        // transactions
-        // notificationService.createNotification(...);
-
         return taskId;
     }
 
     /**
      * UC-TM-03: Assign Repair Task to Technician
      * 
-     * Similar to assignDiagnosisTask but for REPAIR type
+     * NOTE: LUỒNG MỚI - This now handles BOTH sources:
+     * - source='REQUEST' (from Triage - GĐ 2)
+     * - source='DIAGNOSTIC' (from Quote Flow - GĐ 4)
      */
     public int assignRepairTask(
             int workOrderId,
@@ -276,7 +431,6 @@ public class TechManagerService {
             throw new SQLException("Failed to create repair task");
         }
 
-        // TODO: Notify technician
         return taskId;
     }
 
@@ -360,5 +514,23 @@ public class TechManagerService {
      */
     public int countTasksNeedReassignment() throws SQLException {
         return exceptionDAO.countTasksNeedReassignment();
+    }
+
+    // =========================================================================
+    // GĐ 3: GET PENDING TRIAGE WORKORDERDETAILS
+    // =========================================================================
+
+    /**
+     * Get all WorkOrderDetails awaiting Triage classification
+     * (source IS NULL and approval_status='PENDING')
+     * 
+     * DEPRECATED: Classification now happens during approval
+     * 
+     * @param workOrderId WorkOrder ID
+     * @return List of WorkOrderDetail awaiting triage
+     * @throws SQLException if database error
+     */
+    public List<WorkOrderDetail> getPendingTriageDetails(int workOrderId) throws SQLException {
+        return detailDAO.getPendingTriageDetails(workOrderId);
     }
 }

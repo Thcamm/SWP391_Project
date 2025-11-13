@@ -1,6 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
+prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html lang="vi">
   <head>
@@ -112,6 +111,7 @@
                               <i class="bi bi-clock"></i>
                               ${task.hoursOverdue} hours
                             </span>
+                          </td>
                           <td>
                             <button
                               type="button"
@@ -125,7 +125,6 @@
                               <i class="bi bi-x-circle"></i>
                               Cancel Task
                             </button>
-                          </td>
                           </td>
                         </tr>
                       </c:forEach>
@@ -208,6 +207,10 @@
               </button>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       function prepareCancellationFromBtn(btn) {
@@ -224,11 +227,6 @@
         if (techEl) techEl.textContent = tech;
       }
     </script>
-    <script src="${pageContext.request.contextPath}/assets/js/techmanager/overdue-tasks.js"></script>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="${pageContext.request.contextPath}/assets/js/techmanager/overdue-tasks.js"></script>
 
     <%@ include file="footer-techmanager.jsp" %>
   </body>

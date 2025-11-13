@@ -98,7 +98,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
           <!-- Quick Stats -->
           <div class="row mb-4">
-            <div class="col-md-3">
+            <div class="col-md-4">
               <div class="card bg-primary text-white">
                 <div class="card-body text-center">
                   <h4>${stats.pendingRequests}</h4>
@@ -106,27 +106,19 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                 </div>
               </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
               <div class="card bg-info text-white">
                 <div class="card-body text-center">
                   <h4>${stats.unassignedWorkOrderDetails}</h4>
-                  <small>Need Assignment</small>
+                  <small>Task Need Assignment</small>
                 </div>
               </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
               <div class="card bg-warning text-white">
                 <div class="card-body text-center">
                   <h4>${stats.activeRepairs}</h4>
                   <small>Active Repairs</small>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-3">
-              <div class="card bg-success text-white">
-                <div class="card-body text-center">
-                  <h4>${stats.workOrdersReadyForClosure}</h4>
-                  <small>Ready to Close</small>
                 </div>
               </div>
             </div>
@@ -144,42 +136,41 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                 </div>
                 <div class="card-body">
                   <div class="row g-3">
-                    <div class="col-md-3">
+                    <!-- GĐ1: Service Requests -->
+                    <div class="col-md-4">
                       <a
                         href="${pageContext.request.contextPath}/techmanager/service-requests"
                         class="btn btn-outline-primary w-100 p-3">
                         <i class="bi bi-clipboard-check fs-3 d-block mb-2"></i>
-                        <strong>Service Requests</strong>
+                        <strong>GĐ1: Approve & Classify</strong>
+                        <small class="text-muted d-block">Service Requests (Direct Classification)</small>
                         <span class="badge bg-primary d-block mt-2">${stats.pendingRequests} Pending</span>
                       </a>
                     </div>
-                    <div class="col-md-3">
+
+                    <!-- GĐ3: Assign Diagnosis -->
+                    <div class="col-md-4">
                       <a
                         href="${pageContext.request.contextPath}/techmanager/assign-diagnosis"
                         class="btn btn-outline-info w-100 p-3">
                         <i class="bi bi-person-plus fs-3 d-block mb-2"></i>
-                        <strong>Assign Diagnosis</strong>
+                        <strong>GĐ3: Assign Diagnosis</strong>
+                        <small class="text-muted d-block">DIAGNOSTIC only</small>
                         <span class="badge bg-info d-block mt-2">
                           ${stats.assignedDiagnosis + stats.inProgressDiagnosis} Active
                         </span>
                       </a>
                     </div>
-                    <div class="col-md-3">
+
+                    <!-- GĐ5: Assign Repair -->
+                    <div class="col-md-4">
                       <a
                         href="${pageContext.request.contextPath}/techmanager/assign-repair"
                         class="btn btn-outline-warning w-100 p-3">
                         <i class="bi bi-tools fs-3 d-block mb-2"></i>
-                        <strong>Assign Repair</strong>
+                        <strong>GĐ5: Assign Repair</strong>
+                        <small class="text-muted d-block">REQUEST + DIAGNOSTIC</small>
                         <span class="badge bg-warning d-block mt-2">${stats.unassignedWorkOrderDetails} Waiting</span>
-                      </a>
-                    </div>
-                    <div class="col-md-3">
-                      <a
-                        href="${pageContext.request.contextPath}/techmanager/team-management"
-                        class="btn btn-outline-secondary w-100 p-3">
-                        <i class="bi bi-people-fill fs-3 d-block mb-2"></i>
-                        <strong>Team Management</strong>
-                        <span class="badge bg-secondary d-block mt-2">View All</span>
                       </a>
                     </div>
                   </div>
