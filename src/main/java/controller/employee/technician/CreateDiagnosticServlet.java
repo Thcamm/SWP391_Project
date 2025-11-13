@@ -39,7 +39,7 @@ public class CreateDiagnosticServlet extends HttpServlet {
         try { return Integer.parseInt(s); } catch (Exception ignored) { return def; }
     }
 
-    /** Nạp list parts để hiển thị + map các part đã chọn */
+
     private void loadPartsForDisplay(HttpServletRequest req, String partQuery, String[] partDetailIds) {
         int page = parseIntOr(req.getParameter("page"), 1);
         int size = parseIntOr(req.getParameter("size"), 20);

@@ -41,7 +41,7 @@
             <main class="main">
                 <div class="task-page">
                     <div class="page-header">
-                        <h2>🐋All tasks</h2>
+                        <h2>All tasks</h2>
                         <a href="${pageContext.request.contextPath}/technician/home" class="btn-secondary">
                             &laquo; Back to Home
                         </a>
@@ -146,7 +146,8 @@
                                         <th>Customer</th>
                                         <th>Service</th>
                                         <th>Progress</th>
-                                        <th>Assigned Date</th>
+                                        <th>Pl_Start</th>
+                                        <th>Pl_End</th>
                                         <th>Actions</th>
                                     </tr>
                                     </thead>
@@ -167,7 +168,7 @@
                                                     ${task.vehicleInfo}
                                             </td>
                                             <td>${task.customerName}</td>
-                                            <td>${task.serviceInfo}</td>
+                                            <td>${task.taskDescription}</td>
                                             <td>
                                                     <%--                                        <c:if test="${task.status == 'IN_PROGRESS'}">--%>
                                                     <%--                                            --%>
@@ -180,7 +181,12 @@
                                             </td>
 
                                             <td>
-                                                    ${task.assignedDateFormatted}
+                                                    ${task.plannedStartFormatted}
+
+                                            </td>
+
+                                            <td>
+                                                    ${task.plannedEndFormatted}
 
                                             </td>
 
@@ -237,7 +243,7 @@
                                                         <form method="get" action="${ctx}/technician/create-diagnostic" style="display:inline;">
                                                             <input type="hidden" name="assignmentId" value="${task.assignmentID}" />
                                                             <input type="hidden" name="returnTo" value="${returnTo}" />
-                                                            <button type="submit" class="btn btn-primary btn-sm">🩺 Create Diagnostic</button>
+                                                            <button type="submit" class="btn btn-primary btn-sm">Create Diagnostic</button>
                                                         </form>
 
                                                     </c:when>

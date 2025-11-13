@@ -270,10 +270,10 @@ public class ServiceRequestDAO extends DbContext {
     public ServiceRequest getServiceRequestById(int requestId) throws SQLException {
         String sql = "SELECT * FROM ServiceRequest WHERE RequestID = ?";
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)){
-                ps.setInt(1, requestId);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, requestId);
 
-             ResultSet rs = ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 ServiceRequest sr = new ServiceRequest();
                 sr.setRequestID(rs.getInt("RequestID"));
@@ -289,14 +289,16 @@ public class ServiceRequestDAO extends DbContext {
         }
         return null;
 
-    /**
-     * LUỒNG MỚI - GĐ 1: Get all ServiceRequestDetail for a given RequestID
-     * Returns list of individual services to split into N WorkOrderDetails
-     * 
-     * @param requestId The ServiceRequest ID
-     * @return List of ServiceRequestDetail with service information
-     * @throws SQLException if query fails
-     */
+    }
+//
+//    /**
+//     * LUỒNG MỚI - GĐ 1: Get all ServiceRequestDetail for a given RequestID
+//     * Returns list of individual services to split into N WorkOrderDetails
+//     *
+//     * @param requestId The ServiceRequest ID
+//     * @return List of ServiceRequestDetail with service information
+//     * @throws SQLException if query fails
+//     */
     public List<ServiceRequestDetail> getServiceRequestDetails(int requestId) throws SQLException {
         List<ServiceRequestDetail> details = new ArrayList<>();
         String sql = "SELECT srd.DetailID, srd.RequestID, srd.ServiceID, " +
@@ -308,7 +310,7 @@ public class ServiceRequestDAO extends DbContext {
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            
+
             ps.setInt(1, requestId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -327,9 +329,9 @@ public class ServiceRequestDAO extends DbContext {
         return details;
     }
 
-    /**
-     * LUỒNG MỚI - GĐ 1: Get ServiceRequestDetail with Connection (for transaction)
-     */
+//    /**
+//     * LUỒNG MỚI - GĐ 1: Get ServiceRequestDetail with Connection (for transaction)
+//     */
     public List<ServiceRequestDetail> getServiceRequestDetails(Connection conn, int requestId) throws SQLException {
         List<ServiceRequestDetail> details = new ArrayList<>();
         String sql = "SELECT srd.DetailID, srd.RequestID, srd.ServiceID, " +
@@ -357,4 +359,5 @@ public class ServiceRequestDAO extends DbContext {
         }
         return details;
     }
+
 }
