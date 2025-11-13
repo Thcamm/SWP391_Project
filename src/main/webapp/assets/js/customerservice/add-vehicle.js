@@ -7,6 +7,9 @@
 (function() {
     'use strict';
 
+    // Cache for car models data
+    let vehicleData = [];
+
     // Wait until DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initAddVehicleForm);
@@ -15,6 +18,8 @@
     }
 
     function initAddVehicleForm() {
+        console.log("🚀 initAddVehicleForm() called");
+
         // Get required elements
         const form = document.getElementById("addVehicleForm");
         const brandSelect = document.getElementById("brandId");
@@ -24,6 +29,13 @@
         const customerIdInput = document.getElementById("modalCustomerId");
         const modal = document.getElementById('addVehicleModal');
 
+        console.log("Elements found:", {
+            form: !!form,
+            brandSelect: !!brandSelect,
+            modelSelect: !!modelSelect,
+            modal: !!modal
+        });
+
         // Check if form exists
         if (!form) {
             console.warn("Form 'addVehicleForm' not found");
@@ -31,6 +43,49 @@
         }
 
         console.log("Add vehicle form initialized successfully");
+
+        // ============================================
+        // LOAD CAR MODELS DATA FROM JSON FILE
+        // ============================================
+        function loadCarModelsData() {
+            if (vehicleData.length > 0) {
+                return Promise.resolve(vehicleData);
+            }
+
+            // Build URL - check contextPath at runtime
+            const jsonUrl = (typeof contextPath !== 'undefined' && contextPath)
+                ? `${contextPath}/assets/car-models.json`
+                : '/assets/car-models.json';
+
+            console.log("Loading vehicle data from:", jsonUrl);
+            console.log("contextPath value:", typeof contextPath !== 'undefined' ? contextPath : 'undefined');
+
+            return fetch(jsonUrl)
+                .then(function(response) {
+                    console.log("Fetch response:", response.status, response.statusText);
+                    console.log("Response URL:", response.url);
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(function(data) {
+                    vehicleData = data;
+                    console.log("✓ Car models loaded successfully:", data.length, "brands");
+                    return data;
+                })
+                .catch(function(error) {
+                    console.error('❌ Error loading car models:', error);
+                    console.error('Attempted URL:', jsonUrl);
+
+                    // Show detailed error
+                    if (typeof showAlert === 'function') {
+                        showAlert(`Cannot load vehicle data: ${error.message}`, "error");
+                    }
+                    throw error;
+                });
+        }
 
         // ============================================
         // PART 1: HANDLE BRAND → MODEL DROPDOWN
@@ -42,10 +97,10 @@
 
             // Listen for brand selection change
             newBrandSelect.addEventListener("change", function() {
-                const brandId = this.value;
-                console.log("Selected brand:", brandId);
+                const selectedBrandName = this.options[this.selectedIndex].text;
+                console.log("Selected brand:", selectedBrandName);
 
-                if (!brandId) {
+                if (!this.value) {
                     modelSelect.disabled = true;
                     modelSelect.innerHTML = "<option value=''>-- Select brand first --</option>";
                     return;
@@ -55,32 +110,28 @@
                 modelSelect.disabled = false;
                 modelSelect.innerHTML = "<option value=''>Loading models...</option>";
 
-                // Build API URL
-                const apiUrl = (typeof contextPath !== 'undefined' ? contextPath : '') +
-                    '/customerservice/addVehicle?action=getModels&brandId=' + encodeURIComponent(brandId);
+                // Load and filter models
+                loadCarModelsData()
+                    .then(function(data) {
+                        // Find brand in JSON data
+                        const brandData = data.find(function(item) {
+                            return item.brand === selectedBrandName;
+                        });
 
-                // Fetch model list
-                fetch(apiUrl)
-                    .then(function(response) {
-                        if (!response.ok) {
-                            throw new Error('HTTP error: ' + response.status);
-                        }
-                        return response.json();
-                    })
-                    .then(function(models) {
-                        console.log("Loaded " + models.length + " models");
+                        console.log("Found brand data:", brandData);
 
                         modelSelect.innerHTML = "<option value=''>-- Select model --</option>";
 
-                        if (models.length === 0) {
-                            modelSelect.innerHTML = "<option value=''>-- No models available --</option>";
-                        } else {
-                            models.forEach(function(model) {
+                        if (brandData && Array.isArray(brandData.models) && brandData.models.length > 0) {
+                            brandData.models.forEach(function(modelName) {
                                 const option = document.createElement("option");
-                                option.value = model.name;
-                                option.textContent = model.name;
+                                option.value = modelName;
+                                option.textContent = modelName;
                                 modelSelect.appendChild(option);
                             });
+                            console.log("Loaded " + brandData.models.length + " models");
+                        } else {
+                            modelSelect.innerHTML = "<option value=''>-- No models available --</option>";
                         }
                     })
                     .catch(function(error) {
@@ -88,7 +139,7 @@
                         modelSelect.innerHTML = "<option value=''>Error loading models</option>";
 
                         if (typeof showAlert === 'function') {
-                            showAlert("Unable to load model list", "error");
+                            showAlert("Unable to load model list: " + error.message, "error");
                         }
                     });
             });
@@ -278,6 +329,26 @@
         // PART 3: HANDLE MODAL EVENTS
         // ============================================
         if (modal) {
+            // Preload data when modal is opened
+            modal.addEventListener('show.bs.modal', function() {
+                console.log("Modal opened - preloading vehicle data");
+
+                // Set customerId
+                if (typeof window.customerId !== 'undefined' && customerIdInput) {
+                    customerIdInput.value = window.customerId;
+                    console.log("Set customerId in modal:", window.customerId);
+                }
+
+                // Preload vehicle data
+                loadCarModelsData()
+                    .then(function(data) {
+                        console.log("Vehicle data preloaded successfully");
+                    })
+                    .catch(function(error) {
+                        console.error("Failed to preload vehicle data:", error);
+                    });
+            });
+
             // Reset form when modal is closed
             modal.addEventListener('hidden.bs.modal', function() {
                 console.log("Modal closed, resetting form");
@@ -287,16 +358,6 @@
                 if (modelSelect) {
                     modelSelect.disabled = true;
                     modelSelect.innerHTML = "<option value=''>-- Select brand first --</option>";
-                }
-            });
-
-            // Set customerId when modal is opened
-            modal.addEventListener('show.bs.modal', function() {
-                console.log("Modal opened");
-
-                if (typeof window.customerId !== 'undefined' && customerIdInput) {
-                    customerIdInput.value = window.customerId;
-                    console.log("Set customerId in modal:", window.customerId);
                 }
             });
         }

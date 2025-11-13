@@ -82,6 +82,8 @@ public class ViewAppointmentList extends HttpServlet {
                     calc.getSafePage(), itemsPerPage);
         }
         request.setAttribute("appointmentList", result);
+        request.setAttribute("currentPage", result.getCurrentPage());
+        request.setAttribute("totalPages", result.getTotalPages());
         request.getRequestDispatcher("/view/customerservice/appointment-list.jsp")
                 .forward(request, response);
 

@@ -102,6 +102,8 @@ public class CustomerRepairListServlet extends HttpServlet {
 
             // Set attributes for JSP
             request.setAttribute("journeyList", result);
+            request.setAttribute("currentPage", result.getCurrentPage());
+            request.setAttribute("totalPages", result.getTotalPages());
             request.setAttribute("selectedVehicleId", vehicleId);
             request.setAttribute("selectedSortBy", sortBy);
 

@@ -94,6 +94,8 @@ public class ViewAllRepair extends HttpServlet {
             }
             // Set attributes for JSP
             request.setAttribute("journeyList", result);
+            request.setAttribute("currentPage", result.getCurrentPage());
+            request.setAttribute("totalPages", result.getTotalPages());
             request.setAttribute("licensePlate", licensePlate);
             request.setAttribute("selectedSortBy", sortBy);
 

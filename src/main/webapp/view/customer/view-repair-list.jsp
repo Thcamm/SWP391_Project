@@ -271,22 +271,22 @@
                                     <i class="bi bi-calendar3 me-1"></i>
                                     <fmt:formatDate value="${journey.entryDate}" pattern="MMM dd, yyyy" />
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center" style="color: #0b0f14">
                                     <c:choose>
                                         <c:when test="${journey.entryType == 'Appointment'}">
-                                            <span class="badge badge-soft-primary">
-                                                <i class="bi bi-calendar-check me-1"></i> Appointment
+                                            <span class="badge badge-soft-primary" style="color: #0b0f14">
+                                                <i class="bi bi-calendar-check me-1" style="color: #0b0f14"></i> Appointment
                                             </span>
                                         </c:when>
                                         <c:otherwise>
-                                            <span class="badge badge-soft-secondary">
+                                            <span class="badge badge-soft-secondary" style="color: #0b0f14">
                                                 <i class="bi bi-person-walking me-1"></i> Walk-in
                                             </span>
                                         </c:otherwise>
                                     </c:choose>
                                 </td>
-                                <td class="text-center">
-                                    <span class="badge badge-soft-info border border-info border-opacity-25">
+                                <td class="text-center" ">
+                                    <span class="badge badge-soft-info border border-info border-opacity-25" style="color: #0b0f14">
                                         ${journey.latestStage} &bull; ${journey.latestStatus}
                                     </span>
                                 </td>
@@ -322,7 +322,7 @@
         <jsp:param name="currentPage" value="${journeyList.currentPage}" />
         <jsp:param name="totalPages" value="${journeyList.totalPages}" />
         <jsp:param name="baseUrl" value="/customer/repair-list" />
-        <jsp:param name="queryString" value="?vehicleId=${param.vehicleId}&sortBy=${param.sortBy}" />
+        <jsp:param name="queryString" value="vehicleId=${param.vehicleId}&sortBy=${param.sortBy}" />
     </jsp:include>
 </div>
 
