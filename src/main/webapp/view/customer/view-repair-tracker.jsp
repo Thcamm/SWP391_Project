@@ -238,9 +238,7 @@
                                 <%-- Action buttons cho các stage cụ thể --%>
                             <c:choose>
                                 <%-- Invoice: Xem chi tiết hóa đơn --%>
-                                <c:when test="${stage.stageType == 'INVOICE' && journey.invoice != null &&
-                                              (journey.invoice.paymentStatus == 'UNPAID' ||
-                                               journey.invoice.paymentStatus == 'PARTIALLY_PAID')}">
+                                <c:when test="${stage.stageType == 'INVOICE' && journey.invoice != null }">
                                     <div class="stage-actions">
                                         <a href="${pageContext.request.contextPath}/customer/invoice?id=${journey.invoice.invoiceID}"
                                            class="btn btn-primary btn-sm">

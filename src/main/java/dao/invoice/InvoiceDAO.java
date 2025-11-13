@@ -46,35 +46,6 @@ public class InvoiceDAO {
         }
     }
 
-    public int insert(Connection conn, Invoice invoice) throws SQLException {
-        String sql = "INSERT INTO Invoice (" +
-                "WorkOrderID, InvoiceNumber, InvoiceDate, DueDate, " +
-                "Subtotal, TaxAmount, PaidAmount, PaymentStatus, Notes" +
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            stmt.setInt(1, invoice.getWorkOrderID());
-            stmt.setString(2, invoice.getInvoiceNumber());
-            stmt.setDate(3, invoice.getInvoiceDate());
-            stmt.setDate(4, invoice.getDueDate());
-            stmt.setBigDecimal(5, invoice.getSubtotal());
-            stmt.setBigDecimal(6, invoice.getTaxAmount());
-            stmt.setBigDecimal(7, invoice.getPaidAmount());
-            stmt.setString(8, invoice.getPaymentStatus());
-            stmt.setString(9, invoice.getNotes());
-
-            stmt.executeUpdate();
-
-            try (ResultSet rs = stmt.getGeneratedKeys()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-                throw new SQLException("Failed to get generated InvoiceID");
-            }
-        }
-    }
-
     public void delete(int invoiceId) throws SQLException {
         String sql = "DELETE FROM Invoice WHERE InvoiceID = ?";
 
@@ -311,6 +282,33 @@ public class InvoiceDAO {
             }
         }
         return 0;
+    }
+
+    public List<Invoice> getInvoicesByCustomerID(int customerID) throws SQLException {
+        String sql =
+                "SELECT DISTINCT i.* " +
+                        "FROM Invoice i " +
+                        "INNER JOIN WorkOrder wo ON i.WorkOrderID = wo.WorkOrderID " +
+                        "INNER JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
+                        "INNER JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
+                        "WHERE v.CustomerID = ? " +
+                        "ORDER BY i.InvoiceDate DESC";
+
+        List<Invoice> invoices = new ArrayList<>();
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, customerID);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    invoices.add(mapResultSetToInvoice(rs));
+                }
+            }
+        }
+
+        return invoices;
     }
 
     private Invoice mapResultSetToInvoice(ResultSet rs) throws SQLException {

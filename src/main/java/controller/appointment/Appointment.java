@@ -45,16 +45,14 @@ public class Appointment extends HttpServlet {
             return; // Stop execution immediately
         }
 
-        // 2. Get necessary parameters
-        String carBrand = request.getParameter("carBrand");
-        String licensePlate = request.getParameter("licensePlate");
+
         String dateStr = request.getParameter("appointmentDate");
         String description = request.getParameter("description");
 
         CustomerDAO customerDAO = new CustomerDAO();
-        VehicleDAO vehicleDAO = new VehicleDAO(); // Cần có VehicleDAO
+
         AppointmentDAO appointmentDAO = new AppointmentDAO(); // Hoặc dùng Service
-        VehicleService vehicleService = new VehicleService(vehicleDAO);
+
 
 
         try {
@@ -73,7 +71,7 @@ public class Appointment extends HttpServlet {
             java.time.LocalDateTime dateTime = java.time.LocalDateTime.parse(dateStr);
             appointment.setAppointmentDate(dateTime);
             appointment.setDescription(description);
-            appointment.setStatus("PENDING"); // Set initial status
+
 
             // 7. Save to database
             appointmentDAO.insertAppointment(appointment);

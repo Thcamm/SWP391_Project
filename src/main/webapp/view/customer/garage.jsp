@@ -65,8 +65,6 @@
                         <th>Year</th>
                         <th>License Plate</th>
                         <th>Change</th>
-                        <th>Action</th>
-                        <th>Track Service</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -82,18 +80,6 @@
                                     <input type="hidden" name="vehicleId" value="${vehicle.vehicleID}">
                                     <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                                 </form>
-                            </td>
-<%--                            <td>--%>
-<%--                                <a href="${pageContext.request.contextPath}/customerservice/createRequest?customerId=${c.customerId}"--%>
-<%--                                   class="btn btn-sm btn-success">--%>
-<%--                                    Create Request--%>
-<%--                                </a>--%>
-<%--                            </td>--%>
-                            <td>
-                                <a href="#"
-                                   class="btn btn-sm btn-info">
-                                    Tracking
-                                </a>
                             </td>
                         </tr>
                     </c:forEach>

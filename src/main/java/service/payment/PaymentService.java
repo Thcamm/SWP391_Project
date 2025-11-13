@@ -88,7 +88,7 @@ public class PaymentService {
 
             validateInvoiceBeforeInsert(invoice);
 
-            int invoiceId = invoiceDAO.insert(conn, invoice);
+            int invoiceId = invoiceDAO.insert(invoice);
             invoice.setInvoiceID(invoiceId);
 
             conn.commit();
@@ -614,5 +614,36 @@ public class PaymentService {
                 " + Parts: " + partsCost + ")");
 
         return subtotal;
+    }
+
+    public List<Invoice> getInvoicesByCustomerID(int customerID) throws Exception {
+        try {
+            return invoiceDAO.getInvoicesByCustomerID(customerID);
+        } catch (SQLException e) {
+            throw new Exception("Error getting customer invoices: " + e.getMessage(), e);
+        }
+    }
+
+    public boolean invoiceBelongsToCustomer(int invoiceID, int customerID) throws Exception {
+        try {
+            Invoice invoice = invoiceDAO.getById(invoiceID);
+            if (invoice == null) {
+                return false;
+            }
+
+            // Get WorkOrder to find customer
+            WorkOrder workOrder = workOrderDAO.getWorkOrderById(invoice.getWorkOrderID());
+            if (workOrder == null) {
+                return false;
+            }
+
+            // Get customer from work order
+            Customer customer = workOrderDAO.getCustomerForWorkOrder(workOrder.getWorkOrderId());
+
+            return customer != null && customer.getCustomerId() == customerID;
+
+        } catch (SQLException e) {
+            throw new Exception("Error verifying invoice ownership: " + e.getMessage(), e);
+        }
     }
 }

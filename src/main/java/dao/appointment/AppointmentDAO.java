@@ -132,17 +132,17 @@ public class AppointmentDAO extends DbContext {
     }
 
     public void insertAppointment(Appointment appointment) {
-        String sql = "INSERT INTO Appointment (CustomerID, AppointmentDate, Status, Description) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Appointment (CustomerID, AppointmentDate, Description) VALUES (?, ?, ?)";
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
             st.setInt(1, appointment.getCustomerID());
             // Kiểm tra null và set date an toàn
             if (appointment.getAppointmentDate() != null) {
-                st.setTimestamp(3, java.sql.Timestamp.valueOf(appointment.getAppointmentDate()));
+                st.setTimestamp(2, java.sql.Timestamp.valueOf(appointment.getAppointmentDate()));
             } else {
                 throw new IllegalArgumentException("AppointmentService date cannot be null");
             }
-            st.setString(4, appointment.getStatus());
-            st.setString(5, appointment.getDescription());
+
+            st.setString(3, appointment.getDescription());
             st.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace(); // Hiển thị chi tiết lỗi SQL

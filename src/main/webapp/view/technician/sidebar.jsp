@@ -119,7 +119,7 @@
         </nav>
 
         <div class="sidebar-footer">
-            <a href="${pageContext.request.contextPath}/#" class="btn-support">
+            <a href="#" class="btn-support">
                 <i class="bi bi-question-circle"></i>
                 <span>Help & Support</span>
             </a>

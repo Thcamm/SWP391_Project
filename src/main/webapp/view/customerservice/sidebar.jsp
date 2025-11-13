@@ -1,7 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
 prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %> <%@ page
-contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"
-%> <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+contentType="text/html;charset=UTF-8" language="java" %>
 
 <style>
   .sidebar-wrapper {
@@ -176,7 +175,7 @@ contentType="text/html;charset=UTF-8" language="java" %> <%@ taglib uri="http://
         </nav>
 
     <div class="sidebar-footer">
-      <a href="${pageContext.request.contextPath}/support" class="btn-support">
+      <a href="#" class="btn-support">
         <i class="bi bi-question-circle"></i>
         <span>Help & Support</span>
       </a>
