@@ -33,6 +33,7 @@ public class TechnicianService {
 
         Employee technician = technicianDAO.getTechnicianByUserId(userId);
         if(technician == null) {
+            System.out.println("TechnicianService.getTechnicianByUserId: technician not found for userId " + userId);
             return ServiceResult.error(MessageConstants.ERR002); //data not found
         }
 
@@ -46,6 +47,7 @@ public class TechnicianService {
 
         var stats = technicianDAO.getTaskStatistics(technicianId);
         if(stats == null) {
+            System.out.println("TechnicianService.getTaskStatistics: stats not found for technicianId " + technicianId);
             return ServiceResult.error(MessageConstants.ERR002); //data not found
         }
 
@@ -58,6 +60,7 @@ public class TechnicianService {
         }
         TaskAssignment task = technicianDAO.getTaskById(assignmentId);
         if (task == null) {
+            System.out.println("TechnicianService.getTaskById: task not found for assignmentId " + assignmentId);
             return ServiceResult.error(MessageConstants.ERR002); //data not found
 
         }
@@ -164,6 +167,7 @@ public class TechnicianService {
         }
         TaskStatistics stats = technicianDAO.getAllTasksStatistics(technicianId);
         if(stats == null) {
+            System.out.println("TechnicianService.getAllTasksStatistics: stats not found for technicianId " + technicianId);
             return ServiceResult.error(MessageConstants.ERR002);
         }
 
@@ -176,7 +180,11 @@ public class TechnicianService {
         }
 
         TaskAssignment task = technicianDAO.getTaskById(assignmentId);
-        if (task == null) return ServiceResult.error(MessageConstants.ERR002);
+        if (task == null){
+            System.out.println("TechnicianService.acceptTask: task not found for assignmentId " + assignmentId);
+            return ServiceResult.error(MessageConstants.ERR002);
+        }
+
         if (task.getAssignToTechID() != technicianId) return ServiceResult.error(MessageConstants.TASK009);
         if (task.getStatus() != TaskAssignment.TaskStatus.ASSIGNED) {
             return ServiceResult.error(MessageConstants.TASK006); // ví dụ: "Trạng thái hiện tại không cho phép thao tác này"
@@ -240,7 +248,10 @@ public class TechnicianService {
         if (technicianId <= 0 || assignmentId <= 0) return ServiceResult.error(MessageConstants.ERR003);
 
         TaskAssignment task = technicianDAO.getTaskById(assignmentId);
-        if (task == null) return ServiceResult.error(MessageConstants.ERR002);
+        if (task == null) {
+            System.out.println("TechnicianService.completeTask: task not found for assignmentId " + assignmentId);
+            return ServiceResult.error(MessageConstants.ERR002);
+        }
         if (task.getAssignToTechID() != technicianId) return ServiceResult.error(MessageConstants.TASK009);
         if (task.getStatus() != TaskAssignment.TaskStatus.IN_PROGRESS) {
             return ServiceResult.error(MessageConstants.TASK006);

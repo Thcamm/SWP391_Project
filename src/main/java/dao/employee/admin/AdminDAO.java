@@ -489,6 +489,24 @@ public class AdminDAO extends DbContext {
         }
         return null;
     }
+    public int getEmployeeIdByUserId(int userId) throws SQLException {
+        // SQL: Find EmployeeID by joining Employee and User tables on UserID
+        String sql = "SELECT e.EmployeeID FROM Employee e " +
+                "WHERE e.UserID = ?";
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("EmployeeID");
+                }
+            }
+        }
+        return -1;
+    }
 
     public boolean executePromoteToEmployeeSP(int userId, String newRoleName,
             String employeeCode, double salary,
