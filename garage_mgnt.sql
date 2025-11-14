@@ -1087,4 +1087,111 @@ CREATE INDEX ix_dp_vd_isapproved
   ) NOT NULL;
   
   ALTER TABLE VehicleDiagnostic ADD COLUMN RejectReason VARCHAR(255) NULL;
-                
+  
+  ALTER TABLE servicerequest
+DROP FOREIGN KEY fk_sr_appointment;
+ALTER TABLE notification
+DROP FOREIGN KEY fk_ntf_appt;
+ALTER TABLE supportrequest
+DROP FOREIGN KEY supportrequest_ibfk_3;
+
+Drop table appointment;
+CREATE TABLE appointment (
+  AppointmentID int NOT NULL AUTO_INCREMENT,
+  CustomerID int NOT NULL,
+	AppointmentDate           DATETIME   NOT NULL,
+  Status enum('PENDING','ACCEPTED','REJECTED','CANCELLED') DEFAULT 'PENDING',
+  Description text,
+  RescheduleCount int DEFAULT 0,
+  CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UpdatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (AppointmentID),
+  KEY ix_appt_customer (CustomerID),
+  CONSTRAINT fk_appt_customer FOREIGN KEY (CustomerID) 
+      REFERENCES customer (CustomerID) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE servicerequest
+ADD CONSTRAINT fk_sr_appointment
+FOREIGN KEY (AppointmentID) REFERENCES appointment(AppointmentID)
+ON DELETE SET NULL ON UPDATE RESTRICT;
+ALTER TABLE notification
+ADD CONSTRAINT fk_ntf_appt
+FOREIGN KEY (AppointmentID) REFERENCES appointment(AppointmentID)
+ON DELETE SET NULL ON UPDATE RESTRICT;
+ALTER TABLE supportrequest
+ADD CONSTRAINT supportrequest_ibfk_3
+FOREIGN KEY (AppointmentID) REFERENCES appointment(AppointmentID)
+ON DELETE SET NULL ON UPDATE RESTRICT;
+
+ALTER TABLE supportrequest
+  DROP COLUMN Email,
+  DROP COLUMN Phone;
+
+
+ALTER TABLE Feedback
+ADD COLUMN IsAnonymous BOOLEAN DEFAULT FALSE,
+ADD COLUMN ReplyText TEXT ,
+ADD COLUMN ReplyDate DATETIME ,
+ADD COLUMN RepliedBy INT,
+ADD CONSTRAINT fk_feedback_repliedby FOREIGN KEY (RepliedBy) REFERENCES User(UserID),
+ADD COLUMN Status ENUM('PENDING','REPLIED','CLOSED') NOT NULL DEFAULT 'PENDING';
+
+--------------------------------------------------------------
+
+CREATE TABLE PendingChange (
+    ChangeID INT AUTO_INCREMENT PRIMARY KEY,
+    CustomerID INT NOT NULL,                       -- Khách hàng
+    FieldsChanged TEXT NOT NULL,               -- JSON lưu các trường và giá trị mới
+    Token VARCHAR(255) NOT NULL,               -- Token xác nhận
+    TokenExpiry DATETIME DEFAULT NULL,             -- Hạn token
+    Status ENUM('PENDING','CONFIRMED','REJECTED') DEFAULT 'PENDING',
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
+) ENGINE=InnoDB;
+
+DELIMITER //
+
+CREATE TRIGGER trg_pendingchange_set_expiry
+BEFORE INSERT ON PendingChange
+FOR EACH ROW
+BEGIN
+    IF NEW.TokenExpiry IS NULL THEN
+        SET NEW.TokenExpiry = NOW() + INTERVAL 24 HOUR;
+    END IF;
+END; //
+
+DELIMITER ;
+
+ALTER TABLE servicerequest
+ADD COLUMN UpdatedAt datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP AFTER Note;
+
+ALTER TABLE workorder
+ADD COLUMN UpdatedAt datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP ;
+
+-- 1) Thêm cột mới (nullable)
+ALTER TABLE taskassignment
+  ADD COLUMN planned_start   DATETIME NULL,
+  ADD COLUMN planned_end     DATETIME NULL,
+  ADD COLUMN declined_at     DATETIME NULL,
+  ADD COLUMN decline_reason  VARCHAR(255) NULL;
+
+-- 2) Làm sạch dữ liệu Status nếu cần
+UPDATE taskassignment SET Status='ASSIGNED' WHERE Status IS NULL;
+
+-- 3) Đổi ENUM (chỉ khi đã chắc tất cả giá trị hợp lệ)
+ALTER TABLE taskassignment
+  MODIFY COLUMN Status ENUM('ASSIGNED','IN_PROGRESS','COMPLETE','CANCELLED')
+  NOT NULL DEFAULT 'ASSIGNED';
+
+-- 4) (Tuỳ chọn) ràng buộc khoảng giờ
+ALTER TABLE taskassignment
+  ADD CONSTRAINT chk_planned_range
+  CHECK (planned_start IS NULL OR planned_end IS NULL OR planned_end > planned_start);
+
+-- 5) Index phục vụ check trùng lịch/lọc
+CREATE INDEX ix_task_time
+  ON taskassignment (AssignToTechID, planned_start, planned_end, Status);
+  
+taskassignment  DROP TRIGGER IF EXISTS trg_vd_on_status_approved;
+DROP PROCEDURE IF EXISTS SP_OnVehicleDiagnosticApproved;
