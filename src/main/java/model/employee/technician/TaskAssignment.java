@@ -35,11 +35,38 @@ public class TaskAssignment {
     private double estimateHours;
     private String assignedDateFormatted;
     private String customerEmail;
+    private String taskDesDetail;
+    private WorkSource workSource;   
+
+    public WorkSource getWorkSource() {
+        return workSource;
+    }
+    public void setWorkSource(WorkSource workSource) {
+        this.workSource = workSource;
+    }
+    public void setWorkSource(String src) {
+        this.workSource = WorkSource.fromString(src);
+    }
+    public String getTaskDesDetail() {
+        return taskDesDetail;
+    }
+
+    public void setTaskDesDetail(String taskDesDetail) {
+        this.taskDesDetail = taskDesDetail;
+    }
 
     private static final DateTimeFormatter D_HM = DateTimeFormatter.ofPattern("dd/MM HH:mm");
     private static final DateTimeFormatter D_M_Y_HM = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
+    public enum WorkSource {
+        REQUEST, DIAGNOSTIC;
 
+        public static WorkSource fromString(String s) {
+            if (s == null) return REQUEST;
+            try { return valueOf(s.trim().toUpperCase()); }
+            catch (IllegalArgumentException e) { return REQUEST; }
+        }
+    }
 
     public String getPlannedStartFormatted() {
         return plannedStart != null ? plannedStart.format(D_M_Y_HM) : "-";
