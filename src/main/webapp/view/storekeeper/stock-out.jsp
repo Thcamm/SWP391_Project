@@ -52,69 +52,63 @@
                     </div>
                 </c:if>
 
-                <!-- Part Requests Table -->
-                <div class="card border-0 shadow-sm mb-3">
-                    <div class="card-header bg-white border-0 d-flex align-items-center justify-content-between">
-                        <h3 class="h5 mb-0">📋 Pending Part Requests</h3>
-                    </div>
-
-                    <c:choose>
-                        <c:when test="${empty pendingRequests}">
-                            <div class="card-body">
-                                <div class="alert alert-light mb-0 text-center py-5">
-                                    <div class="display-1 mb-3">📭</div>
-                                    <p class="mb-0">No pending requests at the moment.</p>
-                                </div>
-                            </div>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="card-body pt-0">
-                                <div class="table-responsive">
-                                    <table class="table table-hover align-middle mb-0">
-                                        <thead class="table-light">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Request ID</th>
-                                            <th>Part Name</th>
-                                            <th>Quantity</th>
-                                            <th>Unit Price</th>
-                                            <th>Total Amount</th>
-                                            <th>Status</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <c:forEach var="request" items="${pendingRequests}" varStatus="st">
-                                            <tr>
-                                                <td>${st.count}</td>
-                                                <td><strong class="font-monospace">#${request.workOrderPartId}</strong></td>
-                                                <td>${request.partName}</td>
-                                                <td>
-                                                    <span class="badge text-bg-info">${request.quantityUsed}</span>
-                                                </td>
-                                                <td class="font-monospace">
-                                                    <fmt:formatNumber value="${request.unitPrice}" type="currency"/>
-                                                </td>
-                                                <td class="font-monospace fw-semibold">
-                                                    <fmt:formatNumber value="${request.unitPrice * request.quantityUsed}" type="currency"/>
-                                                </td>
-                                                <td>
-                                                    <span class="badge text-bg-warning">
-                                                        ⏳ PENDING
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex justify-content-end gap-2">
-                                                        <!-- Approve Button -->
-                                                        <form action="${pageContext.request.contextPath}/stock-out"
-                                                              method="post" class="m-0">
-                                                            <input type="hidden" name="action" value="approve">
-                                                            <input type="hidden" name="workOrderPartId" value="${request.workOrderPartId}">
-                                                            <button type="submit" class="btn btn-success btn-sm"
-                                                                    onclick="return confirm('Approve this request?\n\nPart: ${request.partName}\nQuantity: ${request.quantityUsed}')">
-                                                                ✓ Approve
-                                                            </button>
-                                                        </form>
+                    <!-- Pending Requests Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead class="table-light">
+                            <tr>
+                                <th>Request ID</th>
+                                <th>Part Name</th>
+                                <th>Quantity Requested</th>
+                                <th>Status</th>
+                                <th>Unit Price</th>
+                                <th>Total Value</th>
+                                <th>Requested At</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <c:forEach var="request" items="${pendingRequests}">
+                                <tr>
+                                    <td>${request.workOrderPartId}</td>
+                                    <td>${request.partName}</td>
+                                    <td>
+                                        <span class="badge bg-info">${request.quantityUsed}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fas fa-clock me-1"></i>PENDING
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <fmt:formatNumber value="${request.unitPrice}" type="currency"/>
+                                    </td>
+                                    <td>
+                                        <fmt:formatNumber value="${request.unitPrice * request.quantityUsed}" type="currency"/>
+                                    </td>
+                                    <td>
+                                        <fmt:formatDate value="${request.requestedAt}" pattern="dd/MM/yyyy HH:mm"/>
+                                    </td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${request.currentStock >= request.quantityUsed}">
+                                                <!-- Approve Button -->
+                                                <form method="post" style="display:inline;">
+                                                    <input type="hidden" name="action" value="approve">
+                                                    <input type="hidden" name="workOrderPartId" value="${request.workOrderPartId}">
+                                                    <button type="submit" class="btn btn-sm btn-success"
+                                                            onclick="return confirm('Approve this request and deduct stock?')">
+                                                        <i class="fas fa-check me-1"></i>Approve
+                                                    </button>
+                                                </form>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <!-- Cannot approve -->
+                                                <button class="btn btn-sm btn-secondary" disabled>
+                                                    <i class="fas fa-times me-1"></i>Insufficient
+                                                </button>
+                                            </c:otherwise>
+                                        </c:choose>
 
                                                         <!-- Reject Button -->
                                                         <form action="${pageContext.request.contextPath}/stock-out"
