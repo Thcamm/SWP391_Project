@@ -5,7 +5,7 @@ import common.constant.MessageConstants;
 import common.message.ServiceResult;
 import common.utils.PaginationUtils;
 import dao.employee.technician.TechnicianDAO;
-import dao.inventory.WorkOrderPartDao;
+import dao.inventory.WorkOrderPartDAO;
 import dao.vehicle.VehicleDiagnosticDAO;
 import dao.workorder.WorkOrderDetailDAO;
 import model.employee.Employee;
@@ -28,7 +28,7 @@ public class TechnicianService {
     private WorkOrderDetailDAO workOrderDetailDAO = new WorkOrderDetailDAO();
 
     private VehicleDiagnosticDAO vehicleDiagnosticDAO = new VehicleDiagnosticDAO();
-    private final WorkOrderPartDao workOrderPartDao = new WorkOrderPartDao();
+    private final WorkOrderPartDAO workOrderPartDao = new WorkOrderPartDAO();
     public TechnicianService() {
         this.technicianDAO = new TechnicianDAO();
     }

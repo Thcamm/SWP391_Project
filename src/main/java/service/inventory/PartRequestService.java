@@ -2,7 +2,7 @@ package service.inventory;
 
 import common.message.ServiceResult;
 import dao.employee.technician.TechnicianDAO;
-import dao.inventory.WorkOrderPartDao;
+import dao.inventory.WorkOrderPartDAO;
 import model.employee.technician.PartOption;
 import model.employee.technician.TaskAssignment;
 import model.employee.technician.TaskPartsVM;
@@ -14,7 +14,7 @@ import java.util.List;
 public class PartRequestService {
 
     private final TechnicianDAO technicianDAO = new TechnicianDAO();
-    private final WorkOrderPartDao workOrderPartDAO = new WorkOrderPartDao();
+    private final WorkOrderPartDAO workOrderPartDAO = new WorkOrderPartDAO();
 
     public ServiceResult getPartsForAssignment(int assignmentId) {
         try {

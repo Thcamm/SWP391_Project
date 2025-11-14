@@ -1,6 +1,6 @@
 package model.employee.technician;
 
-import dao.inventory.WorkOrderPartDao;
+import dao.inventory.WorkOrderPartDAO;
 import model.inventory.WorkOrderPartView;
 
 import java.util.List;
