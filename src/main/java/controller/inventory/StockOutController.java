@@ -94,10 +94,10 @@ public class StockOutController extends HttpServlet {
 
         if (success) {
             response.sendRedirect(request.getContextPath() +
-                    "/workorderpart?action=list&message=rejected");
+                    "/stock-out?action=list&message=rejected");
         } else {
             response.sendRedirect(request.getContextPath() +
-                    "/workorderpart?action=list&error=reject_failed");
+                    "/stock-out?action=list&error=reject_failed");
         }
     }
 }
