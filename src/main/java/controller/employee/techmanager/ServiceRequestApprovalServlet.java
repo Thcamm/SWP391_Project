@@ -178,10 +178,12 @@ public class ServiceRequestApprovalServlet extends HttpServlet {
 
             int totalServices = Integer.parseInt(totalServicesStr);
             Map<Integer, String> sourceClassifications = new HashMap<>();
+            Map<Integer, java.math.BigDecimal> estimateHoursMap = new HashMap<>();
 
             for (int i = 0; i < totalServices; i++) {
                 String serviceDetailIdStr = request.getParameter("serviceDetailId_" + i);
                 String source = request.getParameter("source_" + i);
+                String estimateHoursStr = request.getParameter("estimateHours_" + i);
 
                 if (serviceDetailIdStr != null && source != null) {
                     int serviceDetailId = Integer.parseInt(serviceDetailIdStr);
@@ -191,7 +193,21 @@ public class ServiceRequestApprovalServlet extends HttpServlet {
                     }
 
                     sourceClassifications.put(serviceDetailId, source);
-                    System.out.println("  [Classification] Service Detail #" + serviceDetailId + " → " + source);
+
+                    // Parse estimate hours, default to 2.0 if invalid
+                    java.math.BigDecimal estimateHours = java.math.BigDecimal.valueOf(2.0);
+                    if (estimateHoursStr != null && !estimateHoursStr.trim().isEmpty()) {
+                        try {
+                            estimateHours = new java.math.BigDecimal(estimateHoursStr);
+                        } catch (NumberFormatException e) {
+                            System.err.println(
+                                    "Invalid estimateHours for service " + serviceDetailId + ": " + estimateHoursStr);
+                        }
+                    }
+                    estimateHoursMap.put(serviceDetailId, estimateHours);
+
+                    System.out.println("  [Classification] Service Detail #" + serviceDetailId + " → " + source + " ("
+                            + estimateHours + " hrs)");
                 }
             }
 
@@ -200,7 +216,7 @@ public class ServiceRequestApprovalServlet extends HttpServlet {
             }
 
             int workOrderId = techManagerService.approveServiceRequest(requestId, techManagerEmployeeId,
-                    sourceClassifications);
+                    sourceClassifications, estimateHoursMap);
 
             if (workOrderId <= 0) {
                 throw new SQLException("Failed to create WorkOrder");

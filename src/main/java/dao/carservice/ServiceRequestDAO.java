@@ -243,62 +243,15 @@ public class ServiceRequestDAO extends DbContext {
         }
         return requestList;
     }
-    public List<String> getServiceNamesByRequestId(int requestId) throws SQLException {
-        List<String> serviceNames = new ArrayList<>();
 
-        String sql = """
-        SELECT st.ServiceName
-        FROM servicerequestdetail srd
-        JOIN service_type st ON srd.ServiceID = st.ServiceID
-        WHERE srd.RequestID = ?
-    """;
-
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, requestId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    serviceNames.add(rs.getString("ServiceName"));
-                }
-            }
-        }
-
-        return serviceNames;
-    }
-    public ServiceRequest getServiceRequestById(int requestId) throws SQLException {
-        String sql = "SELECT * FROM ServiceRequest WHERE RequestID = ?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, requestId);
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                ServiceRequest sr = new ServiceRequest();
-                sr.setRequestID(rs.getInt("RequestID"));
-                sr.setCustomerID(rs.getInt("CustomerID"));
-                sr.setVehicleID(rs.getInt("VehicleID"));
-                sr.setAppointmentID(rs.getInt("AppointmentID"));
-                sr.setRequestDate(rs.getTimestamp("RequestDate"));
-                sr.setStatus(rs.getString("Status"));
-                return sr;
-            }
-
-
-        }
-        return null;
-
-    }
-//
-//    /**
-//     * LUỒNG MỚI - GĐ 1: Get all ServiceRequestDetail for a given RequestID
-//     * Returns list of individual services to split into N WorkOrderDetails
-//     *
-//     * @param requestId The ServiceRequest ID
-//     * @return List of ServiceRequestDetail with service information
-//     * @throws SQLException if query fails
-//     */
+    /**
+     * LUỒNG MỚI - GĐ 1: Get all ServiceRequestDetail for a given RequestID
+     * Returns list of individual services to split into N WorkOrderDetails
+     * 
+     * @param requestId The ServiceRequest ID
+     * @return List of ServiceRequestDetail with service information
+     * @throws SQLException if query fails
+     */
     public List<ServiceRequestDetail> getServiceRequestDetails(int requestId) throws SQLException {
         List<ServiceRequestDetail> details = new ArrayList<>();
         String sql = "SELECT srd.DetailID, srd.RequestID, srd.ServiceID, " +
@@ -309,7 +262,7 @@ public class ServiceRequestDAO extends DbContext {
                      "ORDER BY srd.DetailID";
 
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, requestId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -329,9 +282,9 @@ public class ServiceRequestDAO extends DbContext {
         return details;
     }
 
-//    /**
-//     * LUỒNG MỚI - GĐ 1: Get ServiceRequestDetail with Connection (for transaction)
-//     */
+    /**
+     * LUỒNG MỚI - GĐ 1: Get ServiceRequestDetail with Connection (for transaction)
+     */
     public List<ServiceRequestDetail> getServiceRequestDetails(Connection conn, int requestId) throws SQLException {
         List<ServiceRequestDetail> details = new ArrayList<>();
         String sql = "SELECT srd.DetailID, srd.RequestID, srd.ServiceID, " +
@@ -360,4 +313,51 @@ public class ServiceRequestDAO extends DbContext {
         return details;
     }
 
+    public List<String> getServiceNamesByRequestId(int requestId) throws SQLException {
+        List<String> serviceNames = new ArrayList<>();
+
+        String sql = """
+                    SELECT st.ServiceName
+                    FROM servicerequestdetail srd
+                    JOIN service_type st ON srd.ServiceID = st.ServiceID
+                    WHERE srd.RequestID = ?
+                """;
+
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, requestId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    serviceNames.add(rs.getString("ServiceName"));
+                }
+            }
+        }
+
+        return serviceNames;
+    }
+
+    public ServiceRequest getServiceRequestById(int requestId) throws SQLException {
+        String sql = "SELECT * FROM ServiceRequest WHERE RequestID = ?";
+        try (Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, requestId);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ServiceRequest sr = new ServiceRequest();
+                sr.setRequestID(rs.getInt("RequestID"));
+                sr.setCustomerID(rs.getInt("CustomerID"));
+                sr.setVehicleID(rs.getInt("VehicleID"));
+                sr.setAppointmentID(rs.getInt("AppointmentID"));
+                sr.setRequestDate(rs.getTimestamp("RequestDate"));
+                sr.setStatus(rs.getString("Status"));
+                return sr;
+            }
+
+        }
+        return null;
+
+    }
 }

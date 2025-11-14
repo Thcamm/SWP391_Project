@@ -40,8 +40,8 @@ public class RepairTrackerService {
         // Build timeline in order
         buildTimeline(journey);
 
-        CustomerDiagnosticsView diagView = diagnosticService.getDiagnosticsForRequest(customerId, requestId);
-        journey.setDiagnosticsView(diagView);
+//        CustomerDiagnosticsView diagView = diagnosticService.getDiagnosticsForRequest(customerId, requestId);
+//        journey.setDiagnosticsView(diagView);
 
         return journey;
     }

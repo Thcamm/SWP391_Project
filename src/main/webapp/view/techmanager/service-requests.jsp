@@ -211,11 +211,11 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
                               <ul class="mb-0 mt-2">
                                 <li>
                                   <strong>REQUEST:</strong>
-                                  Direct repair - Skip diagnosis (Go to GĐ5)
+                                  Direct repair - Skip diagnosis
                                 </li>
                                 <li>
                                   <strong>DIAGNOSTIC:</strong>
-                                  Needs inspection first (Go to GĐ1)
+                                  Needs inspection first
                                 </li>
                               </ul>
                             </div>
@@ -224,9 +224,10 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
                               <table class="table table-bordered">
                                 <thead class="table-light">
                                   <tr>
-                                    <th width="40%">Service</th>
-                                    <th width="30%">Description</th>
-                                    <th width="15%" class="text-end">Price</th>
+                                    <th width="35%">Service</th>
+                                    <th width="25%">Description</th>
+                                    <th width="12%" class="text-end">Price</th>
+                                    <th width="13%" class="text-center">Est. Hours *</th>
                                     <th width="15%" class="text-center">Classification *</th>
                                   </tr>
                                 </thead>
@@ -243,6 +244,18 @@ uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt" uri="http://j
                                             groupingUsed="true" />
                                           ₫
                                         </strong>
+                                      </td>
+                                      <td class="text-center">
+                                        <input
+                                          type="number"
+                                          name="estimateHours_${status.index}"
+                                          class="form-control form-control-sm"
+                                          step="0.5"
+                                          min="0.5"
+                                          max="100"
+                                          value="2.0"
+                                          required
+                                          style="width: 80px; margin: auto" />
                                       </td>
                                       <td class="text-center">
                                         <input
