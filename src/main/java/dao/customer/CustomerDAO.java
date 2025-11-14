@@ -130,10 +130,10 @@ public class CustomerDAO extends DbContext {
                 ps.setString(index++, "%" + licensePlate.trim() + "%");
             }
             if (fromDate != null && !fromDate.isEmpty()) {
-                ps.setDate(index++, java.sql.Date.valueOf(fromDate));
+                ps.setDate(index++, Date.valueOf(fromDate));
             }
             if (toDate != null && !toDate.isEmpty()) {
-                ps.setDate(index++, java.sql.Date.valueOf(toDate));
+                ps.setDate(index++, Date.valueOf(toDate));
             }
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -197,10 +197,10 @@ public class CustomerDAO extends DbContext {
                 ps.setString(index++, "%" + licensePlate.trim() + "%");
             }
             if (fromDate != null && !fromDate.isEmpty()) {
-                ps.setDate(index++, java.sql.Date.valueOf(fromDate));
+                ps.setDate(index++, Date.valueOf(fromDate));
             }
             if (toDate != null && !toDate.isEmpty()) {
-                ps.setDate(index++, java.sql.Date.valueOf(toDate));
+                ps.setDate(index++, Date.valueOf(toDate));
             }
 
             ps.setInt(index++, limit);

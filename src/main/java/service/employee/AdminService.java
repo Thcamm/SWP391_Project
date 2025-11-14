@@ -192,7 +192,7 @@ public class AdminService {
             newUser.setEmail(email);
             newUser.setGender(gender);
             newUser.setRoleId(roleId);
-            newUser.setPasswordHash(util.PasswordUtil.hashPassword(randomPassword));
+            newUser.setPasswordHash(PasswordUtil.hashPassword(randomPassword));
             newUser.setActiveStatus(true);
             Integer createdByEmployeeId = null;
             createdByEmployeeId = adminDAO.getEmployeeIdByUsername(currentUser);

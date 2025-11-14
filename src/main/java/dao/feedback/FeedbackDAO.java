@@ -245,7 +245,7 @@ public class FeedbackDAO extends DbContext {
         return fb;
     }
 
-    private java.time.LocalDateTime toLocalDateTime(Timestamp ts) {
+    private LocalDateTime toLocalDateTime(Timestamp ts) {
         return ts != null ? ts.toLocalDateTime() : null;
     }
     public Feedback getFeedbackByRequestId( int requestId) throws SQLException {

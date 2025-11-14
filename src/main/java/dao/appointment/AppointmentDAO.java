@@ -139,7 +139,7 @@ public class AppointmentDAO extends DbContext {
             st.setInt(1, appointment.getCustomerID());
             // Kiểm tra null và set date an toàn
             if (appointment.getAppointmentDate() != null) {
-                st.setTimestamp(2, java.sql.Timestamp.valueOf(appointment.getAppointmentDate()));
+                st.setTimestamp(2, Timestamp.valueOf(appointment.getAppointmentDate()));
             } else {
                 throw new IllegalArgumentException("AppointmentService date cannot be null");
             }
@@ -160,7 +160,7 @@ public class AppointmentDAO extends DbContext {
                 "WHERE AppointmentID = ?";
         try (PreparedStatement st = DbContext.getConnection().prepareStatement(sql)) {
             if (appointment.getAppointmentDate() != null) {
-                st.setTimestamp(1, java.sql.Timestamp.valueOf(appointment.getAppointmentDate()));
+                st.setTimestamp(1, Timestamp.valueOf(appointment.getAppointmentDate()));
             } else {
                 throw new IllegalArgumentException("AppointmentService date cannot be null");
             }

@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * DTO để hiển thị chi tiết Work Order cho Customer Service
  */
-public class WorkOrderDetailView {
+public class CSWorkOrderDetailView {
     private WorkOrder workOrder;
     private Customer customer;
     private Vehicle vehicle;
@@ -28,7 +28,7 @@ public class WorkOrderDetailView {
     private SummaryInfo summary;
 
     // Constructor
-    public WorkOrderDetailView() {
+    public CSWorkOrderDetailView() {
     }
 
     // Getters and Setters

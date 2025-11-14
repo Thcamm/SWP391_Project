@@ -116,13 +116,13 @@ public class WorkOrderDAO extends DbContext {
         try (Connection conn = DbContext.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, detail.getWorkOrderId());
-            ps.setString(2, detail.getSource());
+            ps.setString(2, detail.getSource().name());
             if (detail.getDiagnosticId() != null) {
                 ps.setInt(3, detail.getDiagnosticId());
             } else {
                 ps.setNull(3, java.sql.Types.INTEGER);
             }
-            ps.setString(4, detail.getApprovalStatus());
+            ps.setString(4, detail.getApprovalStatus().name());
             ps.setString(5, detail.getTaskDescription());
             ps.setBigDecimal(6, detail.getEstimateHours());
             ps.setBigDecimal(7, detail.getEstimateAmount());
@@ -302,14 +302,14 @@ public class WorkOrderDAO extends DbContext {
         String sql = "INSERT INTO WorkOrderDetail (WorkOrderID, Source, DiagnosticID, ApprovalStatus, TaskDescription, EstimateHours, EstimateAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, detail.getWorkOrderId());
-            ps.setString(2, detail.getSource());
+            ps.setString(2, detail.getSource().name());
             if (detail.getDiagnosticId() != null) {
                 ps.setInt(3, detail.getDiagnosticId());
             } else {
                 ps.setNull(3, java.sql.Types.INTEGER);
             }
             if (detail.getApprovalStatus() != null) {
-                ps.setString(4, detail.getApprovalStatus());
+                ps.setString(4, detail.getApprovalStatus().name());
             } else {
                 ps.setNull(4, java.sql.Types.VARCHAR);
             }

@@ -47,7 +47,7 @@ public class ViewAppointmentDetail extends HttpServlet {
             int appointmentID = Integer.parseInt(idStr);
             // Lấy chi tiết cuộc hẹn (Giả định DAO trả về DTO hoặc Appointment có đủ thông tin Khách hàng)
             Appointment appointmentDetail = appointmentDAO.getAppointmentById(appointmentID);
-            dao.customer.CustomerDAO customerDAO = new dao.customer.CustomerDAO();
+            CustomerDAO customerDAO = new CustomerDAO();
             Customer customerDetail = customerDAO.getCustomerById(appointmentDetail.getCustomerID());
             if (appointmentDetail != null) {
                 request.setAttribute("appointmentDetail", appointmentDetail);

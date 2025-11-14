@@ -21,7 +21,7 @@ public class ServiceRequestDAO extends DbContext {
                 ps1.setInt(1, request.getCustomerID());
                 ps1.setInt(2, request.getVehicleID());
                 if(request.getAppointmentID()!=null) ps1.setInt(3, request.getAppointmentID());
-                else ps1.setNull(3, java.sql.Types.INTEGER);
+                else ps1.setNull(3, Types.INTEGER);
                 if(request.getNote()!=null) ps1.setString(4, request.getNote());
                 else ps1.setNull(4, Types.VARCHAR);
                 ps1.executeUpdate();

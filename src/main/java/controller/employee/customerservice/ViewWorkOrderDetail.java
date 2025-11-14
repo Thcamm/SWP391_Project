@@ -1,7 +1,7 @@
 package controller.employee.customerservice;
 
-import model.dto.WorkOrderDetailView;
-import service.work.WorkOrderDetailService;
+import model.dto.CSWorkOrderDetailView;
+import service.work.CSWorkOrderDetailService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -9,12 +9,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 @WebServlet("/customerservice/workorder-detail")
 public class ViewWorkOrderDetail extends HttpServlet {
 
-    private final WorkOrderDetailService service = new WorkOrderDetailService();
+    private final CSWorkOrderDetailService service = new CSWorkOrderDetailService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -31,7 +30,7 @@ public class ViewWorkOrderDetail extends HttpServlet {
             int workOrderID = Integer.parseInt(idParam);
 
             // 2. Gọi Service để lấy DTO
-            WorkOrderDetailView view = service.getWorkOrderDetailView(workOrderID);
+            CSWorkOrderDetailView view = service.getWorkOrderDetailView(workOrderID);
 
             // 3. Kiểm tra kết quả
             if (view == null) {

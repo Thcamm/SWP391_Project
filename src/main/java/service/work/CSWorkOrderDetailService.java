@@ -8,8 +8,8 @@ import dao.customer.CustomerDAO;
 import dao.vehicle.VehicleDAO;
 import dao.user.UserDAO;
 import dao.inventory.PartDAO;
-import model.dto.WorkOrderDetailView;
-import model.dto.WorkOrderDetailView.*;
+import model.dto.CSWorkOrderDetailView;
+import model.dto.CSWorkOrderDetailView.*;
 import model.employee.technician.TaskAssignment;
 import model.workorder.WorkOrder;
 import model.workorder.WorkOrderDetail;
@@ -20,14 +20,13 @@ import model.user.User;
 import model.inventory.Part;
 
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Service handling logic for displaying Work Order details
  */
-public class WorkOrderDetailService {
+public class CSWorkOrderDetailService {
 
     private final WorkOrderDAO workOrderDAO;
     private final WorkOrderDetailDAO detailDAO;
@@ -38,7 +37,7 @@ public class WorkOrderDetailService {
     private final UserDAO userDAO;
     private final PartDAO partInfoDAO;
 
-    public WorkOrderDetailService() {
+    public CSWorkOrderDetailService() {
         this.workOrderDAO = new WorkOrderDAO();
         this.detailDAO = new WorkOrderDetailDAO();
         this.partDAO = new WorkOrderPartDAO();
@@ -52,7 +51,7 @@ public class WorkOrderDetailService {
     /**
      * Retrieve detailed information of a Work Order
      */
-    public WorkOrderDetailView getWorkOrderDetailView(int workOrderId) throws Exception {
+    public CSWorkOrderDetailView getWorkOrderDetailView(int workOrderId) throws Exception {
         // 1. Get Work Order information
         WorkOrder workOrder = workOrderDAO.getWorkOrderById(workOrderId);
         if (workOrder == null) {
@@ -60,7 +59,7 @@ public class WorkOrderDetailService {
         }
 
         // 2. Create DTO
-        WorkOrderDetailView view = new WorkOrderDetailView();
+        CSWorkOrderDetailView view = new CSWorkOrderDetailView();
         view.setWorkOrder(workOrder);
 
         // 3. Get Customer and Vehicle information
@@ -92,12 +91,12 @@ public class WorkOrderDetailService {
             info.setSourceLabel(detail.getSource().equals("REQUEST") ? "Customer Request" : "Diagnosis");
 
             // Status label and color
-            String[] detailStatus = getDetailStatusInfo(detail.getSource());
+            String[] detailStatus = getDetailStatusInfo(detail.getSource().name());
             info.setStatusLabel(detailStatus[0]);
             info.setStatusColor(detailStatus[1]);
 
             // Approval status
-            String[] approvalStatus = getApprovalStatusInfo(detail.getApprovalStatus());
+            String[] approvalStatus = getApprovalStatusInfo(detail.getApprovalStatus().name());
             info.setApprovalStatusLabel(approvalStatus[0]);
             info.setApprovalStatusColor(approvalStatus[1]);
 
@@ -144,11 +143,11 @@ public class WorkOrderDetailService {
             detailInfos.add(info);
 
             totalDetails++;
-            if ("COMPLETE".equals(detail.getDetailStatus())) {
+            if (detail.getDetailStatus() == WorkOrderDetail.DetailStatus.COMPLETE) {
                 completedDetails++;
             }
 
-            if ("PENDING".equals(detail.getApprovalStatus())) {
+            if (detail.getApprovalStatus() == WorkOrderDetail.ApprovalStatus.PENDING) {
                 pendingApprovals++;
             }
 

@@ -109,7 +109,7 @@ public class PaymentDAO {
         }
     }
 
-    public BigDecimal getTotalRevenueByDateRange(java.sql.Date startDate, java.sql.Date endDate) throws Exception {
+    public BigDecimal getTotalRevenueByDateRange(Date startDate, Date endDate) throws Exception {
         String sql = "SELECT COALESCE(SUM(Amount), 0) FROM Payment " +
                 "WHERE DATE(PaymentDate) BETWEEN ? AND ?";
 
