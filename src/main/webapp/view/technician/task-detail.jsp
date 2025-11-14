@@ -27,7 +27,7 @@
 
                     <!-- Task Information Card -->
                     <div class="task-info-card">
-                        <h3>📋 Task Information</h3>
+                        <h3>Task Information</h3>
                         <div class="info-grid">
                             <div class="info-item">
                                 <div class="info-label">Task ID</div>
@@ -55,7 +55,7 @@
                             </div>
                             <div class="info-item">
                                 <div class="info-label">Service</div>
-                                <div class="info-value">${task.taskDescription}</div>
+                                <div class="info-value">${task.taskDesDetail}</div>
                             </div>
                             <div class="info-item">
                                 <div class="info-label">Assigned Date</div>
@@ -66,12 +66,7 @@
                             <div class="info-item">
                                 <div class="info-label">Progress</div>
                                 <div class="info-value">
-                                    <%--                            <c:choose>--%>
-                                    <%--                                <c:when test="${task.status == 'IN_PROGRESS'}">--%>
-                                    <%--                                    --%>
-                                    <%--                                </c:when>--%>
-                                    <%--                                <c:otherwise>-</c:otherwise>--%>
-                                    <%--                            </c:choose>--%>
+
 
                                     ${task.progressPercentage}%
                                 </div>
@@ -94,7 +89,7 @@
                         <c:choose>
                         <c:when test="${empty vm.page.data}">
                             <div class="empty-state">
-                                <p>📭 No diagnostics found for this task.</p>
+                                <p>No diagnostics found for this task.</p>
                                 <c:if test="${task.status == 'IN_PROGRESS'}">
                                     <p>Click "Create New Diagnostic" to add one.</p>
                                 </c:if>
@@ -214,7 +209,7 @@
                                             <c:when test="${approvedCnt == 0}">
                                                 <a class="btn btn-sm btn-outline-secondary"
                                                    href="${pageContext.request.contextPath}/technician/diagnostic/edit?diagnosticId=${diag.vehicleDiagnosticID}">
-                                                    🐙 Edit
+                                                    Edit
                                                 </a>
                                             </c:when>
 
@@ -225,25 +220,7 @@
                                         </c:choose>
                                     </td>
 
-                                        <%--                                    <td class="actions">--%>
-                                        <%--                                        <a href="${pageContext.request.contextPath}/technician/diagnostic/view?diagnosticId=${diag.vehicleDiagnosticID}"--%>
-                                        <%--                                           class="btn-sm btn-view">👀 View</a>--%>
 
-                                        <%--                                        <c:set var="approvedCnt"--%>
-                                        <%--                                               value="${vm.approvedCount[diag.vehicleDiagnosticID] != null ? vm.approvedCount[diag.vehicleDiagnosticID] : 0}"/>--%>
-
-                                        <%--                                        <c:if test="${approvedCnt == 0}">--%>
-                                        <%--                                            <a class="btn btn-sm btn-outline-secondary"--%>
-                                        <%--                                               href="${pageContext.request.contextPath}/technician/diagnostic/edit?diagnosticId=${diag.vehicleDiagnosticID}">--%>
-                                        <%--                                                🐙 Edit--%>
-                                        <%--                                            </a>--%>
-                                        <%--                                        </c:if>--%>
-
-                                        <%--                                        <c:if test="${approvedCnt > 0}">--%>
-                                        <%--            <span class="text-muted" style="font-size:12px;"--%>
-                                        <%--                  title="This diagnostic has approved parts and cannot be edited.">(locked)</span>--%>
-                                        <%--                                        </c:if>--%>
-                                        <%--                                    </td>--%>
                                 </tr>
                             </c:forEach>
                             </tbody>

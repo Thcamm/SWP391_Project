@@ -1283,7 +1283,7 @@ public class VehicleDiagnosticDAO {
 
         String updateSQL = """
         UPDATE VehicleDiagnostic
-        SET Status = 'REJECTED', RejectReason = ?, UpdatedAt = NOW()
+        SET Status = 'REJECTED', RejectReason = ?
         WHERE VehicleDiagnosticID = ?
     """;
 

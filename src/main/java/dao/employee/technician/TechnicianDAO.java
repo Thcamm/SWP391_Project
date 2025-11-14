@@ -336,11 +336,12 @@ public class TechnicianDAO {
             int limit) {
         StringBuilder sql = new StringBuilder(
                 "SELECT ta.*, " +
-                        "wd.TaskDescription AS WorkOrderDetailDesc, " +
-                        "wd.EstimateHours, " +
-                        "CONCAT(v.LicensePlate, ' - ', v.Brand, ' ', v.Model) AS VehicleInfo, " +
-                        "GROUP_CONCAT(DISTINCT st.ServiceName SEPARATOR ', ') AS ServiceNames, " +
-                        "u.FullName AS CustomerName " +
+                        "       wd.source AS WorkSource, " +                         // 👈 thêm
+                        "       wd.TaskDescription AS WorkOrderDetailDesc, " +
+                        "       wd.EstimateHours, " +
+                        "       CONCAT(v.LicensePlate, ' - ', v.Brand, ' ', v.Model) AS VehicleInfo, " +
+                        "       GROUP_CONCAT(DISTINCT st.ServiceName SEPARATOR ', ') AS ServiceNames, " +
+                        "       u.FullName AS CustomerName " +
                         "FROM TaskAssignment ta " +
                         "JOIN WorkOrderDetail wd ON ta.DetailID = wd.DetailID " +
                         "JOIN WorkOrder wo ON wd.WorkOrderID = wo.WorkOrderID " +
@@ -350,7 +351,9 @@ public class TechnicianDAO {
                         "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
                         "JOIN Customer c ON v.CustomerID = c.CustomerID " +
                         "JOIN `User` u ON c.UserID = u.UserID " +
-                        "WHERE ta.AssignToTechID = ? ");
+                        "WHERE ta.AssignToTechID = ? "
+        );
+
 
         List<Object> params = new ArrayList<>();
         params.add(technicianId);
@@ -389,6 +392,8 @@ public class TechnicianDAO {
                 while (rs.next()) {
                     TaskAssignment task = mapResultSetToTask(rs);
                     task.setServiceInfo(rs.getString("ServiceNames"));
+                    task.setTaskDesDetail(rs.getString("WorkOrderDetailDesc"));
+                    task.setWorkSource(rs.getString("WorkSource"));
                     tasks.add(task);
                 }
             }
@@ -528,6 +533,14 @@ public class TechnicianDAO {
         } catch (SQLException ignore) {}
 
         try {
+            task.setTaskDesDetail(rs.getString("WorkOrderDetailDesc"));
+        } catch (SQLException ignore) {}
+
+        try {
+            task.setWorkSource(rs.getString("WorkSource"));
+        } catch (SQLException ignore) {}
+
+        try {
             task.setCustomerEmail(rs.getString("CustomerEmail"));
         } catch (SQLException ignore) {}
 
@@ -538,6 +551,11 @@ public class TechnicianDAO {
 
         return task;
     }
+
+    private LocalDateTime toLdt(Timestamp ts) {
+        return ts != null ? ts.toLocalDateTime() : null;
+    }
+
 
 
     public boolean updateStatusConditional(Connection conn,

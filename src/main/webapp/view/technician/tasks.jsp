@@ -145,6 +145,7 @@
                                         <th>Vehicle</th>
                                         <th>Customer</th>
                                         <th>Service</th>
+                                        <th>Source_Detail</th>
                                         <th>Progress</th>
                                         <th>Pl_Start</th>
                                         <th>Pl_End</th>
@@ -168,15 +169,9 @@
                                                     ${task.vehicleInfo}
                                             </td>
                                             <td>${task.customerName}</td>
-                                            <td>${task.taskDescription}</td>
+                                            <td>${task.taskDesDetail}</td>
+                                            <td>${task.workSource}</td>
                                             <td>
-                                                    <%--                                        <c:if test="${task.status == 'IN_PROGRESS'}">--%>
-                                                    <%--                                            --%>
-                                                    <%--                                        </c:if>--%>
-                                                    <%--                                        <c:if test="${task.status != 'IN_PROGRESS'}">--%>
-                                                    <%--                                            ---%>
-                                                    <%--                                        </c:if>--%>
-
                                                     ${task.progressPercentage}%
                                             </td>
 
@@ -250,7 +245,7 @@
 
                                                     <%-- COMPLETE --%>
                                                     <c:when test="${task.status eq 'COMPLETE'}">
-                                                        <span class="btn btn-sm" style="background:#e0e0e0;color:#666;cursor:default;">DONE 🤞</span>
+                                                        <span class="btn btn-sm" style="background:#e0e0e0;color:#666;cursor:default;">DONE</span>
                                                     </c:when>
 
                                                     <%-- CANCELLED / DECLINED --%>
