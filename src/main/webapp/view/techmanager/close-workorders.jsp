@@ -15,14 +15,14 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
     <div class="main-container">
       <jsp:include page="sidebar-techmanager.jsp">
-        <jsp:param name="activeMenu" value="dashboard" />
+        <jsp:param name="activeMenu" value="close-workorders" />
       </jsp:include>
 
       <div class="content-wrapper">
         <div class="page-header">
           <h1 class="h2">
             <i class="bi bi-folder-check"></i>
-            Close Work Orders (GĐ7)
+            Close Work Orders
           </h1>
           <div class="btn-toolbar">
             <a href="${pageContext.request.contextPath}/techmanager/dashboard" class="btn btn-sm btn-outline-secondary">
@@ -202,22 +202,23 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Use event delegation for dynamically handling close buttons
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.btn-close-wo').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    const workOrderID = this.getAttribute('data-wo-id');
-                    const vehicleInfo = this.getAttribute('data-vehicle');
-                    
-                    document.getElementById('modalWorkOrderID').value = workOrderID;
-                    document.getElementById('modalWONumber').textContent = '#' + workOrderID;
-                    document.getElementById('modalVehicleInfo').textContent = vehicleInfo;
-                    
-                    const modal = new bootstrap.Modal(document.getElementById('closeModal'));
-                    modal.show();
-                });
-            });
+      // Use event delegation for dynamically handling close buttons
+      document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.btn-close-wo').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            const workOrderID = this.getAttribute('data-wo-id');
+            const vehicleInfo = this.getAttribute('data-vehicle');
+
+            document.getElementById('modalWorkOrderID').value = workOrderID;
+            document.getElementById('modalWONumber').textContent = '#' + workOrderID;
+            document.getElementById('modalVehicleInfo').textContent = vehicleInfo;
+
+            const modal = new bootstrap.Modal(document.getElementById('closeModal'));
+            modal.show();
+          });
         });
-    </script>    <%@ include file="footer-techmanager.jsp" %>
+      });
+    </script>
+    <%@ include file="footer-techmanager.jsp" %>
   </body>
 </html>
