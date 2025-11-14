@@ -423,8 +423,6 @@ public class PartDAO extends DbContext {
         return list;
     }
 
-    // Trong PartDAO.java
-    // 1. THÊM "manufacturer" VÀO DANH SÁCH THAM SỐ
     public List<PartDetail> searchWithFilters(String keyword, String category, String location,
                                               String stockStatus, String priceFrom, String priceTo,
                                               String manufacturer)
@@ -529,6 +527,150 @@ public class PartDAO extends DbContext {
         }
 
         return results;
+    }
+
+    public int countTotalPrice() throws SQLException {
+        String sql = "SELECT SUM(UnitPrice * Quantity) AS TotalPrice FROM PartDetail";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt("TotalPrice");
+            }
+        }
+        return 0;
+    }
+
+    public int countLowStockItems() throws SQLException {
+        String sql = "SELECT COUNT(*) AS LowStockCount FROM PartDetail WHERE Quantity <= MinStock";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt("LowStockCount");
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Add new part with all related information
+     * This method handles: Part, Unit, PartDetail, and Characteristics
+     * Initial quantity is set to 0 by default
+     */
+    public boolean addNewPart(String partCode, String partName, String category, String description,
+                               String sku, String location, String manufacturer, int minStock,
+                               java.math.BigDecimal unitPrice, String unitName) throws SQLException {
+
+        Connection conn = null;
+        PreparedStatement psUnit = null;
+        PreparedStatement psPart = null;
+        PreparedStatement psPartDetail = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            conn.setAutoCommit(false); // Start transaction
+
+            // 1. Insert or get Unit
+            int unitId = -1;
+            String sqlCheckUnit = "SELECT unit_id FROM Unit WHERE name = ?";
+            try (PreparedStatement ps = conn.prepareStatement(sqlCheckUnit)) {
+                ps.setString(1, unitName);
+                rs = ps.executeQuery();
+                if (rs.next()) {
+                    unitId = rs.getInt("unit_id");
+                } else {
+                    // Insert new unit
+                    String sqlInsertUnit = "INSERT INTO Unit (name) VALUES (?)";
+                    psUnit = conn.prepareStatement(sqlInsertUnit, Statement.RETURN_GENERATED_KEYS);
+                    psUnit.setString(1, unitName);
+                    psUnit.executeUpdate();
+
+                    ResultSet rsUnit = psUnit.getGeneratedKeys();
+                    if (rsUnit.next()) {
+                        unitId = rsUnit.getInt(1);
+                    }
+                    rsUnit.close();
+                }
+            }
+
+            if (unitId == -1) {
+                conn.rollback();
+                return false;
+            }
+
+            // 2. Insert Part
+            String sqlInsertPart = "INSERT INTO Part (PartCode, PartName, Category, Description, base_unit_id) " +
+                                   "VALUES (?, ?, ?, ?, ?)";
+            psPart = conn.prepareStatement(sqlInsertPart, Statement.RETURN_GENERATED_KEYS);
+            psPart.setString(1, partCode);
+            psPart.setString(2, partName);
+            psPart.setString(3, category);
+            psPart.setString(4, description);
+            psPart.setInt(5, unitId);
+            psPart.executeUpdate();
+
+            ResultSet rsPart = psPart.getGeneratedKeys();
+            int partId = -1;
+            if (rsPart.next()) {
+                partId = rsPart.getInt(1);
+            }
+            rsPart.close();
+
+            if (partId == -1) {
+                conn.rollback();
+                return false;
+            }
+
+            // 3. Insert PartDetail with default quantity = 0
+            String sqlInsertPartDetail = "INSERT INTO PartDetail (PartID, SKU, Quantity, MinStock, UnitPrice, Location, Manufacturer, Description) " +
+                                         "VALUES (?, ?, 0, ?, ?, ?, ?, ?)";
+            psPartDetail = conn.prepareStatement(sqlInsertPartDetail, Statement.RETURN_GENERATED_KEYS);
+            psPartDetail.setInt(1, partId);
+            psPartDetail.setString(2, sku);
+            psPartDetail.setInt(3, minStock);
+            psPartDetail.setBigDecimal(4, unitPrice);
+            psPartDetail.setString(5, location);
+            psPartDetail.setString(6, manufacturer);
+            psPartDetail.setString(7, description);
+            psPartDetail.executeUpdate();
+
+            ResultSet rsPartDetail = psPartDetail.getGeneratedKeys();
+            int partDetailId = -1;
+            if (rsPartDetail.next()) {
+                partDetailId = rsPartDetail.getInt(1);
+            }
+            rsPartDetail.close();
+
+            if (partDetailId == -1) {
+                conn.rollback();
+                return false;
+            }
+
+            conn.commit(); // Commit transaction
+            return true;
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw e;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     private PartDetail extractPartDetailFromResultSet(ResultSet rs) throws SQLException {

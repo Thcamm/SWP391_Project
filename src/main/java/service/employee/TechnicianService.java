@@ -66,6 +66,7 @@ public class TechnicianService {
         }
         TaskAssignment task = technicianDAO.getTaskById(assignmentId);
         if (task == null) {
+            System.out.println("TechnicianService.getTaskById: task not found for assignmentId " + assignmentId);
             return ServiceResult.error(MessageConstants.ERR002); //data not found
 
         }
@@ -369,7 +370,10 @@ public class TechnicianService {
         if (technicianId <= 0 || assignmentId <= 0) return ServiceResult.error(MessageConstants.ERR003);
 
         TaskAssignment task = technicianDAO.getTaskById(assignmentId);
-        if (task == null) return ServiceResult.error(MessageConstants.ERR002);
+        if (task == null) {
+            System.out.println("TechnicianService.completeTask: task not found for assignmentId " + assignmentId);
+            return ServiceResult.error(MessageConstants.ERR002);
+        }
         if (task.getAssignToTechID() != technicianId) return ServiceResult.error(MessageConstants.TASK009);
         if (task.getStatus() != TaskAssignment.TaskStatus.IN_PROGRESS) {
             return ServiceResult.error(MessageConstants.TASK006);
