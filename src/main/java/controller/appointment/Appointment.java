@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import model.user.User;
 import model.vehicle.Vehicle;
+import service.appointment.AppointmentService;
 import service.vehicle.VehicleService;
 import util.MailService;
 
@@ -19,7 +20,7 @@ import java.io.IOException;
 @WebServlet(name = "AppointmentService", urlPatterns = { "/customer/AppointmentService" })
 public class Appointment extends HttpServlet {
     private static final long serialVersionUID = 1L;
-
+    private AppointmentService appointmentService = new AppointmentService();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -59,6 +60,11 @@ public class Appointment extends HttpServlet {
                 // Example: Create new customer record then get ID
                 throw new ServletException("Customer profile not found for the logged-in user.");
             }
+            if (appointmentService.hasAppointmentInLastHours(customerID)) {
+                request.setAttribute("errorMessage", "You cannot schedule a new appointment within 6 hours of your last appointment.");
+                request.getRequestDispatcher("/view/customer/appointment-scheduling.jsp").forward(request, response);
+                return;
+            }
 
 
             // 6. Handle Appointment
@@ -68,11 +74,12 @@ public class Appointment extends HttpServlet {
             appointment.setAppointmentDate(dateTime);
             appointment.setDescription(description);
 
-            // 7. Save to database
-            appointmentDAO.insertAppointment(appointment);
-            MailService.sendEmail(user.getEmail(),  "AppointmentService scheduled successfully","AppointmentService scheduled successfully");
+
+                appointmentDAO.insertAppointment(appointment);
+                MailService.sendEmail(user.getEmail(),  "AppointmentService scheduled successfully","AppointmentService scheduled successfully");
+                request.setAttribute("successMessage", "AppointmentService scheduled successfully!");
+
             // 8. Redirect after success (PRG Pattern)
-            request.setAttribute("successMessage", "AppointmentService scheduled successfully!");
             request.getRequestDispatcher("/view/customer/appointment-scheduling.jsp").forward(request, response);
 
         } catch (IllegalArgumentException e) {

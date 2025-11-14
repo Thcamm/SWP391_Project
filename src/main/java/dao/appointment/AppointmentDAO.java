@@ -25,6 +25,26 @@ public class AppointmentDAO extends DbContext {
         }
         return 0;
     }
+    public boolean hasAppointmentInLastHour(int customerId) {
+        String sql = """
+        SELECT COUNT(*) 
+        FROM appointment
+        WHERE CustomerID = ?
+        AND CreatedAt >= DATE_SUB(NOW(), INTERVAL 6 HOUR)
+    """;
+
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public List<Map<String, Object>> getAllAppointmentsWithLimit(int limit, int offset) {
         String sql = "SELECT a.AppointmentID, a.CustomerID, a.AppointmentDate, a.CreatedAt, a.Status, a.Description, a.RescheduleCount, a.UpdatedAt, " +
                 "u.FullName AS customerName, " +

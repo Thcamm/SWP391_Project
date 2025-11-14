@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebServlet("/customerservice/workorder-detail")
-public class ViewWorkOrderDetail extends HttpServlet {
+public class CSViewWorkOrderDetail extends HttpServlet {
 
     private final CSWorkOrderDetailService service = new CSWorkOrderDetailService();
 

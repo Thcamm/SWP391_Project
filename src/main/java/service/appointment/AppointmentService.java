@@ -102,5 +102,9 @@ public class AppointmentService {
         int updated = appointmentDAO.autoRejectNoShowAppointments();
         System.out.println(" Auto-rejected " + updated + " appointments (no ServiceOrder).");
     }
+    public boolean hasAppointmentInLastHours(int customerID) throws SQLException {
+        return appointmentDAO.hasAppointmentInLastHour(customerID);
+
+    }
 
 }
