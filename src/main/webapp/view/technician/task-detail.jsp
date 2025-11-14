@@ -81,7 +81,14 @@
                             <c:if test="${task.status == 'IN_PROGRESS'}">
                                 <a href="${pageContext.request.contextPath}/technician/create-diagnostic?assignmentId=${task.assignmentID}"
                                    class="btn-create">
-                                    🩺 Create New Diagnostic
+                                     Create New Diagnostic
+                                </a>
+                            </c:if>
+
+                            <c:if test="${task.status == 'IN_PROGRESS'}">
+                                <a href="${pageContext.request.contextPath}/technician/task-parts?assignmentId=${task.assignmentID}"
+                                   class="btn btn-dark ms-2">
+                                     Manage Parts
                                 </a>
                             </c:if>
                         </div>

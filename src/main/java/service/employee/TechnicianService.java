@@ -5,6 +5,7 @@ import common.constant.MessageConstants;
 import common.message.ServiceResult;
 import common.utils.PaginationUtils;
 import dao.employee.technician.TechnicianDAO;
+import dao.inventory.WorkOrderPartDao;
 import dao.vehicle.VehicleDiagnosticDAO;
 import dao.workorder.WorkOrderDetailDAO;
 import model.employee.Employee;
@@ -27,7 +28,7 @@ public class TechnicianService {
     private WorkOrderDetailDAO workOrderDetailDAO = new WorkOrderDetailDAO();
 
     private VehicleDiagnosticDAO vehicleDiagnosticDAO = new VehicleDiagnosticDAO();
-
+    private final WorkOrderPartDao workOrderPartDao = new WorkOrderPartDao();
     public TechnicianService() {
         this.technicianDAO = new TechnicianDAO();
     }
@@ -380,10 +381,15 @@ public class TechnicianService {
         }
 
 
-//        if (workOrderDetailDAO.hasPendingApprovalOrOpenWorkOrder(assignmentId)) {
-//            return ServiceResult.error(MessageConstants.WO_PENDING);
-//        }
-
+         try {
+        if (workOrderPartDao.hasPendingRequestsForAssignment(assignmentId)) {
+            return ServiceResult.error(MessageConstants.PART002);
+            // nhớ thêm message này trong MessageConstants
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return ServiceResult.error(MessageConstants.ERR001); // hoặc mã lỗi riêng cho part
+    }
 
         boolean ok = technicianDAO.completeTask(assignmentId, notes);
         if (ok) {
