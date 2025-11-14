@@ -164,6 +164,22 @@ public class VehicleDAO {
         }
         return null;
     }
+    public Vehicle getVehicleByRequestId(int requestId) throws SQLException {
+        String sql = "SELECT v.VehicleID, v.CustomerID, v.LicensePlate, v.Brand, v.Model, v.YearManufacture " +
+                "FROM Vehicle v " +
+                "JOIN ServiceRequest sr ON v.VehicleID = sr.VehicleID " +
+                "WHERE sr.RequestID = ?";
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, requestId);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return extractVehicleFromResultSet(rs);
+                }
+            }
+        }
+        return null;
+    }
 
     public boolean updateVehicle(Vehicle vehicle) throws SQLException {
         String sql = "UPDATE Vehicle SET Brand = ?, Model = ?, YearManufacture = ?, LicensePlate = ? WHERE VehicleID = ?";

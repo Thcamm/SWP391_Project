@@ -16,7 +16,7 @@ import java.util.List;
  * Methods marked [TECH_MANAGER ONLY] - Only TechManager should call
  * Methods marked [SHARED] - Both TechManager and Technician can use
  * 
- * @see TechnicianDAO for Technician-specific operations
+// * @see TechnicianDAO for Technician-specific operations
  */
 public class TaskAssignmentDAO extends DbContext {
 
@@ -85,7 +85,23 @@ public class TaskAssignmentDAO extends DbContext {
             return -1;
         }
     }
+    public List<TaskAssignment> getTasksByDetailId(int detailID) throws SQLException {
+        List<TaskAssignment> tasks = new ArrayList<>();
+        String sql = "SELECT * FROM TaskAssignment WHERE DetailID = ? ORDER BY priority DESC, AssignedDate ASC";
 
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, detailID);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    TaskAssignment task = mapResultSetToTask(rs);
+                    tasks.add(task);
+                }
+            }
+        }
+        return tasks;
+    }
     // ===== SHARED METHODS - Both TechManager & Technician use =====
 
     /**

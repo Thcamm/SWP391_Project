@@ -77,6 +77,8 @@ public class AppointmentHistoryServlet extends HttpServlet {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        request.setAttribute("currentPage", result.getCurrentPage());
+        request.setAttribute("totalPages", result.getTotalPages());
         request.setAttribute("appointments", result);
         request.getRequestDispatcher("/view/customer/appointment-history.jsp").forward(request, response);
     }

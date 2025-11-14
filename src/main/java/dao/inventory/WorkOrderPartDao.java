@@ -15,35 +15,35 @@ public class WorkOrderPartDAO extends DbContext {
 
     public List<WorkOrderPartView> getPartsByAssignment(int assignmentId) throws SQLException {
         String sql = """
-            SELECT 
-                wop.WorkOrderPartID,
-                wop.DetailID,
-                wop.PartDetailID,
-                wop.DiagnosticPartID,
-                wop.QuantityUsed,
-                wop.UnitPrice,
-                wop.request_status,
-                wop.requested_at,
-                pd.SKU,
-                pd.Quantity AS StockQty,
-                p.PartCode,
-                p.PartName,
-                e.EmployeeID,
-                u.FullName AS RequestedByName
-            FROM TaskAssignment ta
-            JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID
-            JOIN WorkOrderPart wop   ON wop.DetailID = wod.DetailID
-            JOIN PartDetail pd       ON pd.PartDetailID = wop.PartDetailID
-            JOIN Part p              ON p.PartID = pd.PartID
-            LEFT JOIN Employee e     ON e.EmployeeID = wop.RequestedByID
-            LEFT JOIN `User` u       ON u.UserID = e.UserID
-            WHERE ta.AssignmentID = ?
-            ORDER BY wop.requested_at DESC, wop.WorkOrderPartID DESC
-            """;
+                SELECT
+                    wop.WorkOrderPartID,
+                    wop.DetailID,
+                    wop.PartDetailID,
+                    wop.DiagnosticPartID,
+                    wop.QuantityUsed,
+                    wop.UnitPrice,
+                    wop.request_status,
+                    wop.requested_at,
+                    pd.SKU,
+                    pd.Quantity AS StockQty,
+                    p.PartCode,
+                    p.PartName,
+                    e.EmployeeID,
+                    u.FullName AS RequestedByName
+                FROM TaskAssignment ta
+                JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID
+                JOIN WorkOrderPart wop   ON wop.DetailID = wod.DetailID
+                JOIN PartDetail pd       ON pd.PartDetailID = wop.PartDetailID
+                JOIN Part p              ON p.PartID = pd.PartID
+                LEFT JOIN Employee e     ON e.EmployeeID = wop.RequestedByID
+                LEFT JOIN `User` u       ON u.UserID = e.UserID
+                WHERE ta.AssignmentID = ?
+                ORDER BY wop.requested_at DESC, wop.WorkOrderPartID DESC
+                """;
 
         List<WorkOrderPartView> list = new ArrayList<>();
         try (Connection c = DbContext.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+                PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setInt(1, assignmentId);
 
@@ -58,7 +58,8 @@ public class WorkOrderPartDAO extends DbContext {
                     v.setUnitPrice(rs.getBigDecimal("UnitPrice"));
                     v.setRequestStatus(rs.getString("request_status"));
                     Timestamp ts = rs.getTimestamp("requested_at");
-                    if (ts != null) v.setRequestedAt(ts.toLocalDateTime());
+                    if (ts != null)
+                        v.setRequestedAt(ts.toLocalDateTime());
 
                     v.setSku(rs.getString("SKU"));
                     v.setCurrentStock(rs.getInt("StockQty"));
@@ -76,18 +77,17 @@ public class WorkOrderPartDAO extends DbContext {
     public ServiceResult createPartRequestForAssignment(
             int assignmentId,
             int partDetailId,
-            int quantity
-    ) throws SQLException {
+            int quantity) throws SQLException {
 
         String getTaskSql = "SELECT DetailID, AssignToTechID FROM TaskAssignment WHERE AssignmentID = ?";
         String getPartSql = "SELECT UnitPrice, Quantity AS StockQty FROM PartDetail WHERE PartDetailID = ?";
-        String insertSql  = """
-        INSERT INTO WorkOrderPart
-            (DetailID, PartDetailID, DiagnosticPartID,
-             RequestedByID, QuantityUsed, UnitPrice,
-             request_status, requested_at)
-        VALUES (?, ?, NULL, ?, ?, ?, 'PENDING', NOW())
-        """;
+        String insertSql = """
+                INSERT INTO WorkOrderPart
+                    (DetailID, PartDetailID, DiagnosticPartID,
+                     RequestedByID, QuantityUsed, UnitPrice,
+                     request_status, requested_at)
+                VALUES (?, ?, NULL, ?, ?, ?, 'PENDING', NOW())
+                """;
 
         try (Connection c = DbContext.getConnection()) {
             c.setAutoCommit(false);
@@ -101,7 +101,7 @@ public class WorkOrderPartDAO extends DbContext {
                         return ServiceResult.error("ERR134", "WOP", "Ko tim thay task");
                     }
                     detailId = rs.getInt("DetailID");
-                    techId   = rs.getInt("AssignToTechID");
+                    techId = rs.getInt("AssignToTechID");
                 }
             }
 
@@ -114,7 +114,7 @@ public class WorkOrderPartDAO extends DbContext {
                         return ServiceResult.error("ERR121", "PartDetail", "Khong tim thay part detail");
                     }
                     unitPrice = rs.getBigDecimal("UnitPrice");
-                    stockQty  = rs.getInt("StockQty");
+                    stockQty = rs.getInt("StockQty");
                 }
             }
 
@@ -122,7 +122,7 @@ public class WorkOrderPartDAO extends DbContext {
                 return ServiceResult.error("ERR555", "Quantity", "Số lượng phải > 0.");
             }
             if (quantity > stockQty) {
-                return ServiceResult.error("ERR999","quantity", "Số lượng yêu cầu vượt tồn kho hiện tại.");
+                return ServiceResult.error("ERR999", "quantity", "Số lượng yêu cầu vượt tồn kho hiện tại.");
             }
 
             try (PreparedStatement ps = c.prepareStatement(insertSql)) {
@@ -144,21 +144,21 @@ public class WorkOrderPartDAO extends DbContext {
 
     public List<PartOption> getAvailablePartsForAssignment(int assignmentId) throws SQLException {
         String sql = """
-        SELECT 
-            pd.PartDetailID,
-            pd.SKU,
-            p.PartName,
-             pd.Quantity AS CurrentStock
-        FROM PartDetail pd
-        JOIN Part p ON pd.PartID = p.PartID
-        ORDER BY p.PartName ASC
-    """;
+                    SELECT
+                        pd.PartDetailID,
+                        pd.SKU,
+                        p.PartName,
+                         pd.Quantity AS CurrentStock
+                    FROM PartDetail pd
+                    JOIN Part p ON pd.PartID = p.PartID
+                    ORDER BY p.PartName ASC
+                """;
 
         List<PartOption> list = new ArrayList<>();
 
         try (Connection con = DbContext.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = con.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 PartOption opt = new PartOption();
@@ -175,16 +175,16 @@ public class WorkOrderPartDAO extends DbContext {
 
     public boolean hasPendingRequestsForAssignment(int assignmentId) throws SQLException {
         final String sql = """
-            SELECT 1
-            FROM WorkOrderPart wop
-            JOIN TaskAssignment ta ON ta.DetailID = wop.DetailID
-            WHERE ta.AssignmentID = ?
-              AND wop.request_status = 'PENDING'
-            LIMIT 1
-        """;
+                    SELECT 1
+                    FROM WorkOrderPart wop
+                    JOIN TaskAssignment ta ON ta.DetailID = wop.DetailID
+                    WHERE ta.AssignmentID = ?
+                      AND wop.request_status = 'PENDING'
+                    LIMIT 1
+                """;
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, assignmentId);
 
@@ -207,8 +207,8 @@ public class WorkOrderPartDAO extends DbContext {
                 "ORDER BY wop.requested_at ASC";
 
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 WorkOrderPart request = new WorkOrderPart();
@@ -226,9 +226,9 @@ public class WorkOrderPartDAO extends DbContext {
         return list;
     }
 
-
     /**
      * Approve request and deduct stock
+     * 
      * @return true if approved successfully, false if insufficient stock
      */
     public boolean approveRequest(int workOrderPartId) throws SQLException {
@@ -334,11 +334,35 @@ public class WorkOrderPartDAO extends DbContext {
         String sql = "UPDATE workorderpart SET request_status = 'REJECTED' WHERE WorkOrderPartID = ?";
 
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, workOrderPartId);
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;
         }
+    }
+
+    public List<WorkOrderPart> getPartsByWorkOrderId(int workOrderId) throws Exception {
+        String sql = "SELECT * FROM WorkOrderPart wop " +
+                "JOIN WorkOrderDetail wod on wod.DetailID = wop.DetailID " +
+                "JOIN WorkOrder wo on wod.WorkOrderID = wo.WorkOrderID WHERE wo.workOrderId = ?";
+        List<WorkOrderPart> parts = new java.util.ArrayList<>();
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
+            ps.setInt(1, workOrderId);
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+                    WorkOrderPart part = new WorkOrderPart();
+                    part.setWorkOrderPartId(rs.getInt("WorkOrderPartID"));
+                    part.setDetailID(rs.getInt("DetailID"));
+                    part.setPartDetailID(rs.getInt("PartDetailID"));
+                    part.setQuantityUsed(rs.getInt("QuantityUsed"));
+                    part.setUnitPrice(rs.getBigDecimal("UnitPrice"));
+                    parts.add(part);
+                    return parts;
+                }
+            }
+        }
+        return null;
     }
 }

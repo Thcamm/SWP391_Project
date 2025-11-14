@@ -47,7 +47,7 @@ public class PaymentDAO {
         String sql = "SELECT * FROM Payment WHERE PaymentID = ?";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, paymentID);
 
@@ -65,7 +65,7 @@ public class PaymentDAO {
         String sql = "SELECT * FROM Payment WHERE InvoiceID = ? ORDER BY PaymentDate DESC";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, invoiceID);
 
@@ -83,7 +83,7 @@ public class PaymentDAO {
         String sql = "SELECT * FROM Payment WHERE WorkOrderID = ? ORDER BY PaymentDate DESC";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, workOrderID);
 
@@ -101,8 +101,8 @@ public class PaymentDAO {
         String sql = "SELECT * FROM Payment ORDER BY PaymentDate DESC";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 payments.add(mapResultSetToPayment(rs));
@@ -128,7 +128,7 @@ public class PaymentDAO {
         String sql = "DELETE FROM Payment WHERE PaymentID = ?";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, paymentID);
             int affectedRows = stmt.executeUpdate();
@@ -143,7 +143,7 @@ public class PaymentDAO {
         String sql = "SELECT COALESCE(SUM(Amount), 0) FROM Payment WHERE InvoiceID = ?";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, invoiceID);
 
@@ -161,7 +161,7 @@ public class PaymentDAO {
                 "WHERE DATE(PaymentDate) BETWEEN ? AND ?";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setDate(1, startDate);
             stmt.setDate(2, endDate);
@@ -182,7 +182,7 @@ public class PaymentDAO {
                 "ORDER BY PaymentDate DESC";
 
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setDate(1, from);
             stmt.setDate(2, to);

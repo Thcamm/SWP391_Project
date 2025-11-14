@@ -15,8 +15,8 @@ public class GoogleLogin extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String clientId = util.GoogleConfig.getClientId();
-        String redirectUri = util.GoogleConfig.getRedirectUri();
+        String clientId = GoogleConfig.getClientId();
+        String redirectUri = GoogleConfig.getRedirectUri();
 
         String authUrl = "https://accounts.google.com/o/oauth2/v2/auth"
                 + "?client_id=" + clientId

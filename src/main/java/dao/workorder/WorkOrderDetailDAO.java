@@ -46,27 +46,31 @@ public class WorkOrderDetailDAO {
     /**
      * Create WorkOrderDetail using provided connection (for transactions)
      * This is used when you need to create detail within an existing transaction
+     * <<<<<<< HEAD
      * 
+     * =======
+     *
+     * >>>>>>> 6adf341d4eadfcbfead0ec7fb3b7fa2e3f480c82
      * LUỒNG MỚI: Supports source=NULL for Triage workflow
      */
     public int createWorkOrderDetail(Connection conn, WorkOrderDetail detail) throws SQLException {
         String sql = "INSERT INTO WorkOrderDetail (WorkOrderID, source, diagnostic_id, approval_status, TaskDescription, EstimateHours, EstimateAmount) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, detail.getWorkOrderId());
-            
+
             // LUỒNG MỚI: Allow source=NULL for Triage
             if (detail.getSource() != null) {
                 ps.setString(2, detail.getSource().name());
             } else {
                 ps.setNull(2, java.sql.Types.VARCHAR);
             }
-            
+
             if (detail.getDiagnosticId() != null) {
                 ps.setInt(3, detail.getDiagnosticId());
             } else {
                 ps.setNull(3, java.sql.Types.INTEGER);
             }
-            
+
             // LUỒNG MỚI: Allow approval_status=NULL or PENDING
             if (detail.getApprovalStatus() != null) {
                 ps.setString(4, detail.getApprovalStatus().name());
@@ -154,11 +158,16 @@ public class WorkOrderDetailDAO {
     /**
      * LUỒNG MỚI - GĐ 2: Update WorkOrderDetail source after Triage
      * Used by TechManagerService.triageWorkOrderDetails()
+     * <<<<<<< HEAD
      * 
-     * @param conn Database connection (for transaction)
-     * @param detailId WorkOrderDetail ID
-     * @param source Source classification (REQUEST or DIAGNOSTIC)
-     * @param approvalStatus Approval status (usually APPROVED after Triage)
+     * =======
+     *
+     * >>>>>>> 6adf341d4eadfcbfead0ec7fb3b7fa2e3f480c82
+     * 
+     * @param conn             Database connection (for transaction)
+     * @param detailId         WorkOrderDetail ID
+     * @param source           Source classification (REQUEST or DIAGNOSTIC)
+     * @param approvalStatus   Approval status (usually APPROVED after Triage)
      * @param approvedByUserId TechManager UserID
      * @return true if update succeeded
      * @throws SQLException if update fails
@@ -169,11 +178,11 @@ public class WorkOrderDetailDAO {
             WorkOrderDetail.Source source,
             WorkOrderDetail.ApprovalStatus approvalStatus,
             int approvedByUserId) throws SQLException {
-        
+
         String sql = "UPDATE WorkOrderDetail " +
-                     "SET source = ?, approval_status = ?, approved_by_user_id = ?, approved_at = CURRENT_TIMESTAMP " +
-                     "WHERE DetailID = ?";
-        
+                "SET source = ?, approval_status = ?, approved_by_user_id = ?, approved_at = CURRENT_TIMESTAMP " +
+                "WHERE DetailID = ?";
+
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, source.name());
             ps.setString(2, approvalStatus.name());
@@ -193,9 +202,9 @@ public class WorkOrderDetailDAO {
     public List<WorkOrderDetail> getPendingTriageDetails(int workOrderId) throws SQLException {
         String sql = "SELECT * FROM WorkOrderDetail WHERE WorkOrderID = ? AND source IS NULL ORDER BY DetailID";
         List<WorkOrderDetail> details = new ArrayList<>();
-        
+
         try (Connection conn = DbContext.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+                PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, workOrderId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
@@ -224,7 +233,7 @@ public class WorkOrderDetailDAO {
         WorkOrderDetail detail = new WorkOrderDetail();
         detail.setDetailId(rs.getInt("DetailID"));
         detail.setWorkOrderId(rs.getInt("WorkOrderID"));
-        
+
         // LUỒNG MỚI: Handle NULL source (for Triage)
         String sourceStr = rs.getString("source");
         if (sourceStr != null) {
@@ -260,10 +269,10 @@ public class WorkOrderDetailDAO {
 
     public void recomputeActualHoursAndMaybeMarkComplete(int assignmentId) {
         String sql = """
-        SELECT DetailID
-        FROM TaskAssignment
-        WHERE AssignmentID = ?
-    """;
+                    SELECT DetailID
+                    FROM TaskAssignment
+                    WHERE AssignmentID = ?
+                """;
         try (Connection c = DbContext.getConnection()) {
             c.setAutoCommit(false);
 
@@ -271,29 +280,33 @@ public class WorkOrderDetailDAO {
             try (PreparedStatement ps = c.prepareStatement(sql)) {
                 ps.setInt(1, assignmentId);
                 try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) detailId = rs.getInt(1);
+                    if (rs.next())
+                        detailId = rs.getInt(1);
                 }
             }
-            if (detailId == null) { c.rollback(); return; }
+            if (detailId == null) {
+                c.rollback();
+                return;
+            }
 
             // 1) Tính tổng giờ thực tế của tất cả task thuộc DetailID
             String updHours = """
-            UPDATE WorkOrderDetail wod
-            JOIN (
-                SELECT ta.DetailID,
-                       COALESCE(SUM(
-                           GREATEST(0,
-                               TIMESTAMPDIFF(MINUTE, ta.StartAt,
-                                   COALESCE(ta.CompleteAt, NOW()))
-                           )
-                       ),0) AS minutes_total
-                FROM TaskAssignment ta
-                WHERE ta.DetailID = ?
-                GROUP BY ta.DetailID
-            ) x ON x.DetailID = wod.DetailID
-            SET wod.ActualHours = ROUND(x.minutes_total / 60.0, 2)
-            WHERE wod.DetailID = ?
-        """;
+                        UPDATE WorkOrderDetail wod
+                        JOIN (
+                            SELECT ta.DetailID,
+                                   COALESCE(SUM(
+                                       GREATEST(0,
+                                           TIMESTAMPDIFF(MINUTE, ta.StartAt,
+                                               COALESCE(ta.CompleteAt, NOW()))
+                                       )
+                                   ),0) AS minutes_total
+                            FROM TaskAssignment ta
+                            WHERE ta.DetailID = ?
+                            GROUP BY ta.DetailID
+                        ) x ON x.DetailID = wod.DetailID
+                        SET wod.ActualHours = ROUND(x.minutes_total / 60.0, 2)
+                        WHERE wod.DetailID = ?
+                    """;
             try (PreparedStatement ps = c.prepareStatement(updHours)) {
                 ps.setInt(1, detailId);
                 ps.setInt(2, detailId);
@@ -302,11 +315,11 @@ public class WorkOrderDetailDAO {
 
             // 2) Kiểm tra tất cả task của WOD đã COMPLETE chưa
             String allDoneSql = """
-            SELECT SUM(CASE WHEN Status = 'COMPLETE' THEN 1 ELSE 0 END) AS done_cnt,
-                   COUNT(*) AS all_cnt
-            FROM TaskAssignment
-            WHERE DetailID = ?
-        """;
+                        SELECT SUM(CASE WHEN Status = 'COMPLETE' THEN 1 ELSE 0 END) AS done_cnt,
+                               COUNT(*) AS all_cnt
+                        FROM TaskAssignment
+                        WHERE DetailID = ?
+                    """;
             boolean allDone = false;
             try (PreparedStatement ps = c.prepareStatement(allDoneSql)) {
                 ps.setInt(1, detailId);
@@ -327,7 +340,6 @@ public class WorkOrderDetailDAO {
                 }
             }
 
-
             c.commit();
         } catch (SQLException e) {
             // log error
@@ -335,38 +347,38 @@ public class WorkOrderDetailDAO {
 
     }
 
-
     public boolean hasPendingApprovalOrOpenWorkOrder(int assignmentId) {
-        // 1) có work order detail linked đến diagnostic của assignment này mà approval_status = 'PENDING'
-        final String sqlPending =
-                "SELECT 1 " +
-                        "FROM workorderdetail wod " +
-                        "JOIN vehiclediagnostic vd ON vd.VehicleDiagnosticID = wod.diagnostic_id " +
-                        "WHERE vd.AssignmentID = ? " +
-                        "  AND (wod.approval_status = 'PENDING' OR wod.approval_status IS NULL) " +
-                        "LIMIT 1";
+        // 1) có work order detail linked đến diagnostic của assignment này mà
+        // approval_status = 'PENDING'
+        final String sqlPending = "SELECT 1 " +
+                "FROM workorderdetail wod " +
+                "JOIN vehiclediagnostic vd ON vd.VehicleDiagnosticID = wod.diagnostic_id " +
+                "WHERE vd.AssignmentID = ? " +
+                "  AND (wod.approval_status = 'PENDING' OR wod.approval_status IS NULL) " +
+                "LIMIT 1";
 
         // 2) hoặc workorder chưa completed (nếu bạn có cột status ở workorder)
-        final String sqlOpenWO =
-                "SELECT 1 " +
-                        "FROM workorderdetail wod " +
-                        "JOIN workorder wo ON wo.WorkOrderID = wod.WorkOrderID " +
-                        "JOIN vehiclediagnostic vd ON vd.VehicleDiagnosticID = wod.diagnostic_id " +
-                        "WHERE vd.AssignmentID = ? " +
-                        "  AND (wo.status IS NULL OR wo.status <> 'COMPLETED') " +
-                        "LIMIT 1";
+        final String sqlOpenWO = "SELECT 1 " +
+                "FROM workorderdetail wod " +
+                "JOIN workorder wo ON wo.WorkOrderID = wod.WorkOrderID " +
+                "JOIN vehiclediagnostic vd ON vd.VehicleDiagnosticID = wod.diagnostic_id " +
+                "WHERE vd.AssignmentID = ? " +
+                "  AND (wo.status IS NULL OR wo.status <> 'COMPLETED') " +
+                "LIMIT 1";
 
         try (Connection c = DbContext.getConnection()) {
             try (PreparedStatement ps = c.prepareStatement(sqlPending)) {
                 ps.setInt(1, assignmentId);
                 try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) return true;
+                    if (rs.next())
+                        return true;
                 }
             }
             try (PreparedStatement ps = c.prepareStatement(sqlOpenWO)) {
                 ps.setInt(1, assignmentId);
                 try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) return true;
+                    if (rs.next())
+                        return true;
                 }
             }
             return false;
@@ -374,5 +386,20 @@ public class WorkOrderDetailDAO {
             e.printStackTrace();
             return true; // an toàn: lỗi -> chặn complete
         }
+    }
+
+    public List<WorkOrderDetail> getDetailsByWorkOrderId(int workOrderId) throws SQLException {
+        String sql = "SELECT * FROM WorkOrderDetail WHERE WorkOrderID = ? ORDER BY DetailID";
+        List<WorkOrderDetail> details = new ArrayList<>();
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, workOrderId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    details.add(extractWorkOrderDetail(rs));
+                }
+            }
+        }
+        return details;
     }
 }

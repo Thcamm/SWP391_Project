@@ -82,7 +82,7 @@ public class RolePageServlet extends HttpServlet {
     }
 
     @Override
-    public void doPost(jakarta.servlet.http.HttpServletRequest req, jakarta.servlet.http.HttpServletResponse resp)
+    public void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws jakarta.servlet.ServletException, java.io.IOException {
         doGet(req, resp);
     }

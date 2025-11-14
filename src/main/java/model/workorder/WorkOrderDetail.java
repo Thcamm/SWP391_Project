@@ -19,6 +19,7 @@ public class WorkOrderDetail {
     private BigDecimal estimateHours;
     private BigDecimal estimateAmount;
     private BigDecimal actualHours;
+    private DetailStatus detailStatus;
 
     // Relationships
     private List<TaskAssignment> taskAssignments;
@@ -32,6 +33,9 @@ public class WorkOrderDetail {
 
     public enum ApprovalStatus {
         PENDING, APPROVED, DECLINED
+    }
+    public enum DetailStatus {
+        PENDING, IN_PROGRESS, COMPLETE
     }
 
     public WorkOrderDetail() {
@@ -138,6 +142,14 @@ public class WorkOrderDetail {
     // Business methods
     public boolean isApproved() {
         return ApprovalStatus.APPROVED.equals(this.approvalStatus);
+    }
+
+    public DetailStatus getDetailStatus() {
+        return detailStatus;
+    }
+
+    public void setDetailStatus(DetailStatus detailStatus) {
+        this.detailStatus = detailStatus;
     }
 
     public void approve(int approvedByUserId) {

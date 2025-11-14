@@ -96,7 +96,7 @@ public class ServiceRequestService {
             // Step 4: Create initial WorkOrderDetail (source = REQUEST)
             WorkOrderDetail initialDetail = new WorkOrderDetail();
             initialDetail.setWorkOrderId(workOrderId);
-            initialDetail.setSource(WorkOrderDetail.Source.REQUEST);
+            initialDetail.setSource("REQUEST");
             initialDetail.setDiagnosticId(null);
             initialDetail.setApprovalStatus(null); // Not needed for REQUEST source
 //            initialDetail.setTaskDescription(

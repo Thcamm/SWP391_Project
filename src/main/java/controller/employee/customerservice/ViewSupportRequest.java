@@ -146,6 +146,8 @@ public class ViewSupportRequest extends HttpServlet {
             request.setAttribute("customerEmailMap", customerEmailMap);
             request.setAttribute("customerNameMap", customerNameMap);
             request.setAttribute("supportrequestList", result);
+            request.setAttribute("currentPage", result.getCurrentPage());
+            request.setAttribute("totalPages", result.getTotalPages());
             request.setAttribute("categoryMap", categoryMap);
             request.setAttribute("categories", categories);
             request.setAttribute("statuses", statuses);

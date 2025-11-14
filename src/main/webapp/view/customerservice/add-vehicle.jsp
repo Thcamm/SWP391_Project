@@ -31,12 +31,10 @@
                                 <label for="brandId" class="form-label">
                                     Brand <span class="text-danger">*</span>
                                 </label>
-                                <select id="brandId" name="brandId" class="form-select" required>
+                                <select id="brandName" name="brandName" class="form-select" required>
                                     <option value="">-- Select brand --</option>
-                                    <c:forEach var="brand" items="${brands}">
-                                        <option value="${brand.brandId}">${brand.brandName}</option>
-                                    </c:forEach>
                                 </select>
+
                                 <small class="text-muted">Please select brand first</small>
                             </div>
 
