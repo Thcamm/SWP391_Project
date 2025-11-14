@@ -41,7 +41,6 @@
                                 <th>Request ID</th>
                                 <th>Part Name</th>
                                 <th>Quantity Requested</th>
-                                <th>Current Stock</th>
                                 <th>Status</th>
                                 <th>Unit Price</th>
                                 <th>Total Value</th>
@@ -56,16 +55,6 @@
                                     <td>${request.partName}</td>
                                     <td>
                                         <span class="badge bg-info">${request.quantityUsed}</span>
-                                    </td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${request.currentStock >= request.quantityUsed}">
-                                                <span class="badge bg-success">${request.currentStock}</span>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span class="badge bg-danger">${request.currentStock}</span>
-                                            </c:otherwise>
-                                        </c:choose>
                                     </td>
                                     <td>
                                         <span class="badge bg-warning text-dark">

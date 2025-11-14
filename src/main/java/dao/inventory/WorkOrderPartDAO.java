@@ -27,6 +27,7 @@ public class WorkOrderPartDAO extends DbContext {
             while (rs.next()) {
                 WorkOrderPart request = new WorkOrderPart();
                 request.setWorkOrderPartId(rs.getInt("WorkOrderPartID"));
+                request.setPartDetailID(rs.getInt("PartDetailID"));
                 request.setQuantityUsed(rs.getInt("QuantityUsed"));
                 request.setUnitPrice(rs.getBigDecimal("UnitPrice"));
                 request.setRequestStatus(rs.getString("request_status"));
