@@ -34,9 +34,6 @@ public class DbContext {
         }
     }
 
-    /**
-     * Cho phép lớp con gọi super() (tránh lỗi 'DbContext() has private access').
-     */
     protected DbContext() {
     }
 

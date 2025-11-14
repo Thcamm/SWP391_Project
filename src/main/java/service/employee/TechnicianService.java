@@ -5,6 +5,7 @@ import common.constant.MessageConstants;
 import common.message.ServiceResult;
 import common.utils.PaginationUtils;
 import dao.employee.technician.TechnicianDAO;
+import dao.inventory.WorkOrderPartDAO;
 import dao.vehicle.VehicleDiagnosticDAO;
 import dao.workorder.WorkOrderDetailDAO;
 import model.employee.Employee;
@@ -27,7 +28,7 @@ public class TechnicianService {
     private WorkOrderDetailDAO workOrderDetailDAO = new WorkOrderDetailDAO();
 
     private VehicleDiagnosticDAO vehicleDiagnosticDAO = new VehicleDiagnosticDAO();
-
+    private final WorkOrderPartDAO workOrderPartDao = new WorkOrderPartDAO();
     public TechnicianService() {
         this.technicianDAO = new TechnicianDAO();
     }
@@ -65,6 +66,7 @@ public class TechnicianService {
         }
         TaskAssignment task = technicianDAO.getTaskById(assignmentId);
         if (task == null) {
+            System.out.println("TechnicianService.getTaskById: task not found for assignmentId " + assignmentId);
             return ServiceResult.error(MessageConstants.ERR002); //data not found
 
         }
@@ -368,7 +370,10 @@ public class TechnicianService {
         if (technicianId <= 0 || assignmentId <= 0) return ServiceResult.error(MessageConstants.ERR003);
 
         TaskAssignment task = technicianDAO.getTaskById(assignmentId);
-        if (task == null) return ServiceResult.error(MessageConstants.ERR002);
+        if (task == null) {
+            System.out.println("TechnicianService.completeTask: task not found for assignmentId " + assignmentId);
+            return ServiceResult.error(MessageConstants.ERR002);
+        }
         if (task.getAssignToTechID() != technicianId) return ServiceResult.error(MessageConstants.TASK009);
         if (task.getStatus() != TaskAssignment.TaskStatus.IN_PROGRESS) {
             return ServiceResult.error(MessageConstants.TASK006);
@@ -380,10 +385,15 @@ public class TechnicianService {
         }
 
 
-//        if (workOrderDetailDAO.hasPendingApprovalOrOpenWorkOrder(assignmentId)) {
-//            return ServiceResult.error(MessageConstants.WO_PENDING);
-//        }
-
+         try {
+        if (workOrderPartDao.hasPendingRequestsForAssignment(assignmentId)) {
+            return ServiceResult.error(MessageConstants.PART002);
+            // nhớ thêm message này trong MessageConstants
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return ServiceResult.error(MessageConstants.ERR001); // hoặc mã lỗi riêng cho part
+    }
 
         boolean ok = technicianDAO.completeTask(assignmentId, notes);
         if (ok) {

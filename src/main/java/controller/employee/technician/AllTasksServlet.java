@@ -92,6 +92,10 @@ public class AllTasksServlet extends HttpServlet {
         req.setAttribute("page", page);
         req.setAttribute("pageSize", DEFAULT_PAGE_SIZE);
 
+        System.out.println("Tasks: " + tasks);
+        System.out.println("Tasks data: " + tasks.getData());
+        System.out.println("Tasks size: " + (tasks.getData() != null ? tasks.getData().size() : "null"));
+        System.out.println("TaskStats: " + taskStats);
 
         req.getRequestDispatcher("/view/technician/tasks.jsp").forward(req, resp);
     }

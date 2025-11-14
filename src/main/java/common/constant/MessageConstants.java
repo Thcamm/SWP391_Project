@@ -225,8 +225,8 @@ public class MessageConstants {
     public static final SystemMessage PART002 = new SystemMessage(
             "PART002",
             MessageType.INFO,
-            "Parts are available",
-            "Parts are available. You can pick them up."
+            "Parts",
+            "This task has parts status is pending. Dont completed"
     );
 
     public static final SystemMessage PART003 = new SystemMessage(

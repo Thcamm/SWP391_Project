@@ -1,23 +1,34 @@
 package controller.inventory;
 
+import common.utils.PaginationUtils;
+import dao.employee.admin.AdminDAO;
+import dao.inventory.InventoryTransactionDAO;
 import dao.inventory.PartDAO;
+import dao.inventory.SupplierDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import model.inventory.CharacteristicValue;
+import model.inventory.InventoryTransaction;
 import model.inventory.PartDetail;
+import model.inventory.Supplier;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
-import common.utils.PaginationUtils;
 
 
 @WebServlet(name = "InventoryController", urlPatterns = {"/inventory"})
 public class InventoryController extends HttpServlet {
     private PartDAO partDetailDAO = new PartDAO();
+    private InventoryTransactionDAO transactionDAO = new InventoryTransactionDAO();
+    private SupplierDAO supplierDAO = new SupplierDAO();
+    private AdminDAO adminDAO = new AdminDAO();
     private static final int ITEMS_PER_PAGE = 5; // Number of items per page
 
     @Override
@@ -33,6 +44,8 @@ public class InventoryController extends HttpServlet {
                 searchInventory(request, response);
             } else if (action.equals("lowstock")) {
                 lowStockInventory(request, response);
+            } else if (action.equals("add")) {
+                showAddForm(request, response);
             } else if (action.equals("edit")) {
                 showEditForm(request, response);
             } else if (action.equals("history")) {
@@ -54,10 +67,32 @@ public class InventoryController extends HttpServlet {
         try {
             if (action.equals("update")) {
                 updatePartInfo(request, response);
+            } else if (action.equals("add")) {
+                addNewPart(request, response);
+            } else if (action.equals("stockIn")) {
+                processStockIn(request, response);
             }
         } catch (SQLException e) {
             throw new ServletException("Database error", e);
         }
+    }
+
+    /**
+     * Display form to add new part
+     */
+    private void showAddForm(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, ServletException, IOException {
+
+        // Load all categories for dropdown
+        List<String> allCategories = partDetailDAO.getAllCategories();
+        request.setAttribute("allCategoriesList", allCategories);
+
+        // Load all characteristic types for selection
+        List<CharacteristicValue> characteristicValues = partDetailDAO.getAllCharacteristicValues();
+        request.setAttribute("availableCharacteristics", characteristicValues);
+
+        request.setAttribute("isEdit", false);
+        request.getRequestDispatcher("/view/storekeeper/inventory-form.jsp").forward(request, response);
     }
 
     /**
@@ -100,11 +135,12 @@ public class InventoryController extends HttpServlet {
 
         List<String> allCategories = partDetailDAO.getAllCategories();
         request.setAttribute("allCategoriesList", allCategories);
-
-        // 1. Lấy danh sách đầy đủ để tính toán thống kê chung
         List<PartDetail> allList = partDetailDAO.getAllWithCharacteristics();
-
         List<PartDetail> listToPaginate; // Danh sách sẽ được dùng để phân trang
+
+        // Load all active suppliers
+        List<Supplier> suppliers = supplierDAO.getAllActiveSuppliers();
+        request.setAttribute("suppliers", suppliers);
 
         // 2. Kiểm tra xem có bộ lọc danh mục không
         String categoryFilter = request.getParameter("category");
@@ -140,8 +176,8 @@ public class InventoryController extends HttpServlet {
         request.setAttribute("itemsPerPage", paginationResult.getItemsPerPage());
 
         // 4. Thống kê (luôn tính trên danh sách đầy đủ 'allList' cho các thẻ tiêu đề)
-        request.setAttribute("totalValue", calculateTotalValue(allList));
-        request.setAttribute("lowStockCount", countLowStock(allList));
+        request.setAttribute("totalValue", partDetailDAO.countTotalPrice());
+        request.setAttribute("lowStockCount", partDetailDAO.countLowStockItems());
 
         request.getRequestDispatcher("/view/storekeeper/inventory-list.jsp").forward(request, response);
     }
@@ -163,7 +199,7 @@ public class InventoryController extends HttpServlet {
 
         // Call DAO to filter
         List<PartDetail> filteredList = partDetailDAO.searchWithFilters(
-                keyword, category, location, stockStatus, priceFromStr, priceToStr,manufacturer
+                keyword, category, location, stockStatus, priceFromStr, priceToStr, manufacturer
         );
 
         // Pagination
@@ -198,7 +234,6 @@ public class InventoryController extends HttpServlet {
 
         request.getRequestDispatcher("/view/storekeeper/inventory-list.jsp").forward(request, response);
     }
-
 
 
     /**
@@ -276,16 +311,194 @@ public class InventoryController extends HttpServlet {
         }
     }
 
-    // Helper methods
-    private java.math.BigDecimal calculateTotalValue(List<PartDetail> list) {
-        return list.stream()
-                .map(PartDetail::getTotalValue)
-                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+    /**
+     * Add new part to inventory
+     */
+    private void addNewPart(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+
+        try {
+            // Get Part information
+            String partCode = request.getParameter("partCode");
+            String partName = request.getParameter("partName");
+            String category = request.getParameter("category");
+            String description = request.getParameter("description");
+
+            // Get PartDetail information
+            String sku = request.getParameter("sku");
+            String location = request.getParameter("location");
+            String manufacturer = request.getParameter("manufacturer");
+            int minStock = Integer.parseInt(request.getParameter("minStock"));
+            BigDecimal unitPrice = new BigDecimal(request.getParameter("unitPrice"));
+
+            // Get Unit information
+            String unitName = request.getParameter("unitName");
+
+            System.out.println("=== DEBUG addNewPart ===");
+            System.out.println("partCode: " + partCode);
+            System.out.println("partName: " + partName);
+            System.out.println("category: " + category);
+            System.out.println("sku: " + sku);
+            System.out.println("manufacturer: " + manufacturer);
+            System.out.println("description: " + description);
+            System.out.println("unitName: " + unitName);
+            System.out.println("minStock: " + minStock);
+            System.out.println("location: " + location);
+            System.out.println("unitPrice: " + unitPrice);
+
+            // Validate required fields
+            if (partCode == null || partCode.trim().isEmpty() ||
+                partName == null || partName.trim().isEmpty() ||
+                sku == null || sku.trim().isEmpty() ||
+                unitName == null || unitName.trim().isEmpty()) {
+
+                response.sendRedirect(request.getContextPath() +
+                        "/inventory?action=add&error=missing_required_fields");
+                return;
+            }
+
+            // Validate price
+            if (unitPrice.compareTo(BigDecimal.ZERO) < 0) {
+                response.sendRedirect(request.getContextPath() +
+                        "/inventory?action=add&error=invalid_price");
+                return;
+            }
+            System.out.println("Calling DAO with minStock=" + minStock + ", unitPrice=" + unitPrice);
+            // Call DAO to insert (quantity is set to 0 by default)
+            boolean success = partDetailDAO.addNewPart(
+                    partCode, partName, category, description,
+                    sku, location, manufacturer, minStock, unitPrice,
+                    unitName
+            );
+
+            if (success) {
+                System.out.println("✅ Add part SUCCESS"); // ✅ LOG
+                response.sendRedirect(request.getContextPath() +
+                        "/inventory?action=list&message=add_success");
+            } else {
+                System.out.println("❌ Add part FAILED"); // ✅ LOG
+                response.sendRedirect(request.getContextPath() +
+                        "/inventory?action=add&error=add_failed");
+            }
+
+        } catch (NumberFormatException e) {
+            e.printStackTrace(); // ✅ PRINT STACK TRACE
+            System.out.println("NumberFormatException: " + e.getMessage());
+            response.sendRedirect(request.getContextPath() +
+                    "/inventory?action=add&error=invalid_format");
+        } catch (SQLException e) {
+            e.printStackTrace(); // ✅ PRINT STACK TRACE
+            System.out.println("SQLException: " + e.getMessage());
+            System.out.println("SQL State: " + e.getSQLState());
+            System.out.println("Error Code: " + e.getErrorCode());
+            response.sendRedirect(request.getContextPath() +
+                    "/inventory?action=add&error=database_error");
+        } catch (Exception e) {
+            e.printStackTrace(); // ✅ PRINT STACK TRACE
+            System.out.println("Exception: " + e.getMessage());
+            System.out.println("Exception type: " + e.getClass().getName());
+            response.sendRedirect(request.getContextPath() +
+                    "/inventory?action=add&error=system_error");
+        }
     }
 
-    private long countLowStock(List<PartDetail> list) {
-        return list.stream()
-                .filter(PartDetail::isLowStock)
-                .count();
+    /**
+     * Process stock in transaction
+     */
+    private void processStockIn(HttpServletRequest request, HttpServletResponse response)
+            throws SQLException, IOException {
+
+        HttpSession session = request.getSession();
+
+        // Get storekeeper from session
+        Object userObj = session.getAttribute("user");
+        if (userObj == null) {
+            response.sendRedirect(request.getContextPath() + "/login?error=session_expired");
+            return;
+        }
+
+        int storeKeeperIdByUserID = (int) session.getAttribute("userId");
+        int storeKeeperId = adminDAO.getEmployeeIdByUserId(storeKeeperIdByUserID);
+        // Get form parameters
+        String partDetailIdStr = request.getParameter("partDetailId");
+        String partIdStr = request.getParameter("partId");
+        String quantityStr = request.getParameter("quantity");
+        String unitPriceStr = request.getParameter("unitPrice");
+        String supplierIdStr = request.getParameter("supplierId");
+        String note = request.getParameter("note");
+
+        if (partDetailIdStr == null || partDetailIdStr.trim().isEmpty() ||
+                partIdStr == null || partIdStr.trim().isEmpty() ||
+                quantityStr == null || quantityStr.trim().isEmpty() ||
+                unitPriceStr == null || unitPriceStr.trim().isEmpty()) {
+
+            response.sendRedirect(request.getContextPath() +
+                    "/inventory?action=list&error=missing_fields");
+            return;
+        }
+
+        try {
+            int partDetailId = Integer.parseInt(partDetailIdStr.trim());
+            int partId = Integer.parseInt(partIdStr.trim());
+            int quantity = Integer.parseInt(quantityStr.trim());
+            BigDecimal unitPrice = new BigDecimal(unitPriceStr.trim());
+
+            // Validate quantity and price
+            if (quantity <= 0) {
+                response.sendRedirect(request.getContextPath() +
+                        "/inventory?action=list&error=invalid_quantity");
+                return;
+            }
+
+            if (unitPrice.compareTo(BigDecimal.ZERO) <= 0) {
+                response.sendRedirect(request.getContextPath() +
+                        "/inventory?action=list&error=invalid_price");
+                return;
+            }
+
+            // Create transaction object
+            InventoryTransaction transaction = new InventoryTransaction();
+            transaction.setPartId(partId);
+            transaction.setPartDetailId(partDetailId);
+            transaction.setTransactionType("IN");
+            transaction.setTransactionDate(LocalDateTime.now());
+            transaction.setStoreKeeperId(storeKeeperId);
+            transaction.setQuantity(quantity);
+            transaction.setUnitPrice(unitPrice);
+            transaction.setNote(note != null && !note.trim().isEmpty() ? note.trim() : "Stock in");
+
+            // Handle supplier
+            if (supplierIdStr != null && !supplierIdStr.isEmpty() && !supplierIdStr.equals("0")) {
+                try {
+                    transaction.setSupplierId(Integer.parseInt(supplierIdStr.trim()));
+                } catch (NumberFormatException e) {
+                    System.out.println("Invalid supplierId format: " + supplierIdStr);
+                }
+            }
+
+            // Execute stock in
+            boolean success = transactionDAO.stockIn(transaction);
+
+            if (success) {
+                response.sendRedirect(request.getContextPath() +
+                        "/inventory?action=list&message=stock_in_success");
+            } else {
+                response.sendRedirect(request.getContextPath() +
+                        "/inventory?action=list&error=stock_in_failed");
+            }
+
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            System.out.println("NumberFormatException: " + e.getMessage());
+            response.sendRedirect(request.getContextPath() +
+                    "/inventory?action=list&error=invalid_format");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Exception: " + e.getMessage());
+            System.out.println("Exception type: " + e.getClass().getName());
+            response.sendRedirect(request.getContextPath() +
+                    "/inventory?action=list&error=system_error");
+        }
     }
+
 }
