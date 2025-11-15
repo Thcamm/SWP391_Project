@@ -26,58 +26,88 @@
             </div>
 
             <c:if test="${not empty errorMessage}">
-                <div class="alert alert-danger" role="alert">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="bi bi-exclamation-circle me-2"></i>${errorMessage}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             </c:if>
             <c:if test="${not empty successMessage}">
-                <div class="alert alert-success" role="alert">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="bi bi-check-circle me-2"></i>${successMessage}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             </c:if>
 
-            <%-- Form 1: Gửi OTP --%>
-            <form action="forgotpassword" method="post" id="sendOtpForm">
-                <input type="hidden" name="action" value="send">
+            <%-- Form: Combined Email and OTP --%>
+            <form action="forgotpassword" method="post" id="resetPasswordForm">
+                <input type="hidden" name="action" value="${otpSent ? 'verifyOTP' : 'sendOTP'}">
 
+                <%-- Email Input (Always visible) --%>
                 <div class="mb-3">
                     <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
                     <div class="input-group">
-                        <input type="email" class="form-control" id="email" name="email"
-                               placeholder="Enter your email to receive OTP"
-                               value="${param.email}" required>
-                        <button class="btn btn-outline-secondary" type="submit" id="sendOtpBtn">
-                            Send OTP
-                        </button>
+                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                        <input type="email"
+                               class="form-control"
+                               id="email"
+                               name="email"
+                               placeholder="Enter your registered email"
+                               value="${email != null ? email : param.email}"
+                               ${otpSent ? 'readonly' : ''}
+                               required>
                     </div>
-                </div>
-            </form>
-
-            <%-- Form 2: Reset Password --%>
-            <form action="forgotpassword" method="post" id="resetPasswordForm">
-                <input type="hidden" name="action" value="reset">
-                <input type="hidden" name="email" id="hiddenEmail" value="${email != null ? email : param.email}">
-                <div class="mb-3">
-                    <label for="otp" class="form-label">OTP Code <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="otp" name="otp"
-                           placeholder="Enter the code sent to your email" required>
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle"></i> We'll send a verification code to this email
+                    </small>
                 </div>
 
-                <div class="mb-3">
-                    <label for="newPassword" class="form-label">New Password <span class="text-danger">*</span></label>
-                    <input type="password" class="form-control" id="newPassword" name="newPassword"
-                           placeholder="Enter your new password" required>
-                </div>
+                <%-- OTP Input (Only visible after OTP sent) --%>
+                <c:if test="${otpSent}">
+                    <div class="mb-3">
+                        <label for="otp" class="form-label">Verification Code <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-shield-lock"></i></span>
+                            <input type="text"
+                                   class="form-control"
+                                   id="otp"
+                                   name="otp"
+                                   placeholder="Enter 6-digit code"
+                                   maxlength="6"
+                                   pattern="[0-9]{6}"
+                                   required>
+                        </div>
+                        <small class="text-muted">
+                            <i class="bi bi-clock"></i> Code expires in 15 minutes
+                        </small>
+                    </div>
 
-                <div class="mb-3">
-                    <label for="confirmPassword" class="form-label">Confirm New Password <span class="text-danger">*</span></label>
-                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
-                           placeholder="Confirm your new password" required>
-                </div>
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-lightbulb me-2"></i>
+                        <strong>What happens next?</strong><br/>
+                        After verifying your code, a new password will be automatically generated and sent to your email.
+                    </div>
+                </c:if>
 
+                <%-- Submit Button --%>
                 <button type="submit" class="btn-login">
-                    Reset Password
+                    <c:choose>
+                        <c:when test="${otpSent}">
+                            <i class="bi bi-check-circle me-1"></i> Verify Code & Reset Password
+                        </c:when>
+                        <c:otherwise>
+                            <i class="bi bi-send me-1"></i> Send Verification Code
+                        </c:otherwise>
+                    </c:choose>
                 </button>
+
+                <%-- Resend OTP Link (Only visible after OTP sent) --%>
+                <c:if test="${otpSent}">
+                    <div class="text-center mt-3">
+                        <a href="forgotpassword" class="text-decoration-none">
+                            <i class="bi bi-arrow-clockwise"></i> Didn't receive code? Try again
+                        </a>
+                    </div>
+                </c:if>
             </form>
 
             <div class="footer-links">
