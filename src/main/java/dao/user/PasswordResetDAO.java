@@ -88,4 +88,42 @@ public class PasswordResetDAO extends DbContext {
             e.printStackTrace();
         }
     }
+
+    // Xác thực OTP theo email
+    public boolean verifyOTP(String email, String otp) {
+        String sql = "SELECT prt.* FROM password_reset_tokens prt " +
+                "JOIN User u ON prt.user_id = u.UserID " +
+                "WHERE u.Email = ? AND prt.token = ? AND prt.is_used = FALSE " +
+                "AND prt.expiry_date > NOW() " +
+                "ORDER BY prt.created_date DESC LIMIT 1";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, email);
+            stmt.setString(2, otp);
+            ResultSet rs = stmt.executeQuery();
+
+            return rs.next(); // Trả về true nếu tìm thấy OTP hợp lệ
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // Đánh dấu OTP đã được sử dụng theo email
+    public boolean markOTPAsUsed(String email, String otp) throws SQLException {
+        String sql = "UPDATE password_reset_tokens prt " +
+                "JOIN User u ON prt.user_id = u.UserID " +
+                "SET prt.is_used = TRUE " +
+                "WHERE u.Email = ? AND prt.token = ?";
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, email);
+            stmt.setString(2, otp);
+            return stmt.executeUpdate() > 0;
+        }
+    }
 }

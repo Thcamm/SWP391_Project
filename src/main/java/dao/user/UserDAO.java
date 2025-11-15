@@ -224,6 +224,21 @@ public class UserDAO extends DbContext {
         }
     }
 
+    public boolean updatePassword(String email, String newPasswordHash) throws SQLException {
+        String sql = "UPDATE User SET PasswordHash = ? WHERE Email = ? AND ActiveStatus = 1";
+
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, newPasswordHash);
+            ps.setString(2, email);
+
+            int rowsAffected = ps.executeUpdate();
+
+            return rowsAffected > 0;
+        }
+    }
+
     public List<Integer> findUserIdsByRoleName(String roleName) throws SQLException {
         List<Integer> userIds = new ArrayList<>();
         String sql = "SELECT u.UserID FROM User u JOIN RoleInfo r ON u.RoleID = r.RoleID WHERE r.RoleName = ?";

@@ -1,19 +1,206 @@
 package dao.inventory;
 
 import common.DbContext;
+import common.message.ServiceResult;
+import model.employee.technician.PartOption;
 import model.inventory.WorkOrderPart;
+import model.inventory.WorkOrderPartView;
+import util.MailService;
+
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WorkOrderPartDAO extends DbContext {
 
+    public List<WorkOrderPartView> getPartsByAssignment(int assignmentId) throws SQLException {
+        String sql = """
+                SELECT 
+                    wop.WorkOrderPartID,
+                    wop.DetailID,
+                    wop.PartDetailID,
+                    wop.DiagnosticPartID,
+                    wop.QuantityUsed,
+                    wop.UnitPrice,
+                    wop.request_status,
+                    wop.requested_at,
+                    pd.SKU,
+                    pd.Quantity AS StockQty,
+                    p.PartCode,
+                    p.PartName,
+                    e.EmployeeID,
+                    u.FullName AS RequestedByName
+                FROM TaskAssignment ta
+                JOIN WorkOrderDetail wod ON ta.DetailID = wod.DetailID
+                JOIN WorkOrderPart wop   ON wop.DetailID = wod.DetailID
+                JOIN PartDetail pd       ON pd.PartDetailID = wop.PartDetailID
+                JOIN Part p              ON p.PartID = pd.PartID
+                LEFT JOIN Employee e     ON e.EmployeeID = wop.RequestedByID
+                LEFT JOIN `User` u       ON u.UserID = e.UserID
+                WHERE ta.AssignmentID = ?
+                ORDER BY wop.requested_at DESC, wop.WorkOrderPartID DESC
+                """;
+
+        List<WorkOrderPartView> list = new ArrayList<>();
+        try (Connection c = DbContext.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setInt(1, assignmentId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    WorkOrderPartView v = new WorkOrderPartView();
+                    v.setWorkOrderPartID(rs.getInt("WorkOrderPartID"));
+                    v.setDetailID(rs.getInt("DetailID"));
+                    v.setPartDetailID(rs.getInt("PartDetailID"));
+                    v.setDiagnosticPartID(rs.getInt("DiagnosticPartID"));
+                    v.setQuantityUsed(rs.getInt("QuantityUsed"));
+                    v.setUnitPrice(rs.getBigDecimal("UnitPrice"));
+                    v.setRequestStatus(rs.getString("request_status"));
+                    Timestamp ts = rs.getTimestamp("requested_at");
+                    if (ts != null) v.setRequestedAt(ts.toLocalDateTime());
+
+                    v.setSku(rs.getString("SKU"));
+                    v.setCurrentStock(rs.getInt("StockQty"));
+                    v.setPartCode(rs.getString("PartCode"));
+                    v.setPartName(rs.getString("PartName"));
+                    v.setRequestedByName(rs.getString("RequestedByName"));
+
+                    list.add(v);
+                }
+            }
+        }
+        return list;
+    }
+
+    public ServiceResult createPartRequestForAssignment(
+            int assignmentId,
+            int partDetailId,
+            int quantity
+    ) throws SQLException {
+
+        String getTaskSql = "SELECT DetailID, AssignToTechID FROM TaskAssignment WHERE AssignmentID = ?";
+        String getPartSql = "SELECT UnitPrice, Quantity AS StockQty FROM PartDetail WHERE PartDetailID = ?";
+        String insertSql = """
+                INSERT INTO WorkOrderPart
+                    (DetailID, PartDetailID, DiagnosticPartID,
+                     RequestedByID, QuantityUsed, UnitPrice,
+                     request_status, requested_at)
+                VALUES (?, ?, NULL, ?, ?, ?, 'PENDING', NOW())
+                """;
+
+        try (Connection c = DbContext.getConnection()) {
+            c.setAutoCommit(false);
+
+            int detailId;
+            int techId;
+            try (PreparedStatement ps = c.prepareStatement(getTaskSql)) {
+                ps.setInt(1, assignmentId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (!rs.next()) {
+                        return ServiceResult.error("ERR134", "WOP", "Ko tim thay task");
+                    }
+                    detailId = rs.getInt("DetailID");
+                    techId = rs.getInt("AssignToTechID");
+                }
+            }
+
+            BigDecimal unitPrice;
+            int stockQty;
+            try (PreparedStatement ps = c.prepareStatement(getPartSql)) {
+                ps.setInt(1, partDetailId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (!rs.next()) {
+                        return ServiceResult.error("ERR121", "PartDetail", "Khong tim thay part detail");
+                    }
+                    unitPrice = rs.getBigDecimal("UnitPrice");
+                    stockQty = rs.getInt("StockQty");
+                }
+            }
+
+            if (quantity <= 0) {
+                return ServiceResult.error("ERR555", "Quantity", "Số lượng phải > 0.");
+            }
+            if (quantity > stockQty) {
+                return ServiceResult.error("ERR999", "quantity", "Số lượng yêu cầu vượt tồn kho hiện tại.");
+            }
+
+            try (PreparedStatement ps = c.prepareStatement(insertSql)) {
+                ps.setInt(1, detailId);
+                ps.setInt(2, partDetailId);
+                ps.setInt(3, techId);
+                ps.setInt(4, quantity);
+                ps.setBigDecimal(5, unitPrice);
+                ps.executeUpdate();
+            }
+
+            c.commit();
+            return ServiceResult.success("Đã tạo yêu cầu phụ tùng, chờ kho xử lý.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public List<PartOption> getAvailablePartsForAssignment(int assignmentId) throws SQLException {
+        String sql = """
+                    SELECT 
+                        pd.PartDetailID,
+                        pd.SKU,
+                        p.PartName,
+                         pd.Quantity AS CurrentStock
+                    FROM PartDetail pd
+                    JOIN Part p ON pd.PartID = p.PartID
+                    ORDER BY p.PartName ASC
+                """;
+
+        List<PartOption> list = new ArrayList<>();
+
+        try (Connection con = DbContext.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                PartOption opt = new PartOption();
+                opt.setPartDetailId(rs.getInt("PartDetailID"));
+                opt.setSku(rs.getString("SKU"));
+                opt.setPartName(rs.getString("PartName"));
+                opt.setCurrentStock(rs.getInt("CurrentStock"));
+                list.add(opt);
+            }
+        }
+
+        return list;
+    }
+
+    public boolean hasPendingRequestsForAssignment(int assignmentId) throws SQLException {
+        final String sql = """
+                    SELECT 1
+                    FROM WorkOrderPart wop
+                    JOIN TaskAssignment ta ON ta.DetailID = wop.DetailID
+                    WHERE ta.AssignmentID = ?
+                      AND wop.request_status = 'PENDING'
+                    LIMIT 1
+                """;
+
+        try (Connection conn = DbContext.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, assignmentId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // có bản ghi => còn pending
+            }
+        }
+    }
+
     /**
      * Get all pending part requests
      */
     public List<WorkOrderPart> getPendingRequests() throws SQLException {
         List<WorkOrderPart> list = new ArrayList<>();
-        String sql = "SELECT wop.*, pd.Quantity as CurrentStock, p.PartName " + // ✅ Đổi Name → PartName
+        String sql = "SELECT wop.*, pd.Quantity as CurrentStock, p.PartName " +
                 "FROM workorderpart wop " +
                 "JOIN PartDetail pd ON wop.PartDetailID = pd.PartDetailID " +
                 "JOIN Part p ON pd.PartID = p.PartID " +
@@ -43,6 +230,7 @@ public class WorkOrderPartDAO extends DbContext {
 
     /**
      * Approve request and deduct stock
+     *
      * @return true if approved successfully, false if insufficient stock
      */
     public boolean approveRequest(int workOrderPartId) throws SQLException {
@@ -51,39 +239,36 @@ public class WorkOrderPartDAO extends DbContext {
             conn = getConnection();
             conn.setAutoCommit(false);
 
-            // 1. Get request details
-            String selectSql = "SELECT wop.PartDetailID, wop.QuantityUsed, pd.Quantity " +
-                    "FROM workorderpart wop " +
-                    "JOIN PartDetail pd ON wop.PartDetailID = pd.PartDetailID " +
-                    "WHERE wop.WorkOrderPartID = ? AND wop.request_status = 'PENDING'";
+            // 1. Get request info
+            String getRequestSql = "SELECT wp.*, pd.Quantity as CurrentStock, pd.MinStock, p.PartName " +
+                    "FROM WorkOrderPart wp " +
+                    "JOIN PartDetail pd ON wp.PartDetailID = pd.PartDetailID " +
+                    "JOIN Part p ON pd.PartID = p.PartID " +
+                    "WHERE wp.WorkOrderPartID = ?";
 
-            int partDetailId;
-            int quantityRequested;
-            int currentStock;
+            int requestedById = 0;
+            int partDetailId = 0;
+            int quantityRequested = 0;
+            int currentStock = 0;
+            int minStock = 0;
+            String partName = "";
 
-            try (PreparedStatement ps = conn.prepareStatement(selectSql)) {
+            try (PreparedStatement ps = conn.prepareStatement(getRequestSql)) {
                 ps.setInt(1, workOrderPartId);
                 ResultSet rs = ps.executeQuery();
-
-                if (!rs.next()) {
-                    conn.rollback();
-                    return false; // Request not found or not pending
+                if (rs.next()) {
+                    partDetailId = rs.getInt("PartDetailID");
+                    quantityRequested = rs.getInt("QuantityUsed");
+                    currentStock = rs.getInt("CurrentStock");
+                    minStock = rs.getInt("MinStock");
+                    partName = rs.getString("PartName");
+                    requestedById = rs.getInt("RequestedByID");
                 }
-
-                partDetailId = rs.getInt("PartDetailID");
-                quantityRequested = rs.getInt("QuantityUsed");
-                currentStock = rs.getInt("Quantity");
             }
 
-            // 2. Validate stock
+            // 2. Check stock availability
             if (currentStock < quantityRequested) {
-                // Insufficient stock - reject
-                String rejectSql = "UPDATE workorderpart SET request_status = 'REJECTED' WHERE WorkOrderPartID = ?";
-                try (PreparedStatement ps = conn.prepareStatement(rejectSql)) {
-                    ps.setInt(1, workOrderPartId);
-                    ps.executeUpdate();
-                }
-                conn.commit();
+                conn.rollback();
                 return false;
             }
 
@@ -95,51 +280,93 @@ public class WorkOrderPartDAO extends DbContext {
                 ps.executeUpdate();
             }
 
-            // 4. Approve request
-            String approveSql = "UPDATE workorderpart SET request_status = 'APPROVED' WHERE WorkOrderPartID = ?";
-            try (PreparedStatement ps = conn.prepareStatement(approveSql)) {
+            // 4. Update request status
+            String updateRequestSql = "UPDATE WorkOrderPart SET Status = 'APPROVED' WHERE WorkOrderPartID = ?";
+            try (PreparedStatement ps = conn.prepareStatement(updateRequestSql)) {
                 ps.setInt(1, workOrderPartId);
                 ps.executeUpdate();
             }
 
-            // 5. Create inventory transaction (OUT)
+            // 5. Create inventory transaction
             String insertTransactionSql = "INSERT INTO InventoryTransaction " +
-                    "(PartID, PartDetailID, TransactionType, TransactionDate, StoreKeeperID, Note, Quantity) " +
-                    "SELECT pd.PartID, pd.PartDetailID, 'OUT', NOW(), ?, " +
-                    "CONCAT('Work Order Part Request #', ?), ? " +
-                    "FROM PartDetail pd WHERE pd.PartDetailID = ?";
-
+                    "(PartDetailID, TransactionType, Quantity, TransactionDate) " +
+                    "VALUES (?, 'OUT', ?, GETDATE())";
             try (PreparedStatement ps = conn.prepareStatement(insertTransactionSql)) {
-                ps.setInt(1, 1); // StoreKeeperID - get from session
-                ps.setInt(2, workOrderPartId);
-                ps.setInt(3, quantityRequested);
-                ps.setInt(4, partDetailId);
+                ps.setInt(1, partDetailId);
+                ps.setInt(2, quantityRequested);
                 ps.executeUpdate();
             }
 
             conn.commit();
+
+            // 6. Check if stock falls below minimum and send email
+            int newStock = currentStock - quantityRequested;
+            if (newStock < minStock) {
+                sendLowStockAlert(partDetailId, partName, newStock, minStock, requestedById);
+            }
+
             return true;
 
         } catch (SQLException e) {
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
+            if (conn != null) conn.rollback();
             throw e;
         } finally {
             if (conn != null) {
-                try {
-                    conn.setAutoCommit(true);
-                    conn.close();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
+                conn.setAutoCommit(true);
+                conn.close();
             }
         }
     }
+
+    private void sendLowStockAlert(int partDetailId, String partName, int currentStock, int minStock, int requestedById) {
+        try {
+            // Lấy email của người yêu cầu xuất kho
+            String recipientEmail = getEmployeeEmail(requestedById);
+
+            if (recipientEmail == null || recipientEmail.isEmpty()) {
+                System.err.println("Cannot send alert: No email found for employee ID " + requestedById);
+                return;
+            }
+
+            String subject = "CẢNH BÁO: Tồn kho thấp - " + partName;
+            String body = String.format(
+                    "Kính gửi,\n\n" +
+                            "Sau khi xuất kho linh kiện '%s' (ID: %d), số lượng đã xuống dưới mức tồn kho tối thiểu:\n\n" +
+                            "- Số lượng hiện tại: %d\n" +
+                            "- Mức tối thiểu: %d\n\n" +
+                            "Vui lòng lưu ý khi yêu cầu xuất kho lần sau.\n\n" +
+                            "Trân trọng,\n" +
+                            "Hệ thống quản lý kho",
+                    partName, partDetailId, currentStock, minStock
+            );
+
+            MailService.sendEmail(recipientEmail, subject, body);
+
+        } catch (Exception e) {
+            System.err.println("Failed to send low stock alert: " + e.getMessage());
+        }
+    }
+
+    private String getEmployeeEmail(int employeeId) throws SQLException {
+        String sql = "SELECT u.Email FROM Employee e " +
+                "JOIN `User` u ON e.UserID = u.UserID " +
+                "WHERE e.EmployeeID = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, employeeId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("Email");
+                }
+            }
+        }
+        return null;
+    }
+
+
 
     /**
      * Manually reject request
