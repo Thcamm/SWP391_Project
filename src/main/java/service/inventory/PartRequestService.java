@@ -16,20 +16,24 @@ public class PartRequestService {
     private final TechnicianDAO technicianDAO = new TechnicianDAO();
     private final WorkOrderPartDAO workOrderPartDAO = new WorkOrderPartDAO();
 
-    public ServiceResult getPartsForAssignment(int assignmentId) {
+    public ServiceResult getPartsForAssignment(int assignmentId, String partSearch) {
         try {
             TaskAssignment task = technicianDAO.getTaskById(assignmentId);
             if (task == null) {
                 return ServiceResult.error("ERR993", "Part", "Khong tim thay part nao");
             }
 
+            String keyword = (partSearch == null) ? "" : partSearch.trim();
+
+
             List<WorkOrderPartView> parts = workOrderPartDAO.getPartsByAssignment(assignmentId);
-            List<PartOption> options = workOrderPartDAO.getAvailablePartsForAssignment(assignmentId);
+            List<PartOption> options = workOrderPartDAO.getAvailablePartsForAssignment(assignmentId, keyword);
 
             TaskPartsVM vm = new TaskPartsVM();
             vm.task = task;
             vm.parts = parts;
             vm.availableParts = options;
+            vm.partSearch = keyword;
 
             return ServiceResult.success(vm);
         } catch (SQLException e) {

@@ -134,17 +134,6 @@ uri="http://java.sun.com/jsp/jstl/core" %>
       </div>
     </main>
 
-    <!-- ✅ CHATBOT -->
-    <button id="chat-toggle-btn"><i class="fas fa-comment-dots"></i></button>
-    <div id="chatbox">
-      <div id="chat-header">Garacuabuituanduong</div>
-      <div id="chat-messages"></div>
-      <div id="chat-input-area">
-        <input type="text" id="user-input" placeholder="Aa" />
-        <button id="send-btn"><i class="fas fa-paper-plane"></i></button>
-      </div>
-    </div>
-
     <!-- ✅ FOOTER -->
     <%@ include file="/common/footer.jsp" %>
 

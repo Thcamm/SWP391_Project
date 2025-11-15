@@ -333,8 +333,7 @@ public class TechnicianService {
                 "Requested rejection. Reason: " + reason
         );
 
-        // optional: bắn notify manager
-        // notificationService.notifyTechManagers(...)
+        
 
         if (logged) {
             return ServiceResult.success(MessageConstants.TASK002); // Task rejected successfully
@@ -358,6 +357,13 @@ public class TechnicianService {
         boolean ok = technicianDAO.updateTaskProgress(assignmentId, progressPercentage, notes);
         if (!ok) return ServiceResult.error(MessageConstants.TASK005);
 
+        if (progressPercentage == 100) {
+            ServiceResult completeRs = completeTask(technicianId, assignmentId, notes);
+            if (completeRs.isError()) {
+                return ServiceResult.error(completeRs.getMessage());
+            }
+            return completeRs;
+        }
         technicianDAO.logActivity(
                 technicianId, TechnicianActivity.ActivityType.PROGRESS_UPDATED, assignmentId,
                 "Updated progress to " + progressPercentage + "%"

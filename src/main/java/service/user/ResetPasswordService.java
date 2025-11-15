@@ -22,6 +22,9 @@ public class ResetPasswordService {
     }
 
     public ResetPasswordService() {
+        this.passwordResetDAO = new PasswordResetDAO();
+        this.userDAO = new UserDAO();
+        this.mailService = new MailService();
     }
 
     /**

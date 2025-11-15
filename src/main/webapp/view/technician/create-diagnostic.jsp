@@ -26,14 +26,14 @@
 
                 <!-- Header -->
                 <div class="page-header">
-                    <h1 class="page-title">🩺 Create Diagnostic Report</h1>
+                    <h1 class="page-title">Create Diagnostic Report</h1>
                 </div>
 
 
 
                 <!-- Task Info -->
                 <div class="card">
-                    <div class="card-header bg-info">📋 Task Information</div>
+                    <div class="card-header bg-info">Task Information</div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
@@ -63,7 +63,7 @@
                     <!-- Hiển thị error message nếu có -->
                     <c:if test="${not empty errorMessage}">
                         <div class="alert alert-danger" role="alert">
-                            ❌ <strong>Error:</strong> <c:out value="${errorMessage}"/>
+                            <strong>Error:</strong> <c:out value="${errorMessage}"/>
                         </div>
                     </c:if>
 
@@ -76,7 +76,7 @@
 
                     <!-- Diagnostic details -->
                     <div class="card">
-                        <div class="card-header bg-primary">📝 Diagnostic Details</div>
+                        <div class="card-header bg-primary">Diagnostic Details</div>
                         <div class="card-body">
                             <div class="form-group">
                                 <label for="issueFound" class="form-label">Issue Found <span
@@ -100,9 +100,9 @@
 
                     <!-- Parts -->
                     <div class="card">
-                        <div class="card-header bg-success">🔧 Parts Required/Recommended</div>
+                        <div class="card-header bg-success">Parts Required/Recommended</div>
                         <div class="card-body">
-                            <p class="text-muted mb-3">💡 Add all parts that need to be replaced or are recommended.</p>
+                            <p class="text-muted mb-3">Add all parts that need to be replaced or are recommended.</p>
 
                             <!-- Search -->
                             <div class="row align-items-end mb-3">
@@ -379,7 +379,7 @@
                             <div class="mt-3">
                                 <button type="submit" name="action" value="addPart" class="btn btn-success btn-sm"
                                         formnovalidate>
-                                    🤞 Add Another Part
+                                    Add Another Part
                                 </button>
                                 <small class="text-muted ms-2">Click to add more parts to this diagnostic</small>
                             </div>
@@ -388,7 +388,7 @@
 
                     <!-- Estimate -->
                     <div class="alert alert-info">
-                        <h5 class="alert-heading">💰 Estimate Summary</h5>
+                        <h5 class="alert-heading">Estimate Summary</h5>
                         <hr/>
                         <div class="row">
                             <div class="col-4">
@@ -432,10 +432,10 @@
                     <!-- Actions -->
                     <div class="mt-4 text-center">
                         <button type="submit" name="action" value="submit" class="btn btn-primary btn-lg">
-                            😶‍🌫️ Submit Diagnostic Report
+                            Submit Diagnostic Report
                         </button>
                         <a href="${pageContext.request.contextPath}/technician/tasks" class="btn btn-secondary btn-lg ms-2">
-                            💣 Cancel
+                            Cancel
                         </a>
                     </div>
                 </form>
@@ -448,6 +448,77 @@
 
 <!-- ===== Client helpers: unit price + realtime totals ===== -->
 <script>
+    (function () {
+        const container = document.querySelector('.parts-container');
+        if (!container) return;
+
+        // khi chọn 1 part trong 1 dòng
+        container.addEventListener('change', function (e) {
+            if (!e.target.classList.contains('part-select')) return;
+
+            const select = e.target;
+            const selectedId = select.value;
+            if (!selectedId) return;
+
+            const currentRow = select.closest('.part-row');
+            const currentQtyInput = currentRow.querySelector('input[name="quantity[]"]');
+
+            let existingRow = null;
+
+            // tìm xem part này đã được chọn ở dòng khác chưa
+            container.querySelectorAll('.part-row').forEach(function (row) {
+                if (row === currentRow) return;
+                const s = row.querySelector('.part-select');
+                if (s && s.value === selectedId) {
+                    existingRow = row;
+                }
+            });
+
+            if (existingRow) {
+                const existQtyInput = existingRow.querySelector('input[name="quantity[]"]');
+
+                const existQty = parseInt(existQtyInput.value || '0', 10);
+                const currentQty = parseInt(currentQtyInput.value || '1', 10);
+
+                // cộng dồn quantity vào dòng cũ
+                existQtyInput.value = existQty + currentQty;
+
+                // reset dòng hiện tại về trạng thái “chưa chọn”
+                select.value = '';
+                currentQtyInput.value = 1;
+
+                // có thể hiện message nhẹ
+                // alert('Part này đã có trong danh sách, hệ thống tự cộng số lượng.');
+
+                // OPTIONAL: update unit price / stock nếu bạn có logic JS khác
+            }
+
+            // nếu muốn disable option đã chọn ở các select khác thì gọi thêm:
+            refreshDisabledOptions();
+        });
+
+        function refreshDisabledOptions() {
+            const selects = container.querySelectorAll('.part-select');
+            const selectedSet = new Set();
+
+            // gom tất cả value đang chọn (không rỗng)
+            selects.forEach(function (sel) {
+                if (sel.value) selectedSet.add(sel.value);
+            });
+
+            selects.forEach(function (sel) {
+                const currentValue = sel.value;
+                sel.querySelectorAll('option').forEach(function (opt) {
+                    if (!opt.value) return; // bỏ "-- Select Part --"
+                    // disable nếu option này đang được chọn ở dòng khác
+                    opt.disabled = selectedSet.has(opt.value) && opt.value !== currentValue;
+                });
+            });
+        }
+
+        // chạy 1 lần khi load trang (nếu có dữ liệu cũ)
+        refreshDisabledOptions();
+    })();
     (function () {
         function toNum(v){ return Number.isFinite(+v) ? +v : 0; }
 

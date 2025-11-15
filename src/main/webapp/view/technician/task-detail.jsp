@@ -19,7 +19,7 @@
                 <div class="task-detail-page">
                     <!-- Page Header -->
                     <div class="page-header">
-                        <h2>🔍 Task Details #${task.assignmentID}</h2>
+                        <h2>Task Details #${task.assignmentID}</h2>
                         <a href="${returnTo}" class="btn-back">← Back to Tasks</a>
                     </div>
 
@@ -64,9 +64,17 @@
                                 </div>
                             </div>
                             <div class="info-item">
+                                <div class="info-label">Start At</div>
+                                <div class="info-value">${task.startAtFormatted}</div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-label">Completed At</div>
+                                <div class="info-value">${task.completeAtFormatted}</div>
+                            </div>
+                            <div class="info-item">
                                 <div class="info-label">Progress</div>
                                 <div class="info-value">
-
 
                                     ${task.progressPercentage}%
                                 </div>
@@ -77,7 +85,7 @@
                     <!-- Diagnostics Section -->
                     <div class="diagnostics-section">
                         <div class="section-header">
-                            <h3>🩺 Vehicle Diagnostics (${vm.page.totalItems})</h3>
+                            <h3>Vehicle Diagnostics (${vm.page.totalItems})</h3>
                             <c:if test="${task.status == 'IN_PROGRESS'}">
                                 <a href="${pageContext.request.contextPath}/technician/create-diagnostic?assignmentId=${task.assignmentID}"
                                    class="btn-create">
@@ -201,7 +209,7 @@
 
                                     <td class="actions">
                                         <a href="${pageContext.request.contextPath}/technician/diagnostic/view?diagnosticId=${diag.vehicleDiagnosticID}"
-                                           class="btn-sm btn-view">👀 View</a>
+                                           class="btn-sm btn-view">View</a>
 
                                         <c:set var="approvedCnt"
                                                value="${vm.approvedCount[diag.vehicleDiagnosticID] != null ? vm.approvedCount[diag.vehicleDiagnosticID] : 0}"/>
@@ -209,7 +217,7 @@
                                         <c:choose>
                                             <c:when test="${diag.statusString eq 'REJECTED'}">
                                                 <button class="btn btn-sm btn-secondary" disabled
-                                                        title="Cannot edit rejected diagnostics">🐙 Edit
+                                                        title="Cannot edit rejected diagnostics">Edit
                                                 </button>
                                             </c:when>
 

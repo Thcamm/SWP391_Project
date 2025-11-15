@@ -1,56 +1,53 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
-<!-- Bootstrap 5 -->
+<!-- Bootstrap 5 & FontAwesome -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+<jsp:include page="header.jsp"/>
 
 <div class="container-fluid px-0">
     <div class="row g-0">
+        <!-- Sidebar -->
+        <div class="col-auto" style="flex:0 0 280px; width: 280px;">
+            <jsp:include page="sidebar.jsp"/>
+        </div>
 
-        <!-- Main -->
+        <!-- Main Content -->
         <div class="col" style="min-width:0;">
             <main class="p-3 pb-0">
-                <!-- Topbar -->
+                <!-- Page Header -->
                 <div class="card border-0 shadow-sm mb-3">
                     <div class="card-body d-flex align-items-center justify-content-between">
                         <div>
-                            <h2 class="h4 mb-1">📦 Inventory Management</h2>
+                            <h2 class="h4 mb-1">Inventory Management</h2>
                             <p class="text-muted mb-0">
-                                Manage parts, stock levels and inventory operations
+                                Manage your warehouse inventory
                             </p>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
+                        <div class="d-flex gap-2">
                             <a href="${pageContext.request.contextPath}/inventory?action=add"
                                class="btn btn-primary">
-                                <i class="bi bi-plus-circle"></i> Add New Part
-                            </a>
-                            <a href="${pageContext.request.contextPath}/stock-in"
-                               class="btn btn-success">
-                                <i class="bi bi-box-arrow-in-down"></i> General Stock In
-                            </a>
-                            <a href="${pageContext.request.contextPath}/stock-out"
-                               class="btn btn-warning">
-                                <i class="bi bi-box-arrow-up"></i> Stock Out
+                                <i class="fas fa-plus"></i> Add New Part
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Messages -->
+                <!-- Alert Messages -->
                 <c:if test="${not empty param.message}">
-                    <div class="alert alert-success alert-dismissible fade show">
-                        ✅ ${param.message}
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>${param.message}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 </c:if>
 
                 <c:if test="${not empty param.error}">
-                    <div class="alert alert-danger alert-dismissible fade show">
-                        ⚠️ ${param.error}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>${param.error}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 </c:if>

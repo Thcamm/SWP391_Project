@@ -237,7 +237,7 @@ public class CreateDiagnosticServlet extends HttpServlet {
         }
 
         // parse & validate parts
-        List<DiagnosticPart> parts = new ArrayList<>();
+        Map<Integer, DiagnosticPart> mergedParts = new LinkedHashMap<>();
         if (partDetailIds != null && partDetailIds.length > 0) {
             for (int i = 0; i < partDetailIds.length; i++) {
                 String idStr = partDetailIds[i];
@@ -279,21 +279,29 @@ public class CreateDiagnosticServlet extends HttpServlet {
                     continue;
                 }
 
-                DiagnosticPart row = new DiagnosticPart();
-                row.setPartDetailID(partDetailId);
-                row.setQuantityNeeded(qty);
-                row.setUnitPrice(pd.getUnitPrice());
+                DiagnosticPart existing = mergedParts.get(partDetailId);
 
-                // CHANGED: parse PartCondition an toàn sang enum
-                String condRaw = (conditions != null && i < conditions.length) ? conditions[i] : null;
-                DiagnosticPart.PartCondition condEnum = parseConditionOrDefault(condRaw, DiagnosticPart.PartCondition.REQUIRED); // CHANGED
-                row.setPartCondition(condEnum);
+                if(existing == null){
+                    DiagnosticPart row = new DiagnosticPart();
+                    row.setPartDetailID(partDetailId);
+                    row.setQuantityNeeded(qty);
+                    row.setUnitPrice(pd.getUnitPrice());
 
-                row.setReasonForReplacement((reasons != null && i < reasons.length) ? reasons[i] : null);
-                row.setApproved(false); // KH chưa duyệt
-                parts.add(row);
+                    // CHANGED: parse PartCondition an toàn sang enum
+                    String condRaw = (conditions != null && i < conditions.length) ? conditions[i] : null;
+                    DiagnosticPart.PartCondition condEnum = parseConditionOrDefault(condRaw, DiagnosticPart.PartCondition.REQUIRED); // CHANGED
+                    row.setPartCondition(condEnum);
+
+                    row.setReasonForReplacement((reasons != null && i < reasons.length) ? reasons[i] : null);
+                    row.setApproved(false); // KH chưa duyệt
+                    mergedParts.put(partDetailId, row);
+                }else {
+                    existing.setQuantityNeeded(existing.getQuantityNeeded() + qty);
+                }
             }
         }
+
+        List<DiagnosticPart> parts = new ArrayList<>(mergedParts.values());
 
         if (!errors.isEmpty()) {
             loadPartsForDisplay(req, req.getParameter("partQuery"), partDetailIds);
