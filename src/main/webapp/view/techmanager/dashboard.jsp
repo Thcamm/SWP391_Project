@@ -160,6 +160,18 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                         <span class="badge bg-warning d-block mt-2">${stats.unassignedWorkOrderDetails} Waiting</span>
                       </a>
                     </div>
+
+                    <!-- Close Work Orders Quick Action -->
+                    <div class="col-md-4">
+                      <a
+                        href="${pageContext.request.contextPath}/techmanager/close-workorders"
+                        class="btn btn-outline-success w-100 p-3">
+                        <i class="bi bi-folder-check fs-3 d-block mb-2"></i>
+                        <strong>Close Work Orders</strong>
+                        <small class="text-muted d-block">Ready for Closure</small>
+                        <span class="badge bg-success d-block mt-2">${stats.readyToClose} Ready</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -40,6 +40,19 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           </div>
         </c:if>
 
+        <!-- Debug Info (Remove in production) -->
+        <div class="alert alert-secondary">
+          <strong>Debug Info:</strong>
+          <br />
+          totalReady: ${totalReady}
+          <br />
+          workOrders: ${workOrders}
+          <br />
+          workOrders size: ${workOrders.size()}
+          <br />
+          workOrders empty: ${empty workOrders}
+        </div>
+
         <!-- Statistics -->
         <div class="row mb-4">
           <div class="col-md-4">
@@ -51,6 +64,19 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                 </h5>
                 <h2>${totalReady}</h2>
                 <p class="mb-0 small">All tasks completed</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card text-white bg-secondary">
+              <div class="card-body">
+                <h5 class="card-title">
+                  <i class="bi bi-check2-circle"></i>
+                  Completed Work Orders
+                </h5>
+                <h2>${totalCompleted}</h2>
+                <p class="mb-0 small">Work orders that have been closed and archived</p>
               </div>
             </div>
           </div>

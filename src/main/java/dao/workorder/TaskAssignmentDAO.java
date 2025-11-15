@@ -16,7 +16,7 @@ import java.util.List;
  * Methods marked [TECH_MANAGER ONLY] - Only TechManager should call
  * Methods marked [SHARED] - Both TechManager and Technician can use
  * 
-// * @see TechnicianDAO for Technician-specific operations
+ * // * @see TechnicianDAO for Technician-specific operations
  */
 public class TaskAssignmentDAO extends DbContext {
 
@@ -85,6 +85,7 @@ public class TaskAssignmentDAO extends DbContext {
             return -1;
         }
     }
+
     public List<TaskAssignment> getTasksByDetailId(int detailID) throws SQLException {
         List<TaskAssignment> tasks = new ArrayList<>();
         String sql = "SELECT * FROM TaskAssignment WHERE DetailID = ? ORDER BY priority DESC, AssignedDate ASC";
@@ -101,6 +102,141 @@ public class TaskAssignmentDAO extends DbContext {
             }
         }
         return tasks;
+    }
+
+    /**
+     * Get simplified task assignment info for a WorkOrderDetail
+     * Used for displaying existing assignments in UI
+     */
+    public List<TaskAssignmentSummary> getTaskAssignmentSummaryByDetailId(int detailID) throws SQLException {
+        List<TaskAssignmentSummary> summaries = new ArrayList<>();
+        String sql = "SELECT ta.AssignmentID, ta.Status, ta.AssignedDate, ta.StartAt, ta.CompleteAt, " +
+                "ta.TaskDescription, ta.task_type, ta.priority, " +
+                "e.EmployeeCode, u.FullName AS TechnicianName " +
+                "FROM TaskAssignment ta " +
+                "JOIN Employee e ON ta.AssignToTechID = e.EmployeeID " +
+                "JOIN User u ON e.UserID = u.UserID " +
+                "WHERE ta.DetailID = ? " +
+                "ORDER BY ta.AssignedDate DESC";
+
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, detailID);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    TaskAssignmentSummary summary = new TaskAssignmentSummary();
+                    summary.setAssignmentId(rs.getInt("AssignmentID"));
+                    summary.setStatus(rs.getString("Status"));
+                    summary.setAssignedDate(rs.getTimestamp("AssignedDate"));
+                    summary.setStartAt(rs.getTimestamp("StartAt"));
+                    summary.setCompleteAt(rs.getTimestamp("CompleteAt"));
+                    summary.setTaskDescription(rs.getString("TaskDescription"));
+                    summary.setTaskType(rs.getString("task_type"));
+                    summary.setPriority(rs.getString("priority"));
+                    summary.setEmployeeCode(rs.getString("EmployeeCode"));
+                    summary.setTechnicianName(rs.getString("TechnicianName"));
+                    summaries.add(summary);
+                }
+            }
+        }
+        return summaries;
+    }
+
+    /**
+     * Simple DTO for task assignment summary
+     */
+    public static class TaskAssignmentSummary {
+        private int assignmentId;
+        private String status;
+        private Timestamp assignedDate;
+        private Timestamp startAt;
+        private Timestamp completeAt;
+        private String taskDescription;
+        private String taskType;
+        private String priority;
+        private String employeeCode;
+        private String technicianName;
+
+        public int getAssignmentId() {
+            return assignmentId;
+        }
+
+        public void setAssignmentId(int assignmentId) {
+            this.assignmentId = assignmentId;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        public Timestamp getAssignedDate() {
+            return assignedDate;
+        }
+
+        public void setAssignedDate(Timestamp assignedDate) {
+            this.assignedDate = assignedDate;
+        }
+
+        public Timestamp getStartAt() {
+            return startAt;
+        }
+
+        public void setStartAt(Timestamp startAt) {
+            this.startAt = startAt;
+        }
+
+        public Timestamp getCompleteAt() {
+            return completeAt;
+        }
+
+        public void setCompleteAt(Timestamp completeAt) {
+            this.completeAt = completeAt;
+        }
+
+        public String getTaskDescription() {
+            return taskDescription;
+        }
+
+        public void setTaskDescription(String taskDescription) {
+            this.taskDescription = taskDescription;
+        }
+
+        public String getTaskType() {
+            return taskType;
+        }
+
+        public void setTaskType(String taskType) {
+            this.taskType = taskType;
+        }
+
+        public String getPriority() {
+            return priority;
+        }
+
+        public void setPriority(String priority) {
+            this.priority = priority;
+        }
+
+        public String getEmployeeCode() {
+            return employeeCode;
+        }
+
+        public void setEmployeeCode(String employeeCode) {
+            this.employeeCode = employeeCode;
+        }
+
+        public String getTechnicianName() {
+            return technicianName;
+        }
+
+        public void setTechnicianName(String technicianName) {
+            this.technicianName = technicianName;
+        }
     }
     // ===== SHARED METHODS - Both TechManager & Technician use =====
 
@@ -250,13 +386,12 @@ public class TaskAssignmentDAO extends DbContext {
     public List<WorkOrderDetailWithInfo> getWorkOrderDetailsNeedingDiagnosisAssignment(int techManagerId)
             throws SQLException {
         List<WorkOrderDetailWithInfo> details = new ArrayList<>();
-        // LUỒNG MỚI: Allow multiple diagnosis assignments per WorkOrderDetail
-        // Removed HAVING AssignmentCount = 0 check - TM can assign same detail to
-        // multiple technicians
         String sql = "SELECT wd.*, wo.WorkOrderID, wo.Status AS WorkOrderStatus, wo.CreatedAt AS WorkOrderCreatedAt, " +
                 "v.LicensePlate, v.Brand, v.Model, " +
                 "u.FullName AS CustomerName, " +
-                "COUNT(ta.AssignmentID) AS AssignmentCount " +
+                "COUNT(ta.AssignmentID) AS totalAssignments, " +
+                "COALESCE(SUM(CASE WHEN ta.Status IN ('ASSIGNED', 'IN_PROGRESS') THEN 1 ELSE 0 END), 0) AS activeTasks "
+                +
                 "FROM WorkOrderDetail wd " +
                 "JOIN WorkOrder wo ON wd.WorkOrderID = wo.WorkOrderID " +
                 "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
@@ -265,8 +400,8 @@ public class TaskAssignmentDAO extends DbContext {
                 "JOIN User u ON c.UserID = u.UserID " +
                 "LEFT JOIN TaskAssignment ta ON wd.DetailID = ta.DetailID AND ta.task_type = 'DIAGNOSIS' " +
                 "WHERE wo.TechManagerID = ? " +
-                "AND wd.source = 'DIAGNOSTIC' " + // CHANGED: Only DIAGNOSTIC needs diagnosis
-                "AND wd.approval_status = 'APPROVED' " + // ADDED: Only show approved WODs
+                "AND wd.source = 'DIAGNOSTIC' " +
+                "AND wd.approval_status = 'APPROVED' " +
                 "AND (wo.Status = 'PENDING' OR wo.Status = 'IN_PROCESS') " +
                 "GROUP BY wd.DetailID " +
                 "ORDER BY wo.CreatedAt ASC";
@@ -295,6 +430,11 @@ public class TaskAssignmentDAO extends DbContext {
                     detail.setVehicleInfo(vehicleInfo);
                     detail.setCustomerName(rs.getString("CustomerName"));
                     detail.setWorkOrderCreatedAt(rs.getTimestamp("WorkOrderCreatedAt"));
+                    detail.setTotalAssignments(rs.getInt("totalAssignments"));
+                    detail.setActiveTasks(rs.getInt("activeTasks"));
+
+                    // Load existing assignments
+                    detail.setExistingAssignments(getTaskAssignmentSummaryByDetailId(detail.getDetailId()));
 
                     count++;
                     System.out.println("[Result #" + count + "] DetailID=" + detail.getDetailId() +
@@ -556,6 +696,9 @@ public class TaskAssignmentDAO extends DbContext {
         private String vehicleInfo;
         private String customerName;
         private Timestamp workOrderCreatedAt;
+        private int totalAssignments; // Total number of times this detail has been assigned
+        private int activeTasks; // Number of active tasks (ASSIGNED or IN_PROGRESS)
+        private java.util.List<TaskAssignmentSummary> existingAssignments;
 
         // Getters and Setters
         public int getDetailId() {
@@ -612,6 +755,30 @@ public class TaskAssignmentDAO extends DbContext {
 
         public void setWorkOrderCreatedAt(Timestamp workOrderCreatedAt) {
             this.workOrderCreatedAt = workOrderCreatedAt;
+        }
+
+        public int getTotalAssignments() {
+            return totalAssignments;
+        }
+
+        public void setTotalAssignments(int totalAssignments) {
+            this.totalAssignments = totalAssignments;
+        }
+
+        public int getActiveTasks() {
+            return activeTasks;
+        }
+
+        public void setActiveTasks(int activeTasks) {
+            this.activeTasks = activeTasks;
+        }
+
+        public java.util.List<TaskAssignmentSummary> getExistingAssignments() {
+            return existingAssignments;
+        }
+
+        public void setExistingAssignments(java.util.List<TaskAssignmentSummary> existingAssignments) {
+            this.existingAssignments = existingAssignments;
         }
     }
 

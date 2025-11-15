@@ -57,27 +57,34 @@ public class WorkOrderCloseService {
      * @throws IllegalStateException if work order is not ready to close
      */
     public boolean closeWorkOrder(int workOrderID) throws SQLException {
-        // Verify work order is ready to close
+
+        // 1. Lấy thông tin (Yêu cầu DAO phải cung cấp 'ActiveTasks')
         WorkOrderCloseDTO workOrder = workOrderCloseDAO.getWorkOrderForClosure(workOrderID);
 
         if (workOrder == null) {
-            throw new IllegalStateException("Work Order #" + workOrderID + " not found or not in IN_PROCESS status");
+            throw new IllegalStateException("Work Order #" + workOrderID + " not found.");
         }
 
-        if (!workOrder.isAllTasksComplete()) {
+        // 2. [LOGIC ĐÚNG] Kiểm tra bằng hàm isReadyToClose()
+        // (Yêu cầu DTO phải có hàm này và 'activeTasks')
+        if (!workOrder.isReadyToClose()) {
             throw new IllegalStateException(
                     "Work Order #" + workOrderID + " cannot be closed. " +
-                            "Completed: " + workOrder.getCompletedTasks() + "/" + workOrder.getTotalTasks() + " tasks");
+                            workOrder.getActiveTasks() + " task(s) are still IN_PROGRESS or ASSIGNED.");
         }
 
-        // Close the work order
+        // 3. Nếu không còn task chạy -> Đóng Lệnh
+        // (Yêu cầu DAO phải dùng logic 'NOT IN (ASSIGNED, IN_PROGRESS)')
         boolean success = workOrderCloseDAO.closeWorkOrder(workOrderID);
 
         if (!success) {
             throw new IllegalStateException(
                     "Failed to close Work Order #" + workOrderID +
-                            ". It may have been modified by another user.");
+                            ". It may have been modified or still has active tasks.");
         }
+
+        // 4. (TODO) Gửi Notification cho Kế toán
+        // notificationService.notifyAccountant(workOrderID);
 
         return true;
     }

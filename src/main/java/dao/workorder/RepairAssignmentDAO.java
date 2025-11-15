@@ -88,7 +88,9 @@ public class RepairAssignmentDAO {
                     "wod.diagnostic_id as diagnosticId, wod.source as source, " +
                     "v.VehicleID as vehicleId, v.LicensePlate as licensePlate, v.Model as vehicleModel, " +
                     "u.FullName as customerName, u.PhoneNumber as phoneNumber, " +
-                    "(SELECT COUNT(*) FROM TaskAssignment ta WHERE ta.DetailID = wod.DetailID AND ta.task_type = 'REPAIR') as existingAssignments "
+                    "COALESCE((SELECT COUNT(*) FROM TaskAssignment ta WHERE ta.DetailID = wod.DetailID AND ta.task_type = 'REPAIR'), 0) as totalAssignments, "
+                    +
+                    "COALESCE((SELECT COUNT(*) FROM TaskAssignment ta WHERE ta.DetailID = wod.DetailID AND ta.task_type = 'REPAIR' AND ta.Status IN ('ASSIGNED', 'IN_PROGRESS')), 0) as activeTasks "
                     +
                     "FROM WorkOrderDetail wod " +
                     "JOIN WorkOrder wo ON wod.WorkOrderID = wo.WorkOrderID " +
@@ -124,7 +126,13 @@ public class RepairAssignmentDAO {
                     Repair.setVehicleModel(rs.getString("vehicleModel"));
                     Repair.setCustomerName(rs.getString("customerName"));
                     Repair.setPhoneNumber(rs.getString("phoneNumber"));
-                    // Note: existingAssignments field may not exist in DTO yet
+                    Repair.setTotalAssignments(rs.getInt("totalAssignments"));
+                    Repair.setActiveTasks(rs.getInt("activeTasks"));
+
+                    // Load existing assignments for this detail
+                    TaskAssignmentDAO taskDAO = new TaskAssignmentDAO();
+                    Repair.setExistingAssignments(taskDAO.getTaskAssignmentSummaryByDetailId(detailId));
+
                     Repairs.add(Repair);
                 }
                 System.out.println("Total repairs found: " + count);
@@ -254,5 +262,203 @@ public class RepairAssignmentDAO {
         }
 
         return false;
+    }
+
+    /**
+     * Get repair tasks that are currently IN_PROGRESS
+     * Similar to diagnosis in-progress tasks
+     */
+    public List<InProgressRepairTask> getInProgressRepairTasks(int techManagerId) throws SQLException {
+        List<InProgressRepairTask> tasks = new ArrayList<>();
+        String sql = "SELECT ta.AssignmentID, ta.DetailID, ta.AssignToTechID, ta.AssignedDate, ta.StartAt, " +
+                "ta.TaskDescription, ta.Status, ta.priority, " +
+                "wd.WorkOrderID, wd.TaskDescription AS WorkOrderDetailDescription, " +
+                "wo.Status AS WorkOrderStatus, wo.CreatedAt AS WorkOrderCreatedAt, " +
+                "v.LicensePlate, v.Brand, v.Model, " +
+                "u_cust.FullName AS CustomerName, " +
+                "tech_emp.EmployeeCode AS TechnicianCode, tech_user.FullName AS TechnicianName " +
+                "FROM TaskAssignment ta " +
+                "JOIN WorkOrderDetail wd ON ta.DetailID = wd.DetailID " +
+                "JOIN WorkOrder wo ON wd.WorkOrderID = wo.WorkOrderID " +
+                "JOIN ServiceRequest sr ON wo.RequestID = sr.RequestID " +
+                "JOIN Vehicle v ON sr.VehicleID = v.VehicleID " +
+                "JOIN Customer c ON v.CustomerID = c.CustomerID " +
+                "JOIN User u_cust ON c.UserID = u_cust.UserID " +
+                "JOIN Employee tech_emp ON ta.AssignToTechID = tech_emp.EmployeeID " +
+                "JOIN User tech_user ON tech_emp.UserID = tech_user.UserID " +
+                "WHERE wo.TechManagerID = ? " +
+                "AND ta.task_type = 'REPAIR' " +
+                "AND ta.Status = 'IN_PROGRESS' " +
+                "ORDER BY ta.StartAt ASC";
+
+        try (Connection conn = DbContext.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, techManagerId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    InProgressRepairTask task = new InProgressRepairTask();
+                    task.setAssignmentId(rs.getInt("AssignmentID"));
+                    task.setDetailId(rs.getInt("DetailID"));
+                    task.setWorkOrderId(rs.getInt("WorkOrderID"));
+                    task.setTechnicianId(rs.getInt("AssignToTechID"));
+                    task.setTechnicianCode(rs.getString("TechnicianCode"));
+                    task.setTechnicianName(rs.getString("TechnicianName"));
+                    task.setAssignedDate(rs.getTimestamp("AssignedDate"));
+                    task.setStartAt(rs.getTimestamp("StartAt"));
+                    task.setTaskDescription(rs.getString("TaskDescription"));
+                    task.setStatus(rs.getString("Status"));
+                    task.setPriority(rs.getString("priority"));
+                    task.setWorkOrderDetailDescription(rs.getString("WorkOrderDetailDescription"));
+                    task.setVehicleInfo(rs.getString("LicensePlate") + " - " +
+                            rs.getString("Brand") + " " + rs.getString("Model"));
+                    task.setCustomerName(rs.getString("CustomerName"));
+                    task.setWorkOrderCreatedAt(rs.getTimestamp("WorkOrderCreatedAt"));
+                    tasks.add(task);
+                }
+            }
+        }
+        return tasks;
+    }
+
+    /**
+     * DTO for In-Progress Repair Tasks
+     */
+    public static class InProgressRepairTask {
+        private int assignmentId;
+        private int detailId;
+        private int workOrderId;
+        private int technicianId;
+        private String technicianCode;
+        private String technicianName;
+        private java.sql.Timestamp assignedDate;
+        private java.sql.Timestamp startAt;
+        private String taskDescription;
+        private String status;
+        private String priority;
+        private String workOrderDetailDescription;
+        private String vehicleInfo;
+        private String customerName;
+        private java.sql.Timestamp workOrderCreatedAt;
+
+        public int getAssignmentId() {
+            return assignmentId;
+        }
+
+        public void setAssignmentId(int assignmentId) {
+            this.assignmentId = assignmentId;
+        }
+
+        public int getDetailId() {
+            return detailId;
+        }
+
+        public void setDetailId(int detailId) {
+            this.detailId = detailId;
+        }
+
+        public int getWorkOrderId() {
+            return workOrderId;
+        }
+
+        public void setWorkOrderId(int workOrderId) {
+            this.workOrderId = workOrderId;
+        }
+
+        public int getTechnicianId() {
+            return technicianId;
+        }
+
+        public void setTechnicianId(int technicianId) {
+            this.technicianId = technicianId;
+        }
+
+        public String getTechnicianCode() {
+            return technicianCode;
+        }
+
+        public void setTechnicianCode(String technicianCode) {
+            this.technicianCode = technicianCode;
+        }
+
+        public String getTechnicianName() {
+            return technicianName;
+        }
+
+        public void setTechnicianName(String technicianName) {
+            this.technicianName = technicianName;
+        }
+
+        public java.sql.Timestamp getAssignedDate() {
+            return assignedDate;
+        }
+
+        public void setAssignedDate(java.sql.Timestamp assignedDate) {
+            this.assignedDate = assignedDate;
+        }
+
+        public java.sql.Timestamp getStartAt() {
+            return startAt;
+        }
+
+        public void setStartAt(java.sql.Timestamp startAt) {
+            this.startAt = startAt;
+        }
+
+        public String getTaskDescription() {
+            return taskDescription;
+        }
+
+        public void setTaskDescription(String taskDescription) {
+            this.taskDescription = taskDescription;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        public String getPriority() {
+            return priority;
+        }
+
+        public void setPriority(String priority) {
+            this.priority = priority;
+        }
+
+        public String getWorkOrderDetailDescription() {
+            return workOrderDetailDescription;
+        }
+
+        public void setWorkOrderDetailDescription(String workOrderDetailDescription) {
+            this.workOrderDetailDescription = workOrderDetailDescription;
+        }
+
+        public String getVehicleInfo() {
+            return vehicleInfo;
+        }
+
+        public void setVehicleInfo(String vehicleInfo) {
+            this.vehicleInfo = vehicleInfo;
+        }
+
+        public String getCustomerName() {
+            return customerName;
+        }
+
+        public void setCustomerName(String customerName) {
+            this.customerName = customerName;
+        }
+
+        public java.sql.Timestamp getWorkOrderCreatedAt() {
+            return workOrderCreatedAt;
+        }
+
+        public void setWorkOrderCreatedAt(java.sql.Timestamp workOrderCreatedAt) {
+            this.workOrderCreatedAt = workOrderCreatedAt;
+        }
     }
 }

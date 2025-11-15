@@ -7,8 +7,8 @@ import java.sql.Timestamp;
  * 
  * LUỒNG MỚI (Triage Workflow):
  * - Contains WODs from BOTH sources:
- *   1. REQUEST: Direct from GĐ2 Triage (classified as direct repair)
- *   2. DIAGNOSTIC: From GĐ4 Quote Approval (customer approved quote)
+ * 1. REQUEST: Direct from GĐ2 Triage (classified as direct repair)
+ * 2. DIAGNOSTIC: From GĐ4 Quote Approval (customer approved quote)
  * 
  * @author SWP391 Team
  * @version 2.0 (Updated for LUỒNG MỚI)
@@ -25,6 +25,11 @@ public class ApprovedRepairDTO {
     private String vehicleModel;
     private String customerName;
     private String phoneNumber;
+
+    // Task assignment tracking
+    private int totalAssignments; // Total number of times this detail has been assigned
+    private int activeTasks; // Number of active tasks (ASSIGNED or IN_PROGRESS)
+    private java.util.List<dao.workorder.TaskAssignmentDAO.TaskAssignmentSummary> existingAssignments;
 
     // Constructors
     public ApprovedRepairDTO() {
@@ -117,6 +122,31 @@ public class ApprovedRepairDTO {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public int getTotalAssignments() {
+        return totalAssignments;
+    }
+
+    public void setTotalAssignments(int totalAssignments) {
+        this.totalAssignments = totalAssignments;
+    }
+
+    public int getActiveTasks() {
+        return activeTasks;
+    }
+
+    public void setActiveTasks(int activeTasks) {
+        this.activeTasks = activeTasks;
+    }
+
+    public java.util.List<dao.workorder.TaskAssignmentDAO.TaskAssignmentSummary> getExistingAssignments() {
+        return existingAssignments;
+    }
+
+    public void setExistingAssignments(
+            java.util.List<dao.workorder.TaskAssignmentDAO.TaskAssignmentSummary> existingAssignments) {
+        this.existingAssignments = existingAssignments;
     }
 
     @Override

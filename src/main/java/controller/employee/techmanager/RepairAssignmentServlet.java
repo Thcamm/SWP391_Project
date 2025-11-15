@@ -37,16 +37,27 @@ public class RepairAssignmentServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
+            // Get TechManager's employee ID
+            String userName = (String) request.getSession().getAttribute("userName");
+            Integer techManagerEmployeeId = repairAssignmentService.getTechManagerEmployeeId(userName);
+
             // Get approved Repair waiting for repair assignment
             List<ApprovedRepairDTO> approvedRepairs = repairAssignmentService.getApprovedRepairs();
+
+            // Get in-progress repair tasks
+            List<dao.workorder.RepairAssignmentDAO.InProgressRepairTask> inProgressTasks = repairAssignmentService
+                    .getInProgressRepairTasks(techManagerEmployeeId != null ? techManagerEmployeeId : 0);
 
             // Get available technicians for repair
             List<TechnicianDTO> availableTechnicians = repairAssignmentService.getAvailableTechnicians();
 
             System.out.println("[RepairAssignmentServlet] Found " + approvedRepairs.size() + " approved repairs");
+            System.out.println("[RepairAssignmentServlet] Found " + inProgressTasks.size() + " in-progress repairs");
 
             request.setAttribute("approvedRepairs", approvedRepairs); // Use consistent naming: approvedRepairs
+            request.setAttribute("inProgressTasks", inProgressTasks);
             request.setAttribute("availableTechnicians", availableTechnicians);
+            request.setAttribute("totalInProgress", inProgressTasks.size());
 
             // Handle messages
             String message = request.getParameter("message");
