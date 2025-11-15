@@ -40,19 +40,6 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           </div>
         </c:if>
 
-        <!-- Debug Info (Remove in production) -->
-        <div class="alert alert-secondary">
-          <strong>Debug Info:</strong>
-          <br />
-          totalReady: ${totalReady}
-          <br />
-          workOrders: ${workOrders}
-          <br />
-          workOrders size: ${workOrders.size()}
-          <br />
-          workOrders empty: ${empty workOrders}
-        </div>
-
         <!-- Statistics -->
         <div class="row mb-4">
           <div class="col-md-4">
