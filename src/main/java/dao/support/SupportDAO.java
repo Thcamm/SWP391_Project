@@ -404,14 +404,14 @@ public class SupportDAO extends DbContext {
                     sr.setCustomerId(rs.getInt("CustomerID"));
                     sr.setCategoryId(rs.getInt("CategoryID"));
                     sr.setStatus(rs.getString("Status"));
-                    java.sql.Timestamp createdAtTs = rs.getTimestamp("CreatedAt");
+                    Timestamp createdAtTs = rs.getTimestamp("CreatedAt");
                     if (createdAtTs != null) {
                         sr.setCreatedAt(createdAtTs.toLocalDateTime());
                     } else {
                         sr.setCreatedAt(null);
                     }
 
-                    java.sql.Timestamp updatedAtTs = rs.getTimestamp("UpdatedAt");
+                    Timestamp updatedAtTs = rs.getTimestamp("UpdatedAt");
                     if (updatedAtTs != null) {
                         sr.setUpdatedAt(updatedAtTs.toLocalDateTime());
                     } else {

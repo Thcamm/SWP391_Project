@@ -12,7 +12,7 @@ import java.util.List;
  * 
  * Service for Service Request Approval business logic (GĐ0 → GĐ1).
  * 
- * ⚠️ LUỒNG 4.0 (Merged Workflow):
+ * ⚠ LUỒNG 4.0 (Merged Workflow):
  * - Approval logic has been MOVED to
  * TechManagerService.approveAndClassifyServiceRequest()
  * - This class now only provides UTILITY methods for

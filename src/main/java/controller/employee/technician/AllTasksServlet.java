@@ -30,7 +30,7 @@ public class AllTasksServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(jakarta.servlet.http.HttpServletRequest req, jakarta.servlet.http.HttpServletResponse resp)
+    protected void doGet(HttpServletRequest req, jakarta.servlet.http.HttpServletResponse resp)
             throws jakarta.servlet.ServletException, java.io.IOException {
         vehicleDiagnosticService.autoRejectExpiredDiagnostics(10);
         HttpSession session = req.getSession(false);

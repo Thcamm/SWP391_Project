@@ -38,7 +38,7 @@ public class AppointmentService {
         appointmentDAO.getAppointmentById(appointmentID);
     }
 
-    public void insertAppointment(model.appointment.Appointment appointment) {
+    public void insertAppointment(Appointment appointment) {
         appointmentDAO.insertAppointment(appointment);
     }
     public boolean checkUpdateStatus(int appointmentID, String newStatus) throws Exception {

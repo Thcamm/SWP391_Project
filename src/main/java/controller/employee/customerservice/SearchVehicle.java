@@ -25,7 +25,7 @@ public class SearchVehicle extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        String customerIdRaw = request.getParameter("id");
+        String customerIdRaw = request.getParameter("customerId");
         String query = request.getParameter("query");
         if (query == null) query = "";
 

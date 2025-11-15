@@ -1,6 +1,8 @@
 package controller.employee.customerservice;
 
 import dao.customer.CustomerDAO; // DAO để lấy CustomerID
+import dao.feedback.FeedbackDAO;
+import model.customer.Customer;
 import model.dto.RepairJourneyView;     // DTO
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -8,6 +10,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import model.feedback.Feedback;
 import model.user.User;
 import service.tracking.RepairTrackerService; // Service mới
 
@@ -20,7 +23,7 @@ public class ViewRepairDetail extends HttpServlet {
     // Khởi tạo Service và DAO cần thiết
     private final RepairTrackerService trackerService = new RepairTrackerService();
     private final CustomerDAO customerDAO = new CustomerDAO(); // Giả sử bạn có DAO này
-
+    private final FeedbackDAO feedbackDAO = new FeedbackDAO();
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -52,11 +55,23 @@ public class ViewRepairDetail extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Không tìm thấy quy trình sửa chữa.");
                 return;
             }
+            Feedback feedback = feedbackDAO.getFeedbackByRequestId(requestID);
+            String customerName = null;
 
-            // 5. Gửi DTO sang JSP
+            if (feedback != null) {
+                Customer customer = customerDAO.getCustomerById(feedback.getCustomerID());
+                if (customer != null) {
+                    customerName = customer.getFullName();
+                }
+            }
+
+// Gửi sang JSP
+            request.setAttribute("feedback", feedback); // có thể null
+            request.setAttribute("customerName", customerName); // có thể null
             request.setAttribute("journey", journey);
             request.getRequestDispatcher("/view/customerservice/repair-detail.jsp")
                     .forward(request, response);
+
 
         } catch (NumberFormatException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID không hợp lệ.");

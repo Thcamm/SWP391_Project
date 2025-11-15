@@ -13,23 +13,21 @@ public class WorkOrderPartView {
     private String sku;
     private int quantityUsed;
     private BigDecimal unitPrice;
-    private String requestStatus;   // PENDING / AVAILABLE / DELIVERED
+    private String requestStatus; // PENDING / AVAILABLE / DELIVERED
     private LocalDateTime requestedAt;
     private int currentStock;
     private String requestedByName; // technician name
     private Integer diagnosticPartID; // null nếu là request tay
 
-    private static final DateTimeFormatter DTF =
-            DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     // ===== Helpers cho JSP =====
 
-
     public BigDecimal getTotalPrice() {
-        if (unitPrice == null) return BigDecimal.ZERO;
+        if (unitPrice == null)
+            return BigDecimal.ZERO;
         return unitPrice.multiply(BigDecimal.valueOf(quantityUsed));
     }
-
 
     public String getRequestedAtFormatted() {
         return requestedAt != null ? requestedAt.format(DTF) : "-";
@@ -37,12 +35,17 @@ public class WorkOrderPartView {
 
     /** Label trạng thái đẹp hơn để hiển thị */
     public String getRequestStatusLabel() {
-        if (requestStatus == null) return "-";
+        if (requestStatus == null)
+            return "-";
         switch (requestStatus) {
-            case "PENDING":   return "PENDING";
-            case "AVAILABLE": return "AVAILABLE";
-            case "DELIVERED": return "DELIVERED";
-            default:          return requestStatus;
+            case "PENDING":
+                return "PENDING";
+            case "AVAILABLE":
+                return "AVAILABLE";
+            case "DELIVERED":
+                return "DELIVERED";
+            default:
+                return requestStatus;
         }
     }
 
