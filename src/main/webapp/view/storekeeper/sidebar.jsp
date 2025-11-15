@@ -111,12 +111,12 @@
 
         <div class="menu-divider"></div>
 
-<%--        <li>--%>
-<%--            <a href="${pageContext.request.contextPath}/inventory?action=history">--%>
-<%--                <i class="fas fa-history"></i>--%>
-<%--                <span>Transaction History</span>--%>
-<%--            </a>--%>
-<%--        </li>--%>
+        <li>
+            <a href="${pageContext.request.contextPath}/transactions">
+                <i class="fas fa-history"></i>
+                <span>Transaction History</span>
+            </a>
+        </li>
 
 <%--        <li>--%>
 <%--            <a href="${pageContext.request.contextPath}/inventory?action=reports">--%>

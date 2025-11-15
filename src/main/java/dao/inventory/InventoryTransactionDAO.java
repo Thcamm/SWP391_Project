@@ -12,7 +12,10 @@ public class InventoryTransactionDAO extends DbContext {
 
     public List<InventoryTransaction> getAllTransactions() throws SQLException {
         List<InventoryTransaction> transactions = new ArrayList<>();
-        String sql = "SELECT * FROM InventoryTransaction";
+        String sql = "SELECT it.*, e.EmployeeCode " +
+                     "FROM InventoryTransaction it " +
+                     "LEFT JOIN Employee e ON it.StoreKeeperID = e.EmployeeID " +
+                     "ORDER BY it.TransactionDate DESC";
         try (Connection conn = getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -27,8 +30,17 @@ public class InventoryTransactionDAO extends DbContext {
                 transaction.setStoreKeeperId(rs.getInt("StoreKeeperID"));
                 transaction.setNote(rs.getString("Note"));
                 transaction.setQuantity(rs.getInt("Quantity"));
+
+                // Get UnitPrice (can be null)
+                BigDecimal unitPrice = rs.getBigDecimal("UnitPrice");
+                transaction.setUnitPrice(unitPrice);
+
                 transaction.setWorkOrderPartId(rs.getObject("WorkOrderPartID") != null ? rs.getInt("WorkOrderPartID") : null);
                 transaction.setSupplierId(rs.getObject("SupplierID") != null ? rs.getInt("SupplierID") : null);
+
+                // Get EmployeeCode
+                transaction.setEmployeeCode(rs.getString("EmployeeCode"));
+
                 transactions.add(transaction);
             }
         }

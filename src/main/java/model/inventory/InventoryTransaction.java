@@ -1,6 +1,7 @@
 package model.inventory;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class InventoryTransaction {
 
@@ -15,6 +16,7 @@ public class InventoryTransaction {
     private BigDecimal unitPrice;
     private Integer workOrderPartId;
     private Integer supplierId;
+    private String employeeCode;
 
     public InventoryTransaction() {
     }
@@ -123,5 +125,22 @@ public class InventoryTransaction {
 
     public void setSupplierId(Integer supplierId) {
         this.supplierId = supplierId;
+    }
+
+    public String getEmployeeCode() {
+        return employeeCode;
+    }
+
+    public void setEmployeeCode(String employeeCode) {
+        this.employeeCode = employeeCode;
+    }
+
+    // Helper method to format date for display
+    public String getFormattedTransactionDate() {
+        if (transactionDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            return transactionDate.format(formatter);
+        }
+        return "";
     }
 }
