@@ -130,10 +130,10 @@ public class CustomerDAO extends DbContext {
                 ps.setString(index++, "%" + licensePlate.trim() + "%");
             }
             if (fromDate != null && !fromDate.isEmpty()) {
-                ps.setDate(index++, java.sql.Date.valueOf(fromDate));
+                ps.setDate(index++, Date.valueOf(fromDate));
             }
             if (toDate != null && !toDate.isEmpty()) {
-                ps.setDate(index++, java.sql.Date.valueOf(toDate));
+                ps.setDate(index++, Date.valueOf(toDate));
             }
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -197,10 +197,10 @@ public class CustomerDAO extends DbContext {
                 ps.setString(index++, "%" + licensePlate.trim() + "%");
             }
             if (fromDate != null && !fromDate.isEmpty()) {
-                ps.setDate(index++, java.sql.Date.valueOf(fromDate));
+                ps.setDate(index++, Date.valueOf(fromDate));
             }
             if (toDate != null && !toDate.isEmpty()) {
-                ps.setDate(index++, java.sql.Date.valueOf(toDate));
+                ps.setDate(index++, Date.valueOf(toDate));
             }
 
             ps.setInt(index++, limit);
@@ -515,5 +515,29 @@ public Customer getCustomerById(int customerId) throws SQLException {
 
         // Return empty list instead of null
         return customers;
+    }
+    public Customer getCustomerByRequestId(int requestId) throws SQLException {
+        String sql = "SELECT c.CustomerID, u.UserID, u.FullName, u.Email, u.PhoneNumber " +
+                "FROM Customer c " +
+                "JOIN User u ON c.UserID = u.UserID " +
+                "JOIN ServiceRequest s ON c.CustomerID = s.CustomerID " +
+                "WHERE s.RequestID = ?";
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, requestId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Customer customer = new Customer();
+                    customer.setCustomerId(rs.getInt("CustomerID"));
+                    customer.setUserId(rs.getInt("UserID"));
+                    customer.setFullName(rs.getString("FullName"));
+                    customer.setEmail(rs.getString("Email"));
+                    customer.setPhoneNumber(rs.getString("PhoneNumber"));
+                    return customer;
+                }
+            }
+
+        }
+        return null;
     }
 }

@@ -1,78 +1,115 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-    /* -------------------------------------------
-       Elegant & Professional Color Palette
-    ------------------------------------------- */
-    :root {
-        --theme-navy: #2c3e50;       /* Deep professional navy blue */
-        --theme-soft-bg: #f8f9fa;    /* Very light grayish background (Bootstrap bg-light) */
-        --theme-text-dark: #343a40;  /* Main text color */
-        --theme-border-light: #e9ecef; /* Subtle border color */
-    }
-
-    /* 1. Card Wrapper */
+    /* --- Tinh chỉnh thẻ card chính --- */
     .card.shadow-sm {
-        box-shadow: 0 .1rem .4rem rgba(0,0,0,0.05) !important;
+        background-color: #f8f9fa; /* Màu nền xám rất nhạt */
         border: none;
     }
 
-    /* 2. Card Header (contains "Add New Vehicle" button) */
-    .card-header {
-        background-color: #ffffff;
-        border-bottom: 1px solid var(--theme-border-light);
-    }
-
-    .card-header h5 {
-        color: var(--theme-navy);
-    }
-
-    /* 3. Individual Vehicle Card */
+    /* --- Thẻ thông tin xe (Vehicle Card) --- */
     .vehicle-card {
-        border: 1px solid var(--theme-border-light);
-        border-left: 4px solid var(--theme-navy);
-        transition: all 0.2s ease-in-out;
-        box-shadow: none;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem; /* Bo góc nhiều hơn */
+        transition: all 0.3s ease-in-out;
+        background-color: #ffffff;
     }
+
+    /* Hiệu ứng "nổi lên" khi di chuột */
     .vehicle-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 .2rem .5rem rgba(0,0,0,0.06);
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
-    /* 4. READ Mode (Display) */
-    .vehicle-display .card-title {
-        color: var(--theme-navy);
+    /* Tinh chỉnh tiêu đề (Biển số xe) */
+    .vehicle-card .card-title {
+        font-size: 1.15rem;
         font-weight: 600;
+        color: #0d6efd; /* Màu xanh chủ đạo */
     }
 
-    /* 5. EDIT Mode */
+    /* Tăng khoảng cách icon */
+    .vehicle-card .card-title i {
+        margin-right: 8px;
+    }
+
+    /* --- Khu vực hiển thị thông tin (Năm, Hãng, Model) --- */
+    .vehicle-display p {
+        font-size: 0.95rem; /* Chữ to rõ hơn */
+        color: #495057;
+    }
+    .vehicle-display p strong {
+        color: #212529; /* Chữ tiêu đề đậm hơn */
+    }
+    .vehicle-display p i {
+        width: 1.25em; /* Căn chỉnh các icon cho thẳng hàng */
+    }
+
+    /* --- Khu vực chỉnh sửa (Edit Form) --- */
     .vehicle-form {
-        background-color: var(--theme-soft-bg);
-        padding: 1.25rem;
-        margin: -1.25rem;
-        margin-top: 1rem;
-        border-bottom-left-radius: 0.375rem;
-        border-bottom-right-radius: 0.375rem;
+        background-color: #fdfdfd;
+        border-top: 1px dashed #ced4da;
+        padding: 1.25rem; /* Tăng padding cho thoáng */
+        margin: 1.25rem -1.25rem -1.25rem -1.25rem; /* Kéo ra sát viền card-body */
+        border-radius: 0 0 0.5rem 0.5rem; /* Bo góc ở dưới */
     }
 
     .vehicle-form h6 {
-        color: var(--theme-navy);
-        border-bottom: 1px solid var(--theme-border-light);
-        padding-bottom: 10px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #343a40;
     }
 
-    /* 6. “Edit” Button */
-    .btn-outline-primary {
-        color: var(--theme-navy);
-        border-color: var(--theme-navy);
+    /* --- Thêm icon cho nút Save/Cancel --- */
+    .btn-save::before {
+        font-family: "bootstrap-icons";
+        content: "\F28A"; /* Icon check-lg */
+        margin-right: 5px;
+        font-weight: 600;
     }
-    .btn-outline-primary:hover {
-        background-color: var(--theme-navy);
-        color: #ffffff;
+
+    .btn-cancel::before {
+        font-family: "bootstrap-icons";
+        content: "\F62A"; /* Icon x-lg */
+        margin-right: 5px;
+        font-weight: 600;
     }
+
+    /* --- Modal Thêm Mới --- */
+    #addVehicleModal .modal-header {
+        background-color: #0d6efd;
+        color: white;
+    }
+    #addVehicleModal .modal-header .btn-close {
+        filter: invert(1) grayscale(100) brightness(200%); /* Nút close màu trắng */
+    }
+
+    #addVehicleModal .modal-title {
+        font-weight: 600;
+    }
+
+    /* Thêm icon vào các label trong modal */
+    #addVehicleForm .form-label {
+        font-weight: 500;
+    }
+
+    /* Định nghĩa icon cho từng label bằng 'for' attribute */
+    #addVehicleForm .form-label::after {
+        font-family: "bootstrap-icons";
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-left: 8px;
+        font-style: normal;
+        font-weight: normal;
+    }
+
+    #addVehicleForm label[for="licensePlate"]::after { content: "\F1D7"; } /* Icon bi-person-vcard */
+    #addVehicleForm label[for="yearManufacture"]::after { content: "\F1F3"; } /* Icon bi-calendar-event */
+    #addVehicleForm label[for="brandName"]::after { content: "\F5D2"; } /* Icon bi-tag */
+    #addVehicleForm label[for="modelName"]::after { content: "\F212"; } /* Icon bi-car-front-fill */
 </style>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <div class="card shadow-sm mb-4">
     <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
         <button type="button" class="btn btn-primary" id="btnAddNewVehicle">
@@ -82,19 +119,21 @@
 
     <div class="card-body">
 
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0 text-secondary">
+                <i class="bi bi-car-front-fill me-2"></i>
+                Vehicle List
+            </h5>
+            <span class="badge bg-primary rounded-pill fs-6">
+                Total: ${totalVehicles}
+            </span>
+        </div>
+
         <c:if test="${empty vehicles}">
             <p class="text-center text-muted mb-0">This customer has no vehicles.</p>
         </c:if>
-        <a>Total Vehicles: ${totalVehicles}</a>
-        <c:forEach var="vehicle" items="${vehicles}">
-            <%-- Determine brandId (unchanged) --%>
-            <c:set var="currentBrandId" value="0"/>
-            <c:forEach var="brand" items="${brands}">
-                <c:if test="${brand.brandName == vehicle.brand}">
-                    <c:set var="currentBrandId" value="${brand.brandId}"/>
-                </c:if>
-            </c:forEach>
 
+        <c:forEach var="vehicle" items="${vehicles}">
             <div class="card mb-3 vehicle-card" id="vehicle-card-${vehicle.vehicleID}">
                 <div class="card-body">
                     <input type="hidden" class="vehicle-id" value="${vehicle.vehicleID}">
@@ -103,14 +142,10 @@
                     <div class="vehicle-display">
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <h6 class="card-title mb-1" style="font-size: 1.1rem;">
-                                    <i class="bi bi-bounding-box-circles me-1"></i>
+                                <h6 class="card-title mb-1">
+                                    <i class="bi bi-bounding-box-circles"></i>
                                     <span class="display-license-plate">${vehicle.licensePlate}</span>
                                 </h6>
-                                <p class="card-subtitle mb-2 text-muted">
-                                    <span class="display-brand">${vehicle.brand}</span> -
-                                    <span class="display-model">${vehicle.model}</span>
-                                </p>
                             </div>
                             <div class="vehicle-controls-edit">
                                 <button type="button" class="btn btn-outline-primary btn-sm btn-edit"
@@ -119,14 +154,31 @@
                                 </button>
                             </div>
                         </div>
-                        <p class="mb-0" style="font-size: 0.9rem;">
-                            <strong>Year of Manufacture:</strong>
-                            <span class="display-year">${vehicle.yearManufacture}</span>
-                        </p>
+
+                        <div class="row mt-2">
+                            <div class="col-md-4 col-6">
+                                <p class="mb-1">
+                                    <i class="bi bi-calendar-event me-2 text-muted"></i>
+                                    <strong>Year:</strong> <span class="display-year">${vehicle.yearManufacture}</span>
+                                </p>
+                            </div>
+                            <div class="col-md-4 col-6">
+                                <p class="mb-1">
+                                    <i class="bi bi-tag me-2 text-muted"></i>
+                                    <strong>Brand:</strong> <span class="display-brand">${vehicle.brand}</span>
+                                </p>
+                            </div>
+                            <div class="col-md-4 col-12 mt-1 mt-md-0">
+                                <p class="mb-0">
+                                    <i class="bi bi-car-front me-2 text-muted"></i>
+                                    <strong>Model:</strong> <span class="display-model">${vehicle.model}</span>
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="vehicle-form" style="display:none;">
-                        <h6 class="mb-3">Edit Vehicle Information</h6>
+                        <h6><i class="bi bi-pencil-square me-2"></i>Edit Vehicle Information</h6>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">License Plate</label>
@@ -142,31 +194,20 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Brand</label>
-                                <select class="form-select vehicle-field vehicle-brand">
-                                    <option value="">-- Select Brand --</option>
-                                    <c:forEach var="brand" items="${brands}">
-                                        <option value="${brand.brandId}" ${brand.brandId == currentBrandId ? 'selected' : ''}>
-                                                ${brand.brandName}
-                                        </option>
-                                    </c:forEach>
-                                </select>
+                                <select class="form-select vehicle-field vehicle-brand"></select>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Model</label>
-                                <select class="form-select vehicle-field vehicle-model">
-                                    <option value="${vehicle.model}" selected>${vehicle.model}</option>
-                                </select>
+                                <select class="form-select vehicle-field vehicle-model"></select>
                             </div>
                         </div>
-
-                        <div class="text-end vehicle-controls-save">
+                        <div class="text-end">
                             <button type="button" class="btn btn-secondary btn-sm btn-cancel"
                                     data-vehicle-id="${vehicle.vehicleID}">Cancel</button>
                             <button type="button" class="btn btn-success btn-sm btn-save"
                                     data-vehicle-id="${vehicle.vehicleID}">Save Changes</button>
                         </div>
                     </div>
-
                 </div>
             </div>
         </c:forEach>
@@ -182,239 +223,236 @@
     </div>
 </div>
 
-<!-- Modal: Add Vehicle -->
-<div class="modal fade" id="addVehicleModal" tabindex="-1" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
+<div class="modal fade" id="addVehicleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <form id="addVehicleForm">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addVehicleModalLabel">Add New Vehicle</h5>
+                    <h5 class="modal-title">
+                        <i class="bi bi-plus-circle-fill me-2"></i>Add New Vehicle
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" name="customerId" value="${customer.customerId}">
+                    <input type="hidden" id="modalCustomerId" name="customerId" value="${customer.customerId}">
 
                     <div class="mb-3">
-                        <label class="form-label">License Plate</label>
-                        <input type="text" name="licensePlate" class="form-control" required>
+                        <label for="licensePlate" class="form-label">License Plate</label>
+                        <input type="text" id="licensePlate" name="licensePlate" class="form-control" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Year of Manufacture</label>
-                        <input type="number" name="yearManufacture" class="form-control" required>
+                        <label for="yearManufacture" class="form-label">Year of Manufacture</label>
+                        <input type="number" id="yearManufacture" name="yearManufacture" class="form-control" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Brand</label>
-                        <select name="brandId" id="addBrandSelect" class="form-select" required>
+                        <label for="brandName" class="form-label">Brand</label>
+                        <select id="brandName" name="brandName" class="form-select" required>
                             <option value="">-- Select Brand --</option>
-                            <c:forEach var="brand" items="${brands}">
-                                <option value="${brand.brandId}">${brand.brandName}</option>
-                            </c:forEach>
                         </select>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Model</label>
-                        <select name="modelName" id="addModelSelect" class="form-select" required>
-                            <option value="">-- Select Model --</option>
+                        <label for="modelName" class="form-label">Model</label>
+                        <select id="modelName" name="modelName" class="form-select" required>
+                            <option value="">-- Select Brand First --</option>
                         </select>
                     </div>
                 </div>
-
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Add Vehicle</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i>Close
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-1"></i>Add Vehicle
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
 <script>
-    (function () {
+    (function() {
         'use strict';
-        const contextPath = "${pageContext.request.contextPath}";
-        const originalVehicleValues = {};
 
-        // ==============================
-        // MODAL HANDLING
-        // ==============================
-        document.getElementById('btnAddNewVehicle').addEventListener('click', () => {
-            const form = document.getElementById('addVehicleForm');
-            form.reset();
-            const modelSelect = document.getElementById('addModelSelect');
-            modelSelect.innerHTML = "<option value=''>-- Select Model --</option>";
-            new bootstrap.Modal(document.getElementById('addVehicleModal')).show();
+        let vehicleData = [];
+        const contextPath = "${pageContext.request.contextPath}";
+
+        // Load car models JSON
+        function loadCarModels() {
+            if (vehicleData.length > 0) return Promise.resolve(vehicleData);
+            return fetch(contextPath + '/assets/car-models.json')
+                .then(res => res.json())
+                .then(data => { vehicleData = data; return data; })
+                .catch(err => console.error("Failed to load car models JSON", err));
+        }
+
+        // Populate brand select
+        function populateBrandSelect(select, selectedBrand) {
+            select.innerHTML = "<option value=''>-- Select Brand --</option>";
+            vehicleData.forEach(b => {
+                const opt = document.createElement("option");
+                opt.value = b.brand;
+                opt.textContent = b.brand;
+                if (b.brand === selectedBrand) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        // Populate model select
+        function populateModelSelect(select, brandName, selectedModel) {
+            select.innerHTML = "<option value=''>-- Select Model --</option>";
+            const brand = vehicleData.find(b => b.brand === brandName);
+            if (!brand || !brand.models.length) {
+                select.innerHTML = "<option value=''>-- No models --</option>";
+                return;
+            }
+            brand.models.forEach(m => {
+                const opt = document.createElement("option");
+                opt.value = m;
+                opt.textContent = m;
+                if (m === selectedModel) opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        // ----------------------------
+        // Add Vehicle Modal
+        // ----------------------------
+        const addForm = document.getElementById("addVehicleForm");
+        const brandSelect = document.getElementById("brandName");
+        const modelSelect = document.getElementById("modelName");
+        const modal = document.getElementById("addVehicleModal");
+        const customerIdInput = document.getElementById("modalCustomerId");
+
+        document.getElementById("btnAddNewVehicle").addEventListener("click", () => {
+            addForm.reset();
+            modelSelect.disabled = true;
+            modelSelect.innerHTML = "<option value=''>-- Select Brand First --</option>";
+            loadCarModels().then(() => populateBrandSelect(brandSelect));
+            new bootstrap.Modal(modal).show();
         });
 
-        // Load models when selecting brand
-        document.getElementById('addBrandSelect').addEventListener('change', function() {
-            const brandId = this.value;
-            const modelSelect = document.getElementById('addModelSelect');
-            if (!brandId) {
+        brandSelect.addEventListener("change", () => {
+            const brandName = brandSelect.value;
+            if (!brandName) {
+                modelSelect.disabled = true;
                 modelSelect.innerHTML = "<option value=''>-- Select Brand First --</option>";
                 return;
             }
-            modelSelect.innerHTML = "<option>Loading...</option>";
-            fetch(contextPath + '/customerservice/addVehicle?action=getModels&brandId=' + encodeURIComponent(brandId))
-                .then(res => res.json())
-                .then(models => {
-                    modelSelect.innerHTML = "<option value=''>-- Select Model --</option>";
-                    models.forEach(m => {
-                        const op = document.createElement("option");
-                        op.value = m.name;
-                        op.textContent = m.name;
-                        modelSelect.appendChild(op);
-                    });
-                })
-                .catch(err => {
-                    modelSelect.innerHTML = "<option>Error loading</option>";
-                    console.error(err);
-                });
+            modelSelect.disabled = false;
+            populateModelSelect(modelSelect, brandName);
         });
 
-        // Submit add vehicle form
-        document.getElementById('addVehicleForm').addEventListener('submit', function(e) {
+        addForm.addEventListener("submit", function(e) {
             e.preventDefault();
-            const formData = new URLSearchParams(new FormData(this));
-            formData.append('action', 'saveVehicle');
-            fetch(contextPath + '/customerservice/addVehicle', {
+            const payload = new URLSearchParams({
+                customerId: customerIdInput.value,
+                brandName: brandSelect.value,
+                modelName: modelSelect.value,
+                licensePlate: document.getElementById("licensePlate").value.trim(),
+                yearManufacture: document.getElementById("yearManufacture").value
+            });
+
+            const btn = addForm.querySelector("button[type='submit']");
+            const oldText = btn.textContent;
+            btn.disabled = true; btn.textContent = "Saving...";
+
+            fetch(contextPath + '/customerservice/addVehicle?action=saveVehicle', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-                body: formData.toString()
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: payload.toString()
             })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
-                        alert('Vehicle added successfully!');
-                        window.location.reload();
-                    } else {
-                        alert('Error: ' + (data.message || 'Unknown error'));
-                    }
+                        alert("Vehicle added successfully!");
+                        location.reload();
+                    } else alert(data.message || "Server error");
                 })
-                .catch(err => alert('System error: ' + err.message));
+                .catch(err => alert("Error: " + err.message))
+                .finally(() => { btn.disabled = false; btn.textContent = oldText; });
         });
 
-        // =================================================
-        // EDIT / SAVE / CANCEL HANDLING
-        // =================================================
+        // ----------------------------
+        // Edit Vehicle Cards
+        // ----------------------------
+        const originalValues = {};
 
-        function loadModelsForEdit(brandSelect, modelSelect, selectedModelName) {
-            const brandId = brandSelect.value;
-            if (!brandId) {
-                modelSelect.innerHTML = "<option value=''>-- Select Brand First --</option>";
-                modelSelect.disabled = true;
-                return;
-            }
-            modelSelect.disabled = false;
-            modelSelect.innerHTML = "<option>Loading...</option>";
-            fetch(contextPath + '/customerservice/addVehicle?action=getModels&brandId=' + encodeURIComponent(brandId))
-                .then(res => res.json())
-                .then(models => {
-                    modelSelect.innerHTML = "<option value=''>-- Select Model --</option>";
-                    models.forEach(m => {
-                        const op = document.createElement('option');
-                        op.value = m.name;
-                        op.textContent = m.name;
-                        if (selectedModelName && selectedModelName === m.name) {
-                            op.selected = true;
-                        }
-                        modelSelect.appendChild(op);
-                    });
-                });
-        }
+        document.querySelectorAll(".btn-edit").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const vehicleID = btn.dataset.vehicleId;
+                const card = document.getElementById("vehicle-card-" + vehicleID);
+                const display = card.querySelector(".vehicle-display");
+                const form = card.querySelector(".vehicle-form");
 
-        function enableVehicleEdit(vehicleID) {
-            const card = document.getElementById('vehicle-card-' + vehicleID);
-            const displayView = card.querySelector('.vehicle-display');
-            const formView = card.querySelector('.vehicle-form');
+                originalValues[vehicleID] = {};
+                form.querySelectorAll(".vehicle-field").forEach(f => originalValues[vehicleID][f.classList[1]] = f.value);
 
-            originalVehicleValues[vehicleID] = {};
-            formView.querySelectorAll('.vehicle-field').forEach(f => {
-                const fieldKey = Array.from(f.classList).find(c => c.startsWith('vehicle-') && c !== 'vehicle-field');
-                originalVehicleValues[vehicleID][fieldKey] = f.value;
-            });
-
-            const brandSelect = formView.querySelector('.vehicle-brand');
-            const modelSelect = formView.querySelector('.vehicle-model');
-            const currentModelName = originalVehicleValues[vehicleID]['vehicle-model'];
-
-            loadModelsForEdit(brandSelect, modelSelect, currentModelName);
-
-            const newBrandSelect = brandSelect.cloneNode(true);
-            brandSelect.parentNode.replaceChild(newBrandSelect, brandSelect);
-            newBrandSelect.value = originalVehicleValues[vehicleID]['vehicle-brand'];
-            newBrandSelect.addEventListener('change', () => {
-                loadModelsForEdit(newBrandSelect, modelSelect, null);
-            });
-
-            displayView.style.display = 'none';
-            formView.style.display = 'block';
-        }
-
-        function cancelVehicleEdit(vehicleID) {
-            const card = document.getElementById('vehicle-card-' + vehicleID);
-            const displayView = card.querySelector('.vehicle-display');
-            const formView = card.querySelector('.vehicle-form');
-            const values = originalVehicleValues[vehicleID];
-
-            if (values) {
-                formView.querySelectorAll('.vehicle-field').forEach(f => {
-                    const fieldKey = Array.from(f.classList).find(c => c.startsWith('vehicle-') && c !== 'vehicle-field');
-                    if (values[fieldKey]) {
-                        f.value = values[fieldKey];
-                    }
+                const brandSelect = form.querySelector(".vehicle-brand");
+                const modelSelect = form.querySelector(".vehicle-model");
+                loadCarModels().then(() => {
+                    populateBrandSelect(brandSelect, originalValues[vehicleID]['vehicle-brand']);
+                    populateModelSelect(modelSelect, originalValues[vehicleID]['vehicle-brand'], originalValues[vehicleID]['vehicle-model']);
                 });
 
-                const modelSelect = formView.querySelector('.vehicle-model');
-                modelSelect.innerHTML = `<option value="${values['vehicle-model']}" selected>${values['vehicle-model']}</option>`;
-            }
+                brandSelect.addEventListener("change", () => populateModelSelect(modelSelect, brandSelect.value));
 
-            formView.style.display = 'none';
-            displayView.style.display = 'block';
-        }
-
-        function saveVehicleEdit(vehicleID) {
-            const card = document.getElementById('vehicle-card-' + vehicleID);
-            const formView = card.querySelector('.vehicle-form');
-
-            const data = new URLSearchParams({
-                action: 'updateVehicle',
-                vehicleId: vehicleID,
-                customerId: card.querySelector('.customer-id').value,
-                licensePlate: formView.querySelector('.vehicle-license-plate').value.trim(),
-                yearManufacture: formView.querySelector('.vehicle-year').value,
-                brandId: formView.querySelector('.vehicle-brand').value,
-                modelName: formView.querySelector('.vehicle-model').value
+                display.style.display = "none";
+                form.style.display = "block";
             });
+        });
 
-            fetch(contextPath + '/customerservice/addVehicle', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-                body: data.toString()
-            })
-                .then(res => res.json())
-                .then(result => {
-                    if (result.success) {
-                        alert('Vehicle updated successfully!');
-                        window.location.reload();
-                    } else {
-                        alert('Error: ' + (result.message || "Unknown error"));
-                    }
+        document.querySelectorAll(".btn-cancel").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const vehicleID = btn.dataset.vehicleId;
+                const card = document.getElementById("vehicle-card-" + vehicleID);
+                const display = card.querySelector(".vehicle-display");
+                const form = card.querySelector(".vehicle-form");
+
+                const values = originalValues[vehicleID];
+                if (values) form.querySelectorAll(".vehicle-field").forEach(f => f.value = values[f.classList[1]]);
+
+                form.style.display = "none";
+                display.style.display = "block";
+            });
+        });
+
+        document.querySelectorAll(".btn-save").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const vehicleID = btn.dataset.vehicleId;
+                const card = document.getElementById("vehicle-card-" + vehicleID);
+                const form = card.querySelector(".vehicle-form");
+
+                const payload = new URLSearchParams({
+                    action: 'updateVehicle',
+                    vehicleId: vehicleID,
+                    customerId: card.querySelector('.customer-id').value,
+                    licensePlate: form.querySelector('.vehicle-license-plate').value.trim(),
+                    yearManufacture: form.querySelector('.vehicle-year').value,
+                    brandName: form.querySelector('.vehicle-brand').value,
+                    modelName: form.querySelector('.vehicle-model').value
+                });
+
+                btn.disabled = true;
+                const oldText = btn.textContent;
+                btn.textContent = "Saving...";
+
+                fetch(contextPath + '/customerservice/addVehicle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: payload.toString()
                 })
-                .catch(err => alert('System error: ' + err.message));
-        }
-
-        document.querySelectorAll('.btn-edit').forEach(btn =>
-            btn.addEventListener('click', () => enableVehicleEdit(btn.dataset.vehicleId))
-        );
-        document.querySelectorAll('.btn-save').forEach(btn =>
-            btn.addEventListener('click', () => saveVehicleEdit(btn.dataset.vehicleId))
-        );
-        document.querySelectorAll('.btn-cancel').forEach(btn =>
-            btn.addEventListener('click', () => cancelVehicleEdit(btn.dataset.vehicleId))
-        );
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) location.reload();
+                        else alert(data.message || "Server error");
+                    })
+                    .catch(err => alert("Error: " + err.message))
+                    .finally(() => { btn.disabled = false; btn.textContent = oldText; });
+            });
+        });
 
     })();
 </script>

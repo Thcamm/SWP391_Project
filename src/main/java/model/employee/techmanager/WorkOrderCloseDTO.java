@@ -1,12 +1,13 @@
 package model.employee.techmanager;
 
+import java.sql.Timestamp;
+
 /**
  * DTO for WorkOrder ready to close (GĐ7).
- * Used by WorkOrderCloseService to display work orders that have all tasks
- * completed.
+ * [REFACTORED] Now uses 'activeTasks' for logic, not 'completedTasks'.
+ * * @author SWP391 Team
  * 
- * @author SWP391 Team
- * @version 1.0
+ * @version 2.0 (Logic Fixed)
  */
 public class WorkOrderCloseDTO {
     private int workOrderID;
@@ -15,27 +16,19 @@ public class WorkOrderCloseDTO {
     private String customerName;
     private int totalTasks;
     private int completedTasks;
-    private java.sql.Timestamp createdAt;
+    private Timestamp createdAt;
     private String techManagerName;
 
-    // Constructors
+    // --- TRƯỜNG MỚI (NEW FIELD) ---
+    // (Được cung cấp bởi DAO query)
+    private int activeTasks; // Số task đang 'ASSIGNED' hoặc 'IN_PROGRESS'
+    // -------------------------
+
+    // Constructors (Giữ nguyên)
     public WorkOrderCloseDTO() {
     }
 
-    public WorkOrderCloseDTO(int workOrderID, int requestID, String vehicleInfo,
-            String customerName, int totalTasks, int completedTasks,
-            java.sql.Timestamp createdAt, String techManagerName) {
-        this.workOrderID = workOrderID;
-        this.requestID = requestID;
-        this.vehicleInfo = vehicleInfo;
-        this.customerName = customerName;
-        this.totalTasks = totalTasks;
-        this.completedTasks = completedTasks;
-        this.createdAt = createdAt;
-        this.techManagerName = techManagerName;
-    }
-
-    // Getters and Setters
+    // Getters and Setters (Giữ nguyên)
     public int getWorkOrderID() {
         return workOrderID;
     }
@@ -84,11 +77,11 @@ public class WorkOrderCloseDTO {
         this.completedTasks = completedTasks;
     }
 
-    public java.sql.Timestamp getCreatedAt() {
+    public Timestamp getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(java.sql.Timestamp createdAt) {
+    public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -100,10 +93,37 @@ public class WorkOrderCloseDTO {
         this.techManagerName = techManagerName;
     }
 
-    // Business logic methods
+    // --- GETTER/SETTER MỚI ---
+    public int getActiveTasks() {
+        return activeTasks;
+    }
+
+    public void setActiveTasks(int activeTasks) {
+        this.activeTasks = activeTasks;
+    }
+    // -------------------------
+
+    // --- SỬA LẠI LOGIC NGHIỆP VỤ ---
+
+    /**
+     * [LOGIC CŨ - BỊ SAI]
+     * (Hàm này sai vì 1 WOD có 1 COMPLETE và 1 CANCELLED sẽ bị false)
+     */
+    @Deprecated
     public boolean isAllTasksComplete() {
         return totalTasks > 0 && totalTasks == completedTasks;
     }
+
+    /**
+     * [LOGIC MỚI - ĐÚNG]
+     * Kiểm tra xem WorkOrder có Sẵn sàng để Đóng không.
+     * Điều kiện: Phải có task VÀ không còn task nào đang chạy.
+     */
+    public boolean isReadyToClose() {
+        // Chỉ cần kiểm tra không còn task nào đang 'ASSIGNED' hoặc 'IN_PROGRESS'
+        return totalTasks > 0 && activeTasks == 0;
+    }
+    // -----------------------------
 
     public int getDaysOpen() {
         if (createdAt == null)
@@ -116,12 +136,10 @@ public class WorkOrderCloseDTO {
     public String toString() {
         return "WorkOrderCloseDTO{" +
                 "workOrderID=" + workOrderID +
-                ", requestID=" + requestID +
-                ", vehicleInfo='" + vehicleInfo + '\'' +
-                ", customerName='" + customerName + '\'' +
                 ", totalTasks=" + totalTasks +
                 ", completedTasks=" + completedTasks +
-                ", daysOpen=" + getDaysOpen() +
+                ", activeTasks=" + activeTasks + // Thêm vào log
+                ", isReadyToClose=" + isReadyToClose() + // Dùng logic mới
                 '}';
     }
 }

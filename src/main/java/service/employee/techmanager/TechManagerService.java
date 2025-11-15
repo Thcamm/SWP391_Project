@@ -117,10 +117,12 @@ public class TechManagerService {
      *                              classification
      * @return WorkOrder ID
      */
-    public int approveServiceRequest(int requestId, int techManagerId, Map<Integer, String> sourceClassifications)
+    public int approveServiceRequest(int requestId, int techManagerId, Map<Integer, String> sourceClassifications,
+            Map<Integer, BigDecimal> estimateHoursMap)
             throws SQLException {
         try {
-            return approveServiceRequestAndCreateWorkOrder(requestId, techManagerId, sourceClassifications);
+            return approveServiceRequestAndCreateWorkOrder(requestId, techManagerId, sourceClassifications,
+                    estimateHoursMap);
         } catch (Exception e) {
             System.err.println("Error approving service request: " + e.getMessage());
             throw new SQLException("Failed to approve service request: " + e.getMessage(), e);
@@ -154,7 +156,8 @@ public class TechManagerService {
     private int approveServiceRequestAndCreateWorkOrder(
             int requestId,
             int techManagerId,
-            Map<Integer, String> sourceClassifications) throws SQLException {
+            Map<Integer, String> sourceClassifications,
+            Map<Integer, BigDecimal> estimateHoursMap) throws SQLException {
 
         Connection conn = null;
         try {
@@ -226,7 +229,10 @@ public class TechManagerService {
                 wod.setTaskDescription(serviceDetail.getServiceName() +
                         (serviceDetail.getServiceDescription() != null ? " - " + serviceDetail.getServiceDescription()
                                 : ""));
-                wod.setEstimateHours(BigDecimal.valueOf(2.0)); // Default estimate
+                // Get estimate hours from map, default to 2.0 if not provided
+                BigDecimal estimateHours = estimateHoursMap.getOrDefault(serviceDetail.getDetailId(),
+                        BigDecimal.valueOf(2.0));
+                wod.setEstimateHours(estimateHours);
                 wod.setEstimateAmount(serviceDetail.getServiceUnitPrice() != null ? serviceDetail.getServiceUnitPrice()
                         : BigDecimal.ZERO);
 

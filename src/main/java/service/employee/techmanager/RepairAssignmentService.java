@@ -54,6 +54,23 @@ public class RepairAssignmentService {
     }
 
     /**
+     * Get TechManager's employee ID by username
+     */
+    public Integer getTechManagerEmployeeId(String userName) throws SQLException {
+        // Reuse logic from DiagnosisAssignmentService or create similar
+        dao.employee.admin.AdminDAO adminDAO = new dao.employee.admin.AdminDAO();
+        return adminDAO.getEmployeeIdByUsername(userName);
+    }
+
+    /**
+     * Get repair tasks currently in progress
+     */
+    public List<RepairAssignmentDAO.InProgressRepairTask> getInProgressRepairTasks(int techManagerId)
+            throws SQLException {
+        return repairAssignmentDAO.getInProgressRepairTasks(techManagerId);
+    }
+
+    /**
      * Assign repair task to technician with validation.
      * 
      * @param detailId        work order detail ID

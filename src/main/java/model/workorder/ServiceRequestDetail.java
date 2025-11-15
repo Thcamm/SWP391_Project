@@ -10,11 +10,12 @@ public class ServiceRequestDetail {
     private int detailId;
     private int requestId;
     private int serviceId;
-    
+
     // Transient fields for display (not in DB)
     private String serviceName;
     private String serviceDescription;
     private java.math.BigDecimal serviceUnitPrice;
+    private java.math.BigDecimal estimateHours; // For TechManager to input during approval
 
     public ServiceRequestDetail() {
     }
@@ -72,6 +73,14 @@ public class ServiceRequestDetail {
 
     public void setServiceUnitPrice(java.math.BigDecimal serviceUnitPrice) {
         this.serviceUnitPrice = serviceUnitPrice;
+    }
+
+    public java.math.BigDecimal getEstimateHours() {
+        return estimateHours;
+    }
+
+    public void setEstimateHours(java.math.BigDecimal estimateHours) {
+        this.estimateHours = estimateHours;
     }
 
     @Override

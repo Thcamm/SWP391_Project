@@ -29,7 +29,7 @@
 
                 <!-- Header -->
                 <div class="page-header d-flex align-items-center justify-content-between">
-                    <h1 class="page-title">🩺 Diagnostic #<c:out value="${diagnostic.vehicleDiagnosticID}"/></h1>
+                    <h1 class="page-title">Diagnostic #<c:out value="${diagnostic.vehicleDiagnosticID}"/></h1>
                     <div class="d-flex gap-2">
                         <a class="btn btn-outline-secondary"
                            href="${pageContext.request.contextPath}/technician/task-detail?assignmentId=${diagnostic.assignmentID}">
@@ -40,7 +40,7 @@
 
                 <!-- Summary -->
                 <div class="card mb-3">
-                    <div class="card-header bg-info">📋 Diagnostic Info</div>
+                    <div class="card-header bg-info">Diagnostic Info</div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
@@ -85,7 +85,7 @@
 
                 <!-- Issue Found -->
                 <div class="card mb-3">
-                    <div class="card-header bg-primary">🤖 Issue Found</div>
+                    <div class="card-header bg-primary">Issue Found</div>
                     <div class="card-body">
                         <pre style="white-space:pre-wrap;margin:0"><c:out value="${diagnostic.issueFound}"/></pre>
                     </div>
@@ -94,7 +94,7 @@
                 <!-- Parts -->
                 <div class="card">
                     <div class="card-header bg-success d-flex align-items-center justify-content-between">
-                        <span>🐓 Parts</span>
+                        <span>Parts</span>
                         <small class="text-white-50">
                             <c:out value="${empty parts ? 0 : fn:length(parts)}"/> item(s)
                         </small>

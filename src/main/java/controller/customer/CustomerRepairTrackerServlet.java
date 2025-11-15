@@ -3,7 +3,7 @@ package controller.customer;
 import dao.carservice.ServiceRequestDAO;
 import dao.customer.CustomerDAO; // DAO để lấy CustomerID
 import dao.vehicle.VehicleDAO;
-import model.dto.RepairJourneyView;     // DTO
+import model.dto.RepairJourneyView; // DTO
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -55,10 +55,10 @@ public class CustomerRepairTrackerServlet extends HttpServlet {
 
             int requestID = Integer.parseInt(idParam);
             ServiceRequestDAO serviceRequestDAO = new ServiceRequestDAO();
-            List<String> serviceName= serviceRequestDAO.getServiceNamesByRequestId(requestID);
+            List<String> serviceName = serviceRequestDAO.getServiceNamesByRequestId(requestID);
             // 3. Gọi Service (KHÔNG gọi DAO) để lấy DTO (đã xử lý logic)
             RepairJourneyView journey = trackerService.getProcessedJourney(customerID, requestID);
-            
+
             Vehicle vehicle = new Vehicle();
             VehicleDAO vehicleDAO = new VehicleDAO();
             int vehicleID = serviceRequestDAO.getServiceRequestById(requestID).getVehicleID();

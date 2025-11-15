@@ -102,6 +102,37 @@
                                     </p>
                                 </c:when>
                                 <c:otherwise>
+                                    <!-- Form search parts (GET) -->
+                                    <form method="get"
+                                          action="${pageContext.request.contextPath}/technician/task-parts"
+                                          class="row g-3 mb-3">
+
+                                        <input type="hidden" name="assignmentId" value="${task.assignmentID}"/>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Search part</label>
+                                            <input type="text"
+                                                   name="partSearch"
+                                                   class="form-control"
+                                                   placeholder="Search by name / code / SKU..."
+                                                   value="${vm.partSearch}"/>
+                                        </div>
+
+                                        <div class="col-md-3 d-flex align-items-end">
+                                            <button type="submit" class="btn btn-outline-secondary w-100">
+                                                Search
+                                            </button>
+                                        </div>
+
+                                        <div class="col-md-3 d-flex align-items-end">
+                                            <a href="${pageContext.request.contextPath}/technician/task-parts?assignmentId=${task.assignmentID}"
+                                               class="btn btn-outline-light border w-100">
+                                                Reset
+                                            </a>
+                                        </div>
+                                    </form>
+
+                                    <hr/>
                                     <form method="post"
                                           action="${pageContext.request.contextPath}/technician/task-parts"
                                           class="row g-3 align-items-end">
@@ -145,13 +176,13 @@
                                             <strong>IN_PROGRESS</strong>.
                                         </div>
                                     </form>
+
                                 </c:otherwise>
                             </c:choose>
                         </div>
                     </div>
                 </c:if>
 
-                <!-- Lịch sử yêu cầu phụ tùng -->
                 <div class="diagnostics-section">
                     <div class="section-header">
                         <h3> History of Request Part

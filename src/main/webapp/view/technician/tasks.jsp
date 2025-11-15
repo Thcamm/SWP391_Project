@@ -316,7 +316,7 @@
                                                                         class="btn btn-outline-secondary btn-sm ms-1"
                                                                         data-bs-toggle="modal"
                                                                         data-bs-target="#cancelWhy-${task.assignmentID}">
-                                                                    Why?
+                                                                    Reason
                                                                 </button>
                                                                     <div class="modal fade" id="cancelWhy-${task.assignmentID}" tabindex="-1" aria-hidden="true">
                                                                         <div class="modal-dialog modal-dialog-centered">

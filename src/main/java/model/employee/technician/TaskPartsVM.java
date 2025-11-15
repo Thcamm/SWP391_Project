@@ -9,7 +9,16 @@ public class TaskPartsVM {
     public TaskAssignment task;
     public List<WorkOrderPartView> parts;
 
+    public String getPartSearch() {
+        return partSearch;
+    }
+
+    public void setPartSearch(String partSearch) {
+        this.partSearch = partSearch;
+    }
+
     public List<PartOption> availableParts;
+    public String partSearch;
     public TaskAssignment getTask() {
         return task;
     }

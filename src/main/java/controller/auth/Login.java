@@ -40,7 +40,7 @@ public class Login extends HttpServlet {
         User user = userService.findByUserName(username);
         if (user != null && PasswordUtil.checkPassword(password, user.getPasswordHash())) {
 
-            String roleCode = new dao.employee.admin.rbac.RoleDao().findRoleCodeById(user.getRoleId());
+            String roleCode = new RoleDao().findRoleCodeById(user.getRoleId());
             String roleName = null;
             try {
                 roleName = new RoleDao().findRoleNameById(user.getRoleId());

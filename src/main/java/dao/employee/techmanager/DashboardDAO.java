@@ -330,15 +330,26 @@ public class DashboardDAO {
      * @return count of work orders ready for closure
      * @throws SQLException if database error occurs
      */
+    // Trong file: DashboardDAO.java
+    // Sửa lại hàm: countWorkOrdersReadyForClosure()
+
     public int countWorkOrdersReadyForClosure() throws SQLException {
         String sql = "SELECT COUNT(DISTINCT wo.WorkOrderID) " +
                 "FROM WorkOrder wo " +
+                // Điều kiện 1: Phải đang chạy
                 "WHERE wo.Status = 'IN_PROCESS' " +
+
+                // Điều kiện 2: Phải có ít nhất 1 Task (để tránh WOs rỗng)
+                "AND EXISTS (SELECT 1 FROM WorkOrderDetail wod JOIN TaskAssignment ta ON wod.DetailID = ta.DetailID WHERE wod.WorkOrderID = wo.WorkOrderID) "
+                +
+
+                // Điều kiện 3: VÀ KHÔNG TỒN TẠI (NOT EXISTS) bất kỳ task nào còn "Đang chạy"
                 "AND NOT EXISTS (" +
-                "    SELECT 1 FROM WorkOrderDetail wod " +
-                "    LEFT JOIN TaskAssignment ta ON wod.DetailID = ta.DetailID " +
+                "    SELECT 1 " +
+                "    FROM WorkOrderDetail wod " +
+                "    JOIN TaskAssignment ta ON wod.DetailID = ta.DetailID " +
                 "    WHERE wod.WorkOrderID = wo.WorkOrderID " +
-                "    AND (ta.AssignmentID IS NULL OR ta.Status != 'COMPLETE')" +
+                "    AND ta.Status IN ('ASSIGNED', 'IN_PROGRESS')" + // Lọc các task đang chạy
                 ")";
 
         try (Connection conn = DbContext.getConnection();

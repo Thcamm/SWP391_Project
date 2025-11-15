@@ -40,8 +40,8 @@ public class RepairTrackerService {
         // Build timeline in order
         buildTimeline(journey);
 
-        CustomerDiagnosticsView diagView = diagnosticService.getDiagnosticsForRequest(customerId, requestId);
-        journey.setDiagnosticsView(diagView);
+//        CustomerDiagnosticsView diagView = diagnosticService.getDiagnosticsForRequest(customerId, requestId);
+//        journey.setDiagnosticsView(diagView);
 
         return journey;
     }
@@ -433,11 +433,11 @@ public class RepairTrackerService {
 // Thêm các phương thức này vào RepairTrackerService
 
     public List<RepairJourneySummaryDTO> getFilteredTracker(
-            String fullName, String vehicle, String sortBy, int limit, int offset) throws SQLException {
-        return journeyDAO.getFilteredTracking(fullName, vehicle, sortBy, limit, offset);
+            String fullName, Integer vehicleId, String sortBy, int limit, int offset) throws SQLException {
+        return journeyDAO.getFilteredTracking(fullName, vehicleId, sortBy, limit, offset);
     }
 
-    public int countFilteredTracker(String fullName,  String vehicle) throws SQLException {
-        return journeyDAO.countFilteredTracking(fullName,vehicle);
+    public int countFilteredTracker(String fullName, Integer vehicleId) throws SQLException {
+        return journeyDAO.countFilteredTracking(fullName, vehicleId);
     }
 }
