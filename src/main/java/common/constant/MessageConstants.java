@@ -11,61 +11,7 @@ public class MessageConstants {
             "No search results."
     );
 
-    public static final SystemMessage MSG002 = new SystemMessage(
-            "MSG002",
-            MessageType.VALIDATION,
-            "Input-required fields are empty",
-            "The * field is required."
-    );
-
-    public static final SystemMessage MSG003 = new SystemMessage(
-            "MSG003",
-            MessageType.SUCCESS,
-            "Updating asset(s) information successfully",
-            "Update asset(s) successfully."
-    );
-
-    public static final SystemMessage MSG004 = new SystemMessage(
-            "MSG004",
-            MessageType.SUCCESS,
-            "Adding new asset successfully",
-            "Add asset successfully."
-    );
-
-    public static final SystemMessage MSG005 = new SystemMessage(
-            "MSG005",
-            MessageType.SUCCESS,
-            "Confirming email of asset hand-over is sent successfully",
-            "A confirmation email has been sent to {email_address}."
-    );
-
-    public static final SystemMessage MSG006 = new SystemMessage(
-            "MSG006",
-            MessageType.SUCCESS,
-            "Resetting asset information successfully",
-            "Return asset(s) successfully."
-    );
-
-    public static final SystemMessage MSG007 = new SystemMessage(
-            "MSG007",
-            MessageType.SUCCESS,
-            "Deleting asset information successfully",
-            "Delete asset(s) successfully."
-    );
-
-    public static final SystemMessage MSG008 = new SystemMessage(
-            "MSG008",
-            MessageType.VALIDATION,
-            "Input value length > max length",
-            "Exceed max length of {max_length}."
-    );
-
-    public static final SystemMessage MSG009 = new SystemMessage(
-            "MSG009",
-            MessageType.INLINE,
-            "Username or password is not correct when clicking sign-in",
-            "Incorrect user name or password. Please check again."
-    );
+    
 
     public static final SystemMessage MSG010 = new SystemMessage(
             "MSG010",
