@@ -200,7 +200,7 @@ public class WorkOrderPartDAO extends DbContext {
      */
     public List<WorkOrderPart> getPendingRequests() throws SQLException {
         List<WorkOrderPart> list = new ArrayList<>();
-        String sql = "SELECT wop.*, pd.Quantity as CurrentStock, p.PartName " +
+        String sql = "SELECT wop.*, pd.Quantity as CurrentStock, p.PartName " + // ✅ Đổi Name → PartName
                 "FROM workorderpart wop " +
                 "JOIN PartDetail pd ON wop.PartDetailID = pd.PartDetailID " +
                 "JOIN Part p ON pd.PartID = p.PartID " +
