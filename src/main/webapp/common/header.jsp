@@ -314,9 +314,7 @@
             <span>Vehicle Management (My Garage)</span>
         </a>
 
-            <a href="${pageContext.request.contextPath}/customer/approve-quote">
-                Notification of Quote Approval
-            </a>
+
 
     </nav>
 </div>

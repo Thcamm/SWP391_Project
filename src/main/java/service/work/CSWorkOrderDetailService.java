@@ -152,7 +152,8 @@ public class CSWorkOrderDetailService {
             }
 
             totalEstimatedAmount = totalEstimatedAmount.add(
-                    detail.getEstimateAmount() != null ? detail.getEstimateAmount() : BigDecimal.ZERO);
+                    detail.getEstimateAmount() != null ? detail.getEstimateAmount() : BigDecimal.ZERO
+            );
 
         }
 
@@ -212,84 +213,59 @@ public class CSWorkOrderDetailService {
     // Helper methods
     private String[] getDetailStatusInfo(String status) {
         switch (status) {
-            case "PENDING":
-                return new String[] { "Pending", "warning" };
-            case "IN_PROGRESS":
-                return new String[] { "In Progress", "primary" };
-            case "COMPLETE":
-                return new String[] { "Completed", "success" };
-            default:
-                return new String[] { "Unknown", "secondary" };
+            case "PENDING": return new String[]{"Pending", "warning"};
+            case "IN_PROGRESS": return new String[]{"In Progress", "primary"};
+            case "COMPLETE": return new String[]{"Completed", "success"};
+            default: return new String[]{"Unknown", "secondary"};
         }
     }
 
     private String[] getApprovalStatusInfo(String status) {
         switch (status) {
-            case "PENDING":
-                return new String[] { "Pending Approval", "warning" };
-            case "APPROVED":
-                return new String[] { "Approved", "success" };
-            case "DECLINED":
-                return new String[] { "Declined", "danger" };
-            default:
-                return new String[] { "N/A", "secondary" };
+            case "PENDING": return new String[]{"Pending Approval", "warning"};
+            case "APPROVED": return new String[]{"Approved", "success"};
+            case "DECLINED": return new String[]{"Declined", "danger"};
+            default: return new String[]{"N/A", "secondary"};
         }
     }
 
     private String getTaskTypeLabel(String type) {
         switch (type) {
-            case "DIAGNOSIS":
-                return "Diagnosis";
-            case "REPAIR":
-                return "Repair";
-            case "OTHER":
-                return "Other";
-            default:
-                return type;
+            case "DIAGNOSIS": return "Diagnosis";
+            case "REPAIR": return "Repair";
+            case "OTHER": return "Other";
+            default: return type;
         }
     }
 
     private String[] getPriorityInfo(String priority) {
         switch (priority) {
-            case "URGENT":
-                return new String[] { "Urgent", "danger" };
-            case "HIGH":
-                return new String[] { "High", "warning" };
-            case "MEDIUM":
-                return new String[] { "Medium", "info" };
-            case "LOW":
-                return new String[] { "Low", "secondary" };
-            default:
-                return new String[] { "Unknown", "secondary" };
+            case "URGENT": return new String[]{"Urgent", "danger"};
+            case "HIGH": return new String[]{"High", "warning"};
+            case "MEDIUM": return new String[]{"Medium", "info"};
+            case "LOW": return new String[]{"Low", "secondary"};
+            default: return new String[]{"Unknown", "secondary"};
         }
     }
 
     private String[] getTaskStatusInfo(String status) {
         switch (status) {
-            case "ASSIGNED":
-                return new String[] { "Assigned", "info" };
-            case "IN_PROGRESS":
-                return new String[] { "In Progress", "primary" };
-            case "COMPLETE":
-                return new String[] { "Completed", "success" };
-            default:
-                return new String[] { "Unknown", "secondary" };
+            case "ASSIGNED": return new String[]{"Assigned", "info"};
+            case "IN_PROGRESS": return new String[]{"In Progress", "primary"};
+            case "COMPLETE": return new String[]{"Completed", "success"};
+            default: return new String[]{"Unknown", "secondary"};
         }
     }
 
     private String[] getPartStatusInfo(String status) {
         if (status == null) {
-            return new String[] { "Unknown", "secondary" };
+            return new String[]{"Unknown", "secondary"};
         }
         switch (status) {
-            case "PENDING":
-                return new String[] { "Pending", "warning" };
-            case "AVAILABLE":
-                return new String[] { "Available", "info" };
-            case "DELIVERED":
-                return new String[] { "Delivered", "success" };
-            default:
-                return new String[] { "Unknown", "secondary" };
+            case "PENDING": return new String[]{"Pending", "warning"};
+            case "AVAILABLE": return new String[]{"Available", "info"};
+            case "DELIVERED": return new String[]{"Delivered", "success"};
+            default: return new String[]{"Unknown", "secondary"};
         }
     }
 }
