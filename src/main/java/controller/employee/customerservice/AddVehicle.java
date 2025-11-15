@@ -30,22 +30,6 @@ public class AddVehicle extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String action = request.getParameter("action");
-
-        if ("getModels".equals(action)) {
-            handleGetModels(request, response);
-            return;
-        }
-
-        // Default: load brands for modal
-        response.setContentType("text/html;charset=UTF-8");
-        try {
-            List<CarBrand> brands = carDAO.getAllBrands();
-            request.setAttribute("brands", brands);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            request.setAttribute("error", "Không thể tải dữ liệu hãng xe.");
-        }
         request.getRequestDispatcher("/view/customerservice/add-vehicle.jsp").forward(request, response);
     }
 
@@ -84,20 +68,20 @@ public class AddVehicle extends HttpServlet {
             // Get parameters
             String vehicleIdStr = request.getParameter("vehicleId"); // Thêm mới
             String customerIdStr = request.getParameter("customerId");
-            String brandIdStr = request.getParameter("brandId");
+            String brandName= request.getParameter("brandName");
             String modelName = request.getParameter("modelName");
             String yearStr = request.getParameter("yearManufacture");
             String licensePlate = request.getParameter("licensePlate");
 
             // --- Validation (Tương tự handleSaveVehicle) ---
-            if (isEmpty(vehicleIdStr) || isEmpty(brandIdStr) /* ...v.v... */) {
+            if (isEmpty(vehicleIdStr) || isEmpty(customerIdStr) || isEmpty(brandName) ||
+                    isEmpty(modelName) || isEmpty(yearStr) || isEmpty(licensePlate)) {
                 out.write(buildErrorJson("Thiếu thông tin cập nhật"));
                 return;
             }
 
             int vehicleId = Integer.parseInt(vehicleIdStr);
             int customerId = Integer.parseInt(customerIdStr);
-            int brandId = Integer.parseInt(brandIdStr);
             int year = Integer.parseInt(yearStr);
 
             // KHÁC BIỆT QUAN TRỌNG:
@@ -108,18 +92,12 @@ public class AddVehicle extends HttpServlet {
                 return;
             }
 
-            // Lấy tên hãng xe (giống hệt)
-            CarBrand brand = carDAO.getBrandById(brandId);
-            if (brand == null) {
-                out.write(buildErrorJson("Hãng xe không tồn tại"));
-                return;
-            }
 
             // Tạo đối tượng Vehicle (thêm VehicleID)
             Vehicle vehicleToUpdate = new Vehicle();
             vehicleToUpdate.setVehicleID(vehicleId); // Thêm mới
             vehicleToUpdate.setCustomerID(customerId);
-            vehicleToUpdate.setBrand(brand.getBrandName());
+            vehicleToUpdate.setBrand(brandName);
             vehicleToUpdate.setModel(modelName);
             vehicleToUpdate.setYearManufacture(year);
             vehicleToUpdate.setLicensePlate(licensePlate.toUpperCase());
@@ -131,7 +109,7 @@ public class AddVehicle extends HttpServlet {
                 // Trả về JSON thành công, giống như 'save'
                 jsonResponse = buildSuccessJson(
                         vehicleId,
-                        brand.getBrandName(),
+                        brandName,
                         modelName,
                         licensePlate.toUpperCase(),
                         year
@@ -151,55 +129,6 @@ public class AddVehicle extends HttpServlet {
     /**
      * Handle get models by brand ID
      */
-    private void handleGetModels(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-
-        response.setContentType("application/json;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-
-        try {
-            String brandIdStr = request.getParameter("brandId");
-
-            if (brandIdStr == null || brandIdStr.isEmpty()) {
-                out.write("[]");
-                return;
-            }
-
-            int brandId = Integer.parseInt(brandIdStr);
-            List<CarModel> models = carDAO.getModelsByBrandId(brandId);
-
-            // Build JSON array
-            StringBuilder json = new StringBuilder("[");
-            for (int i = 0; i < models.size(); i++) {
-                CarModel model = models.get(i);
-                json.append("{")
-                        .append("\"id\":").append(model.getModelId()).append(",")
-                        .append("\"name\":\"").append(escapeJson(model.getModelName())).append("\"")
-                        .append("}");
-
-                if (i < models.size() - 1) {
-                    json.append(",");
-                }
-            }
-            json.append("]");
-
-            out.write(json.toString());
-
-            System.out.println("✅ Loaded " + models.size() + " models for brand " + brandId);
-
-        } catch (NumberFormatException e) {
-            System.err.println("❌ Invalid brandId format");
-            out.write("[]");
-
-        } catch (SQLException e) {
-            System.err.println("❌ Database error: " + e.getMessage());
-            e.printStackTrace();
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.write("{\"error\":\"Database error\"}");
-        } finally {
-            out.close();
-        }
-    }
 
     /**
      * Handle save new vehicle
@@ -216,14 +145,14 @@ public class AddVehicle extends HttpServlet {
         try {
             // Get parameters
             String customerIdStr = request.getParameter("customerId");
-            String brandIdStr = request.getParameter("brandId");
+            String brandName= request.getParameter("brandName");
             String modelName = request.getParameter("modelName");
             String yearStr = request.getParameter("yearManufacture");
             String licensePlate = request.getParameter("licensePlate");
 
             System.out.println("=== Add Vehicle Request ===");
             System.out.println("customerId: " + customerIdStr);
-            System.out.println("brandId: " + brandIdStr);
+            System.out.println("brandId: " + brandName);
             System.out.println("modelName: " + modelName);
             System.out.println("year: " + yearStr);
             System.out.println("licensePlate: " + licensePlate);
@@ -231,7 +160,7 @@ public class AddVehicle extends HttpServlet {
             // Validation
             List<String> missingFields = new ArrayList<>();
             if (isEmpty(customerIdStr)) missingFields.add("customerId");
-            if (isEmpty(brandIdStr)) missingFields.add("brandId");
+            if (isEmpty(brandName)) missingFields.add("brandId");
             if (isEmpty(modelName)) missingFields.add("modelName");
             if (isEmpty(yearStr)) missingFields.add("year");
             if (isEmpty(licensePlate)) missingFields.add("licensePlate");
@@ -245,7 +174,6 @@ public class AddVehicle extends HttpServlet {
 
             // Parse integers
             int customerId = Integer.parseInt(customerIdStr);
-            int brandId = Integer.parseInt(brandIdStr);
             int year = Integer.parseInt(yearStr);
 
             // Validate license plate format
@@ -273,16 +201,8 @@ public class AddVehicle extends HttpServlet {
                 return;
             }
 
-            // Get brand name
-            CarBrand brand = carDAO.getBrandById(brandId);
-            if (brand == null) {
-                jsonResponse = buildErrorJson("Hãng xe không tồn tại");
-                System.err.println("❌ Brand not found");
-                out.write(jsonResponse);
-                return;
-            }
 
-            String brandName = brand.getBrandName();
+
 
             // Create vehicle object
             Vehicle newVehicle = new Vehicle();

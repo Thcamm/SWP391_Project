@@ -141,37 +141,66 @@ public class WorkOrderPartDAO extends DbContext {
             throw e;
         }
     }
-
-    public List<PartOption> getAvailablePartsForAssignment(int assignmentId) throws SQLException {
+    public List<PartOption> getAvailablePartsForAssignment(int assignmentId, String keyword) throws SQLException {
         String sql = """
-        SELECT 
-            pd.PartDetailID,
-            pd.SKU,
-            p.PartName,
-             pd.Quantity AS CurrentStock
+        SELECT pd.PartDetailID,
+               pd.SKU,
+               p.PartName,
+               p.PartCode,
+               pd.Quantity AS currentStock,
+               pd.UnitPrice
         FROM PartDetail pd
-        JOIN Part p ON pd.PartID = p.PartID
-        ORDER BY p.PartName ASC
-    """;
-
-        List<PartOption> list = new ArrayList<>();
-
-        try (Connection con = DbContext.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                PartOption opt = new PartOption();
-                opt.setPartDetailId(rs.getInt("PartDetailID"));
-                opt.setSku(rs.getString("SKU"));
-                opt.setPartName(rs.getString("PartName"));
-                opt.setCurrentStock(rs.getInt("CurrentStock"));
-                list.add(opt);
-            }
+        JOIN Part p ON p.PartID = pd.PartID
+        WHERE pd.Quantity > 0
+          AND NOT EXISTS (
+              SELECT 1
+              FROM WorkOrderPart wop
+              JOIN WorkOrderDetail wod ON wod.DetailID = wop.DetailID
+              JOIN TaskAssignment ta   ON ta.DetailID  = wod.DetailID
+              WHERE ta.AssignmentID = ?
+                AND wop.PartDetailID = pd.PartDetailID
+          )
+        """;
+        boolean hasKeyword = (keyword != null && !keyword.isBlank());
+        if (hasKeyword) {
+            sql+= ("""
+            AND (
+                    p.PartName LIKE CONCAT('%', ?, '%')
+                 OR p.PartCode LIKE CONCAT('%', ?, '%')
+                 OR pd.SKU     LIKE CONCAT('%', ?, '%')
+                )
+        """);
         }
 
-        return list;
+        sql+= (" ORDER BY p.PartName ASC");
+
+        try (Connection con = DbContext.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql.toString())) {
+
+            int idx = 1;
+            ps.setInt(idx++, assignmentId);
+
+            if (hasKeyword) {
+                ps.setString(idx++, keyword);
+                ps.setString(idx++, keyword);
+                ps.setString(idx++, keyword);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                List<PartOption> listParts = new ArrayList<>();
+                while (rs.next()) {
+                    PartOption opt = new PartOption();
+                    opt.setPartDetailId(rs.getInt("PartDetailID"));
+                    opt.setSku(rs.getString("SKU"));
+                    opt.setPartName(rs.getString("PartName"));
+                    opt.setCurrentStock(rs.getInt("CurrentStock"));
+                    listParts.add(opt);
+                }
+                return listParts;
+            }
+        }
     }
+
 
     public boolean hasPendingRequestsForAssignment(int assignmentId) throws SQLException {
         final String sql = """

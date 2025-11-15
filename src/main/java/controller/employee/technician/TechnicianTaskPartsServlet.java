@@ -21,8 +21,10 @@ public class TechnicianTaskPartsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+
         int assignmentId = Integer.parseInt(req.getParameter("assignmentId"));
-        ServiceResult result = partService.getPartsForAssignment(assignmentId);
+        String partSearch = req.getParameter("partSearch");
+        ServiceResult result = partService.getPartsForAssignment(assignmentId, partSearch);
 
         if (result.isError()) {
             MessageHelper.setErrorMessage(req.getSession(), result.getMessage());

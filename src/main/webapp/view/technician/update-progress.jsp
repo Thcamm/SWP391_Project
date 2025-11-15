@@ -70,8 +70,8 @@
                             <div class="info-item">
                                 <span class="info-label">Priority:</span>
                                 <span class="priority-badge ${fn:toLowerCase(task.priority)}">
-        <c:out value="${task.priority}"/>
-      </span>
+                                     <c:out value="${task.priority}"/>
+                                </span>
                             </div>
 
                             <div class="info-item">
@@ -142,7 +142,7 @@
                             </div>
 
                             <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">😇 Update Progress</button>
+                                <button type="submit" class="btn btn-primary">Update Progress</button>
                                 <a href="${pageContext.request.contextPath}/technician/tasks" class="btn btn-secondary">Cancel</a>
                             </div>
 

@@ -85,13 +85,13 @@
                 <!-- New Tasks -->
                 <div class="card border-0 shadow-sm mb-3">
                     <div class="card-header bg-white border-0 d-flex align-items-center justify-content-between">
-                        <h3 class="h5 mb-0">🆕 New Tasks</h3>
+                        <h3 class="h5 mb-0">New Tasks</h3>
                     </div>
 
                     <c:choose>
                         <c:when test="${empty newTasks.data}">
                             <div class="card-body">
-                                <div class="alert alert-light mb-0">✨ No new tasks right now.</div>
+                                <div class="alert alert-light mb-0">No new tasks right now.</div>
                             </div>
                         </c:when>
                         <c:otherwise>
@@ -178,13 +178,13 @@
                 <!-- In Progress -->
                 <div class="card border-0 shadow-sm mb-3">
                     <div class="card-header bg-white border-0">
-                        <h3 class="h5 mb-0">⚙️ In Progress</h3>
+                        <h3 class="h5 mb-0">In Progress</h3>
                     </div>
 
                     <c:choose>
                         <c:when test="${empty inProgressTasks.data}">
                             <div class="card-body">
-                                <div class="alert alert-light mb-0">📭 No tasks in progress.</div>
+                                <div class="alert alert-light mb-0">No tasks in progress.</div>
                             </div>
                         </c:when>
                         <c:otherwise>
@@ -260,7 +260,7 @@
                     <div class="col-12 col-lg-7">
                         <div class="card border-0 shadow-sm h-100">
                             <div class="card-header bg-white border-0">
-                                <h3 class="h6 mb-0">📜 Recent Activities</h3>
+                                <h3 class="h6 mb-0">Recent Activities</h3>
                             </div>
                             <c:choose>
                                 <c:when test="${empty recentActivities.data}">
@@ -292,14 +292,14 @@
                     <div class="col-12 col-lg-5">
                         <div class="card border-0 shadow-sm h-100">
                             <div class="card-header bg-white border-0">
-                                <h3 class="h6 mb-0">⚡ Quick Actions</h3>
+                                <h3 class="h6 mb-0">Quick Actions</h3>
                             </div>
                             <div class="card-body">
                                 <div class="row g-3">
                                     <div class="col-12 col-sm-6">
                                         <a class="btn btn-outline-secondary w-100 py-3"
                                            href="${pageContext.request.contextPath}/technician/tasks">
-                                            📊 All Tasks
+                                            All Tasks
                                         </a>
                                     </div>
                                     <!-- Thêm các action khác tại đây nếu cần -->
