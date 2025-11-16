@@ -32,7 +32,6 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           </div>
         </div>
 
-        <!-- Alert Messages -->
         <c:if test="${param.message != null}">
           <div class="alert alert-${param.type} alert-dismissible fade show" role="alert">
             <c:out value="${param.message}" />
@@ -40,7 +39,6 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
           </div>
         </c:if>
 
-        <!-- Statistics -->
         <div class="row mb-4">
           <div class="col-md-4">
             <div class="card text-white bg-success">
@@ -50,7 +48,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                   Ready to Close
                 </h5>
                 <h2>${totalReady}</h2>
-                <p class="mb-0 small">All tasks completed</p>
+                <p class="mb-0 small">WorkOrders awaiting final closure</p>
               </div>
             </div>
           </div>
@@ -59,22 +57,34 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             <div class="card text-white bg-secondary">
               <div class="card-body">
                 <h5 class="card-title">
-                  <i class="bi bi-check2-circle"></i>
-                  Completed Work Orders
+                  <i class="bi bi-calendar-check"></i>
+                  Closed Today
                 </h5>
-                <h2>${totalCompleted}</h2>
-                <p class="mb-0 small">Work orders that have been closed and archived</p>
+                <h2>${totalClosedToday}</h2>
+                <p class="mb-0 small">WorkOrders closed today</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card text-white bg-dark">
+              <div class="card-body">
+                <h5 class="card-title">
+                  <i class="bi bi-calendar-month"></i>
+                  Closed This Month
+                </h5>
+                <h2>${totalClosedMonth}</h2>
+                <p class="mb-0 small">WorkOrders closed this month</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Work Orders Ready for Closure -->
         <div class="card shadow-sm">
-          <div class="card-header bg-success text-white">
+          <div class="card-header bg-info text-white">
             <h5 class="mb-0">
               <i class="bi bi-list-check"></i>
-              Work Orders Ready for Closure
+              All In-Progress Work Orders
             </h5>
           </div>
           <div class="card-body">
@@ -82,13 +92,15 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
               <c:when test="${empty workOrders}">
                 <div class="alert alert-info mb-0">
                   <i class="bi bi-info-circle"></i>
-                  No work orders ready for closure. All work orders are either in progress or already closed.
+                  No in-progress work orders found.
                 </div>
               </c:when>
               <c:otherwise>
-                <div class="alert alert-success">
-                  <strong>✓ ${totalReady} Work Order(s)</strong>
-                  are ready to be closed. All tasks have been completed by technicians.
+                <div class="alert alert-info">
+                  <strong>Total: ${totalWorkOrders} Work Order(s)</strong>
+                  <br>
+                  <span class="badge bg-success">${totalReady} Ready to Close</span>
+                  <span class="badge bg-warning text-dark">${totalWorkOrders - totalReady} In Progress</span>
                 </div>
 
                 <div class="table-responsive">
@@ -121,7 +133,9 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                             <small>${wo.techManagerName}</small>
                           </td>
                           <td>
-                            <span class="badge bg-success">${wo.completedTasks}/${wo.totalTasks} Complete</span>
+                            <span class="badge ${wo.isReadyToClose() ? 'bg-success' : 'bg-warning'}">
+                              ${wo.completedTasks}/${wo.totalTasks} Done
+                            </span>
                           </td>
                           <td>
                             <span class="badge ${wo.daysOpen > 7 ? 'bg-warning text-dark' : 'bg-secondary'}">
@@ -134,10 +148,14 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
                           <td>
                             <button
                               type="button"
-                              class="btn btn-sm btn-success btn-close-wo"
+                              class="btn btn-sm ${wo.isReadyToClose() ? 'btn-success' : 'btn-warning'} btn-close-wo"
                               data-wo-id="${wo.workOrderID}"
-                              data-vehicle="${wo.vehicleInfo}">
-                              <i class="bi bi-check-circle"></i>
+                              data-vehicle="${wo.vehicleInfo}"
+                              <c:if test="${!wo.isReadyToClose()}">
+                                title="This WO has active tasks, but you can attempt to close."
+                              </c:if>
+                              >
+                              <i class="bi ${wo.isReadyToClose() ? 'bi-check-circle' : 'bi-exclamation-triangle'}"></i>
                               Close WO
                             </button>
                           </td>
@@ -167,10 +185,72 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
             </c:choose>
           </div>
         </div>
+
+        <div class="card shadow-sm mt-4">
+          <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">
+              <i class="bi bi-archive-fill"></i>
+              Recently Closed Work Orders (Last 30 Days)
+            </h5>
+          </div>
+          <div class="card-body">
+            <c:choose>
+              <c:when test="${empty closedWorkOrders}">
+                <div class="alert alert-secondary mb-0">
+                  <i class="bi bi-info-circle"></i>
+                  No work orders have been closed in the last 30 days.
+                </div>
+              </c:when>
+              <c:otherwise>
+                <div class="table-responsive">
+                  <table class="table table-hover table-sm">
+                    <thead>
+                      <tr>
+                        <th>WO #</th>
+                        <th>Vehicle</th>
+                        <th>Customer</th>
+                        <th>Tasks Status</th>
+                        <th>Closed At</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <c:forEach items="${closedWorkOrders}" var="wo">
+                        <tr class="opacity-75">
+                          <%-- Làm mờ đi --%>
+                          <td><strong>#${wo.workOrderID}</strong></td>
+                          <td>
+                            <i class="bi bi-car-front"></i>
+                            ${wo.vehicleInfo}
+                          </td>
+                          <td>
+                            <i class="bi bi-person"></i>
+                            ${wo.customerName}
+                          </td>
+                          <td>
+                            <span class="badge bg-secondary">${wo.completedTasks}/${wo.totalTasks} Done</span>
+                          </td>
+                          <td>
+                            <%-- Giả sử DTO của bạn có 'completedAt' (đã thêm ở bước trước) --%>
+                            <fmt:formatDate value="${wo.completedAt}" pattern="dd/MM/yyyy HH:mm" />
+                          </td>
+                          <td>
+                            <a href="#" class="btn btn-sm btn-outline-info">
+                              <i class="bi bi-receipt"></i>
+                              View Invoice
+                            </a>
+                          </td>
+                        </tr>
+                      </c:forEach>
+                    </tbody>
+                  </table>
+                </div>
+              </c:otherwise>
+            </c:choose>
+          </div>
+        </div>
       </div>
     </div>
-
-    <!-- Close Confirmation Modal -->
     <div class="modal fade" id="closeModal" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -215,7 +295,7 @@ prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      // Use event delegation for dynamically handling close buttons
+      // (Code JavaScript của modal giữ nguyên)
       document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.btn-close-wo').forEach(function (btn) {
           btn.addEventListener('click', function () {

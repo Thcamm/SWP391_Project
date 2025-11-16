@@ -172,7 +172,7 @@ public class UserCreateEmployeeServlet extends BaseAdminServlet {
                         + generatedPassword;
                 redirectWithMessage(response, request.getContextPath() + "/admin/users", message, "success");
             } else {
-                redirectWithMessage(response, redirectUrl, "Creation failed! Username or Email may already exist.",
+                redirectWithMessage(response, redirectUrl, "Creation failed! An unexpected error occurred during the database operation. Please check the server logs for details.",
                         "error");
             }
         } catch (Exception e) {

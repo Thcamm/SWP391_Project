@@ -99,6 +99,7 @@ public class RepairAssignmentDAO {
                     "JOIN Customer c ON v.CustomerID = c.CustomerID " +
                     "JOIN User u ON c.UserID = u.UserID " +
                     "WHERE wod.approval_status = 'APPROVED' " +
+                    "AND wo.Status = 'IN_PROCESS' " + // Ensure WorkOrder is still active
                     "AND wod.source = 'REQUEST' " + // Only REQUEST source for direct repair assignment
                     "ORDER BY wod.approved_at DESC";
 
