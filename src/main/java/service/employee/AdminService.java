@@ -193,7 +193,8 @@ public class AdminService {
      * Create user with optional employee details for non-customer roles
      */
     // THAY ĐỔI: Kiểu trả về là String
-    public String createUser(String fullName, String userName, String email, int roleId, String gender,
+    public String createUser(String fullName, String userName, String email, String phoneNumber, int roleId,
+            String gender,
             String currentUser, String employeeCode, Double salary) {
 
         // 1. Tạo mật khẩu ngẫu nhiên ngay từ đầu
@@ -215,6 +216,7 @@ public class AdminService {
             newUser.setFullName(fullName);
             newUser.setUserName(userName);
             newUser.setEmail(email);
+            newUser.setPhoneNumber(phoneNumber); // ✅ FIX: Add phone number
             newUser.setGender(gender);
             newUser.setRoleId(roleId);
             newUser.setPasswordHash(PasswordUtil.hashPassword(randomPassword));

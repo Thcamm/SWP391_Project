@@ -161,6 +161,7 @@ public class UserCreateEmployeeServlet extends BaseAdminServlet {
                     fullName.trim(),
                     userName.trim(),
                     email.trim(),
+                    phoneNumber != null ? phoneNumber.trim() : null, // ✅ FIX: Pass phoneNumber
                     roleId,
                     gender,
                     getCurrentUser(request),
@@ -172,7 +173,8 @@ public class UserCreateEmployeeServlet extends BaseAdminServlet {
                         + generatedPassword;
                 redirectWithMessage(response, request.getContextPath() + "/admin/users", message, "success");
             } else {
-                redirectWithMessage(response, redirectUrl, "Creation failed! An unexpected error occurred during the database operation. Please check the server logs for details.",
+                redirectWithMessage(response, redirectUrl,
+                        "Creation failed! An unexpected error occurred during the database operation. Please check the server logs for details.",
                         "error");
             }
         } catch (Exception e) {

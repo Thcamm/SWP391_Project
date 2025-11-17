@@ -7,28 +7,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-/**
- * DEPRECATED - Partial Replacement by TechManagerService
- * 
- * Service for Service Request Approval business logic (GĐ0 → GĐ1).
- * 
- * ⚠ LUỒNG 4.0 (Merged Workflow):
- * - Approval logic has been MOVED to
- * TechManagerService.approveAndClassifyServiceRequest()
- * - This class now only provides UTILITY methods for
- * ServiceRequestApprovalServlet
- * 
- * KEPT METHODS (Utility):
- * - getPendingServiceRequests() - Query service requests
- * - getTechManagerEmployeeId() - Get employee ID
- * - rejectServiceRequest() - Handle rejections
- * 
- * @author SWP391 Team
- * @version 4.0 (Merged Workflow)
- * @deprecated Use TechManagerService for approval logic. This class only
- *             provides utilities.
- */
-@Deprecated
+
 public class ServiceRequestApprovalService {
 
     private final dao.employee.techmanager.ServiceRequestDAO serviceRequestDAO;

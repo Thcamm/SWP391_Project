@@ -127,13 +127,12 @@ public class UserCreateCustomerServlet extends BaseAdminServlet {
                     fullName.trim(),
                     userName.trim(),
                     email.trim(),
+                    phoneNumber != null ? phoneNumber.trim() : null, // ✅ FIX: Pass phoneNumber
                     customerRoleId,
                     gender,
                     currentUser,
-                    null,
-                    null
-            // dobStr,
-            // phoneNumber
+                    null, // employeeCode (null for customers)
+                    null // salary (null for customers)
             );
 
             if (generatedPassword != null) {
