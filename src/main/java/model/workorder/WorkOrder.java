@@ -21,7 +21,7 @@ public class WorkOrder {
     // available)
 
     public enum Status {
-        PENDING, IN_PROCESS, IN_PROGRESS, COMPLETE
+        PENDING, IN_PROCESS, COMPLETE
     }
 
     public WorkOrder() {
@@ -34,10 +34,8 @@ public class WorkOrder {
         this.techManagerId = techManagerId;
         this.requestId = requestId;
         this.estimateAmount = estimateAmount;
-        this.status = Status.PENDING;
+        this.status = Status.IN_PROCESS;
     }
-
-
 
     // Getters and Setters
     public int getWorkOrderId() {
@@ -95,6 +93,7 @@ public class WorkOrder {
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
+
     // Relationships
     public List<WorkOrderDetail> getWorkOrderDetails() {
         return workOrderDetails;

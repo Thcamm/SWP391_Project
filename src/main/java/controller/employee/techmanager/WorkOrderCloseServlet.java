@@ -45,7 +45,7 @@ public class WorkOrderCloseServlet extends HttpServlet {
                 return;
             }
 
-            List<WorkOrderCloseDTO> workOrders = service.getAllWorkOrdersForClosure(techManagerId);
+            List<WorkOrderCloseDTO> workOrders = service.getAllInProgressWorkOrders(techManagerId);
             int readyCount = (int) workOrders.stream().filter(wo -> wo.getActiveTasks() == 0).count();
 
             request.setAttribute("workOrders", workOrders);

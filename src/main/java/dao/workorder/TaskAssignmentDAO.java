@@ -402,6 +402,7 @@ public class TaskAssignmentDAO extends DbContext {
                 "WHERE wo.TechManagerID = ? " +
                 "AND wd.source = 'DIAGNOSTIC' " +
                 "AND wd.approval_status = 'APPROVED' " +
+                "AND wd.diagnostic_id IS NULL " +
                 "AND (wo.Status = 'PENDING' OR wo.Status = 'IN_PROCESS') " +
                 "GROUP BY wd.DetailID " +
                 "ORDER BY wo.CreatedAt ASC";

@@ -63,32 +63,6 @@ public class ServiceRequestApprovalService {
     }
 
     /**
-     * DELETED - LUỒNG CŨ (OLD WORKFLOW)
-     * 
-     * This method has been REPLACED by:
-     * TechManagerService.approveServiceRequestAndCreateWorkOrder()
-     * 
-     * OLD LOGIC (Deleted):
-     * - Created 1 WorkOrder + 1 WorkOrderDetail "Chẩn đoán tổng quát"
-     * - Set source=REQUEST, approval_status=APPROVED immediately
-     * 
-     * NEW LOGIC (LUỒNG MỚI - in TechManagerService):
-     * - Creates 1 WorkOrder + N WorkOrderDetails (one per service)
-     * - Each WOD has source=NULL, approval_status=PENDING
-     * - Redirects to Triage screen (GĐ 2) for classification
-     * 
-     * @deprecated Use TechManagerService.approveServiceRequestAndCreateWorkOrder()
-     *             instead
-     */
-    @Deprecated
-    private void approveServiceRequest_OLD_LOGIC_DELETED() {
-        throw new UnsupportedOperationException(
-                "LUỒNG CŨ - This method has been deleted. " +
-                        "Use TechManagerService.approveServiceRequestAndCreateWorkOrder() instead. " +
-                        "See LUỒNG MỚI documentation in TechManagerService.");
-    }
-
-    /**
      * Reject service request.
      * 
      * @param requestId service request ID

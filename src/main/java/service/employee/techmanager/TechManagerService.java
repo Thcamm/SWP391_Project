@@ -191,7 +191,7 @@ public class TechManagerService {
             WorkOrder workOrder = new WorkOrder();
             workOrder.setRequestId(requestId);
             workOrder.setTechManagerId(techManagerId);
-            workOrder.setStatus(WorkOrder.Status.PENDING);
+            workOrder.setStatus(WorkOrder.Status.IN_PROCESS);
 
             // Calculate total estimate amount from all services
             BigDecimal totalEstimate = serviceDetails.stream()

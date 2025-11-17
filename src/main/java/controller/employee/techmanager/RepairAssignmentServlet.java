@@ -1,5 +1,6 @@
 package controller.employee.techmanager;
 
+import dao.employee.techmanager.RepairAssignmentDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -45,7 +46,7 @@ public class RepairAssignmentServlet extends HttpServlet {
             List<ApprovedRepairDTO> approvedRepairs = repairAssignmentService.getApprovedRepairs();
 
             // Get in-progress repair tasks
-            List<dao.workorder.RepairAssignmentDAO.InProgressRepairTask> inProgressTasks = repairAssignmentService
+            List<RepairAssignmentDAO.InProgressRepairTask> inProgressTasks = repairAssignmentService
                     .getInProgressRepairTasks(techManagerEmployeeId != null ? techManagerEmployeeId : 0);
 
             // Get available technicians for repair

@@ -21,7 +21,6 @@
 
     <div class="footer-bottom">
         <small>© 2025 Garage Management System - Tech Manager Portal. All rights reserved.
-            <span class="ver">Version 1.0.0</span>
         </small>
     </div>
 </footer>

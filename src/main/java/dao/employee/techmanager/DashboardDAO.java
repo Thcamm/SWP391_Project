@@ -108,7 +108,7 @@ public class DashboardDAO {
                 "JOIN WorkOrder wo ON wd.WorkOrderID = wo.WorkOrderID " +
                 "LEFT JOIN TaskAssignment ta ON wd.DetailID ta.DetailID AND ta.task_type = 'DIAGNOSIS' " +
                 "WHERE wd.source = 'DIAGNOSTIC' " + // CHANGED: Only DIAGNOSTIC needs diagnosis (LUỒNG MỚI)
-                "AND (wo.Status = 'PENDING' OR wo.Status = 'IN_PROCESS') " +
+                "AND  wo.Status = 'IN_PROCESS' " +
                 "AND ta.AssignmentID IS NULL";
 
         try (Connection conn = DbContext.getConnection();

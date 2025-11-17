@@ -1,6 +1,7 @@
-package dao.workorder;
+package dao.employee.techmanager;
 
 import common.DbContext;
+import dao.workorder.TaskAssignmentDAO;
 import model.employee.techmanager.ApprovedRepairDTO;
 import model.dto.TechnicianDTO;
 
@@ -99,8 +100,8 @@ public class RepairAssignmentDAO {
                     "JOIN Customer c ON v.CustomerID = c.CustomerID " +
                     "JOIN User u ON c.UserID = u.UserID " +
                     "WHERE wod.approval_status = 'APPROVED' " +
-                    "AND wo.Status = 'IN_PROCESS' " + // Ensure WorkOrder is still active
-                    "AND wod.source = 'REQUEST' " + // Only REQUEST source for direct repair assignment
+                    "AND wo.Status IN ('IN_PROCESS', 'PENDING') " +
+                    "AND (wod.source = 'REQUEST' OR wod.source = 'DIAGNOSTIC') " +
                     "ORDER BY wod.approved_at DESC";
 
             System.out.println("\nSTEP 4: Executing full query with all JOINs...");

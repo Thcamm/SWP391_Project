@@ -283,9 +283,6 @@ public class ServiceRequestDAO extends DbContext {
         return details;
     }
 
-    /**
-     * LUỒNG MỚI - GĐ 1: Get ServiceRequestDetail with Connection (for transaction)
-     */
     public List<ServiceRequestDetail> getServiceRequestDetails(Connection conn, int requestId) throws SQLException {
         List<ServiceRequestDetail> details = new ArrayList<>();
         String sql = "SELECT srd.DetailID, srd.RequestID, srd.ServiceID, " +

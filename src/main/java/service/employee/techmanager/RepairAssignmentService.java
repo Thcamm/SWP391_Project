@@ -1,6 +1,6 @@
 package service.employee.techmanager;
 
-import dao.workorder.RepairAssignmentDAO;
+import dao.employee.techmanager.RepairAssignmentDAO;
 import model.employee.techmanager.ApprovedRepairDTO;
 import model.dto.TechnicianDTO;
 
