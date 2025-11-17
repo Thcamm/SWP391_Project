@@ -2,7 +2,7 @@ package service.employee.techmanager;
 
 import dao.employee.admin.AdminDAO;
 import dao.employee.technician.TechnicianDAO;
-import dao.workorder.TaskAssignmentDAO;
+import dao.employee.techmanager.TaskAssignmentDAO;
 import dao.misc.NotificationDAO;
 import model.employee.Employee;
 import model.employee.technician.TaskAssignment;

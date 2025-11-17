@@ -30,38 +30,28 @@ prefix="fn" %> <%@ page contentType="text/html;charset=UTF-8" language="java" %>
           Service Requests
         </a>
       </li>
+      <li>
+        <a
+          href="${pageContext.request.contextPath}/techmanager/diagnosis-review"
+          class="nav-link ${activeMenu == 'diagnosis-review' ? 'active' : ''}">
+          <i class="bi bi-file-earmark-text"></i>
+          Diagnosis Review
+        </a>
+      </li>
     </ul>
   </nav>
 
   <div class="header-right">
     <div class="user-info">
-      <div class="nav-item dropdown">
-        <a
-          class="nav-link dropdown-toggle"
-          href="#"
-          id="userDropdown"
-          role="button"
-          data-bs-toggle="dropdown"
-          aria-expanded="false">
-          <i class="bi bi-person-circle"></i>
-          ${sessionScope.user.fullName}
-        </a>
-        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-          <li>
-            <a class="dropdown-item" href="${pageContext.request.contextPath}/profile">
-              <i class="bi bi-person"></i>
-              Profile
-            </a>
-          </li>
-          <li><hr class="dropdown-divider" /></li>
-          <li>
-            <a class="dropdown-item text-danger" href="${pageContext.request.contextPath}/Home?action=logout">
-              <i class="bi bi-box-arrow-right"></i>
-              Logout
-            </a>
-          </li>
-        </ul>
-      </div>
+      <a href="${pageContext.request.contextPath}/user/profile">
+        <span class="user-name">${sessionScope.user.fullName}</span>
+      </a>
+
+      <span class="user-role">Tech Manager</span>
     </div>
+    <a href="${pageContext.request.contextPath}/Home?action=logout" class="logout-btn">
+      <i class="bi bi-box-arrow-right"></i>
+      Logout
+    </a>
   </div>
 </header>

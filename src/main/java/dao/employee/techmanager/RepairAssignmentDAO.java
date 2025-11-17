@@ -1,7 +1,6 @@
 package dao.employee.techmanager;
 
 import common.DbContext;
-import dao.workorder.TaskAssignmentDAO;
 import model.employee.techmanager.ApprovedRepairDTO;
 import model.dto.TechnicianDTO;
 

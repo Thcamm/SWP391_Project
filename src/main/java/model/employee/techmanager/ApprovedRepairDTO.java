@@ -1,5 +1,7 @@
 package model.employee.techmanager;
 
+import dao.employee.techmanager.TaskAssignmentDAO;
+
 import java.sql.Timestamp;
 
 /**
@@ -29,7 +31,7 @@ public class ApprovedRepairDTO {
     // Task assignment tracking
     private int totalAssignments; // Total number of times this detail has been assigned
     private int activeTasks; // Number of active tasks (ASSIGNED or IN_PROGRESS)
-    private java.util.List<dao.workorder.TaskAssignmentDAO.TaskAssignmentSummary> existingAssignments;
+    private java.util.List<TaskAssignmentDAO.TaskAssignmentSummary> existingAssignments;
 
     // Constructors
     public ApprovedRepairDTO() {
@@ -140,12 +142,12 @@ public class ApprovedRepairDTO {
         this.activeTasks = activeTasks;
     }
 
-    public java.util.List<dao.workorder.TaskAssignmentDAO.TaskAssignmentSummary> getExistingAssignments() {
+    public java.util.List<TaskAssignmentDAO.TaskAssignmentSummary> getExistingAssignments() {
         return existingAssignments;
     }
 
     public void setExistingAssignments(
-            java.util.List<dao.workorder.TaskAssignmentDAO.TaskAssignmentSummary> existingAssignments) {
+            java.util.List<TaskAssignmentDAO.TaskAssignmentSummary> existingAssignments) {
         this.existingAssignments = existingAssignments;
     }
 

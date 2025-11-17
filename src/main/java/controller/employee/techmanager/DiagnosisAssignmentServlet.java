@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import dao.workorder.TaskAssignmentDAO;
+import dao.employee.techmanager.TaskAssignmentDAO;
 import model.employee.Employee;
 import service.employee.techmanager.DiagnosisAssignmentService;
 

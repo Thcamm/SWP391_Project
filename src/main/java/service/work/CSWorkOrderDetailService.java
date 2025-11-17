@@ -3,7 +3,7 @@ package service.work;
 import dao.workorder.WorkOrderDAO;
 import dao.workorder.WorkOrderDetailDAO;
 import dao.inventory.WorkOrderPartDAO;
-import dao.workorder.TaskAssignmentDAO;
+import dao.employee.techmanager.TaskAssignmentDAO;
 import dao.customer.CustomerDAO;
 import dao.vehicle.VehicleDAO;
 import dao.user.UserDAO;
