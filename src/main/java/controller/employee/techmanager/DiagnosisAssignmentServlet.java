@@ -70,18 +70,6 @@ public class DiagnosisAssignmentServlet extends HttpServlet {
             // Get list of available Technicians
             List<Employee> technicians = diagnosisAssignmentService.getAvailableTechnicians();
 
-            // =================== DEBUG: Check PhoneNumber ===================
-            System.out.println("=== [DiagnosisAssignmentServlet] Technicians loaded: " + technicians.size());
-            for (Employee tech : technicians) {
-                System.out.println("  - " + tech.getFullName() +
-                        " | Code: " + tech.getEmployeeCode() +
-                        " | Phone: " + tech.getPhoneNumber() +
-                        " | Phone is null? " + (tech.getPhoneNumber() == null) +
-                        " | Phone is empty? " + (tech.getPhoneNumber() != null && tech.getPhoneNumber().isEmpty()));
-            }
-            System.out.println("=== END DEBUG ===");
-            // ================================================================
-
             request.setAttribute("pendingDetails", pendingDetails);
             request.setAttribute("inProgressTasks", inProgressTasks);
             request.setAttribute("technicians", technicians);
